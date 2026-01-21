@@ -1,0 +1,55 @@
+package pl.masslany.podkop.business.links.data.network.main
+
+import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
+import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
+import pl.masslany.podkop.business.links.data.api.LinksDataSource
+import pl.masslany.podkop.business.links.data.network.api.LinksApi
+
+class LinksDataSourceImpl(
+    private val linksApi: LinksApi,
+) : LinksDataSource {
+    override suspend fun getLinks(
+        page: Any?,
+        limit: Int?,
+        sort: String,
+        type: String,
+        category: String?,
+        bucket: String?,
+    ): Result<ResourceResponseDto> {
+        return linksApi.getLinks(page, limit, sort, type, category, bucket)
+    }
+
+    override suspend fun getLink(id: Int): Result<SingleResourceResponseDto> {
+        return linksApi.getLink(id)
+    }
+
+    override suspend fun getComments(
+        id: Int,
+        page: Int?,
+        limit: Int?,
+        sort: String?,
+        ama: Boolean?,
+    ): Result<ResourceResponseDto> {
+        return linksApi.getComments(id, page, limit, sort, ama)
+    }
+
+    override suspend fun getSubComments(
+        linkId: Int,
+        commentId: Int,
+        page: Int?,
+    ): Result<ResourceResponseDto> {
+        return linksApi.getSubComments(linkId, commentId, page)
+    }
+
+    override suspend fun getRelatedLinks(linkId: Int): Result<ResourceResponseDto> {
+        return linksApi.getRelatedLinks(linkId)
+    }
+
+    override suspend fun voteOnLink(linkId: Int): Result<Unit> {
+        return linksApi.voteOnLink(linkId)
+    }
+
+    override suspend fun removeVoteOnLink(linkId: Int): Result<Unit> {
+        return linksApi.removeVoteOnLink(linkId)
+    }
+}

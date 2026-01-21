@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version libs.versions.kotlinx.serialization
 }
 
 kotlin {
@@ -13,7 +14,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "Podkop"
             isStatic = true
         }
     }
@@ -28,13 +29,17 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(project(":business"))
         }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
     }
 
-    android {
+    androidLibrary {
         namespace = "pl.masslany.composeapp.podkop"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
