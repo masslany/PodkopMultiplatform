@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    kotlin("plugin.serialization") version libs.versions.kotlinx.serialization
 }
 
 kotlin {
@@ -31,7 +30,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
-            implementation(project(":business"))
+            implementation(projects.business)
         }
 
         commonTest.dependencies {
@@ -40,7 +39,7 @@ kotlin {
     }
 
     androidLibrary {
-        namespace = "pl.masslany.composeapp.podkop"
+        namespace = "pl.masslany.podkop.composeapp"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 

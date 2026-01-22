@@ -31,9 +31,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":composeApp"))
-    implementation(project(":business"))
-    implementation(project(":common"))
+    implementation(projects.composeApp)
+    implementation(projects.business)
+    implementation(projects.common)
 
     implementation(libs.koin.core)
     implementation(libs.koin.compose)

@@ -22,7 +22,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.ktor.serialization.kotlinx.json)
 
-            api(project(":common"))
+            api(projects.common)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
