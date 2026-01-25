@@ -1,14 +1,20 @@
 package pl.masslany.podkop.features.links
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 
 @Composable
 fun LinksScreenRoot(
@@ -22,6 +28,7 @@ fun LinksScreenRoot(
 
     LinksScreen(
         modifier = Modifier
+            .fillMaxSize()
             .padding(paddingValues),
         state = state,
         actions = viewModel,
@@ -34,8 +41,14 @@ private fun LinksScreen(
     state: LinksScreenState,
     actions: LinksActions,
 ) {
-
-    Text(
-        text = "LinksScreen upcoming = $state"
-    )
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(state.resourceItems) {
+            Card {
+                ResourceItemRenderer(it, actions)
+            }
+        }
+    }
 }

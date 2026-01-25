@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.flow
 import pl.masslany.podkop.features.links.LinksScreen
 import pl.masslany.podkop.features.upcoming.UpcomingScreen
 import podkop.composeapp.generated.resources.Res
-import podkop.composeapp.generated.resources.home
 import podkop.composeapp.generated.resources.ic_nav_letter_m
 import podkop.composeapp.generated.resources.ic_nav_shovel
-import podkop.composeapp.generated.resources.upcoming
+import podkop.composeapp.generated.resources.navigation_label_homepage
+import podkop.composeapp.generated.resources.navigation_label_upcoming
 
 class AppConfigProvider(
 ) : NavigationConfigProvider {
@@ -23,14 +23,14 @@ class AppConfigProvider(
         val links = TopLevelDestination(
             root = LinksScreen,
             iconRes = Res.drawable.ic_nav_shovel,
-            labelRes = Res.string.home,
+            labelRes = Res.string.navigation_label_homepage,
             enabled = true,
         )
 
         val upcoming = TopLevelDestination(
             root = UpcomingScreen,
             iconRes = Res.drawable.ic_nav_letter_m,
-            labelRes = Res.string.upcoming,
+            labelRes = Res.string.navigation_label_upcoming,
             enabled = true,
         )
 
@@ -38,5 +38,4 @@ class AppConfigProvider(
             persistentListOf(links, upcoming)
         )
     }
-
 }

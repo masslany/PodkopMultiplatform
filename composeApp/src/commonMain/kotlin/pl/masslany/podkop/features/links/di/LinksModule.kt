@@ -6,6 +6,10 @@ import pl.masslany.podkop.features.links.LinksViewModel
 
 val linksModule = module {
     viewModel { params ->
-        LinksViewModel(isUpcoming = params.get<Boolean>())
+        LinksViewModel(
+            isUpcoming = params.get<Boolean>(),
+            linksRepository = get(),
+            resourceItemStateHolder = get(),
+        )
     }
 }

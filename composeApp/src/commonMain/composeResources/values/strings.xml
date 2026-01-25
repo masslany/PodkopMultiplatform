@@ -1,4 +1,144 @@
 <resources>
-    <string name="home">Home</string>
-    <string name="upcoming">Upcoming</string>
+    <!-- Navigation  -->
+    <string name="navigation_label_homepage">Główna</string>
+    <string name="navigation_label_upcoming">Wykopalisko</string>
+    <string name="navigation_label_entries">Mikroblog</string>
+
+    <!-- Top Bar  -->
+    <string name="topbar_label_homepage">Strona główna</string>
+    <string name="topbar_label_upcoming">Wykopalisko</string>
+    <string name="topbar_label_entries">Mikroblog</string>
+    <string name="topbar_label_settings">Ustawienia</string>
+    <string name="topbar_label_profile">Profil</string>
+    <string name="topbar_label_entry">Wpis</string>
+    <string name="topbar_label_search">Szukaj</string>
+
+    <!-- Links screen -->
+    <string name="links_screen_label_hits">Hity</string>
+    <string name="links_screen_label_hits_error">Wystąpił problem podczas wczytywania</string>
+    <string name="links_screen_label_adult_rating">18+</string>
+
+    <!-- Settings -->
+    <string name="settings_headline_theme">Motyw</string>
+    <string name="settings_body_dynamic_colors">Dynamiczne kolory</string>
+
+    <!-- Accessibility -->
+    <string name="accessibility_topbar_add">Dodaj</string>
+    <string name="accessibility_topbar_profile">Profil</string>
+    <string name="accessibility_topbar_back">Cofnij</string>
+    <string name="accessibility_topbar_settings">Ustawienia</string>
+    <string name="accessibility_topbar_downloads">Pobierz</string>
+    <string name="accessibility_topbar_search">Szukaj</string>
+    <string name="accessibility_lock_icon">Zablokuj</string>
+    <string name="accessibility_unlock_icon">Odblokuj</string>
+    <string name="accessibility_fab_scroll_to_top">Przewiń do góry</string>
+
+    <!-- Profile -->
+    <string name="profile_not_logged_in_message">Nie jesteś zalogowany</string>
+    <string name="profile_log_in_button">Zaloguj się</string>
+    <string name="profile_summary_actions">Akcje</string>
+    <string name="profile_summary_links">Znaleziska</string>
+    <string name="profile_summary_entries">Mikroblog</string>
+    <string name="profile_summary_followers">Obserwujący</string>
+    <string name="profile_summary_following_users">Obserwowani użytkownicy</string>
+    <string name="profile_summary_following_tags">Obserwowane tagi</string>
+    <plurals name="profile_header_days_since">
+        <item quantity="one">%1$d dzień</item>
+        <item quantity="other">%1$d dni</item>
+    </plurals>
+    <plurals name="profile_header_months_since">
+        <item quantity="one">%1$d miesiąc</item>
+        <item quantity="few">%1$d miesiące</item>
+        <item quantity="other">%1$d miesięcy</item>
+    </plurals>
+    <plurals name="profile_header_years_since">
+        <item quantity="one">%1$d rok</item>
+        <item quantity="few">%1$d lata</item>
+        <item quantity="other">%1$d lat</item>
+    </plurals>
+    <string name="profile_header_ago">temu</string>
+    <string name="profile_header_joined">Dołączył</string>
+    <string name="profile_header_whitespace">\u0020</string>
+
+    <!-- Dropdown menu -->
+    <string name="dropdown_menu_label_active">Aktywne</string>
+    <string name="dropdown_menu_label_newest">Najnowsze</string>
+    <string name="dropdown_menu_label_digged">Wykopane</string>
+    <string name="dropdown_menu_label_commented">Komentowane</string>
+    <string name="dropdown_menu_label_best">Najlepsze</string>
+    <string name="dropdown_menu_label_oldest">Najstarsze</string>
+    <string name="dropdown_menu_label_hot">Gorące</string>
+    <string name="dropdown_menu_label_hot_2h">2h</string>
+    <string name="dropdown_menu_label_hot_6h">6h</string>
+    <string name="dropdown_menu_label_hot_12h">12h</string>
+    <string name="dropdown_menu_label_all">Wszystko</string>
+    <string name="dropdown_menu_label_everything">Wszystkie</string>
+    <string name="dropdown_menu_label_links">Znaleziska</string>
+    <string name="dropdown_menu_label_entries">Wpisy</string>
+
+    <!-- Comments -->
+    <string name="comment_label_removed_by_moderator">Komentarz usunięty przez moderatora</string>
+    <string name="comment_label_removed_by_author">Komentarz usunięty przez autora</string>
+    <string name="comment_button_load_all_comments">Pokaż wszystkie (%1$d)</string>
+
+    <!-- Published time -->
+    <plurals name="published_at_days">
+        <item quantity="one">%1$d dzień temu</item>
+        <item quantity="other">%1$d dni temu</item>
+    </plurals>
+    <string name="published_at_hours_minutes">%1$d godz. %2$d min temu</string>
+    <string name="published_at_hours">%1$d godz. temu</string>
+    <string name="published_at_minutes">%1$d min temu</string>
+    <string name="published_at_now">chwilę temu</string>
+
+    <!-- Embed image -->
+    <string name="embed_image_source">źródło: %1$s</string>
+    <string name="embed_adult_image">Materiał zawiera treści +18. \n Kliknij aby pokazać.</string>
+
+    <!-- Link details screen -->
+    <string name="links_details_screen_no_comments">Brak komentarzy</string>
+    <string name="links_details_screen_error_loading_comments">Wystąpił problem podczas wczytywania komentarzy</string>
+    <string name="links_details_screen_related_label">Powiązane</string>
+    <string name="links_details_screen_no_related">Brak powiązanych</string>
+
+    <!-- Generic error -->
+    <string name="generic_error_title">Wystąpił błąd podczas próby pobrania danych</string>
+    <string name="generic_error_body">Upewnij się, że masz połączenie z internetem i spróbuj jeszcze raz</string>
+    <string name="generic_error_button_label">Spróbuj ponownie</string>
+
+    <!-- Tag details -->
+    <string name="tag_details_screen_observe_button">Obserwuj</string>
+    <string name="tag_details_screen_observed_button">Obserwowany</string>
+    <string name="tag_details_screen_no_results_label">Brak wyników</string>
+    <string name="tag_details_screen_error_label">Wystąpił problem podczas wczytywania danych</string>
+
+    <!-- Search -->
+    <string name="search_screen_text_field_placeholder">Wyszukaj użytkownika, tag...</string>
+    <string name="search_screen_tags_result_label">Tagi</string>
+    <string name="search_screen_users_result_label">Użytkownicy</string>
+    <string name="search_screen_users_result_failure">Wystąpił błąd podczas wczytywania użytkowników</string>
+    <string name="search_screen_tags_result_failure">Wystąpił błąd podczas wczytywania tagów</string>
+    <string name="search_screen_tags_followers">Obserwujący: %1$d</string>
+    <string name="search_screen_no_results">Brak wyników</string>
+
+    <!-- Image viewer screen -->
+    <string name="image_viewer_screen_permission_denied">Brak wymaganych uprawnień do zapisu</string>
+
+    <!-- Snackbar -->
+    <string name="snackbar_image_saved">Zapisano</string>
+    <string name="snackbar_generic_error">Wystąpił problem</string>
+
+    <!-- Survey -->
+    <string name="survey_answers_count">Odpowiedzi: %1$s</string>
+    <string name="survey_show_results">Pokaż wyniki</string>
+    <string name="survey_hide_results">Ukryj wyniki</string>
+
+    <!-- Dialog -->
+    <string name="dialog_title_logout">Czy na pewno chcesz się wylogować?</string>
+    <string name="dialog_button_confirm">Potwierdź</string>
+    <string name="dialog_button_dismiss">Anuluj</string>
+
+    <!-- Refresh -->
+    <string name="refresh_button">Odśwież</string>
+
 </resources>

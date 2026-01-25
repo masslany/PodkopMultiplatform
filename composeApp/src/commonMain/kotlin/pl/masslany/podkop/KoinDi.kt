@@ -10,6 +10,7 @@ import pl.masslany.podkop.business.di.businessModule
 import pl.masslany.podkop.common.navigation.di.navigationModule
 import pl.masslany.podkop.features.bottombar.di.bottomBarModule
 import pl.masslany.podkop.features.links.di.linksModule
+import pl.masslany.podkop.features.resources.di.resourcesModule
 
 val composeAppModule = module {
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate) }
@@ -18,6 +19,7 @@ val composeAppModule = module {
         navigationModule,
         bottomBarModule,
         linksModule,
+        resourcesModule,
     )
 }
 
