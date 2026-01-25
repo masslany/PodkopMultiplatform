@@ -2,25 +2,32 @@ package pl.masslany.podkop
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
+import pl.masslany.podkop.common.navigation.AppNavigator
 
 class MainActivityViewModel(
-    private val startupManager: StartupManager,
+    startupManager: StartupManager,
+    navigator: AppNavigator,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<AppState>(AppState.Initializing)
-    val state = _state.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            startupManager.state.collect { appState ->
-                _state.update { appState }
-            }
+    val state = combine(
+        startupManager.state,
+        navigator.isReady,
+    ) { startupState, isReady ->
+        if (!isReady) {
+            AppState.Initializing
+        } else {
+            startupState
         }
     }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            AppState.Initializing
+        )
+
 }

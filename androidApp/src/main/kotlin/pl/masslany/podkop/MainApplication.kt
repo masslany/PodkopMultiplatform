@@ -5,6 +5,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 
@@ -20,6 +21,7 @@ class MainApplication : Application() {
 
         initKoin {
             androidContext(this@MainApplication)
+            androidLogger()
             modules(mainModule)
         }
 

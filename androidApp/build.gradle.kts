@@ -1,4 +1,5 @@
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -22,7 +23,6 @@ android {
 
         buildConfigField("String", "WYKOP_KEY", "\"${apikeyProperties.getProperty("WYKOP_KEY")}\"")
         buildConfigField("String", "WYKOP_SECRET", "\"${apikeyProperties.getProperty("WYKOP_SECRET")}\"")
-
     }
     buildFeatures {
         compose = true
@@ -40,6 +40,13 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.androidx.core.splashscreen)
 
-    // Add Android-specific runner dependencies
     implementation(libs.androidx.activity.compose)
+}
+
+tasks {
+    withType<KotlinCompile> {
+        compilerOptions {
+            freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
+        }
+    }
 }
