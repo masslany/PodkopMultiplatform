@@ -6,7 +6,6 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
@@ -50,7 +49,7 @@ open class BaseResourceItemStateItemStateHolder(
     }
 
     // This is open so specialized handlers can update multiple lists
-    open fun notifyItemUpdated(newState: ResourceItemState) {
-        _items.update { list -> list.map { if(it.id == newState.id) newState else it }.toImmutableList() }
-    }
+//    open fun notifyItemUpdated(newState: ResourceItemState) {
+//        _items.update { list -> list.map { if(it.id == newState.id) newState else it }.toImmutableList() }
+//    }
 }

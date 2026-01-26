@@ -23,6 +23,10 @@ kotlin {
     }
     
     sourceSets {
+        androidMain.dependencies  {
+            implementation(libs.ktor.client.android)
+        }
+
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -38,8 +42,14 @@ kotlin {
             implementation(libs.jetbrains.navigation3.ui)
             implementation(libs.lifecycle.viewmodel.navigation3)
             implementation(libs.kotlinx.collections.immutable)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
 
             implementation(projects.business)
+        }
+
+        iosMain.dependencies  {
+            implementation(libs.ktor.client.darwin)
         }
 
         commonTest.dependencies {

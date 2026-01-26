@@ -4,7 +4,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -24,6 +23,7 @@ import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.navigation.NavigationContent
 import pl.masslany.podkop.common.navigation.bottombar.BottomBarManager
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarManager
+import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.features.bottombar.BottomBarRoot
 import pl.masslany.podkop.features.links.LinksScreen
 import pl.masslany.podkop.features.links.LinksScreenRoot
@@ -32,7 +32,7 @@ import pl.masslany.podkop.features.upcoming.UpcomingScreen
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    PodkopTheme {
         val appNavigator = koinInject<AppNavigator>()
 
         MainApp(
