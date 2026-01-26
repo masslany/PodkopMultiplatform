@@ -1,4 +1,3 @@
 package pl.masslany.podkop.features.resources.models.comment
 
-interface CommentActions {
-}
+interface CommentActions

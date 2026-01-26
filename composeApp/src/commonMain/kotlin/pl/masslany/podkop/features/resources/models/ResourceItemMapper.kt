@@ -14,12 +14,14 @@ fun ResourceItem.toResourceItemState(): ResourceItemState =
 
 private fun ResourceItem.toEntryItemState(): EntryItemState  {
     return EntryItemState(
+        id = this.id,
         text = this.content.ifBlank { this.description },
     )
 }
 
 private fun ResourceItem.toLinkItemState(): LinkItemState {
     return LinkItemState(
+        id = this.id,
         text = this.content.ifBlank { this.description },
     )
 }

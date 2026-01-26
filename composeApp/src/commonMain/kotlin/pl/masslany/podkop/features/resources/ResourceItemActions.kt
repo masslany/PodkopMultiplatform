@@ -1,4 +1,4 @@
-package pl.masslany.podkop.features.resources.models
+package pl.masslany.podkop.features.resources
 
 import androidx.compose.runtime.Stable
 import pl.masslany.podkop.features.resources.models.comment.CommentActions

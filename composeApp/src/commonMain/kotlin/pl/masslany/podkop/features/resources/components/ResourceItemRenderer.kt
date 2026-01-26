@@ -2,7 +2,7 @@ package pl.masslany.podkop.features.resources.components
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import pl.masslany.podkop.features.resources.models.ResourceItemActions
+import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.comment.CommentItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState

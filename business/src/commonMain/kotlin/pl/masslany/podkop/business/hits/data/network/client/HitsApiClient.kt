@@ -1,0 +1,31 @@
+package pl.masslany.podkop.business.hits.data.network.client
+
+import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
+import pl.masslany.podkop.business.hits.data.network.api.HitsApi
+import pl.masslany.podkop.common.network.api.ApiClient
+import pl.masslany.podkop.common.network.api.request
+import pl.masslany.podkop.common.network.models.request.Request
+
+
+class HitsApiClient(
+    private val apiClient: ApiClient,
+) : HitsApi {
+    override suspend fun getLinkHits(sort: String): Result<ResourceResponseDto> {
+        val queryParams =
+            mutableMapOf(
+                "sort" to sort,
+            )
+
+        val request =
+            Request<ResourceResponseDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/hits/links",
+                queryParameters = queryParams,
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+}
