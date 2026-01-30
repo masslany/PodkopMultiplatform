@@ -29,7 +29,16 @@ The project is divided into several modules to ensure a clean separation of conc
 
 The app interacts with the Wykop API and requires API keys to function.
 
+### Android
 1. Create a file named `apikeys.properties` in the root directory of the project.
+2. Add your Wykop API credentials:
+   ```properties
+   WYKOP_KEY=your_api_key_here
+   WYKOP_SECRET=your_api_secret_here
+   ```
+
+### iOS
+1. Create a file named `ApiKeys.xcconfig` in the `iosApp/Configuration` directory.
 2. Add your Wykop API credentials:
    ```properties
    WYKOP_KEY=your_api_key_here
