@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -46,7 +45,6 @@ private fun BottomBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = Color.White,
     ) {
         destinations.forEach { bottomBarDestinationState ->
             NavigationBarItem(
