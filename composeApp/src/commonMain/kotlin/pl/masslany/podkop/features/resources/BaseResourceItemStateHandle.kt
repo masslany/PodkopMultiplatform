@@ -50,7 +50,7 @@ open class BaseResourceItemStateItemStateHolder(
                 linksRepository.getLink(id)
                     .onSuccess {
                         println("DBG ---> link updated: $it")
-                        notifyItemUpdated(it.data.toResourceItemState(isUpcoming))
+                        notifyItemUpdated(it.data)
                     }
                     .onFailure {
                         println("DBG ---> link updated failed: $it")
@@ -73,7 +73,7 @@ open class BaseResourceItemStateItemStateHolder(
 
 
     // This is open so specialized handlers can update multiple lists
-    open fun notifyItemUpdated(newState: ResourceItemState) {
-        _items.update { list -> list.map { if(it.id == newState.id) newState else it }.toImmutableList() }
+    open fun notifyItemUpdated(newState: ResourceItem) {
+        _items.update { list -> list.map { if(it.id == newState.id) newState.toResourceItemState(isUpcoming) else it }.toImmutableList() }
     }
 }

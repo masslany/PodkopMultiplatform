@@ -14,16 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
-import pl.masslany.podkop.features.links.hits.models.HitItemState
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
+import pl.masslany.podkop.features.resources.models.ResourceItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.links_screen_label_hits
 
 @Composable
 fun HitsList(
     modifier: Modifier,
-    state: ImmutableList<HitItemState>,
+    state: ImmutableList<ResourceItemState>,
     actions: ResourceItemActions,
 ) {
     Column(
