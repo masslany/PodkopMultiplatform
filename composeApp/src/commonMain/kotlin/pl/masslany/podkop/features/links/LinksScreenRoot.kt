@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.features.links.hits.HitsList
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 
@@ -54,6 +55,19 @@ private fun LinksScreen(
                     actions = actions,
                 )
             }
+        }
+
+        item {
+            DropdownMenu(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp),
+                items = state.sortMenuState.items,
+                selected = state.sortMenuState.selected,
+                expanded = state.sortMenuState.expanded,
+                onSelected = actions::onSortSelected,
+                onExpandedChange = actions::onSortExpandedChanged,
+                onDismissRequest = actions::onSortDismissed,
+            )
         }
 
         items(

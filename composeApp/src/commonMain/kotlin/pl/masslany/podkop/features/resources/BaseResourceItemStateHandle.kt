@@ -14,7 +14,7 @@ import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.toResourceItemState
 
-open class BaseResourceItemStateItemStateHolder(
+open class BaseResourceItemStateHolder(
     private val linksRepository: LinksRepository,
     private val appNavigator: AppNavigator,
 ) : ResourceItemStateHolder {

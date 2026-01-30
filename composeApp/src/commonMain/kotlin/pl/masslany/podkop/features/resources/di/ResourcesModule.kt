@@ -1,12 +1,12 @@
 package pl.masslany.podkop.features.resources.di
 
 import org.koin.dsl.module
-import pl.masslany.podkop.features.resources.BaseResourceItemStateItemStateHolder
+import pl.masslany.podkop.features.resources.BaseResourceItemStateHolder
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 
 val resourcesModule = module {
     factory<ResourceItemStateHolder> {
-        BaseResourceItemStateItemStateHolder(
+        BaseResourceItemStateHolder(
             linksRepository = get(),
             appNavigator = get(),
         )

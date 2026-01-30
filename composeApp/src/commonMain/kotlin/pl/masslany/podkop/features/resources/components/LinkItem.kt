@@ -41,9 +41,9 @@ import pl.masslany.podkop.common.models.AuthorState
 import pl.masslany.podkop.common.models.CountState
 import pl.masslany.podkop.common.models.DescriptionState
 import pl.masslany.podkop.common.models.NameColorType
+import pl.masslany.podkop.common.models.PublishedTimeType
 import pl.masslany.podkop.common.models.TagItem
 import pl.masslany.podkop.common.models.TitleState
-import pl.masslany.podkop.common.models.PublishedTimeType
 import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 
@@ -134,11 +134,11 @@ fun LinkItem(
                         Source(
                             state = state.source
                         )
+                    }
+                    state.publishedTimeType?.let {
                         Spacer(modifier = Modifier.size(4.dp))
                         Dot()
                         Spacer(modifier = Modifier.size(4.dp))
-                    }
-                    state.publishedTimeType?.let {
                         Published(type = state.publishedTimeType)
                     }
                 }

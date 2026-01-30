@@ -11,13 +11,13 @@ import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.links.hits.models.toHitItemState
-import pl.masslany.podkop.features.resources.BaseResourceItemStateItemStateHolder
+import pl.masslany.podkop.features.resources.BaseResourceItemStateHolder
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 class LinksResourceItemStateHolderImpl(
     linksRepository: LinksRepository,
     appNavigator: AppNavigator,
-) : BaseResourceItemStateItemStateHolder(
+) : BaseResourceItemStateHolder(
     linksRepository = linksRepository,
     appNavigator = appNavigator,
 ), LinksResourceItemStateHolder {
