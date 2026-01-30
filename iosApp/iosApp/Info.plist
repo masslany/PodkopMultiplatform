@@ -4,5 +4,9 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+    <key>WYKOP_KEY</key>
+    <string>$(WYKOP_KEY)</string>
+    <key>WYKOP_SECRET</key>
+    <string>$(WYKOP_SECRET)</string>
 </dict>
 </plist>
