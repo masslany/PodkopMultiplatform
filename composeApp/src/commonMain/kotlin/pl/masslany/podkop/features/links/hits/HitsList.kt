@@ -43,7 +43,7 @@ fun HitsList(
                 key = { item -> item.id },
             ) {
                 ResourceItemRenderer(
-                    item = it,
+                    state = it,
                     actions = actions,
                 )
             }

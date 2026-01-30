@@ -14,54 +14,61 @@ import pl.masslany.podkop.features.resources.models.link.LinkItemState
 @Composable
 fun ResourceItemRenderer(
     modifier: Modifier = Modifier,
-    item: ResourceItemState,
+    state: ResourceItemState,
     actions: ResourceItemActions,
 ) {
-    when (item) {
-        is EntryItemState -> EntryItemRenderer(modifier, item, actions)
-        is LinkItemState -> LinkItemRenderer(modifier, item, actions)
-        is CommentItemState -> CommentItemRenderer(modifier, item, actions)
-        is HitItemState -> HitItemRenderer(modifier, item, actions)
+    when (state) {
+        is EntryItemState -> EntryItemRenderer(modifier, state, actions)
+        is LinkItemState -> LinkItemRenderer(modifier, state, actions)
+        is CommentItemState -> CommentItemRenderer(modifier, state, actions)
+        is HitItemState -> HitItemRenderer(modifier, state, actions)
     }
 }
 
 @Composable
 fun EntryItemRenderer(
     modifier: Modifier,
-    item: EntryItemState,
+    state: EntryItemState,
     actions: ResourceItemActions,
 ) {
-    Text(text = item.text)
+    Text(text = state.text)
 }
 
 @Composable
 fun LinkItemRenderer(
     modifier: Modifier,
-    item: LinkItemState,
+    state: LinkItemState,
     actions: ResourceItemActions,
 ) {
-    Text(text = item.text)
+    LinkItem(
+        modifier = modifier,
+        state = state,
+        onLinkClick = { actions.onLinkClicked(state.id) },
+        onVoteClick = { actions.onLinkVoteClicked(state.id, state.countState.isVoted) },
+        onAuthorClick = { actions.onProfileClicked(it) },
+        onTagClick = { actions.onTagClicked(it) },
+    )
 }
 
 @Composable
 fun CommentItemRenderer(
     modifier: Modifier,
-    item: CommentItemState,
+    state: CommentItemState,
     actions: ResourceItemActions,
 ) {
-    Text(text = item.text)
+    Text(text = state.text)
 }
 
 @Composable
 fun HitItemRenderer(
     modifier: Modifier,
-    item: HitItemState,
+    state: HitItemState,
     actions: ResourceItemActions,
 ) {
     HitItem(
         modifier = modifier,
-        state = item,
-        onItemClick = { actions.onLinkClicked(item.id) },
-        onVoteClick = { actions.onLinkVoteClicked(item.id, item.countState.isVoted) }
+        state = state,
+        onItemClick = { actions.onLinkClicked(state.id) },
+        onVoteClick = { actions.onLinkVoteClicked(state.id, state.countState.isVoted) }
     )
 }

@@ -9,6 +9,6 @@ import pl.masslany.podkop.features.resources.models.ResourceItemState
 interface ResourceItemStateHolder : ResourceItemActions {
     val items: StateFlow<ImmutableList<ResourceItemState>>
 
-    fun init(scope: CoroutineScope)
+    fun init(scope: CoroutineScope, isUpcoming: Boolean = false)
     fun updateData(data: List<ResourceItem>)
 }

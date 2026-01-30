@@ -32,7 +32,7 @@ import podkop.composeapp.generated.resources.fire
 
 @Composable
 fun Count(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     state: CountState,
     backgroundColor: Color = Color.Transparent,
     onClick: () -> Unit ,

@@ -34,7 +34,7 @@ class LinksViewModel(
     }.stateIn(viewModelScope, WhileSubscribed(5000), LinksScreenState.initial)
 
     init {
-        linksResourceItemStateHolder.init(viewModelScope)
+        linksResourceItemStateHolder.init(viewModelScope, isUpcoming)
 
         _state.update {
             it.copy(
@@ -55,7 +55,7 @@ class LinksViewModel(
                     linksResourceItemStateHolder.updateData(it.data)
                 }
                 .onFailure {
-                    println("MEOW failed to load links with $it")
+                    println("DBG --> failed to load links with $it")
                 }
 
             if (!isUpcoming) {
@@ -64,7 +64,7 @@ class LinksViewModel(
                         linksResourceItemStateHolder.updateHits(it.data)
                     }
                     .onFailure {
-                        println("MEOW failed to load hits with $it")
+                        println("DBG --> failed to load hits with $it")
                     }
             }
         }

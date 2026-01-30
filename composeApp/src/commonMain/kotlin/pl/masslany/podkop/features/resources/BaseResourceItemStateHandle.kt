@@ -6,11 +6,11 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.navigation.AppNavigator
-import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.toResourceItemState
 
@@ -24,10 +24,18 @@ open class BaseResourceItemStateItemStateHolder(
 
     protected var scope: CoroutineScope? = null
 
-    override fun init(scope: CoroutineScope) { this.scope = scope }
+    private var isUpcoming: Boolean = false
+
+    override fun init(
+        scope: CoroutineScope,
+        isUpcoming: Boolean
+    ) {
+        this.scope = scope
+        this.isUpcoming = isUpcoming
+    }
 
     override fun updateData(data: List<ResourceItem>) {
-        _items.value = data.map { it.toResourceItemState() }.toImmutableList()
+        _items.value = data.map { it.toResourceItemState(isUpcoming) }.toImmutableList()
     }
 
     override fun onLinkVoteClicked(id: Int, voted: Boolean) {
@@ -39,17 +47,33 @@ open class BaseResourceItemStateItemStateHolder(
             }
 
             result.onSuccess {
-                linksRepository.getLink(id).onSuccess {  }
+                linksRepository.getLink(id)
+                    .onSuccess {
+                        println("DBG ---> link updated: $it")
+                        notifyItemUpdated(it.data.toResourceItemState(isUpcoming))
+                    }
+                    .onFailure {
+                        println("DBG ---> link updated failed: $it")
+                    }
             }
         }
     }
 
     override fun onLinkClicked(id: Int) {
-        appNavigator.navigateTo(object : NavTarget {}) //TODO: Link details
+        println("DBG ---> link clicked: $id")
     }
 
+    override fun onTagClicked(tag: String) {
+        println("DBG ---> tag clicked: $tag")
+    }
+
+    override fun onProfileClicked(username: String) {
+        println("DBG ---> profile clicked: $username")
+    }
+
+
     // This is open so specialized handlers can update multiple lists
-//    open fun notifyItemUpdated(newState: ResourceItemState) {
-//        _items.update { list -> list.map { if(it.id == newState.id) newState else it }.toImmutableList() }
-//    }
+    open fun notifyItemUpdated(newState: ResourceItemState) {
+        _items.update { list -> list.map { if(it.id == newState.id) newState else it }.toImmutableList() }
+    }
 }

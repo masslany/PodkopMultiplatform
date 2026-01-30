@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -57,18 +56,16 @@ private fun LinksScreen(
             }
         }
 
-        items(state.links) {
-            Card(
+        items(
+            items = state.links,
+            key = { item -> item.id }
+        ) {
+            ResourceItemRenderer(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-            ){
-                ResourceItemRenderer(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp),
-                    it,
-                    actions
-                )
-            }
+                    .padding(horizontal = 16.dp),
+                state = it,
+                actions = actions
+            )
         }
     }
 }
