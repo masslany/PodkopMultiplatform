@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import podkop.composeapp.generated.resources.Res
-import podkop.composeapp.generated.resources.comment
+import podkop.composeapp.generated.resources.ic_comment
 
 @Composable
 fun CommentCount(
@@ -25,7 +25,7 @@ fun CommentCount(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            painter = painterResource(resource = Res.drawable.comment),
+            painter = painterResource(resource = Res.drawable.ic_comment),
             contentDescription = null,
             modifier = Modifier
                 .size(16.dp),

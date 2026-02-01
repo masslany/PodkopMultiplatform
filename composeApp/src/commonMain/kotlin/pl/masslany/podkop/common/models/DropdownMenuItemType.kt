@@ -40,3 +40,13 @@ fun LinksSortType.toDropdownMenuItemType(): DropdownMenuItemType {
         LinksSortType.Newest -> DropdownMenuItemType.Newest
     }
 }
+
+fun DropdownMenuItemType.toLinksSortType(): LinksSortType {
+    return when (this) {
+         DropdownMenuItemType.Active -> LinksSortType.Active
+         DropdownMenuItemType.Commented -> LinksSortType.Commented
+         DropdownMenuItemType.Digged -> LinksSortType.Digged
+         DropdownMenuItemType.Newest -> LinksSortType.Newest
+        else -> throw IllegalArgumentException("Attempt to convert $this to LinksSortType")
+    }
+}

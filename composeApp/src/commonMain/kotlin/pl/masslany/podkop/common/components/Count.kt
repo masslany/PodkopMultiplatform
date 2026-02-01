@@ -28,7 +28,7 @@ import pl.masslany.podkop.common.models.CountState
 import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.common.theme.colorsPalette
 import podkop.composeapp.generated.resources.Res
-import podkop.composeapp.generated.resources.fire
+import podkop.composeapp.generated.resources.ic_fire
 
 @Composable
 fun Count(
@@ -63,7 +63,7 @@ fun Count(
         )
         if (state.isHot) {
             Image(
-                painter = painterResource(resource = Res.drawable.fire),
+                painter = painterResource(resource = Res.drawable.ic_fire),
                 contentDescription = null,
                 modifier = Modifier
                     .size(24.dp)

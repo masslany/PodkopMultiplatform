@@ -12,4 +12,6 @@ interface LinksActions : ResourceItemActions {
     fun onSortExpandedChanged(expanded: Boolean)
 
     fun onSortDismissed()
+
+    fun onRefresh(sortType: DropdownMenuItemType)
 }

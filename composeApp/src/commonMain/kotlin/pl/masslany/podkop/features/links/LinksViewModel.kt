@@ -17,6 +17,7 @@ import pl.masslany.podkop.business.links.domain.models.request.LinksType
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.models.toDropdownMenuItemType
+import pl.masslany.podkop.common.models.toLinksSortType
 
 class LinksViewModel(
     val isUpcoming: Boolean,
@@ -37,11 +38,12 @@ class LinksViewModel(
         )
     }.stateIn(viewModelScope, WhileSubscribed(5000), LinksScreenState.initial)
 
+    val linksType = if (isUpcoming) LinksType.UPCOMING else LinksType.HOMEPAGE
+
     init {
         linksResourceItemStateHolder.init(viewModelScope, isUpcoming)
 
         val selectedLinksSortType = if (isUpcoming) LinksSortType.Active else LinksSortType.Newest
-        val linksType = if (isUpcoming) LinksType.UPCOMING else LinksType.HOMEPAGE
 
         _state.update { previousState ->
             previousState.copy(
@@ -67,6 +69,11 @@ class LinksViewModel(
             )
                 .onSuccess {
                     linksResourceItemStateHolder.updateData(it.data)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                    }
                 }
                 .onFailure {
                     println("DBG --> failed to load links with $it")
@@ -86,7 +93,30 @@ class LinksViewModel(
 
     override fun onSortSelected(sortType: DropdownMenuItemType) {
         _state.update { previousState ->
-            previousState.updateSortMenuSelected(sortType)
+            previousState
+                .updateSortMenuSelected(sortType)
+                .updateRefreshing(true)
+        }
+        viewModelScope.launch {
+            linksRepository.getLinks(
+                page = 1,
+                limit = null,
+                linksSortType = sortType.toLinksSortType(),
+                linksType = linksType,
+                category = null,
+                bucket = null,
+            )
+                .onSuccess {
+                    linksResourceItemStateHolder.updateData(it.data)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                    }
+                }
+                .onFailure {
+                    println("DBG --> failed to load links with $it")
+                }
         }
     }
 
@@ -102,4 +132,31 @@ class LinksViewModel(
         }
     }
 
+    override fun onRefresh(sortType: DropdownMenuItemType) {
+        _state.update { previousState ->
+            previousState
+                .updateRefreshing(true)
+        }
+        viewModelScope.launch {
+            linksRepository.getLinks(
+                page = 1,
+                limit = null,
+                linksSortType = sortType.toLinksSortType(),
+                linksType = linksType,
+                category = null,
+                bucket = null,
+            )
+                .onSuccess {
+                    linksResourceItemStateHolder.updateData(it.data)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                    }
+                }
+                .onFailure {
+                    println("DBG --> failed to load links with $it")
+                }
+        }
+    }
 }

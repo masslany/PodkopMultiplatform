@@ -8,6 +8,7 @@ import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 data class LinksScreenState(
     val isLoading: Boolean,
+    val isRefreshing: Boolean,
     val isUpcoming: Boolean,
     val links: ImmutableList<ResourceItemState>,
     val hits: ImmutableList<ResourceItemState>,
@@ -15,7 +16,8 @@ data class LinksScreenState(
 ) {
     companion object {
         val initial = LinksScreenState(
-            isLoading = false,
+            isLoading = true,
+            isRefreshing = false,
             isUpcoming = false,
             links = persistentListOf(),
             hits = persistentListOf(),
@@ -38,6 +40,10 @@ data class LinksScreenState(
 
     fun updateLoading(isLoading: Boolean) = this.copy(
         isLoading = isLoading,
+    )
+
+    fun updateRefreshing(isRefreshing: Boolean) = this.copy(
+        isRefreshing = isRefreshing,
     )
 
 }

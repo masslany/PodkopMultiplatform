@@ -68,7 +68,7 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onProfileClicked(username: String) {
-        println("DBG ---> profile clicked: $username")
+        println("DBG ---> ic_profile clicked: $username")
     }
 
 

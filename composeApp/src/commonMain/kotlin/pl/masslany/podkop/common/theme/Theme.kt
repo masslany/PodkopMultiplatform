@@ -74,7 +74,7 @@ internal val darkColorScheme = darkColorScheme(
 @Composable
 fun PodkopTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = provideColorScheme(darkTheme, dynamicColor)
