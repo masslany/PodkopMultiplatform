@@ -7,9 +7,6 @@ Podkop is a Kotlin Multiplatform (KMP) client for Wykop.pl, built with modern An
 The project is divided into several modules to ensure a clean separation of concerns and maximize code sharing:
 
 - **`:business`**: The core logic of the application. It contains the domain models, repositories, and data sources (networking with Ktor, serialization). This is a pure Kotlin Multiplatform module.
-  - `di`: Koin modules for dependency injection.
-  - `auth`: Authentication logic.
-  - `links` & `hits`: Core functionality for browsing content.
 - **`:composeApp`**: Shared UI module using Compose Multiplatform. It contains the ViewModels, screens, and navigation logic that are shared between Android and iOS.
 - **`:common`**: Shared utilities, design system components, and base classes used by other modules.
 - **`:androidApp`**: The Android-specific entry point and configuration.
