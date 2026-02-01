@@ -11,16 +11,13 @@ import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.initKoin
 
 fun initKoinIos() {
-    initKoin {
-
-    }
+    initKoin()
 }
 
 class IOSDependencyHelper : KoinComponent {
     val startupManager: StartupManager by inject()
     val dispatcherProvider: DispatcherProvider by inject()
 
-    // We create a scope here to mimic your Android MainScope
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     fun start(key: String, secret: String) {

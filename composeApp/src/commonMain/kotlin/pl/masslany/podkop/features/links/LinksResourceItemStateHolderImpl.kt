@@ -46,5 +46,4 @@ class LinksResourceItemStateHolderImpl(
             }.toImmutableList()
         }
     }
-
 }

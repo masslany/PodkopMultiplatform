@@ -7,7 +7,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 
-private val lightColorScheme = lightColorScheme(
+internal val lightColorScheme = lightColorScheme(
     primary = lightPrimary,
     onPrimary = lightOnPrimary,
     primaryContainer = lightPrimaryContainer,
@@ -39,7 +39,7 @@ private val lightColorScheme = lightColorScheme(
     scrim = lightScrim,
 )
 
-private val darkColorScheme = darkColorScheme(
+internal val darkColorScheme = darkColorScheme(
     primary = darkPrimary,
     onPrimary = darkOnPrimary,
     primaryContainer = darkPrimaryContainer,
@@ -74,14 +74,10 @@ private val darkColorScheme = darkColorScheme(
 @Composable
 fun PodkopTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme =
-        when {
-            darkTheme -> darkColorScheme
-            else -> lightColorScheme
-        }
+    val colorScheme = provideColorScheme(darkTheme, dynamicColor)
 
     val colorsPalette = if (darkTheme) {
         DarkColorsPalette
