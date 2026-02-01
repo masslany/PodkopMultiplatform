@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
@@ -25,12 +24,13 @@ import pl.masslany.podkop.common.navigation.bottombar.BottomBarManager
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarManager
 import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.features.bottombar.BottomBarRoot
+import pl.masslany.podkop.features.entries.EntriesScreen
+import pl.masslany.podkop.features.entries.EntriesScreenRoot
 import pl.masslany.podkop.features.links.LinksScreen
 import pl.masslany.podkop.features.links.LinksScreenRoot
 import pl.masslany.podkop.features.upcoming.UpcomingScreen
 
 @Composable
-@Preview
 fun App() {
     PodkopTheme {
         val appNavigator = koinInject<AppNavigator>()
@@ -93,6 +93,11 @@ private fun MainApp(
                             )
                         }
 
+                        entry<EntriesScreen> {
+                            EntriesScreenRoot(
+                                paddingValues = contentPadding,
+                            )
+                        }
                         entry<GenericDialog>(
                             metadata = DialogSceneStrategy.dialog(
                                 DialogProperties()

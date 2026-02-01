@@ -1,4 +1,4 @@
-package pl.masslany.podkop.features.links
+package pl.masslany.podkop.features.entries
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -42,32 +42,24 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.extensions.isScrollingUp
-import pl.masslany.podkop.features.links.hits.HitsList
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_profile
-import podkop.composeapp.generated.resources.accessibility_topbar_search
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_person
-import podkop.composeapp.generated.resources.ic_search
-import podkop.composeapp.generated.resources.topbar_label_homepage
-import podkop.composeapp.generated.resources.topbar_label_upcoming
+import podkop.composeapp.generated.resources.topbar_label_entries
 
 private const val FabItemsOffset = 10
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LinksScreenRoot(
-    isUpcoming: Boolean,
+fun EntriesScreenRoot(
     paddingValues: PaddingValues,
 ) {
-    val viewModel = koinViewModel<LinksViewModel>(
-        parameters = { parametersOf(isUpcoming) }
-    )
+    val viewModel = koinViewModel<EntriesViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -91,19 +83,8 @@ fun LinksScreenRoot(
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
-                title = { Text(text = getTopBarTitle(state.isUpcoming)) },
+                title = { Text(text = stringResource(resource = Res.string.topbar_label_entries)) },
                 actions = {
-                    if (!state.isUpcoming) {
-                        IconButton(onClick = {  }) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = vectorResource(resource = Res.drawable.ic_search),
-                                contentDescription = stringResource(
-                                    resource = Res.string.accessibility_topbar_search
-                                )
-                            )
-                        }
-                    }
                     IconButton(onClick = {  }) {
                         Icon(
                             modifier = Modifier.size(24.dp),
@@ -160,7 +141,7 @@ fun LinksScreenRoot(
                     )
                 }
             } else {
-                LinksScreen(
+                EntriesScreen(
                     modifier = Modifier
                         .fillMaxSize(),
                     state = state,
@@ -174,10 +155,10 @@ fun LinksScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LinksScreen(
+private fun EntriesScreen(
     modifier: Modifier = Modifier,
-    state: LinksScreenState,
-    actions: LinksActions,
+    state: EntriesScreenState,
+    actions: EntriesActions,
     lazyListState: LazyListState,
 ) {
     LazyColumn(
@@ -185,17 +166,6 @@ private fun LinksScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
     ) {
-        if (!state.isUpcoming) {
-            item {
-                HitsList(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    state = state.hits,
-                    actions = actions,
-                )
-            }
-        }
-
         item {
             DropdownMenu(
                 modifier = Modifier
@@ -214,7 +184,7 @@ private fun LinksScreen(
         }
 
         items(
-            items = state.links,
+            items = state.entries,
             key = { item -> item.id }
         ) {
             ResourceItemRenderer(
@@ -224,15 +194,5 @@ private fun LinksScreen(
                 actions = actions
             )
         }
-    }
-}
-
-
-@Composable
-private fun getTopBarTitle(isUpcoming: Boolean): String {
-    return if (isUpcoming) {
-        stringResource(resource = Res.string.topbar_label_upcoming)
-    } else {
-        stringResource(resource = Res.string.topbar_label_homepage)
     }
 }

@@ -9,6 +9,7 @@ import org.koin.dsl.module
 import pl.masslany.podkop.business.di.businessModule
 import pl.masslany.podkop.common.navigation.di.navigationModule
 import pl.masslany.podkop.features.bottombar.di.bottomBarModule
+import pl.masslany.podkop.features.entries.di.entriesModule
 import pl.masslany.podkop.features.links.di.linksModule
 import pl.masslany.podkop.features.resources.di.resourcesModule
 
@@ -19,6 +20,7 @@ val composeAppModule = module {
         navigationModule,
         bottomBarModule,
         linksModule,
+        entriesModule,
         resourcesModule,
     )
 }
