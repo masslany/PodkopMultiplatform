@@ -7,6 +7,7 @@ import pl.masslany.podkop.features.entries.EntriesViewModel
 val entriesModule = module {
     viewModel {
         EntriesViewModel(
+            entriesRepository = get(),
             resourceItemStateHolder = get(),
         )
     }

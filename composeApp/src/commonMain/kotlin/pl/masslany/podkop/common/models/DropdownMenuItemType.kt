@@ -1,5 +1,6 @@
 package pl.masslany.podkop.common.models
 
+import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 
 sealed class DropdownMenuItemType {
@@ -30,6 +31,14 @@ sealed class DropdownMenuItemType {
     data object Entries : DropdownMenuItemType()
 
     data object Everything : DropdownMenuItemType()
+}
+
+fun EntriesSortType.toDropdownMenuItemType(): DropdownMenuItemType {
+    return when (this) {
+        EntriesSortType.Active -> DropdownMenuItemType.Active
+        EntriesSortType.Hot -> DropdownMenuItemType.Hot
+        EntriesSortType.Newest -> DropdownMenuItemType.Newest
+    }
 }
 
 fun LinksSortType.toDropdownMenuItemType(): DropdownMenuItemType {

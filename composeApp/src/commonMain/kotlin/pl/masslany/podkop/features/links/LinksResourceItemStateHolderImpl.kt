@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
+import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.links.hits.models.toHitItemState
@@ -16,8 +17,10 @@ import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 class LinksResourceItemStateHolderImpl(
     linksRepository: LinksRepository,
+    entriesRepository: EntriesRepository,
     appNavigator: AppNavigator,
 ) : BaseResourceItemStateHolder(
+    entriesRepository = entriesRepository,
     linksRepository = linksRepository,
     appNavigator = appNavigator,
 ), LinksResourceItemStateHolder {

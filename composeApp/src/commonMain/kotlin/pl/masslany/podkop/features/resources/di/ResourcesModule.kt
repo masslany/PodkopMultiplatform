@@ -8,6 +8,7 @@ val resourcesModule = module {
     factory<ResourceItemStateHolder> {
         BaseResourceItemStateHolder(
             linksRepository = get(),
+            entriesRepository = get(),
             appNavigator = get(),
         )
     }

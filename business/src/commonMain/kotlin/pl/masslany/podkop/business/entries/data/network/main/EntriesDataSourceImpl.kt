@@ -30,4 +30,12 @@ class EntriesDataSourceImpl(
     ): Result<ResourceResponseDto> {
         return entriesApi.getEntryComments(entryId, page)
     }
+
+    override suspend fun voteUp(entryId: Int): Result<Unit> {
+        return entriesApi.voteUp(entryId)
+    }
+
+    override suspend fun removeVoteUp(entryId: Int): Result<Unit> {
+        return entriesApi.removeVoteUp(entryId)
+    }
 }

@@ -73,4 +73,30 @@ class EntriesApiClient(
             onFailure = { Result.failure(it) },
         )
     }
+
+    override suspend fun voteUp(entryId: Int): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/entries/$entryId/votes",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun removeVoteUp(entryId: Int): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.DELETE,
+                path = "api/v3/entries/$entryId/votes",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
 }

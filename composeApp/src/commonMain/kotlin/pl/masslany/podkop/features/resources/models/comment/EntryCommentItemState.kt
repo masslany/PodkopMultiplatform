@@ -2,7 +2,6 @@ package pl.masslany.podkop.features.resources.models.comment
 
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 
-data class CommentItemState(
+data class EntryCommentItemState(
     override val id: Int,
-    val text: String
 ) : ResourceItemState

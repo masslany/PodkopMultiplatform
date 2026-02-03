@@ -70,6 +70,18 @@ class EntriesRepositoryImpl(
         }
     }
 
+    override suspend fun voteUp(entryId: Int): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.voteUp(entryId)
+        }
+    }
+
+    override suspend fun removeVoteUp(entryId: Int): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.removeVoteUp(entryId)
+        }
+    }
+
     override suspend fun getLastUpdated(): Instant {
         return withContext(dispatcherProvider.io) {
             val long = keyValueStorage.getLong(ENTRIES_LAST_UPDATED_KEY) ?: Clock.System.now().epochSeconds

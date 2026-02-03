@@ -18,6 +18,7 @@ val linksModule = module {
     factory<LinksResourceItemStateHolder> {
         LinksResourceItemStateHolderImpl(
             linksRepository = get(),
+            entriesRepository = get(),
             appNavigator = get(),
         )
     }

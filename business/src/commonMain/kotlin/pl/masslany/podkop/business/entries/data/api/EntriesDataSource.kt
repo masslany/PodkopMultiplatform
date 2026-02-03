@@ -21,4 +21,8 @@ interface EntriesDataSource {
         entryId: Int,
         page: Any?,
     ): Result<ResourceResponseDto>
+
+    suspend fun voteUp(entryId: Int): Result<Unit>
+
+    suspend fun removeVoteUp(entryId: Int): Result<Unit>
 }

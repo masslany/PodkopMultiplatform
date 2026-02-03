@@ -30,6 +30,10 @@ interface EntriesRepository {
         page: Any?,
     ): Result<Resources>
 
+    suspend fun voteUp(entryId: Int): Result<Unit>
+
+    suspend fun removeVoteUp(entryId: Int): Result<Unit>
+
     suspend fun getLastUpdated(): Instant
 
     suspend fun setLastUpdated(lastUpdated: Instant)
