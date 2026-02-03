@@ -106,6 +106,10 @@ open class BaseResourceItemStateHolder(
         }
     }
 
+    override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) {
+
+    }
+
     private fun updateEntryVote(
         entryId: Int,
         action: EntryVoteAction

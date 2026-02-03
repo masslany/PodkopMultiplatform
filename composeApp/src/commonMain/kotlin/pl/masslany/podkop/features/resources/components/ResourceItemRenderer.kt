@@ -1,22 +1,27 @@
 package pl.masslany.podkop.features.resources.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import pl.masslany.podkop.features.links.hits.HitItem
 import pl.masslany.podkop.features.links.hits.models.HitItemState
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import pl.masslany.podkop.features.resources.models.ResourceItemState
-import pl.masslany.podkop.features.resources.models.comment.EntryCommentItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
+import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 
 @Composable
@@ -35,7 +40,7 @@ fun ResourceItemRenderer(
 }
 
 @Composable
-fun EntryItemRenderer(
+private fun EntryItemRenderer(
     modifier: Modifier,
     state: EntryItemState,
     actions: ResourceItemActions,
@@ -50,19 +55,44 @@ fun EntryItemRenderer(
                 containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
             )
         ) {
-            EntryItem(
+            Column(
                 modifier = Modifier
-                    .padding(16.dp),
-                state = state,
-                onProfileClick = { actions.onProfileClicked(it) },
-                onVoteUpClick = {
-                    actions.onEntryVoteUpClicked(
-                        entryId = state.id,
-                        voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+                    .padding(16.dp)
+            ) {
+                EntryItem(
+                    state = state,
+                    onProfileClick = { actions.onProfileClicked(it) },
+                    onVoteUpClick = {
+                        actions.onEntryVoteUpClicked(
+                            entryId = state.id,
+                            voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+                        )
+                    },
+                )
+                state.comments.forEach { comment ->
+                    Spacer(Modifier.size(12.dp))
+                    HorizontalDivider(
+                        thickness = Dp.Hairline,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                     )
-                },
-
-            )
+                    Spacer(Modifier.size(12.dp))
+                    EntryCommentItem(
+                        modifier = Modifier
+                            .padding(
+                                start = 16.dp,
+                            ),
+                        state = comment,
+                        onProfileClick = { actions.onProfileClicked(it) },
+                        onVoteUpClick = {
+                            actions.onEntryCommentVoteUpClick(
+                                entryCommentId = comment.id,
+                                parentEntryId = comment.parentId,
+                                voted = comment.voteState.positiveVoteButtonState?.isVoted ?: false
+                            )
+                        }
+                    )
+                }
+            }
         }
     } else {
         EntryItem(
@@ -80,7 +110,7 @@ fun EntryItemRenderer(
 }
 
 @Composable
-fun LinkItemRenderer(
+private fun LinkItemRenderer(
     modifier: Modifier,
     state: LinkItemState,
     actions: ResourceItemActions,
@@ -96,7 +126,7 @@ fun LinkItemRenderer(
 }
 
 @Composable
-fun EntryCommentItemRenderer(
+private fun EntryCommentItemRenderer(
     modifier: Modifier,
     state: EntryCommentItemState,
     actions: ResourceItemActions,
@@ -104,7 +134,7 @@ fun EntryCommentItemRenderer(
 }
 
 @Composable
-fun HitItemRenderer(
+private fun HitItemRenderer(
     modifier: Modifier,
     state: HitItemState,
     actions: ResourceItemActions,

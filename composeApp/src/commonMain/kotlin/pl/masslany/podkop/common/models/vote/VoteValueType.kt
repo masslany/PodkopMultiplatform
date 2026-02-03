@@ -1,5 +1,6 @@
 package pl.masslany.podkop.common.models.vote
 
+import pl.masslany.podkop.business.common.domain.models.common.Comment
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 
 sealed class VoteValueType {
@@ -68,6 +69,18 @@ sealed class VoteValueType {
 
 fun ResourceItem.toVoteValueType(): VoteValueType {
     val voteCount = (this.votes?.up ?: 0) - (this.votes?.down ?: 0)
+
+    return if (voteCount == 0) {
+        VoteValueType.Zero
+    } else if (voteCount > 0) {
+        VoteValueType.Positive(voteCount.toString())
+    } else {
+        VoteValueType.Negative(voteCount.toString())
+    }
+}
+
+fun Comment.toVoteValueType(): VoteValueType {
+    val voteCount = this.votes.up - this.votes.down
 
     return if (voteCount == 0) {
         VoteValueType.Zero
