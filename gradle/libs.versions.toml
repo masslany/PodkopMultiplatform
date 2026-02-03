@@ -36,6 +36,8 @@ compose-material3 = "1.9.0"
 compose-runtime = "1.10.0"
 compose-ui = "1.10.0"
 
+multiplatformMarkdownRenderer = "0.39.2"
+
 [libraries]
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
@@ -87,6 +89,9 @@ compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-pre
 compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundation" }
 lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNavigation3" }
+
+multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
+multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
 
 [bundles]
 

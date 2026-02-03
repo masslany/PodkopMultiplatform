@@ -80,6 +80,7 @@
     <string name="comment_label_removed_by_moderator">Komentarz usunięty przez moderatora</string>
     <string name="comment_label_removed_by_author">Komentarz usunięty przez autora</string>
     <string name="comment_button_load_all_comments">Pokaż wszystkie (%1$d)</string>
+    <string name="comment_button_show_spoiler">Pokaż spoiler</string>
 
     <!-- Published time -->
     <plurals name="published_at_days">
