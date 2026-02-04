@@ -27,11 +27,11 @@ fun HitsList(
     actions: ResourceItemActions,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Text(
             modifier = Modifier.padding(start = 16.dp),
-            text = stringResource(resource = Res.string.links_screen_label_hits)
+            text = stringResource(resource = Res.string.links_screen_label_hits),
         )
         Spacer(modifier = Modifier.size(8.dp))
         LazyRow(

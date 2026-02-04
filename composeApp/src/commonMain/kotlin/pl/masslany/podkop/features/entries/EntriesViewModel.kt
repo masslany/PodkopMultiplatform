@@ -22,7 +22,9 @@ import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 class EntriesViewModel(
     private val entriesRepository: EntriesRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
-) : ViewModel(), EntriesActions, ResourceItemStateHolder by resourceItemStateHolder {
+) : ViewModel(),
+    EntriesActions,
+    ResourceItemStateHolder by resourceItemStateHolder {
 
     private val _state = MutableStateFlow(EntriesScreenState.initial)
     val state = combine(
@@ -50,13 +52,13 @@ class EntriesViewModel(
                 sortMenuState = DropdownMenuState(
                     items = entriesSortTypes,
                     selected = DropdownMenuItemType.Hot,
-                    expanded = false
+                    expanded = false,
                 ),
                 hotSortMenuState = DropdownMenuState(
                     items = hotSortTypes,
                     selected = DropdownMenuItemType.TwelveHours,
                     expanded = false,
-                )
+                ),
             )
         }
 

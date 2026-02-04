@@ -22,7 +22,7 @@ fun Vote(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         VoteValue(state.voteValueType)
         state.positiveVoteButtonState?.let {

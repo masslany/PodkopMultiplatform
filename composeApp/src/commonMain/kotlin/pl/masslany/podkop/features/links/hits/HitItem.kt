@@ -61,7 +61,7 @@ fun HitItem(
                     .align(Alignment.Center),
                 painter = painterResource(resource = Res.drawable.no_image),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
             )
         } else {
             AsyncImage(
@@ -92,9 +92,9 @@ fun HitItem(
                         colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.75f)),
                         startY = 0f,
                         endY = 100f,
-                    )
+                    ),
                 )
-                .align(Alignment.BottomCenter)
+                .align(Alignment.BottomCenter),
         )
         Title(
             modifier = Modifier
@@ -112,7 +112,7 @@ fun HitItem(
             AdultRating(
                 modifier = Modifier
                     .padding(8.dp)
-                    .align(Alignment.TopEnd)
+                    .align(Alignment.TopEnd),
             )
         }
     }
@@ -129,7 +129,7 @@ private fun HitItemPreview() {
                     title = "Title",
                     maxLines = 3,
                     isAdult = false,
-                    displayAdultBadge = false
+                    displayAdultBadge = false,
                 ),
                 countState = CountState(
                     count = "300",

@@ -8,6 +8,6 @@ import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 interface LinksResourceItemStateHolder : ResourceItemStateHolder {
     val hits: StateFlow<ImmutableList<ResourceItemState>>
-    
+
     fun updateHits(data: List<ResourceItem>)
 }

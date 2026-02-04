@@ -25,16 +25,16 @@ fun AdultRating(
             .wrapContentSize()
             .background(
                 color = MaterialTheme.colorsPalette.adultRed,
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(24.dp),
             )
             .padding(
                 horizontal = 4.dp,
-                vertical = 1.dp
-            )
+                vertical = 1.dp,
+            ),
     ) {
         Text(
             text = stringResource(resource = Res.string.links_screen_label_adult_rating),
-            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
         )
     }
 }

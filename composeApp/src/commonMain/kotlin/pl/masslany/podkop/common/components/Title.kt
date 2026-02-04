@@ -19,7 +19,7 @@ fun Title(
     maxLines: Int? = null,
     textStyle: TextStyle = MaterialTheme.typography.titleSmall,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    overflow: TextOverflow = TextOverflow.Ellipsis
+    overflow: TextOverflow = TextOverflow.Ellipsis,
 ) {
     TextFlow(
         modifier = modifier,
@@ -32,7 +32,7 @@ fun Title(
     ) {
         if (state.isAdult && state.displayAdultBadge) {
             AdultRating(
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = 8.dp),
             )
         }
     }

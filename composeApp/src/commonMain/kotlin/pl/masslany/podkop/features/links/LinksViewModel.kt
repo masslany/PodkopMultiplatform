@@ -24,7 +24,9 @@ class LinksViewModel(
     val linksRepository: LinksRepository,
     val hitsRepository: HitsRepository,
     val linksResourceItemStateHolder: LinksResourceItemStateHolder,
-) : ViewModel(), LinksActions, LinksResourceItemStateHolder by linksResourceItemStateHolder {
+) : ViewModel(),
+    LinksActions,
+    LinksResourceItemStateHolder by linksResourceItemStateHolder {
 
     private val _state = MutableStateFlow(LinksScreenState.initial)
     val state = combine(
@@ -53,8 +55,8 @@ class LinksViewModel(
                         .map { linksSortType -> linksSortType.toDropdownMenuItemType() }
                         .toImmutableList(),
                     selected = selectedLinksSortType.toDropdownMenuItemType(),
-                    expanded = false
-                )
+                    expanded = false,
+                ),
             )
         }
 

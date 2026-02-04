@@ -36,7 +36,7 @@ fun App() {
         val appNavigator = koinInject<AppNavigator>()
 
         MainApp(
-            appNavigator = appNavigator
+            appNavigator = appNavigator,
         )
     }
 }
@@ -47,7 +47,6 @@ private fun MainApp(
     modifier: Modifier = Modifier,
     appNavigator: AppNavigator,
 ) {
-
     val state by appNavigator.state.collectAsStateWithLifecycle()
     val bottomBarManager = remember(appNavigator) { BottomBarManager(appNavigator) }
 
@@ -64,21 +63,19 @@ private fun MainApp(
                         modifier = Modifier
                             .graphicsLayer {
                                 translationY = translationAnimationValue
-                            }
+                            },
                     )
                 }
-
-            }
+            },
         ) { contentPadding ->
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxSize(),
             ) {
                 NavigationContent(
                     state = state,
                     onBack = { appNavigator.back() },
                     entryProvider = entryProvider {
-
                         entry<LinksScreen> {
                             LinksScreenRoot(
                                 isUpcoming = false,
@@ -100,15 +97,15 @@ private fun MainApp(
                         }
                         entry<GenericDialog>(
                             metadata = DialogSceneStrategy.dialog(
-                                DialogProperties()
-                            )
+                                DialogProperties(),
+                            ),
                         ) {
                             DefaultGenericDialog(
                                 dialog = it,
                                 navigator = appNavigator,
                             )
                         }
-                    }
+                    },
                 )
             }
         }

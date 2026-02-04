@@ -22,7 +22,7 @@ actual fun SetDialogDestinationToEdgeToEdge() {
             dialogWindow.attributes = attributes
             parentView.layoutParams = FrameLayout.LayoutParams(
                 activityWindow.decorView.width,
-                activityWindow.decorView.height
+                activityWindow.decorView.height,
             )
         }
     }

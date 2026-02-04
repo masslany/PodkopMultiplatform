@@ -23,7 +23,8 @@ class LinksResourceItemStateHolderImpl(
     entriesRepository = entriesRepository,
     linksRepository = linksRepository,
     appNavigator = appNavigator,
-), LinksResourceItemStateHolder {
+),
+    LinksResourceItemStateHolder {
 
     private val _hits = MutableStateFlow<ImmutableList<ResourceItemState>>(persistentListOf())
     override val hits: StateFlow<ImmutableList<ResourceItemState>> = _hits

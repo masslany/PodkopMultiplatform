@@ -1,0 +1,46 @@
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+
+# Kotlin specific settings
+[*.{kt,kts}]
+# 1. Increase line length. Compose nesting eats horizontal space fast.
+max_line_length = 120
+
+# 2. Fix the "staircase" effect you hate.
+# This stops ktlint from forcing a newline after the '=' in parameters.
+ktlint_standard_multiline-expression-wrapping = disabled
+
+# 3. Prevent aggressive wrapping of function arguments.
+# This keeps your 'colors = markdownColor(...)' on one line if it fits.
+ktlint_standard_argument-list-wrapping = disabled
+
+# 4. Trailing commas make Compose diffs much cleaner.
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+# 5. Handle function signatures more gracefully.
+ktlint_standard_function-signature = disabled
+
+# 6. Adjust spacing for better readability in DSLs.
+ktlint_standard_value-argument-comment = disabled
+
+# 7. STOP the ).padding( behavior.
+# This rule is the one that forces the chain to collapse onto the closing paren.
+ktlint_standard_multiline-expression-wrapping = disabled
+
+# 8. Keep the dots at the start of the line.
+# If this is enabled, ktlint might try to move the dot to the end of the previous line
+# or merge them. Disabling it gives you manual control over your chains.
+ktlint_standard_chain-wrapping = disabled
+
+# 9. Prevent ktlint from fighting your manual line breaks.
+# Sometimes ktlint 1.x thinks it knows better than you about where a call should end.
+ktlint_standard_function-call-spacing = disabled
+
+# 10. Use the Android Studio/IntelliJ style instead of "Ktlint Official".
+# The 'official' style is significantly more aggressive about collapsing chains.
+ktlint_code_style = android_studio

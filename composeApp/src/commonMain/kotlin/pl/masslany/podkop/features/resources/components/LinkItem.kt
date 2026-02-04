@@ -62,8 +62,8 @@ fun LinkItem(
             .clip(CardDefaults.shape)
             .clickable { onLinkClick() },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-        )
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
+        ),
     ) {
         Column {
             Row(
@@ -72,15 +72,15 @@ fun LinkItem(
                         top = 16.dp,
                         start = 16.dp,
                         end = 16.dp,
-                    )
+                    ),
             ) {
                 Column(
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Count(
                         state = state.countState,
                         backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
-                        onClick = onVoteClick
+                        onClick = onVoteClick,
                     )
                 }
                 state.titleState?.let {
@@ -91,11 +91,11 @@ fun LinkItem(
             Spacer(modifier = Modifier.size(8.dp))
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
             ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 ) {
                     state.descriptionState?.let {
                         Description(
@@ -132,7 +132,7 @@ fun LinkItem(
                     }
                     state.source?.let {
                         Source(
-                            state = state.source
+                            state = state.source,
                         )
                     }
                     state.publishedTimeType?.let {
@@ -182,25 +182,25 @@ private fun LinkItemPreview() {
                     title = "Title",
                     maxLines = Int.MAX_VALUE,
                     isAdult = false,
-                    displayAdultBadge = true
+                    displayAdultBadge = true,
                 ),
                 descriptionState = DescriptionState(
                     "Description desc desc desc. ".repeat(5),
-                    3
+                    3,
                 ),
                 countState = CountState(
                     count = "300",
                     isHot = false,
                     isVoted = false,
-                    canVote = false
+                    canVote = false,
                 ),
                 authorState = AuthorState("Username", NameColorType.Orange),
                 source = "test.website",
                 imageUrl = "",
                 tags = persistentListOf(
-                    TagItem("#test",  true),
-                    TagItem("#test2",  true),
-                    TagItem("#test3", false)
+                    TagItem("#test", true),
+                    TagItem("#test2", true),
+                    TagItem("#test3", false),
                 ),
                 commentCount = 10,
                 publishedTimeType = PublishedTimeType.Now,

@@ -22,13 +22,13 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
 
     val descriptionState = DescriptionState(
         description = this.description,
-        maxLines = 5
+        maxLines = 5,
     )
 
     val votes = this.votes
     val countState = if (votes != null) {
         val canVote = this.actions?.voteUp ?: false ||
-                this.actions?.voteDown ?: false
+            this.actions?.voteDown ?: false
 
         CountState(
             count = votes.up.toString(),

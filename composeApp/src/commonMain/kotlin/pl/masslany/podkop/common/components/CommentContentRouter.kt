@@ -49,12 +49,13 @@ fun EntryContentRouter(state: EntryContentState) {
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorsPalette.tagBlue,
-                            ).toSpanStyle()
-                        )
+                            ).toSpanStyle(),
+                        ),
                     ),
                 )
             }
         }
+
         EntryContentState.DeletedByAuthor -> {
             Text(
                 text = stringResource(resource = Res.string.comment_label_removed_by_author),
@@ -62,6 +63,7 @@ fun EntryContentRouter(state: EntryContentState) {
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
             )
         }
+
         EntryContentState.DeletedByModerator -> {
             Text(
                 text = stringResource(resource = Res.string.comment_label_removed_by_moderator),
@@ -127,5 +129,5 @@ private val spoilerComponents = markdownComponents(
                 style = typography.paragraph,
             )
         }
-    }
+    },
 )

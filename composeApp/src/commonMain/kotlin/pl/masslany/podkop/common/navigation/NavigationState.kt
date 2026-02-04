@@ -12,7 +12,7 @@ sealed interface OverlayState {
 data class TabState(
     val availableTabs: ImmutableList<TopLevelDestination>,
     val currentTabRoot: NavTarget,
-    val stacks: ImmutableMap<NavTarget, ImmutableList<NavTarget>> // Key: Tab Root, Value: Backstack
+    val stacks: ImmutableMap<NavTarget, ImmutableList<NavTarget>>, // Key: Tab Root, Value: Backstack
 )
 
 data class NavigationState(

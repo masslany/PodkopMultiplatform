@@ -34,55 +34,43 @@ sealed class DropdownMenuItemType {
     data object Everything : DropdownMenuItemType()
 }
 
-fun EntriesSortType.toDropdownMenuItemType(): DropdownMenuItemType {
-    return when (this) {
-        EntriesSortType.Active -> DropdownMenuItemType.Active
-        EntriesSortType.Hot -> DropdownMenuItemType.Hot
-        EntriesSortType.Newest -> DropdownMenuItemType.Newest
-    }
+fun EntriesSortType.toDropdownMenuItemType(): DropdownMenuItemType = when (this) {
+    EntriesSortType.Active -> DropdownMenuItemType.Active
+    EntriesSortType.Hot -> DropdownMenuItemType.Hot
+    EntriesSortType.Newest -> DropdownMenuItemType.Newest
 }
 
-fun LinksSortType.toDropdownMenuItemType(): DropdownMenuItemType {
-    return when (this) {
-        LinksSortType.Active -> DropdownMenuItemType.Active
-        LinksSortType.Commented -> DropdownMenuItemType.Commented
-        LinksSortType.Digged -> DropdownMenuItemType.Digged
-        LinksSortType.Newest -> DropdownMenuItemType.Newest
-    }
+fun LinksSortType.toDropdownMenuItemType(): DropdownMenuItemType = when (this) {
+    LinksSortType.Active -> DropdownMenuItemType.Active
+    LinksSortType.Commented -> DropdownMenuItemType.Commented
+    LinksSortType.Digged -> DropdownMenuItemType.Digged
+    LinksSortType.Newest -> DropdownMenuItemType.Newest
 }
 
-fun HotSortType.toDropdownMenuItemType(): DropdownMenuItemType {
-    return when (this) {
-        HotSortType.TwoHours -> DropdownMenuItemType.TwoHours
-        HotSortType.SixHours -> DropdownMenuItemType.SixHours
-        HotSortType.TwelveHours -> DropdownMenuItemType.TwelveHours
-    }
+fun HotSortType.toDropdownMenuItemType(): DropdownMenuItemType = when (this) {
+    HotSortType.TwoHours -> DropdownMenuItemType.TwoHours
+    HotSortType.SixHours -> DropdownMenuItemType.SixHours
+    HotSortType.TwelveHours -> DropdownMenuItemType.TwelveHours
 }
 
-fun DropdownMenuItemType.toLinksSortType(): LinksSortType {
-    return when (this) {
-         DropdownMenuItemType.Active -> LinksSortType.Active
-         DropdownMenuItemType.Commented -> LinksSortType.Commented
-         DropdownMenuItemType.Digged -> LinksSortType.Digged
-         DropdownMenuItemType.Newest -> LinksSortType.Newest
-        else -> throw IllegalArgumentException("Attempt to convert $this to LinksSortType")
-    }
+fun DropdownMenuItemType.toLinksSortType(): LinksSortType = when (this) {
+    DropdownMenuItemType.Active -> LinksSortType.Active
+    DropdownMenuItemType.Commented -> LinksSortType.Commented
+    DropdownMenuItemType.Digged -> LinksSortType.Digged
+    DropdownMenuItemType.Newest -> LinksSortType.Newest
+    else -> throw IllegalArgumentException("Attempt to convert $this to LinksSortType")
 }
 
-fun DropdownMenuItemType.toEntriesSortType(): EntriesSortType {
-    return when (this) {
-        DropdownMenuItemType.Active -> EntriesSortType.Active
-        DropdownMenuItemType.Hot -> EntriesSortType.Hot
-        DropdownMenuItemType.Newest -> EntriesSortType.Newest
-        else -> throw IllegalArgumentException("Attempt to convert $this to EntriesSortType")
-    }
+fun DropdownMenuItemType.toEntriesSortType(): EntriesSortType = when (this) {
+    DropdownMenuItemType.Active -> EntriesSortType.Active
+    DropdownMenuItemType.Hot -> EntriesSortType.Hot
+    DropdownMenuItemType.Newest -> EntriesSortType.Newest
+    else -> throw IllegalArgumentException("Attempt to convert $this to EntriesSortType")
 }
 
-fun DropdownMenuItemType.toHotSortType(): HotSortType {
-    return when (this) {
-        DropdownMenuItemType.TwoHours -> HotSortType.TwoHours
-        DropdownMenuItemType.SixHours -> HotSortType.SixHours
-        DropdownMenuItemType.TwelveHours -> HotSortType.TwelveHours
-        else -> throw IllegalArgumentException("Attempt to convert $this to HotSortType")
-    }
+fun DropdownMenuItemType.toHotSortType(): HotSortType = when (this) {
+    DropdownMenuItemType.TwoHours -> HotSortType.TwoHours
+    DropdownMenuItemType.SixHours -> HotSortType.SixHours
+    DropdownMenuItemType.TwelveHours -> HotSortType.TwelveHours
+    else -> throw IllegalArgumentException("Attempt to convert $this to HotSortType")
 }

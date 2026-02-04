@@ -41,7 +41,9 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
 
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
+
         Deleted.Moderator -> EntryContentState.DeletedByModerator
+
         Deleted.None -> EntryContentState.Content(
             content = this.content.toHighlightedTagProfileMarkdown(),
         )
@@ -55,6 +57,6 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
         entryContentState = entryContentState,
-        embedImageState = null
+        embedImageState = null,
     )
 }

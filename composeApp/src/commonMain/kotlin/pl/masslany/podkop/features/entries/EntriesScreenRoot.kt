@@ -86,13 +86,13 @@ fun EntriesScreenRoot(
             TopAppBar(
                 title = { Text(text = stringResource(resource = Res.string.topbar_label_entries)) },
                 actions = {
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_person),
                             contentDescription = stringResource(
-                                resource = Res.string.accessibility_topbar_profile
-                            )
+                                resource = Res.string.accessibility_topbar_profile,
+                            ),
                         )
                     }
                 },
@@ -101,10 +101,10 @@ fun EntriesScreenRoot(
             )
         },
         floatingActionButton = {
-            AnimatedVisibility (
+            AnimatedVisibility(
                 visible = showFab,
                 enter = fadeIn(),
-                exit = fadeOut()
+                exit = fadeOut(),
             ) {
                 FloatingActionButton(
                     onClick = {
@@ -113,32 +113,32 @@ fun EntriesScreenRoot(
                             scrollBehavior.state.contentOffset = 0f
                             lazyListState.animateScrollToItem(0)
                         }
-                    }
+                    },
                 ) {
                     Icon(
                         modifier = Modifier.size(24.dp),
                         imageVector = vectorResource(resource = Res.drawable.ic_keyboard_arrow_up),
                         contentDescription = stringResource(
-                            resource = Res.string.accessibility_fab_scroll_to_top
-                        )
+                            resource = Res.string.accessibility_fab_scroll_to_top,
+                        ),
                     )
                 }
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPaddingValues ->
         PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = { viewModel.onRefresh(state.sortMenuState.selected) },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPaddingValues.calculateTopPadding())
+                .padding(top = innerPaddingValues.calculateTopPadding()),
         ) {
             if (state.isLoading) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
                     )
                 }
             } else {
@@ -202,13 +202,13 @@ private fun EntriesScreen(
 
         items(
             items = state.entries,
-            key = { item -> item.id }
+            key = { item -> item.id },
         ) {
             ResourceItemRenderer(
                 modifier = Modifier
                     .padding(horizontal = 16.dp),
                 state = it,
-                actions = actions
+                actions = actions,
             )
         }
     }

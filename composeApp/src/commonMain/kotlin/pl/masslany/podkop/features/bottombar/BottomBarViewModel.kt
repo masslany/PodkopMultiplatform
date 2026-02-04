@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.NavTarget
 
-class BottomBarViewModel(
-    private val appNavigator: AppNavigator,
-) : ViewModel(), BottomBarActions {
+class BottomBarViewModel(private val appNavigator: AppNavigator) :
+    ViewModel(),
+    BottomBarActions {
 
     val state = MutableStateFlow(BottomBarState.initial)
 
@@ -25,7 +25,6 @@ class BottomBarViewModel(
         appNavigator.switchTab(screen)
     }
 
-
     private fun loadInitialDestinations() {
         val navigationState = appNavigator.state.value
         state.update {
@@ -36,9 +35,9 @@ class BottomBarViewModel(
                         isSelected = navigationState.tabState.currentTabRoot == topLevelDestination.root,
                         isEnabled = topLevelDestination.enabled,
                         labelRes = topLevelDestination.labelRes,
-                        iconRes = topLevelDestination.iconRes
+                        iconRes = topLevelDestination.iconRes,
                     )
-                }?.toImmutableList() ?: persistentListOf()
+                }?.toImmutableList() ?: persistentListOf(),
             )
         }
     }
@@ -52,7 +51,7 @@ class BottomBarViewModel(
                     prev.copy(
                         destinations = prev.destinations.map { dest ->
                             dest.copy(isSelected = dest.screen == selectedRoot)
-                        }.toImmutableList()
+                        }.toImmutableList(),
                     )
                 }
             }

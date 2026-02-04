@@ -26,7 +26,7 @@ val composeAppModule = module {
 }
 
 fun initKoin(
-    appDeclaration: KoinAppDeclaration = {}
+    appDeclaration: KoinAppDeclaration = {},
 ) {
     startKoin {
         appDeclaration()

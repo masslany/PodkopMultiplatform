@@ -10,9 +10,7 @@ val LocalBottomBarManager = staticCompositionLocalOf<BottomBarManager> {
 }
 
 // The connection logic
-class BottomBarScrollConnection(
-    private val manager: BottomBarManager
-) : NestedScrollConnection {
+class BottomBarScrollConnection(private val manager: BottomBarManager) : NestedScrollConnection {
 
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
         // We intercept the scroll here.

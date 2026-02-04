@@ -66,7 +66,7 @@ fun LinksScreenRoot(
     paddingValues: PaddingValues,
 ) {
     val viewModel = koinViewModel<LinksViewModel>(
-        parameters = { parametersOf(isUpcoming) }
+        parameters = { parametersOf(isUpcoming) },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -94,23 +94,23 @@ fun LinksScreenRoot(
                 title = { Text(text = getTopBarTitle(state.isUpcoming)) },
                 actions = {
                     if (!state.isUpcoming) {
-                        IconButton(onClick = {  }) {
+                        IconButton(onClick = { }) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = vectorResource(resource = Res.drawable.ic_search),
                                 contentDescription = stringResource(
-                                    resource = Res.string.accessibility_topbar_search
-                                )
+                                    resource = Res.string.accessibility_topbar_search,
+                                ),
                             )
                         }
                     }
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = { }) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_person),
                             contentDescription = stringResource(
-                                resource = Res.string.accessibility_topbar_profile
-                            )
+                                resource = Res.string.accessibility_topbar_profile,
+                            ),
                         )
                     }
                 },
@@ -119,10 +119,10 @@ fun LinksScreenRoot(
             )
         },
         floatingActionButton = {
-            AnimatedVisibility (
+            AnimatedVisibility(
                 visible = showFab,
                 enter = fadeIn(),
-                exit = fadeOut()
+                exit = fadeOut(),
             ) {
                 FloatingActionButton(
                     onClick = {
@@ -131,32 +131,32 @@ fun LinksScreenRoot(
                             scrollBehavior.state.contentOffset = 0f
                             lazyListState.animateScrollToItem(0)
                         }
-                    }
+                    },
                 ) {
                     Icon(
                         modifier = Modifier.size(24.dp),
                         imageVector = vectorResource(resource = Res.drawable.ic_keyboard_arrow_up),
                         contentDescription = stringResource(
-                            resource = Res.string.accessibility_fab_scroll_to_top
-                        )
+                            resource = Res.string.accessibility_fab_scroll_to_top,
+                        ),
                     )
                 }
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0)
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPaddingValues ->
         PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = { viewModel.onRefresh(state.sortMenuState.selected) },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPaddingValues.calculateTopPadding())
+                .padding(top = innerPaddingValues.calculateTopPadding()),
         ) {
             if (state.isLoading) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = Modifier.align(Alignment.Center),
                     )
                 }
             } else {
@@ -215,24 +215,21 @@ private fun LinksScreen(
 
         items(
             items = state.links,
-            key = { item -> item.id }
+            key = { item -> item.id },
         ) {
             ResourceItemRenderer(
                 modifier = Modifier
                     .padding(horizontal = 16.dp),
                 state = it,
-                actions = actions
+                actions = actions,
             )
         }
     }
 }
 
-
 @Composable
-private fun getTopBarTitle(isUpcoming: Boolean): String {
-    return if (isUpcoming) {
-        stringResource(resource = Res.string.topbar_label_upcoming)
-    } else {
-        stringResource(resource = Res.string.topbar_label_homepage)
-    }
+private fun getTopBarTitle(isUpcoming: Boolean): String = if (isUpcoming) {
+    stringResource(resource = Res.string.topbar_label_upcoming)
+} else {
+    stringResource(resource = Res.string.topbar_label_homepage)
 }

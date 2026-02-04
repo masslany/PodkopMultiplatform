@@ -3,11 +3,9 @@ package pl.masslany.podkop.common.models.vote
 import pl.masslany.podkop.business.common.domain.models.common.Comment
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 
-
-fun ResourceItem.toVoteState(): VoteState  {
+fun ResourceItem.toVoteState(): VoteState {
     val showPositiveVoteButton = this.actions?.voteUp == true
     val showNegativeVoteButton = this.actions?.voteDown == true
-
 
     return VoteState(
         voteValueType = this.toVoteValueType(),
@@ -15,7 +13,7 @@ fun ResourceItem.toVoteState(): VoteState  {
             VoteButtonState(
                 voteButtonType = VoteButtonType.Positive,
                 isVoted = !(this.actions?.voteUp ?: false) &&
-                        this.actions?.undoVote ?: false,
+                    this.actions?.undoVote ?: false,
             )
         } else {
             null
@@ -24,18 +22,17 @@ fun ResourceItem.toVoteState(): VoteState  {
             VoteButtonState(
                 voteButtonType = VoteButtonType.Negative,
                 isVoted = !(this.actions?.voteDown ?: false) &&
-                        this.actions?.undoVote ?: false,
+                    this.actions?.undoVote ?: false,
             )
         } else {
-             null
+            null
         },
     )
 }
 
-fun Comment.toVoteState(): VoteState  {
+fun Comment.toVoteState(): VoteState {
     val showPositiveVoteButton = this.actions.voteUp
     val showNegativeVoteButton = this.actions.voteDown
-
 
     return VoteState(
         voteValueType = this.toVoteValueType(),
@@ -43,7 +40,7 @@ fun Comment.toVoteState(): VoteState  {
             VoteButtonState(
                 voteButtonType = VoteButtonType.Positive,
                 isVoted = !this.actions.voteUp &&
-                        this.actions.undoVote,
+                    this.actions.undoVote,
             )
         } else {
             null
@@ -52,7 +49,7 @@ fun Comment.toVoteState(): VoteState  {
             VoteButtonState(
                 voteButtonType = VoteButtonType.Negative,
                 isVoted = !this.actions.voteDown &&
-                        this.actions.undoVote,
+                    this.actions.undoVote,
             )
         } else {
             null

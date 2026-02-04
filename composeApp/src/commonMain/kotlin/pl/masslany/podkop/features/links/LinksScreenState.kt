@@ -12,7 +12,7 @@ data class LinksScreenState(
     val isUpcoming: Boolean,
     val links: ImmutableList<ResourceItemState>,
     val hits: ImmutableList<ResourceItemState>,
-    val sortMenuState: DropdownMenuState
+    val sortMenuState: DropdownMenuState,
 ) {
     companion object {
         val initial = LinksScreenState(
@@ -27,15 +27,15 @@ data class LinksScreenState(
 
     fun updateSortMenuExpanded(expanded: Boolean) = this.copy(
         sortMenuState = sortMenuState.copy(
-            expanded = expanded
-        )
+            expanded = expanded,
+        ),
     )
 
     fun updateSortMenuSelected(sortType: DropdownMenuItemType) = this.copy(
         sortMenuState = sortMenuState.copy(
             expanded = false,
             selected = sortType,
-        )
+        ),
     )
 
     fun updateLoading(isLoading: Boolean) = this.copy(
@@ -45,5 +45,4 @@ data class LinksScreenState(
     fun updateRefreshing(isRefreshing: Boolean) = this.copy(
         isRefreshing = isRefreshing,
     )
-
 }

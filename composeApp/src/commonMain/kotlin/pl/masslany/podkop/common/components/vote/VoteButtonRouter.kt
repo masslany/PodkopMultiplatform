@@ -37,6 +37,7 @@ fun VoteButton(
             state = state,
             onClick = onVoteUpClick,
         )
+
         VoteButtonType.Negative -> NegativeButton(
             modifier = modifier,
             state = state,
@@ -49,24 +50,24 @@ fun VoteButton(
 private fun PositiveButton(
     modifier: Modifier,
     state: VoteButtonState,
-    onClick: () -> Unit ,
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = modifier
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorsPalette.votePositive,
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(4.dp),
             )
             .background(
                 color = getPositiveBackgroundColor(state.isVoted),
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(4.dp),
             )
             .clip(RoundedCornerShape(4.dp))
             .clickable { onClick() }
             .padding(4.dp)
             .height(12.dp)
-            .aspectRatio(1f)
+            .aspectRatio(1f),
     ) {
         Icon(
             imageVector = vectorResource(resource = Res.drawable.ic_add),
@@ -87,61 +88,51 @@ private fun NegativeButton(
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorsPalette.voteNegative,
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(4.dp),
             )
             .background(
                 color = getNegativeBackgroundColor(state.isVoted),
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(4.dp),
             )
             .clip(RoundedCornerShape(4.dp))
             .clickable { onClick() }
             .padding(4.dp)
             .height(12.dp)
             .aspectRatio(1f),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
-
         Icon(
             imageVector = vectorResource(resource = Res.drawable.ic_remove),
             contentDescription = null,
-            tint = getNegativeIconColor(state.isVoted)
+            tint = getNegativeIconColor(state.isVoted),
         )
     }
 }
 
 @Composable
-private fun getPositiveIconColor(isVoted: Boolean): Color {
-    return if (isVoted) {
-        MaterialTheme.colorScheme.surface
-    } else {
-        MaterialTheme.colorsPalette.votePositive
-    }
+private fun getPositiveIconColor(isVoted: Boolean): Color = if (isVoted) {
+    MaterialTheme.colorScheme.surface
+} else {
+    MaterialTheme.colorsPalette.votePositive
 }
 
 @Composable
-private fun getPositiveBackgroundColor(isVoted: Boolean): Color {
-    return if (isVoted) {
-        MaterialTheme.colorsPalette.votePositive
-    } else {
-        Color.Transparent
-    }
+private fun getPositiveBackgroundColor(isVoted: Boolean): Color = if (isVoted) {
+    MaterialTheme.colorsPalette.votePositive
+} else {
+    Color.Transparent
 }
 
 @Composable
-private fun getNegativeIconColor(isVoted: Boolean): Color {
-    return if (isVoted) {
-        MaterialTheme.colorScheme.surface
-    } else {
-        MaterialTheme.colorsPalette.voteNegative
-    }
+private fun getNegativeIconColor(isVoted: Boolean): Color = if (isVoted) {
+    MaterialTheme.colorScheme.surface
+} else {
+    MaterialTheme.colorsPalette.voteNegative
 }
 
 @Composable
-private fun getNegativeBackgroundColor(isVoted: Boolean): Color {
-    return if (isVoted) {
-        MaterialTheme.colorsPalette.voteNegative
-    } else {
-        Color.Transparent
-    }
+private fun getNegativeBackgroundColor(isVoted: Boolean): Color = if (isVoted) {
+    MaterialTheme.colorsPalette.voteNegative
+} else {
+    Color.Transparent
 }
-

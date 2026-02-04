@@ -6,7 +6,7 @@ import pl.masslany.podkop.common.models.TitleState
 
 fun ResourceItem.toHitItemState(): HitItemState {
     val canVote = this.actions?.voteUp ?: false ||
-            this.actions?.voteDown ?: false
+        this.actions?.voteDown ?: false
 
     val imageUrl = this.media?.photo?.url.orEmpty()
 

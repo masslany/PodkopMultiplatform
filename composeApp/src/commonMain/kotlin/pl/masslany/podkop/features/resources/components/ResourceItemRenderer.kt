@@ -50,14 +50,14 @@ private fun EntryItemRenderer(
         Card(
             modifier = modifier
                 .clip(CardDefaults.shape)
-                .clickable {  },
+                .clickable { },
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
-            )
+                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
+            ),
         ) {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 EntryItem(
                     state = state,
@@ -73,7 +73,7 @@ private fun EntryItemRenderer(
                     Spacer(Modifier.size(12.dp))
                     HorizontalDivider(
                         thickness = Dp.Hairline,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                     )
                     Spacer(Modifier.size(12.dp))
                     EntryCommentItem(
@@ -87,9 +87,9 @@ private fun EntryItemRenderer(
                             actions.onEntryCommentVoteUpClick(
                                 entryCommentId = comment.id,
                                 parentEntryId = comment.parentId,
-                                voted = comment.voteState.positiveVoteButtonState?.isVoted ?: false
+                                voted = comment.voteState.positiveVoteButtonState?.isVoted ?: false,
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -104,7 +104,7 @@ private fun EntryItemRenderer(
                     entryId = state.id,
                     voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
                 )
-            }
+            },
         )
     }
 }
@@ -143,6 +143,6 @@ private fun HitItemRenderer(
         modifier = modifier,
         state = state,
         onItemClick = { actions.onLinkClicked(state.id) },
-        onVoteClick = { actions.onLinkVoteClicked(state.id, state.countState.isVoted) }
+        onVoteClick = { actions.onLinkVoteClicked(state.id, state.countState.isVoted) },
     )
 }

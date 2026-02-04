@@ -61,7 +61,7 @@ internal fun TextFlowCanvas(
             fontStyle = fontStyle,
             letterSpacing = letterSpacing,
             // However we need to disable font padding to align both text paragraphs perfectly
-            //platformStyle = PlatformTextStyle(false),
+            // platformStyle = PlatformTextStyle(false),
         ),
     )
 

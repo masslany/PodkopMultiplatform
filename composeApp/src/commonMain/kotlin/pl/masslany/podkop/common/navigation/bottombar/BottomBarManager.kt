@@ -4,9 +4,7 @@ import androidx.compose.runtime.Stable
 import pl.masslany.podkop.common.navigation.AppNavigator
 
 @Stable
-class BottomBarManager(
-    private val navigator: AppNavigator
-) {
+class BottomBarManager(private val navigator: AppNavigator) {
     // Buffer to prevent flickering. User must scroll X pixels before we react.
     private val scrollThreshold = 15f
     private var accumulatedScroll = 0f

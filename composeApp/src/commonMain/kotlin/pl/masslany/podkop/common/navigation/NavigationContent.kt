@@ -26,7 +26,7 @@ fun NavigationContent(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         val rootTarget = state.rootStack.lastOrNull()
 
@@ -55,13 +55,14 @@ fun NavigationContent(
 
     when (val ov = state.overlay) {
         OverlayState.None -> Unit
+
         is OverlayState.Blocking -> {
             Dialog(
                 onDismissRequest = {},
                 properties = DialogProperties(
                     dismissOnBackPress = false,
                     dismissOnClickOutside = false,
-                )
+                ),
             ) {
                 GenericNavDisplay(
                     backStack = persistentListOf(ov.target),
@@ -90,10 +91,9 @@ private fun GenericNavDisplay(
         sceneStrategy = bottomSheetStrategy then dialogSceneStrategy,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator()
+            rememberViewModelStoreNavEntryDecorator(),
         ),
         entryProvider = { entryProvider(it) },
         onBack = onBack,
     )
 }
-

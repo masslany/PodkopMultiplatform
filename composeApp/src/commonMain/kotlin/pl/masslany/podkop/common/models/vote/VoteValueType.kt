@@ -4,64 +4,64 @@ import pl.masslany.podkop.business.common.domain.models.common.Comment
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 
 sealed class VoteValueType {
-    data class Positive(val value: String): VoteValueType()
+    data class Positive(val value: String) : VoteValueType()
 
-    data class Negative(val value: String): VoteValueType()
+    data class Negative(val value: String) : VoteValueType()
 
     data object Zero : VoteValueType()
 
-    fun increaseVoteUp(): VoteValueType {
-        return when (this) {
-            is Zero -> Positive("1")
-            is Positive -> Positive((this.value.toInt() + 1).toString())
-            is Negative -> {
-                if (this.value.toInt() == -1) {
-                    Zero
-                } else {
-                    Negative((this.value.toInt() + 1).toString())
-                }
+    fun increaseVoteUp(): VoteValueType = when (this) {
+        is Zero -> Positive("1")
+
+        is Positive -> Positive((this.value.toInt() + 1).toString())
+
+        is Negative -> {
+            if (this.value.toInt() == -1) {
+                Zero
+            } else {
+                Negative((this.value.toInt() + 1).toString())
             }
         }
     }
 
-    fun increaseVoteDown(): VoteValueType {
-        return when (this) {
-            is Zero -> Negative("-1")
-            is Positive -> {
-                if (this.value.toInt() == 1) {
-                    Zero
-                } else {
-                    Positive((this.value.toInt() - 1).toString())
-                }
+    fun increaseVoteDown(): VoteValueType = when (this) {
+        is Zero -> Negative("-1")
+
+        is Positive -> {
+            if (this.value.toInt() == 1) {
+                Zero
+            } else {
+                Positive((this.value.toInt() - 1).toString())
             }
-            is Negative -> Negative((this.value.toInt() - 1).toString())
         }
+
+        is Negative -> Negative((this.value.toInt() - 1).toString())
     }
 
-    fun removeVoteUp(): VoteValueType {
-        return when (this) {
-            is Zero -> Negative("-1")
-            is Positive -> {
-                if (this.value.toInt() == 1) {
-                    Zero
-                } else {
-                    Positive((this.value.toInt() - 1).toString())
-                }
+    fun removeVoteUp(): VoteValueType = when (this) {
+        is Zero -> Negative("-1")
+
+        is Positive -> {
+            if (this.value.toInt() == 1) {
+                Zero
+            } else {
+                Positive((this.value.toInt() - 1).toString())
             }
-            is Negative -> Negative((this.value.toInt() - 1).toString())
         }
+
+        is Negative -> Negative((this.value.toInt() - 1).toString())
     }
 
-    fun removeVoteDown(): VoteValueType {
-        return when (this) {
-            is Zero -> Positive("1")
-            is Positive -> Positive((this.value.toInt() + 1).toString())
-            is Negative -> {
-                if (this.value.toInt() == -1) {
-                    Zero
-                } else {
-                    Negative((this.value.toInt() + 1).toString())
-                }
+    fun removeVoteDown(): VoteValueType = when (this) {
+        is Zero -> Positive("1")
+
+        is Positive -> Positive((this.value.toInt() + 1).toString())
+
+        is Negative -> {
+            if (this.value.toInt() == -1) {
+                Zero
+            } else {
+                Negative((this.value.toInt() + 1).toString())
             }
         }
     }
@@ -90,4 +90,3 @@ fun Comment.toVoteValueType(): VoteValueType {
         VoteValueType.Negative(voteCount.toString())
     }
 }
-

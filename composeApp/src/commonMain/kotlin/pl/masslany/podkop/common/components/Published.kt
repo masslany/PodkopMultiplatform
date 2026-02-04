@@ -17,7 +17,7 @@ import podkop.composeapp.generated.resources.published_at_now
 @Composable
 fun Published(
     modifier: Modifier = Modifier,
-    type: PublishedTimeType
+    type: PublishedTimeType,
 ) {
     Text(
         modifier = modifier,
@@ -28,26 +28,25 @@ fun Published(
 }
 
 @Composable
-private fun PublishedTimeType.toText(): String {
-    return when (this) {
-        is PublishedTimeType.FullDate -> this.formattedDate
-        is PublishedTimeType.Days ->
-            pluralStringResource(resource = Res.plurals.published_at_days, this.days, this.days)
+private fun PublishedTimeType.toText(): String = when (this) {
+    is PublishedTimeType.FullDate -> this.formattedDate
 
-        is PublishedTimeType.HoursMinutes ->
-            stringResource(
-                resource = Res.string.published_at_hours_minutes,
-                this.hours,
-                this.minutes
-            )
+    is PublishedTimeType.Days ->
+        pluralStringResource(resource = Res.plurals.published_at_days, this.days, this.days)
 
-        is PublishedTimeType.Hours ->
-            stringResource(resource = Res.string.published_at_hours, this.hours)
+    is PublishedTimeType.HoursMinutes ->
+        stringResource(
+            resource = Res.string.published_at_hours_minutes,
+            this.hours,
+            this.minutes,
+        )
 
-        is PublishedTimeType.Minutes ->
-            stringResource(resource = Res.string.published_at_minutes, this.minutes)
+    is PublishedTimeType.Hours ->
+        stringResource(resource = Res.string.published_at_hours, this.hours)
 
-        is PublishedTimeType.Now ->
-            stringResource(resource = Res.string.published_at_now)
-    }
+    is PublishedTimeType.Minutes ->
+        stringResource(resource = Res.string.published_at_minutes, this.minutes)
+
+    is PublishedTimeType.Now ->
+        stringResource(resource = Res.string.published_at_now)
 }

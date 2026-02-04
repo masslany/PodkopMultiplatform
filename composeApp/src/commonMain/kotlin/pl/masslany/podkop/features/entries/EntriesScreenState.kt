@@ -25,11 +25,11 @@ data class EntriesScreenState(
 
     fun updateSortMenuExpanded(expanded: Boolean) = this.copy(
         sortMenuState = sortMenuState.copy(
-            expanded = expanded
+            expanded = expanded,
         ),
         hotSortMenuState = hotSortMenuState?.copy(
             expanded = false,
-        )
+        ),
     )
 
     fun updateSortMenuSelected(
@@ -48,23 +48,23 @@ data class EntriesScreenState(
             )
         } else {
             null
-        }
+        },
     )
 
     fun updateHotSortMenuExpanded(expanded: Boolean) = this.copy(
         sortMenuState = sortMenuState.copy(
-            expanded = false
+            expanded = false,
         ),
         hotSortMenuState = hotSortMenuState?.copy(
             expanded = expanded,
-        )
+        ),
     )
 
     fun updateHotSortMenuSelected(sortType: DropdownMenuItemType) = this.copy(
         hotSortMenuState = hotSortMenuState?.copy(
             selected = sortType,
             expanded = false,
-        )
+        ),
     )
 
     fun updateLoading(isLoading: Boolean) = this.copy(
@@ -74,5 +74,4 @@ data class EntriesScreenState(
     fun updateRefreshing(isRefreshing: Boolean) = this.copy(
         isRefreshing = isRefreshing,
     )
-
 }

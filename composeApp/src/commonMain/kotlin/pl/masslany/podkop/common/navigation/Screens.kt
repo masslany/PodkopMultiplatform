@@ -1,8 +1,8 @@
 package pl.masslany.podkop.common.navigation
 
-import kotlinx.serialization.Serializable
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import kotlinx.serialization.Serializable
 
 @Serializable
 data object MainApp : MainAppTarget
@@ -18,5 +18,5 @@ data class GenericDialog(
     val description: String? = null,
     val positiveText: String = "OK",
     val negativeText: String? = null,
-    val key: String = Uuid.random().toString()
+    val key: String = Uuid.random().toString(),
 ) : NavTarget

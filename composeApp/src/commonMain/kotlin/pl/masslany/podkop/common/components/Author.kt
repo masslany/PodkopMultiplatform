@@ -24,17 +24,14 @@ fun Author(
         color = state.color.toComposeColor(),
         modifier = modifier.clickable {
             onClick(state.name)
-        }
+        },
     )
 }
 
 @Composable
-fun NameColorType.toComposeColor(): Color {
-    return when (this) {
-        NameColorType.Black -> MaterialTheme.colorsPalette.nameBlack
-        NameColorType.Burgundy -> MaterialTheme.colorsPalette.nameBurgundy
-        NameColorType.Green -> MaterialTheme.colorsPalette.nameGreen
-        NameColorType.Orange -> MaterialTheme.colorsPalette.nameOrange
-    }
+fun NameColorType.toComposeColor(): Color = when (this) {
+    NameColorType.Black -> MaterialTheme.colorsPalette.nameBlack
+    NameColorType.Burgundy -> MaterialTheme.colorsPalette.nameBurgundy
+    NameColorType.Green -> MaterialTheme.colorsPalette.nameGreen
+    NameColorType.Orange -> MaterialTheme.colorsPalette.nameOrange
 }
-

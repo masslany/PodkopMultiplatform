@@ -35,13 +35,13 @@ fun Count(
     modifier: Modifier = Modifier,
     state: CountState,
     backgroundColor: Color = Color.Transparent,
-    onClick: () -> Unit ,
+    onClick: () -> Unit,
 ) {
     Box(modifier = modifier) {
         BasicText(
             text = state.count,
             style = MaterialTheme.typography.labelMedium.copy(
-                color = countTextColor(isHot = state.isHot, isVoted = state.isVoted)
+                color = countTextColor(isHot = state.isHot, isVoted = state.isVoted),
             ),
             modifier = Modifier
                 .clip(shape = RoundedCornerShape(12.dp))
@@ -52,7 +52,7 @@ fun Count(
                 .border(
                     width = 2.dp,
                     color = borderColor(isVoted = state.isVoted),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
                 )
                 .padding(4.dp)
                 .wrapContentSize(),
@@ -69,45 +69,39 @@ fun Count(
                     .size(24.dp)
                     .offset(8.dp, 8.dp)
                     .align(Alignment.BottomEnd),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorsPalette.hotOrange)
+                colorFilter = ColorFilter.tint(MaterialTheme.colorsPalette.hotOrange),
             )
         }
     }
 }
 
 @Composable
-private fun countTextColor(isHot: Boolean, isVoted: Boolean): Color {
-    return if (isHot) {
-        if (isVoted) {
-            MaterialTheme.colorsPalette.hotOrange.copy(alpha = 0.6f)
-        } else {
-            MaterialTheme.colorsPalette.hotOrange
-        }
+private fun countTextColor(isHot: Boolean, isVoted: Boolean): Color = if (isHot) {
+    if (isVoted) {
+        MaterialTheme.colorsPalette.hotOrange.copy(alpha = 0.6f)
     } else {
-        if (isVoted) {
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        } else {
-            MaterialTheme.colorScheme.onSurface
-        }
+        MaterialTheme.colorsPalette.hotOrange
+    }
+} else {
+    if (isVoted) {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    } else {
+        MaterialTheme.colorScheme.onSurface
     }
 }
 
 @Composable
-private fun borderColor(isVoted: Boolean): Color {
-    return if (isVoted) {
-        MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f)
-    } else {
-        MaterialTheme.colorScheme.secondary
-    }
+private fun borderColor(isVoted: Boolean): Color = if (isVoted) {
+    MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f)
+} else {
+    MaterialTheme.colorScheme.secondary
 }
 
 @Composable
-private fun backgroundColorRouter(color: Color, isVoted: Boolean): Color {
-    return if (isVoted) {
-        color.copy(alpha = 0.8f)
-    } else {
-        color
-    }
+private fun backgroundColorRouter(color: Color, isVoted: Boolean): Color = if (isVoted) {
+    color.copy(alpha = 0.8f)
+} else {
+    color
 }
 
 @Preview

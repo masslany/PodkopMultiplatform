@@ -1,11 +1,11 @@
 package pl.masslany.podkop.common.models
 
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.ZERO
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.number
 import kotlinx.datetime.toInstant
-import kotlin.time.Clock
-import kotlin.time.Duration.Companion.ZERO
 
 sealed class PublishedTimeType {
 
@@ -61,7 +61,6 @@ fun LocalDateTime.toPublishedTimeType(): PublishedTimeType {
         else -> PublishedTimeType.Now
     }
 }
-
 
 private const val DAYS_IN_WEEK = 7
 private const val HOURS_IN_DAY = 24

@@ -11,10 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AppNavigator(
-    private val configProvider: NavigationConfigProvider,
-    private val scope: CoroutineScope
-) {
+class AppNavigator(private val configProvider: NavigationConfigProvider, private val scope: CoroutineScope) {
     private val _isReady = MutableStateFlow(false)
     val isReady = _isReady.asStateFlow()
 
@@ -65,7 +62,9 @@ class AppNavigator(
         _state.update { previousState ->
             if (previousState.tabState != null) {
                 previousState.copy(tabState = previousState.tabState.copy(currentTabRoot = root))
-            } else previousState
+            } else {
+                previousState
+            }
         }
     }
 
@@ -119,7 +118,7 @@ class AppNavigator(
                     // There are screens on the current tab's stack - pop the last one
                     consumed = true
                     val newStacks = previousState.tabState.stacks +
-                            (currentRoot to stack.dropLast(1).toPersistentList())
+                        (currentRoot to stack.dropLast(1).toPersistentList())
                     previousState.copy(tabState = previousState.tabState.copy(stacks = newStacks.toPersistentMap()))
                 } else {
                     // We are at the root of a tab (e.g., "Upcoming")
@@ -140,7 +139,7 @@ class AppNavigator(
                 if (previousState.rootStack.size > 1) {
                     consumed = true
                     previousState.copy(
-                        rootStack = previousState.rootStack.dropLast(1).toPersistentList()
+                        rootStack = previousState.rootStack.dropLast(1).toPersistentList(),
                     )
                 } else {
                     consumed = false
@@ -178,7 +177,7 @@ class AppNavigator(
             it.copy(
                 rootStack = persistentListOf(mainTarget),
                 tabState = TabState(tabs, startTab, initialStacks),
-                overlay = OverlayState.None
+                overlay = OverlayState.None,
             )
         }
         _isReady.value = true

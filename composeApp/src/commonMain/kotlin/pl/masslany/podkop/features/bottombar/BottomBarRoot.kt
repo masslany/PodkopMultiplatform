@@ -58,18 +58,17 @@ private fun BottomBar(
                 icon = {
                     Icon(
                         painter = painterResource(bottomBarDestinationState.iconRes),
-                        contentDescription = null
+                        contentDescription = null,
                     )
                 },
                 alwaysShowLabel = true,
                 label = {
                     Text(
                         text = stringResource(bottomBarDestinationState.labelRes),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
                     )
                 },
             )
         }
     }
 }
-

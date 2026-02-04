@@ -33,7 +33,7 @@ open class BaseResourceItemStateHolder(
 
     override fun init(
         scope: CoroutineScope,
-        isUpcoming: Boolean
+        isUpcoming: Boolean,
     ) {
         this.scope = scope
         this.isUpcoming = isUpcoming
@@ -67,11 +67,10 @@ open class BaseResourceItemStateHolder(
     fun onLinkCommentVoted(
         linkId: Int,
         commentId: Int,
-        voted: Boolean
+        voted: Boolean,
     ) {
         val item = (_items.value.find { it.id == linkId } as? LinkItemState)
-            //todo think this through
-
+        // todo think this through
     }
 
     override fun onLinkClicked(id: Int) {
@@ -97,22 +96,22 @@ open class BaseResourceItemStateHolder(
             result.onSuccess {
                 updateEntryVote(
                     entryId = entryId,
-                    action = if (voted)
+                    action = if (voted) {
                         EntryVoteAction.VoteUp
-                    else
+                    } else {
                         EntryVoteAction.RemoveVoteUp
+                    },
                 )
             }
         }
     }
 
     override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) {
-
     }
 
     private fun updateEntryVote(
         entryId: Int,
-        action: EntryVoteAction
+        action: EntryVoteAction,
     ) {
         updateItem(entryId) { item ->
             val entry = item as? EntryItemState ?: return@updateItem item
@@ -129,10 +128,9 @@ open class BaseResourceItemStateHolder(
         }
     }
 
-
     protected fun updateItem(
         id: Int,
-        updater: (ResourceItemState) -> ResourceItemState
+        updater: (ResourceItemState) -> ResourceItemState,
     ) {
         _items.update { list ->
             list.map { item ->
@@ -143,6 +141,16 @@ open class BaseResourceItemStateHolder(
 
     // This is open so specialized handlers can update multiple lists
     open fun notifyItemUpdated(newState: ResourceItem) {
-        _items.update { list -> list.map { if(it.id == newState.id) newState.toResourceItemState(isUpcoming) else it }.toImmutableList() }
+        _items.update { list ->
+            list.map {
+                if (it.id ==
+                    newState.id
+                ) {
+                    newState.toResourceItemState(isUpcoming)
+                } else {
+                    it
+                }
+            }.toImmutableList()
+        }
     }
 }

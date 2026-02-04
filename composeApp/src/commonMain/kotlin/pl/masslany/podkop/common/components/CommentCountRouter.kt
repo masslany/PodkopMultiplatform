@@ -29,13 +29,13 @@ fun CommentCount(
             contentDescription = null,
             modifier = Modifier
                 .size(16.dp),
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
         )
         Spacer(Modifier.size(4.dp))
         Text(
             text = count.toString(),
             color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }

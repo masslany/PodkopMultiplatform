@@ -15,12 +15,9 @@ import podkop.composeapp.generated.resources.navigation_label_entries
 import podkop.composeapp.generated.resources.navigation_label_homepage
 import podkop.composeapp.generated.resources.navigation_label_upcoming
 
-class AppConfigProvider(
-) : NavigationConfigProvider {
+class AppConfigProvider : NavigationConfigProvider {
 
-    override suspend fun resolveStartDestination(): NavTarget {
-        return MainApp
-    }
+    override suspend fun resolveStartDestination(): NavTarget = MainApp
 
     override val topLevelDestinations: Flow<ImmutableList<TopLevelDestination>> = flow {
         val links = TopLevelDestination(
@@ -45,7 +42,7 @@ class AppConfigProvider(
         )
 
         emit(
-            persistentListOf(links, upcoming, entries)
+            persistentListOf(links, upcoming, entries),
         )
     }
 }

@@ -29,7 +29,7 @@ internal class BottomSheetScene<T : Any>(
         ModalBottomSheet(
             onDismissRequest = onBack,
             properties = modalBottomSheetProperties,
-            containerColor = Color.White
+            containerColor = Color.White,
         ) {
             entry.Content()
         }
@@ -56,7 +56,7 @@ class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
                 overlaidEntries = entries.dropLast(1),
                 entry = lastEntry,
                 modalBottomSheetProperties = properties,
-                onBack = onBack
+                onBack = onBack,
             )
         }
     }
@@ -71,7 +71,7 @@ class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
          */
         @OptIn(ExperimentalMaterial3Api::class)
         fun bottomSheet(
-            modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties()
+            modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties(),
         ): Map<String, Any> = mapOf(BOTTOM_SHEET_KEY to modalBottomSheetProperties)
 
         internal const val BOTTOM_SHEET_KEY = "bottomsheet"

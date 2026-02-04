@@ -36,7 +36,7 @@ fun Avatar(
 ) {
     Column(
         modifier = modifier
-            .clickable { onClick() }
+            .clickable { onClick() },
     ) {
         AvatarImageTypeRouter(avatarType = state.type)
         Spacer(Modifier.size(4.dp))
@@ -44,9 +44,8 @@ fun Avatar(
             type = state.genderIndicatorType,
             modifier = Modifier
                 .width(36.dp)
-                .height(2.dp)
+                .height(2.dp),
         )
-
     }
 }
 
@@ -68,25 +67,26 @@ fun AvatarImageTypeRouter(avatarType: AvatarType) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
                     )
                 },
                 error = {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp))
+                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
                     ) {
                         Image(
                             modifier = Modifier.fillMaxSize(),
                             painter = painterResource(resource = Res.drawable.ic_profile),
                             contentDescription = null,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                         )
                     }
                 },
             )
         }
+
         AvatarType.NoAvatar -> {
             Image(
                 modifier = Modifier
@@ -94,7 +94,7 @@ fun AvatarImageTypeRouter(avatarType: AvatarType) {
                     .clip(MaterialTheme.shapes.small),
                 painter = painterResource(resource = Res.drawable.ic_profile),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
             )
         }
     }

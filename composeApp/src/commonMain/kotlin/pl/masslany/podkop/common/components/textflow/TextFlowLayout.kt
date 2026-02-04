@@ -86,6 +86,7 @@ public fun TextFlowLayout(
         // And calculate an offset for obstacle(s)
         val obstacleOffset = when (obstacleAlignment) {
             TextFlowLayoutObstacleAlignment.TopStart -> IntOffset.Zero
+
             TextFlowLayoutObstacleAlignment.TopEnd -> IntOffset(
                 constraints.maxWidth - maxObstacleWidth,
                 0,

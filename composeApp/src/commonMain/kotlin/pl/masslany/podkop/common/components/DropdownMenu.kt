@@ -47,7 +47,7 @@ fun DropdownMenu(
     ExposedDropdownMenuBox(
         modifier = modifier,
         expanded = expanded,
-        onExpandedChange = onExpandedChange
+        onExpandedChange = onExpandedChange,
     ) {
         FilterChip(
             selected = true,
@@ -66,11 +66,11 @@ fun DropdownMenu(
                 Icon(
                     modifier = Modifier.rotate(if (expanded) ExpandedRotation else DefaultRotation),
                     imageVector = vectorResource(resource = Res.drawable.ic_arrow_dropdown),
-                    contentDescription = null
+                    contentDescription = null,
                 )
             },
             modifier = Modifier
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable),
         )
         ExposedDropdownMenu(
             expanded = expanded,
@@ -90,54 +90,51 @@ fun DropdownMenu(
             }
         }
     }
-
 }
 
 @Composable
-private fun DropdownMenuItemType.toText(): String {
-    return when (this) {
-        DropdownMenuItemType.Active ->
-            stringResource(resource = Res.string.dropdown_menu_label_active)
+private fun DropdownMenuItemType.toText(): String = when (this) {
+    DropdownMenuItemType.Active ->
+        stringResource(resource = Res.string.dropdown_menu_label_active)
 
-        DropdownMenuItemType.Newest ->
-            stringResource(resource = Res.string.dropdown_menu_label_newest)
+    DropdownMenuItemType.Newest ->
+        stringResource(resource = Res.string.dropdown_menu_label_newest)
 
-        DropdownMenuItemType.Commented ->
-            stringResource(resource = Res.string.dropdown_menu_label_commented)
+    DropdownMenuItemType.Commented ->
+        stringResource(resource = Res.string.dropdown_menu_label_commented)
 
-        DropdownMenuItemType.Digged ->
-            stringResource(resource = Res.string.dropdown_menu_label_digged)
+    DropdownMenuItemType.Digged ->
+        stringResource(resource = Res.string.dropdown_menu_label_digged)
 
-        DropdownMenuItemType.Best ->
-            stringResource(resource = Res.string.dropdown_menu_label_best)
+    DropdownMenuItemType.Best ->
+        stringResource(resource = Res.string.dropdown_menu_label_best)
 
-        DropdownMenuItemType.Oldest ->
-            stringResource(resource = Res.string.dropdown_menu_label_oldest)
+    DropdownMenuItemType.Oldest ->
+        stringResource(resource = Res.string.dropdown_menu_label_oldest)
 
-        DropdownMenuItemType.Hot ->
-            stringResource(resource = Res.string.dropdown_menu_label_hot)
+    DropdownMenuItemType.Hot ->
+        stringResource(resource = Res.string.dropdown_menu_label_hot)
 
-        DropdownMenuItemType.TwoHours ->
-            stringResource(resource = Res.string.dropdown_menu_label_hot_2h)
+    DropdownMenuItemType.TwoHours ->
+        stringResource(resource = Res.string.dropdown_menu_label_hot_2h)
 
-        DropdownMenuItemType.SixHours ->
-            stringResource(resource = Res.string.dropdown_menu_label_hot_6h)
+    DropdownMenuItemType.SixHours ->
+        stringResource(resource = Res.string.dropdown_menu_label_hot_6h)
 
-        DropdownMenuItemType.TwelveHours ->
-            stringResource(resource = Res.string.dropdown_menu_label_hot_12h)
+    DropdownMenuItemType.TwelveHours ->
+        stringResource(resource = Res.string.dropdown_menu_label_hot_12h)
 
-        DropdownMenuItemType.All ->
-            stringResource(resource = Res.string.dropdown_menu_label_all)
+    DropdownMenuItemType.All ->
+        stringResource(resource = Res.string.dropdown_menu_label_all)
 
-        DropdownMenuItemType.Entries ->
-            stringResource(resource = Res.string.dropdown_menu_label_entries)
+    DropdownMenuItemType.Entries ->
+        stringResource(resource = Res.string.dropdown_menu_label_entries)
 
-        DropdownMenuItemType.Links ->
-            stringResource(resource = Res.string.dropdown_menu_label_links)
+    DropdownMenuItemType.Links ->
+        stringResource(resource = Res.string.dropdown_menu_label_links)
 
-        DropdownMenuItemType.Everything ->
-            stringResource(resource = Res.string.dropdown_menu_label_everything)
-    }
+    DropdownMenuItemType.Everything ->
+        stringResource(resource = Res.string.dropdown_menu_label_everything)
 }
 
 private const val ExpandedRotation = 180f

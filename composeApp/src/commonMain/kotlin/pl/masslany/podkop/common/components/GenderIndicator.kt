@@ -18,15 +18,13 @@ fun GenderIndicator(
     Box(
         modifier = modifier
             .clip(MaterialTheme.shapes.extraSmall)
-            .background(type.toComposeColor())
+            .background(type.toComposeColor()),
     )
 }
 
 @Composable
-fun GenderIndicatorType.toComposeColor(): Color {
-    return when (this) {
-        GenderIndicatorType.Female -> MaterialTheme.colorsPalette.genderPink
-        GenderIndicatorType.Male -> MaterialTheme.colorsPalette.genderBlue
-        GenderIndicatorType.Unspecified -> MaterialTheme.colorsPalette.genderGray
-    }
+fun GenderIndicatorType.toComposeColor(): Color = when (this) {
+    GenderIndicatorType.Female -> MaterialTheme.colorsPalette.genderPink
+    GenderIndicatorType.Male -> MaterialTheme.colorsPalette.genderBlue
+    GenderIndicatorType.Unspecified -> MaterialTheme.colorsPalette.genderGray
 }

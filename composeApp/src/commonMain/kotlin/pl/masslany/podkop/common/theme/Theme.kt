@@ -86,7 +86,7 @@ fun PodkopTheme(
     }
 
     CompositionLocalProvider(
-        LocalColorsPalette provides colorsPalette
+        LocalColorsPalette provides colorsPalette,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

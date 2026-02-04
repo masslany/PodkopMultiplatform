@@ -7,11 +7,10 @@ import androidx.compose.runtime.Composable
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.GenericDialog
 
-
 @Composable
 fun DefaultGenericDialog(
     dialog: GenericDialog,
-    navigator: AppNavigator
+    navigator: AppNavigator,
 ) {
     AlertDialog(
         onDismissRequest = { navigator.back() },
@@ -34,6 +33,8 @@ fun DefaultGenericDialog(
                     Text(dialog.negativeText)
                 }
             }
-        } else null
+        } else {
+            null
+        },
     )
 }

@@ -7,7 +7,7 @@ import pl.masslany.podkop.features.resources.models.entrycomment.toEntryCommentI
 import pl.masslany.podkop.features.resources.models.link.toLinkItemState
 
 fun ResourceItem.toResourceItemState(isUpcoming: Boolean = false): ResourceItemState =
-    when(this.resource) {
+    when (this.resource) {
         Resource.Entry -> this.toEntryItemState()
         Resource.Link -> this.toLinkItemState(isUpcoming)
         Resource.EntryComment -> this.toEntryCommentItemState()

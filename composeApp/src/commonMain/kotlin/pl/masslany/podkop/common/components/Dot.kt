@@ -11,7 +11,7 @@ import androidx.compose.ui.text.TextStyle
 fun Dot(
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.bodySmall,
-    color: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f)
+    color: Color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.9f),
 ) {
     Text(
         modifier = modifier,

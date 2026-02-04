@@ -10,7 +10,7 @@ import pl.masslany.podkop.common.models.DescriptionState
 @Composable
 fun Description(
     modifier: Modifier = Modifier,
-    state: DescriptionState
+    state: DescriptionState,
 ) {
     Text(
         text = state.description,

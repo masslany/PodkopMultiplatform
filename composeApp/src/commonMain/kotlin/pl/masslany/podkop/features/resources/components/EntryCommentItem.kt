@@ -18,15 +18,15 @@ import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentIte
 fun EntryCommentItem(
     state: EntryCommentItemState,
     modifier: Modifier = Modifier,
-    onProfileClick: (String) -> Unit ,
-    onVoteUpClick: () -> Unit ,
+    onProfileClick: (String) -> Unit,
+    onVoteUpClick: () -> Unit,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Row {
             Row(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Avatar(
                     state = state.avatarState,

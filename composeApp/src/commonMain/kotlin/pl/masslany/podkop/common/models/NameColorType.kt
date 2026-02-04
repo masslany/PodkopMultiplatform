@@ -9,11 +9,9 @@ sealed class NameColorType {
     data object Black : NameColorType()
 }
 
-fun NameColor.toNameColorType(): NameColorType {
-    return when(this) {
-        NameColor.Orange -> NameColorType.Orange
-        NameColor.Burgundy -> NameColorType.Burgundy
-        NameColor.Green -> NameColorType.Green
-        NameColor.Black -> NameColorType.Black
-    }
+fun NameColor.toNameColorType(): NameColorType = when (this) {
+    NameColor.Orange -> NameColorType.Orange
+    NameColor.Burgundy -> NameColorType.Burgundy
+    NameColor.Green -> NameColorType.Green
+    NameColor.Black -> NameColorType.Black
 }

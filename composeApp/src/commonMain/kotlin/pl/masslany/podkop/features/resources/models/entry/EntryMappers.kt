@@ -16,7 +16,7 @@ import pl.masslany.podkop.common.models.toPublishedTimeType
 import pl.masslany.podkop.common.models.vote.toVoteState
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
 
-internal fun ResourceItem.toEntryItemState(): EntryItemState  {
+internal fun ResourceItem.toEntryItemState(): EntryItemState {
     val author = this.author
 
     val authorState = author?.let {
@@ -44,12 +44,13 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState  {
 
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
+
         Deleted.Moderator -> EntryContentState.DeletedByModerator
+
         Deleted.None -> EntryContentState.Content(
             content = this.content.toHighlightedTagProfileMarkdown(),
         )
     }
-
 
     return EntryItemState(
         id = this.id,
@@ -62,7 +63,7 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState  {
             .toImmutableList(),
         voteState = this.toVoteState(),
         entryContentState = entryContentState,
-        embedImageState = null
+        embedImageState = null,
     )
 }
 
@@ -83,7 +84,9 @@ private fun Comment.toEntryCommentItemState(): EntryCommentItemState {
 
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
+
         Deleted.Moderator -> EntryContentState.DeletedByModerator
+
         Deleted.None -> EntryContentState.Content(
             content = this.content.toHighlightedTagProfileMarkdown(),
         )
@@ -97,6 +100,6 @@ private fun Comment.toEntryCommentItemState(): EntryCommentItemState {
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
         entryContentState = entryContentState,
-        embedImageState = null
+        embedImageState = null,
     )
 }
