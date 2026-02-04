@@ -15,6 +15,8 @@ import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.models.toDropdownMenuItemType
+import pl.masslany.podkop.common.models.toEntriesSortType
+import pl.masslany.podkop.common.models.toHotSortType
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 
 class EntriesViewModel(
@@ -32,17 +34,28 @@ class EntriesViewModel(
         )
     }.stateIn(viewModelScope, WhileSubscribed(5000), EntriesScreenState.initial)
 
+    private val entriesSortTypes = entriesRepository.getEntriesSortTypes()
+        .map { entriesSortType -> entriesSortType.toDropdownMenuItemType() }
+        .toImmutableList()
+
+    private val hotSortTypes = entriesRepository.getHotSortTypes()
+        .map { hotSortType -> hotSortType.toDropdownMenuItemType() }
+        .toImmutableList()
+
     init {
         resourceItemStateHolder.init(viewModelScope)
 
         _state.update { previousState ->
             previousState.copy(
                 sortMenuState = DropdownMenuState(
-                    items = entriesRepository.getEntriesSortTypes()
-                        .map { entriesSortType -> entriesSortType.toDropdownMenuItemType() }
-                        .toImmutableList(),
+                    items = entriesSortTypes,
                     selected = DropdownMenuItemType.Hot,
                     expanded = false
+                ),
+                hotSortMenuState = DropdownMenuState(
+                    items = hotSortTypes,
+                    selected = DropdownMenuItemType.TwelveHours,
+                    expanded = false,
                 )
             )
         }
@@ -73,10 +86,30 @@ class EntriesViewModel(
     override fun onSortSelected(sortType: DropdownMenuItemType) {
         _state.update { previousState ->
             previousState
-                .updateSortMenuSelected(sortType)
+                .updateSortMenuSelected(sortType, hotSortTypes)
                 .updateRefreshing(true)
         }
-
+        viewModelScope.launch {
+            entriesRepository.getEntries(
+                page = 1,
+                limit = null,
+                entriesSortType = sortType.toEntriesSortType(),
+                hotSortType = HotSortType.TwelveHours,
+                category = null,
+                bucket = null,
+            )
+                .onSuccess {
+                    resourceItemStateHolder.updateData(it.data)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                    }
+                }
+                .onFailure {
+                    println("DBG --> failed to load links with $it")
+                }
+        }
     }
 
     override fun onSortExpandedChanged(expanded: Boolean) {
@@ -91,11 +124,72 @@ class EntriesViewModel(
         }
     }
 
+    override fun onHotSortSelected(sortType: DropdownMenuItemType) {
+        _state.update { previousState ->
+            previousState
+                .updateHotSortMenuSelected(sortType)
+                .updateRefreshing(true)
+        }
+        viewModelScope.launch {
+            entriesRepository.getEntries(
+                page = 1,
+                limit = null,
+                entriesSortType = EntriesSortType.Hot,
+                hotSortType = sortType.toHotSortType(),
+                category = null,
+                bucket = null,
+            )
+                .onSuccess {
+                    resourceItemStateHolder.updateData(it.data)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                    }
+                }
+                .onFailure {
+                    println("DBG --> failed to load links with $it")
+                }
+        }
+    }
+
+    override fun onHotSortExpandedChanged(expanded: Boolean) {
+        _state.update { previousState ->
+            previousState.updateHotSortMenuExpanded(expanded)
+        }
+    }
+
+    override fun onHotSortDismissed() {
+        _state.update { previousState ->
+            previousState.updateHotSortMenuExpanded(false)
+        }
+    }
+
     override fun onRefresh(sortType: DropdownMenuItemType) {
         _state.update { previousState ->
             previousState
                 .updateRefreshing(true)
         }
-
+        viewModelScope.launch {
+            entriesRepository.getEntries(
+                page = 1,
+                limit = null,
+                entriesSortType = EntriesSortType.Hot,
+                hotSortType = HotSortType.TwelveHours,
+                category = null,
+                bucket = null,
+            )
+                .onSuccess {
+                    resourceItemStateHolder.updateData(it.data)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                    }
+                }
+                .onFailure {
+                    println("DBG --> failed to load links with $it")
+                }
+        }
     }
 }

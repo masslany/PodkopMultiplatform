@@ -11,7 +11,7 @@ data class EntriesScreenState(
     val isRefreshing: Boolean,
     val entries: ImmutableList<ResourceItemState>,
     val sortMenuState: DropdownMenuState,
-    val durationMenuState: DropdownMenuState,
+    val hotSortMenuState: DropdownMenuState?,
 ) {
     companion object Companion {
         val initial = EntriesScreenState(
@@ -19,20 +19,51 @@ data class EntriesScreenState(
             isRefreshing = false,
             entries = persistentListOf(),
             sortMenuState = DropdownMenuState.initial,
-            durationMenuState = DropdownMenuState.initial,
+            hotSortMenuState = null,
         )
     }
 
     fun updateSortMenuExpanded(expanded: Boolean) = this.copy(
         sortMenuState = sortMenuState.copy(
             expanded = expanded
+        ),
+        hotSortMenuState = hotSortMenuState?.copy(
+            expanded = false,
         )
     )
 
-    fun updateSortMenuSelected(sortType: DropdownMenuItemType) = this.copy(
+    fun updateSortMenuSelected(
+        sortType: DropdownMenuItemType,
+        hotSortTypes: ImmutableList<DropdownMenuItemType>,
+    ) = this.copy(
         sortMenuState = sortMenuState.copy(
             expanded = false,
             selected = sortType,
+        ),
+        hotSortMenuState = if (sortType == DropdownMenuItemType.Hot) {
+            DropdownMenuState(
+                items = hotSortTypes,
+                selected = DropdownMenuItemType.TwelveHours,
+                expanded = false,
+            )
+        } else {
+            null
+        }
+    )
+
+    fun updateHotSortMenuExpanded(expanded: Boolean) = this.copy(
+        sortMenuState = sortMenuState.copy(
+            expanded = false
+        ),
+        hotSortMenuState = hotSortMenuState?.copy(
+            expanded = expanded,
+        )
+    )
+
+    fun updateHotSortMenuSelected(sortType: DropdownMenuItemType) = this.copy(
+        hotSortMenuState = hotSortMenuState?.copy(
+            selected = sortType,
+            expanded = false,
         )
     )
 

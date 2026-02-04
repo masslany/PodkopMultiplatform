@@ -13,5 +13,11 @@ interface EntriesActions : ResourceItemActions {
 
     fun onSortDismissed()
 
+    fun onHotSortSelected(sortType: DropdownMenuItemType)
+
+    fun onHotSortExpandedChanged(expanded: Boolean)
+
+    fun onHotSortDismissed()
+
     fun onRefresh(sortType: DropdownMenuItemType)
 }

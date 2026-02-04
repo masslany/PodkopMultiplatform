@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -167,20 +168,36 @@ private fun EntriesScreen(
         state = lazyListState,
     ) {
         item {
-            DropdownMenu(
-                modifier = Modifier
-                    .padding(
-                        top = 8.dp,
-                        start = 16.dp,
-                        end = 16.dp,
-                    ),
-                items = state.sortMenuState.items,
-                selected = state.sortMenuState.selected,
-                expanded = state.sortMenuState.expanded,
-                onSelected = actions::onSortSelected,
-                onExpandedChange = actions::onSortExpandedChanged,
-                onDismissRequest = actions::onSortDismissed,
-            )
+            Row {
+                DropdownMenu(
+                    modifier = Modifier
+                        .padding(
+                            top = 8.dp,
+                            start = 16.dp,
+                        ),
+                    items = state.sortMenuState.items,
+                    selected = state.sortMenuState.selected,
+                    expanded = state.sortMenuState.expanded,
+                    onSelected = actions::onSortSelected,
+                    onExpandedChange = actions::onSortExpandedChanged,
+                    onDismissRequest = actions::onSortDismissed,
+                )
+                state.hotSortMenuState?.let {
+                    DropdownMenu(
+                        modifier = Modifier
+                            .padding(
+                                top = 8.dp,
+                                start = 16.dp,
+                            ),
+                        items = state.hotSortMenuState.items,
+                        selected = state.hotSortMenuState.selected,
+                        expanded = state.hotSortMenuState.expanded,
+                        onSelected = actions::onHotSortSelected,
+                        onExpandedChange = actions::onHotSortExpandedChanged,
+                        onDismissRequest = actions::onHotSortDismissed,
+                    )
+                }
+            }
         }
 
         items(
