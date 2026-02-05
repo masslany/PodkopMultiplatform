@@ -32,7 +32,7 @@ import podkop.composeapp.generated.resources.comment_label_removed_by_author
 import podkop.composeapp.generated.resources.comment_label_removed_by_moderator
 
 @Composable
-fun EntryContentRouter(state: EntryContentState) {
+fun EntryContent(state: EntryContentState) {
     when (state) {
         is EntryContentState.Content -> {
             if (state.content.isNotEmpty()) {

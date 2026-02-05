@@ -48,6 +48,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.multiplatform.markdown.renderer)
             implementation(libs.multiplatform.markdown.renderer.m3)
+            implementation(libs.haze)
 
             implementation(projects.business)
         }

@@ -9,7 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import pl.masslany.podkop.common.components.Author
 import pl.masslany.podkop.common.components.Avatar
-import pl.masslany.podkop.common.components.EntryContentRouter
+import pl.masslany.podkop.common.components.EmbedImage
+import pl.masslany.podkop.common.components.EntryContent
 import pl.masslany.podkop.common.components.Published
 import pl.masslany.podkop.common.components.vote.Vote
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
@@ -54,6 +55,13 @@ fun EntryCommentItem(
             )
         }
         Spacer(Modifier.size(8.dp))
-        EntryContentRouter(state = state.entryContentState)
+        EntryContent(state = state.entryContentState)
+        state.embedImageState?.let {
+            Spacer(Modifier.size(8.dp))
+            EmbedImage(
+                state = state.embedImageState,
+                onImageClick = { /* no-op */ },
+            )
+        }
     }
 }
