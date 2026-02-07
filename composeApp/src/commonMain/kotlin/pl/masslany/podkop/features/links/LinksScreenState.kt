@@ -13,6 +13,7 @@ data class LinksScreenState(
     val links: ImmutableList<ResourceItemState>,
     val hits: ImmutableList<ResourceItemState>,
     val sortMenuState: DropdownMenuState,
+    val isPaginating: Boolean,
 ) {
     companion object {
         val initial = LinksScreenState(
@@ -22,6 +23,7 @@ data class LinksScreenState(
             links = persistentListOf(),
             hits = persistentListOf(),
             sortMenuState = DropdownMenuState.initial,
+            isPaginating = false,
         )
     }
 

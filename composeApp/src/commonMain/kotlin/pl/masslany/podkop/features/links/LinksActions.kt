@@ -2,10 +2,13 @@ package pl.masslany.podkop.features.links
 
 import androidx.compose.runtime.Stable
 import pl.masslany.podkop.common.models.DropdownMenuItemType
+import pl.masslany.podkop.common.pagination.PaginationActions
 import pl.masslany.podkop.features.resources.ResourceItemActions
 
 @Stable
-interface LinksActions : ResourceItemActions {
+interface LinksActions :
+    ResourceItemActions,
+    PaginationActions {
 
     fun onSortSelected(sortType: DropdownMenuItemType)
 

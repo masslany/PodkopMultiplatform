@@ -6,16 +6,17 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -45,6 +46,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.features.links.hits.HitsList
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import podkop.composeapp.generated.resources.Res
@@ -71,7 +73,14 @@ fun LinksScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val lazyListState = rememberLazyListState()
+    val lazyListState = rememberLazyListPaginator(
+        shouldPaginate = { lastVisibleIndex, totalItems ->
+            viewModel.shouldPaginate(lastVisibleIndex, totalItems)
+        },
+        paginate = {
+            viewModel.paginate()
+        },
+    )
     val isScrollingUp = lazyListState.isScrollingUp()
     val showFab by remember(isScrollingUp) {
         derivedStateOf {
@@ -223,6 +232,23 @@ private fun LinksScreen(
                 state = it,
                 actions = actions,
             )
+        }
+
+        if (state.isPaginating) {
+            item(
+                key = "PaginationLoadingIndicator",
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                    )
+                }
+            }
         }
     }
 }

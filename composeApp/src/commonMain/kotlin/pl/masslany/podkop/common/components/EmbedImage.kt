@@ -119,5 +119,3 @@ fun EmbedImage(
         )
     }
 }
-
-

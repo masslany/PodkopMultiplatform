@@ -17,6 +17,9 @@ import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.models.toDropdownMenuItemType
 import pl.masslany.podkop.common.models.toEntriesSortType
 import pl.masslany.podkop.common.models.toHotSortType
+import pl.masslany.podkop.common.pagination.PageRequest
+import pl.masslany.podkop.common.pagination.Paginator
+import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 
 class EntriesViewModel(
@@ -26,13 +29,37 @@ class EntriesViewModel(
     EntriesActions,
     ResourceItemStateHolder by resourceItemStateHolder {
 
+    private var currentEntriesSortType: EntriesSortType = EntriesSortType.Hot
+    private var currentHotSortType: HotSortType = HotSortType.TwelveHours
+
+    private val paginator = Paginator(
+        scope = viewModelScope,
+        onNewItems = { data ->
+            resourceItemStateHolder.appendData(data)
+        },
+    ) { request ->
+        entriesRepository.getEntries(
+            page = when (request) {
+                is PageRequest.Index -> request.page
+                is PageRequest.Cursor -> request.key
+            },
+            limit = null,
+            entriesSortType = currentEntriesSortType,
+            hotSortType = currentHotSortType,
+            category = null,
+            bucket = null,
+        )
+    }
+
     private val _state = MutableStateFlow(EntriesScreenState.initial)
     val state = combine(
         _state,
         resourceItemStateHolder.items,
-    ) { state, entries ->
+        paginator.state,
+    ) { state, entries, paginator ->
         state.copy(
             entries = entries,
+            isPaginating = paginator is PaginatorState.Loading,
         )
     }.stateIn(viewModelScope, WhileSubscribed(5000), EntriesScreenState.initial)
 
@@ -66,13 +93,14 @@ class EntriesViewModel(
             entriesRepository.getEntries(
                 page = 1,
                 limit = null,
-                entriesSortType = EntriesSortType.Hot,
-                hotSortType = HotSortType.TwelveHours,
+                entriesSortType = currentEntriesSortType,
+                hotSortType = currentHotSortType,
                 category = null,
                 bucket = null,
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
+                    paginator.setup(it.pagination, it.data.size)
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
@@ -86,6 +114,9 @@ class EntriesViewModel(
     }
 
     override fun onSortSelected(sortType: DropdownMenuItemType) {
+        currentEntriesSortType = sortType.toEntriesSortType()
+        currentHotSortType = HotSortType.TwelveHours
+
         _state.update { previousState ->
             previousState
                 .updateSortMenuSelected(sortType, hotSortTypes)
@@ -96,12 +127,13 @@ class EntriesViewModel(
                 page = 1,
                 limit = null,
                 entriesSortType = sortType.toEntriesSortType(),
-                hotSortType = HotSortType.TwelveHours,
+                hotSortType = currentHotSortType,
                 category = null,
                 bucket = null,
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
+                    paginator.setup(it.pagination, it.data.size)
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
@@ -127,6 +159,9 @@ class EntriesViewModel(
     }
 
     override fun onHotSortSelected(sortType: DropdownMenuItemType) {
+        currentEntriesSortType = EntriesSortType.Hot
+        currentHotSortType = sortType.toHotSortType()
+
         _state.update { previousState ->
             previousState
                 .updateHotSortMenuSelected(sortType)
@@ -136,13 +171,14 @@ class EntriesViewModel(
             entriesRepository.getEntries(
                 page = 1,
                 limit = null,
-                entriesSortType = EntriesSortType.Hot,
+                entriesSortType = currentEntriesSortType,
                 hotSortType = sortType.toHotSortType(),
                 category = null,
                 bucket = null,
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
+                    paginator.setup(it.pagination, it.data.size)
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
@@ -183,6 +219,7 @@ class EntriesViewModel(
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
+                    paginator.setup(it.pagination, it.data.size)
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
@@ -193,5 +230,11 @@ class EntriesViewModel(
                     println("DBG --> failed to load links with $it")
                 }
         }
+    }
+
+    override fun shouldPaginate(lastVisibleIndex: Int?, totalItems: Int): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
+
+    override fun paginate() {
+        paginator.paginate()
     }
 }

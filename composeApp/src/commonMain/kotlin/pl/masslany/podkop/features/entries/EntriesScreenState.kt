@@ -12,6 +12,7 @@ data class EntriesScreenState(
     val entries: ImmutableList<ResourceItemState>,
     val sortMenuState: DropdownMenuState,
     val hotSortMenuState: DropdownMenuState?,
+    val isPaginating: Boolean,
 ) {
     companion object Companion {
         val initial = EntriesScreenState(
@@ -20,6 +21,7 @@ data class EntriesScreenState(
             entries = persistentListOf(),
             sortMenuState = DropdownMenuState.initial,
             hotSortMenuState = null,
+            isPaginating = false,
         )
     }
 

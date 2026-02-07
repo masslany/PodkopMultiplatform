@@ -43,6 +43,12 @@ open class BaseResourceItemStateHolder(
         _items.value = data.map { it.toResourceItemState(isUpcoming) }.toImmutableList()
     }
 
+    override fun appendData(data: List<ResourceItem>) {
+        _items.update { list ->
+            (list + data.map { it.toResourceItemState(isUpcoming) }).toImmutableList()
+        }
+    }
+
     override fun onLinkVoteClicked(id: Int, voted: Boolean) {
         scope?.launch {
             val result = if (voted) {

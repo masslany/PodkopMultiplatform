@@ -18,6 +18,9 @@ import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.models.toDropdownMenuItemType
 import pl.masslany.podkop.common.models.toLinksSortType
+import pl.masslany.podkop.common.pagination.PageRequest
+import pl.masslany.podkop.common.pagination.Paginator
+import pl.masslany.podkop.common.pagination.PaginatorState
 
 class LinksViewModel(
     val isUpcoming: Boolean,
@@ -28,24 +31,44 @@ class LinksViewModel(
     LinksActions,
     LinksResourceItemStateHolder by linksResourceItemStateHolder {
 
+    val linksType = if (isUpcoming) LinksType.UPCOMING else LinksType.HOMEPAGE
+    var selectedLinksSortType = if (isUpcoming) LinksSortType.Active else LinksSortType.Newest
+
+    private val paginator = Paginator(
+        scope = viewModelScope,
+        onNewItems = { data ->
+            linksResourceItemStateHolder.appendData(data)
+        },
+    ) { request ->
+        linksRepository.getLinks(
+            page = when (request) {
+                is PageRequest.Index -> request.page
+                is PageRequest.Cursor -> request.key
+            },
+            limit = null,
+            linksType = linksType,
+            linksSortType = selectedLinksSortType,
+            bucket = null,
+            category = null,
+        )
+    }
+
     private val _state = MutableStateFlow(LinksScreenState.initial)
     val state = combine(
         _state,
         linksResourceItemStateHolder.items,
         linksResourceItemStateHolder.hits,
-    ) { state, links, hits ->
+        paginator.state,
+    ) { state, links, hits, paginator ->
         state.copy(
             links = links,
             hits = hits,
+            isPaginating = paginator is PaginatorState.Loading,
         )
     }.stateIn(viewModelScope, WhileSubscribed(5000), LinksScreenState.initial)
 
-    val linksType = if (isUpcoming) LinksType.UPCOMING else LinksType.HOMEPAGE
-
     init {
         linksResourceItemStateHolder.init(viewModelScope, isUpcoming)
-
-        val selectedLinksSortType = if (isUpcoming) LinksSortType.Active else LinksSortType.Newest
 
         _state.update { previousState ->
             previousState.copy(
@@ -71,6 +94,7 @@ class LinksViewModel(
             )
                 .onSuccess {
                     linksResourceItemStateHolder.updateData(it.data)
+                    paginator.setup(it.pagination, it.data.size)
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
@@ -94,6 +118,8 @@ class LinksViewModel(
     }
 
     override fun onSortSelected(sortType: DropdownMenuItemType) {
+        selectedLinksSortType = sortType.toLinksSortType()
+
         _state.update { previousState ->
             previousState
                 .updateSortMenuSelected(sortType)
@@ -103,13 +129,14 @@ class LinksViewModel(
             linksRepository.getLinks(
                 page = 1,
                 limit = null,
-                linksSortType = sortType.toLinksSortType(),
+                linksSortType = selectedLinksSortType,
                 linksType = linksType,
                 category = null,
                 bucket = null,
             )
                 .onSuccess {
                     linksResourceItemStateHolder.updateData(it.data)
+                    paginator.setup(it.pagination, it.data.size)
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
@@ -135,6 +162,8 @@ class LinksViewModel(
     }
 
     override fun onRefresh(sortType: DropdownMenuItemType) {
+        selectedLinksSortType = sortType.toLinksSortType()
+
         _state.update { previousState ->
             previousState
                 .updateRefreshing(true)
@@ -143,13 +172,14 @@ class LinksViewModel(
             linksRepository.getLinks(
                 page = 1,
                 limit = null,
-                linksSortType = sortType.toLinksSortType(),
+                linksSortType = selectedLinksSortType,
                 linksType = linksType,
                 category = null,
                 bucket = null,
             )
                 .onSuccess {
                     linksResourceItemStateHolder.updateData(it.data)
+                    paginator.setup(it.pagination, it.data.size)
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
@@ -160,5 +190,11 @@ class LinksViewModel(
                     println("DBG --> failed to load links with $it")
                 }
         }
+    }
+
+    override fun shouldPaginate(lastVisibleIndex: Int?, totalItems: Int): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
+
+    override fun paginate() {
+        paginator.paginate()
     }
 }
