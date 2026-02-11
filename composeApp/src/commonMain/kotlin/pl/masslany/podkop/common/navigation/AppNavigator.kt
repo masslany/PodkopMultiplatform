@@ -11,7 +11,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class AppNavigator(private val configProvider: NavigationConfigProvider, private val scope: CoroutineScope) {
+class AppNavigator(
+    private val configProvider: NavigationConfigProvider,
+    private val scope: CoroutineScope,
+    private val externalBrowser: ExternalBrowser,
+) {
     private val _isReady = MutableStateFlow(false)
     val isReady = _isReady.asStateFlow()
 
@@ -148,6 +152,10 @@ class AppNavigator(private val configProvider: NavigationConfigProvider, private
             }
         }
         return consumed
+    }
+
+    fun openExternalLink(url: String) {
+        externalBrowser.open(url)
     }
 
     // --- Helpers ---

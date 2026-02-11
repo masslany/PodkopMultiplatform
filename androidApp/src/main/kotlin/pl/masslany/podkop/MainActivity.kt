@@ -18,6 +18,8 @@ import pl.masslany.podkop.common.navigation.AppNavigator
 class MainActivity : ComponentActivity() {
 
     private val appNavigator: AppNavigator by inject()
+    private val activityHolder: AndroidActivityHolder by inject()
+
     private val viewModel by viewModel<MainActivityViewModel>()
 
     private var backCallback: OnBackInvokedCallback? = null
@@ -29,6 +31,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        activityHolder.activity = this
 
         registerOnBackCallback()
 
@@ -40,9 +43,8 @@ class MainActivity : ComponentActivity() {
     private fun registerOnBackCallback() {
         if (SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val callback = OnBackInvokedCallback {
-                // Delegate to AppNavigator
                 if (!appNavigator.back()) {
-                    finish() // allow system to close the activity
+                    finish()
                 }
             }
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
@@ -51,7 +53,6 @@ class MainActivity : ComponentActivity() {
             )
             backCallback = callback
         } else {
-            // Fallback for < 33
             onBackPressedDispatcher.addCallback(this) {
                 if (!appNavigator.back()) {
                     finish()
@@ -61,6 +62,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        activityHolder.activity = null
         super.onDestroy()
         if (SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             backCallback?.let {

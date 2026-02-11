@@ -16,6 +16,7 @@ data class LinkItemState(
     val countState: CountState,
     val authorState: AuthorState?,
     val source: String?,
+    val sourceUrl: String,
     val publishedTimeType: PublishedTimeType?,
     val commentCount: Int,
     val imageUrl: String,

@@ -53,6 +53,7 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
     }
 
     val source = this.source?.label
+    val sourceUrl = this.source?.url
 
     val imageUrl = this.media?.photo?.url.orEmpty()
 
@@ -78,6 +79,7 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
         countState = countState,
         authorState = authorState,
         source = source,
+        sourceUrl = sourceUrl.orEmpty(),
         imageUrl = imageUrl,
         tags = tags,
         commentCount = commentCount,

@@ -122,6 +122,7 @@ private fun LinkItemRenderer(
         onVoteClick = { actions.onLinkVoteClicked(state.id, state.countState.isVoted) },
         onAuthorClick = { actions.onProfileClicked(it) },
         onTagClick = { actions.onTagClicked(it) },
+        onSourceClick = { actions.onLinkUrlClicked(state.sourceUrl) },
     )
 }
 

@@ -6,12 +6,25 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.dsl.module
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
+import pl.masslany.podkop.common.navigation.ExternalBrowser
 import pl.masslany.podkop.initKoin
 
 fun initKoinIos() {
-    initKoin()
+    initKoin {
+        modules(iOSModule)
+    }
+}
+
+val iOSModule = module {
+    single { IOSViewControllerHolder() }
+    single {
+        ExternalBrowser(
+            viewControllerProvider = get<IOSViewControllerHolder>().provider,
+        )
+    }
 }
 
 class IOSDependencyHelper : KoinComponent {
@@ -25,4 +38,6 @@ class IOSDependencyHelper : KoinComponent {
             startupManager.init(key = key, secret = secret)
         }
     }
+
+    fun viewControllerHolder(): IOSViewControllerHolder = getKoin().get()
 }

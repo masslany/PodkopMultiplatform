@@ -26,6 +26,7 @@ kotlin {
     sourceSets {
         androidMain.dependencies  {
             implementation(libs.ktor.client.android)
+            implementation(libs.androidx.browser)
         }
 
         commonMain.dependencies {

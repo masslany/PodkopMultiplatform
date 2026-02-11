@@ -56,6 +56,7 @@ fun LinkItem(
     onVoteClick: () -> Unit,
     onAuthorClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
+    onSourceClick: () -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -132,7 +133,8 @@ fun LinkItem(
                     }
                     state.source?.let {
                         Source(
-                            state = state.source,
+                            source = state.source,
+                            onSourceClick = onSourceClick,
                         )
                     }
                     state.publishedTimeType?.let {
@@ -196,6 +198,7 @@ private fun LinkItemPreview() {
                 ),
                 authorState = AuthorState("Username", NameColorType.Orange),
                 source = "test.website",
+                sourceUrl = "https://test.website",
                 imageUrl = "",
                 tags = persistentListOf(
                     TagItem("#test", true),
@@ -209,6 +212,7 @@ private fun LinkItemPreview() {
             onVoteClick = {},
             onLinkClick = {},
             onAuthorClick = {},
+            onSourceClick = {},
         )
     }
 }

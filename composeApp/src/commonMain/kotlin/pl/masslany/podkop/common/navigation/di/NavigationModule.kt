@@ -10,6 +10,7 @@ val navigationModule = module {
         AppNavigator(
             scope = get(),
             configProvider = get(),
+            externalBrowser = get(),
         )
     }
 

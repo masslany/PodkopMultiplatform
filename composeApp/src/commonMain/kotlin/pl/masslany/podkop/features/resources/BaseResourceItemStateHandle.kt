@@ -83,6 +83,10 @@ open class BaseResourceItemStateHolder(
         println("DBG ---> link clicked: $id")
     }
 
+    override fun onLinkUrlClicked(url: String) {
+        appNavigator.openExternalLink(url)
+    }
+
     override fun onTagClicked(tag: String) {
         println("DBG ---> tag clicked: $tag")
     }
