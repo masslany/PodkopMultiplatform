@@ -225,6 +225,7 @@ private fun LinksScreen(
         items(
             items = state.links,
             key = { item -> item.id },
+            contentType = { item -> item.contentType },
         ) {
             ResourceItemRenderer(
                 modifier = Modifier

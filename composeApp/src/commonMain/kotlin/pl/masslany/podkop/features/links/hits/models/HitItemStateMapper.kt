@@ -3,6 +3,7 @@ package pl.masslany.podkop.features.links.hits.models
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.common.models.CountState
 import pl.masslany.podkop.common.models.TitleState
+import pl.masslany.podkop.features.resources.models.ResourceType
 
 fun ResourceItem.toHitItemState(): HitItemState {
     val canVote = this.actions?.voteUp ?: false ||
@@ -11,13 +12,14 @@ fun ResourceItem.toHitItemState(): HitItemState {
     val imageUrl = this.media?.photo?.url.orEmpty()
 
     return HitItemState(
+        id = this.id,
         titleState = TitleState(
             title = this.title,
             maxLines = 3,
             isAdult = this.adult,
             displayAdultBadge = false,
         ),
-        id = this.id,
+        contentType = ResourceType.HitItem,
         countState = CountState(
             count = (votes?.up ?: 0).toString(),
             isHot = this.hot,

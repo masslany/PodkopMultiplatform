@@ -9,6 +9,7 @@ import pl.masslany.podkop.common.models.TagItem
 import pl.masslany.podkop.common.models.TitleState
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.models.toPublishedTimeType
+import pl.masslany.podkop.features.resources.models.ResourceType
 
 internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
     val titleState = this.title.ifBlank { null }?.let {
@@ -74,6 +75,7 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
 
     return LinkItemState(
         id = this.id,
+        contentType = ResourceType.LinkItem,
         titleState = titleState,
         descriptionState = descriptionState,
         countState = countState,

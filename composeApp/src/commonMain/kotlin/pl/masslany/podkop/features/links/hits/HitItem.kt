@@ -35,6 +35,7 @@ import pl.masslany.podkop.common.models.CountState
 import pl.masslany.podkop.common.models.TitleState
 import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.features.links.hits.models.HitItemState
+import pl.masslany.podkop.features.resources.models.ResourceType
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.no_image
 
@@ -139,6 +140,7 @@ private fun HitItemPreview() {
                 ),
                 imageUrl = "",
                 isAdult = false,
+                contentType = ResourceType.HitItem,
             ),
             onItemClick = { },
             onVoteClick = { },

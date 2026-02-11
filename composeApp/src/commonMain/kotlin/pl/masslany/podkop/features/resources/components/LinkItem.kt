@@ -45,6 +45,7 @@ import pl.masslany.podkop.common.models.PublishedTimeType
 import pl.masslany.podkop.common.models.TagItem
 import pl.masslany.podkop.common.models.TitleState
 import pl.masslany.podkop.common.theme.PodkopTheme
+import pl.masslany.podkop.features.resources.models.ResourceType
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -207,6 +208,7 @@ private fun LinkItemPreview() {
                 ),
                 commentCount = 10,
                 publishedTimeType = PublishedTimeType.Now,
+                contentType = ResourceType.LinkItem,
             ),
             onTagClick = {},
             onVoteClick = {},

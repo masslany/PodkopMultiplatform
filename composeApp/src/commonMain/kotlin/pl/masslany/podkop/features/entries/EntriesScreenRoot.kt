@@ -213,6 +213,7 @@ private fun EntriesScreen(
         items(
             items = state.entries,
             key = { item -> item.id },
+            contentType = { item -> item.contentType },
         ) {
             ResourceItemRenderer(
                 modifier = Modifier

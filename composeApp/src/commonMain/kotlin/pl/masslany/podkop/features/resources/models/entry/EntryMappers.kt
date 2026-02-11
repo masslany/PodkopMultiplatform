@@ -15,6 +15,7 @@ import pl.masslany.podkop.common.models.toHighlightedTagProfileMarkdown
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.models.toPublishedTimeType
 import pl.masslany.podkop.common.models.vote.toVoteState
+import pl.masslany.podkop.features.resources.models.ResourceType
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
 
 internal fun ResourceItem.toEntryItemState(): EntryItemState {
@@ -67,6 +68,7 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
 
     return EntryItemState(
         id = this.id,
+        contentType = ResourceType.EntryItem,
         authorState = authorState,
         avatarState = avatarState,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
@@ -120,6 +122,7 @@ private fun Comment.toEntryCommentItemState(): EntryCommentItemState {
 
     return EntryCommentItemState(
         id = this.id,
+        contentType = ResourceType.EntryCommentItem,
         parentId = this.parentId,
         authorState = authorState,
         avatarState = avatarState,

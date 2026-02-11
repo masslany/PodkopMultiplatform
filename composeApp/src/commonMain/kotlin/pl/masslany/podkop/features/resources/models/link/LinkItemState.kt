@@ -8,9 +8,11 @@ import pl.masslany.podkop.common.models.PublishedTimeType
 import pl.masslany.podkop.common.models.TagItem
 import pl.masslany.podkop.common.models.TitleState
 import pl.masslany.podkop.features.resources.models.ResourceItemState
+import pl.masslany.podkop.features.resources.models.ResourceType
 
 data class LinkItemState(
     override val id: Int,
+    override val contentType: ResourceType,
     val titleState: TitleState?,
     val descriptionState: DescriptionState?,
     val countState: CountState,
