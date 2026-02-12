@@ -73,7 +73,9 @@ class AppNavigator(
     }
 
     fun setBottomBarVisible(visible: Boolean) {
+        println("MEOW setBottomBarVisible $visible")
         if (_state.value.isBottomBarVisible != visible) {
+            println("MEOW setBottomBarVisible in if")
             _state.update { it.copy(isBottomBarVisible = visible) }
         }
     }

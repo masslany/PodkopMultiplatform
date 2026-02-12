@@ -1,6 +1,5 @@
 package pl.masslany.podkop
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
@@ -20,8 +20,8 @@ import pl.masslany.podkop.common.components.dialog.DefaultGenericDialog
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.navigation.NavigationContent
-import pl.masslany.podkop.common.navigation.bottombar.BottomBarManager
-import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarManager
+import pl.masslany.podkop.common.navigation.bottombar.BottomBarScrollBehavior
+import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.features.bottombar.BottomBarRoot
 import pl.masslany.podkop.features.entries.EntriesScreen
@@ -48,21 +48,20 @@ private fun MainApp(
     appNavigator: AppNavigator,
 ) {
     val state by appNavigator.state.collectAsStateWithLifecycle()
-    val bottomBarManager = remember(appNavigator) { BottomBarManager(appNavigator) }
+    val bottomBarBehavior = remember { BottomBarScrollBehavior() }
 
-    CompositionLocalProvider(LocalBottomBarManager provides bottomBarManager) {
+    CompositionLocalProvider(LocalBottomBarScrollBehavior provides bottomBarBehavior) {
         Scaffold(
             modifier = modifier.fillMaxSize(),
             bottomBar = {
                 if (state.isTabMode && state.tabState != null) {
-                    val translationAnimationValue by animateFloatAsState(
-                        label = "MenuBar translationY factor",
-                        targetValue = if (state.isBottomBarVisible) 1f else 0f,
-                    )
                     BottomBarRoot(
                         modifier = Modifier
+                            .onSizeChanged {
+                                bottomBarBehavior.heightPx = it.height.toFloat()
+                            }
                             .graphicsLayer {
-                                translationY = translationAnimationValue
+                                translationY = bottomBarBehavior.offsetPx
                             },
                     )
                 }

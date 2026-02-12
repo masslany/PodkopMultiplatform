@@ -36,7 +36,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -46,6 +48,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
+import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.features.links.hits.HitsList
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
@@ -73,6 +77,7 @@ fun LinksScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
     val lazyListState = rememberLazyListPaginator(
         shouldPaginate = { lastVisibleIndex, totalItems ->
             viewModel.shouldPaginate(lastVisibleIndex, totalItems)
@@ -87,16 +92,27 @@ fun LinksScreenRoot(
             lazyListState.firstVisibleItemIndex > FabItemsOffset && isScrollingUp
         }
     }
+    val density = LocalDensity.current
+    val bottomPadding by remember {
+        derivedStateOf {
+            with(density) {
+                val offset = bottomBarScrollBehavior.offsetPx.toDp()
+                val height = bottomBarScrollBehavior.heightPx.toDp()
+                (height - offset).coerceIn(0.dp, height)
+            }
+        }
+    }
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = Modifier
             .padding(
-                bottom = paddingValues.calculateBottomPadding(),
+                bottom = bottomPadding,
                 start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
                 end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
             )
             .fillMaxSize()
+            .nestedScroll(bottomBarScrollBehavior.nestedScrollConnection())
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
