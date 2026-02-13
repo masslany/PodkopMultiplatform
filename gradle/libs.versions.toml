@@ -1,9 +1,9 @@
 [versions]
-agp = "9.0.0"
+agp = "9.0.1"
 android-compileSdk = "36"
 android-minSdk = "26"
 android-targetSdk = "36"
-androidx-activity = "1.12.2"
+androidx-activity = "1.12.4"
 androidx-appcompat = "1.7.1"
 androidx-core = "1.17.0"
 androidx-espresso = "3.7.0"
@@ -11,13 +11,13 @@ androidx-lifecycle = "2.9.6"
 androidx-testExt = "1.3.0"
 browser = "1.9.0"
 coilCompose = "3.3.0"
-componentsResources = "1.10.0"
-composeMultiplatform = "1.10.0"
+componentsResources = "1.10.1"
+composeMultiplatform = "1.10.1"
 datastorePreferences = "1.2.0"
-foundation = "1.10.0"
-haze = "1.7.1"
+foundation = "1.10.1"
+haze = "1.7.2"
 junit = "4.13.2"
-kotlin = "2.3.0"
+kotlin = "2.3.10"
 
 kotlinxCollectionsImmutable = "0.4.0"
 ktor = "3.4.0"
@@ -31,16 +31,16 @@ koin-compose = "4.1.1"
 
 coreSplashscreen = "1.2.0"
 
-lifecycleViewmodelNavigation3 = "2.10.0-alpha07"
+lifecycleViewmodelNavigation3 = "2.10.0-alpha08"
 navigation3-ui = "1.0.0-alpha06"
 
 compose-material3 = "1.9.0"
-compose-runtime = "1.10.0"
-compose-ui = "1.10.0"
+compose-runtime = "1.10.1"
+compose-ui = "1.10.1"
 
 multiplatformMarkdownRenderer = "0.39.2"
 
-kotlinter = "5.4.0"
+kotlinter = "5.4.2"
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
