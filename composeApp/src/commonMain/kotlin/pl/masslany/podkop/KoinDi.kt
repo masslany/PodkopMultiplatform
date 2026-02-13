@@ -10,6 +10,7 @@ import pl.masslany.podkop.business.di.businessModule
 import pl.masslany.podkop.common.navigation.di.navigationModule
 import pl.masslany.podkop.features.bottombar.di.bottomBarModule
 import pl.masslany.podkop.features.entries.di.entriesModule
+import pl.masslany.podkop.features.entrydetails.di.entryDetailsModule
 import pl.masslany.podkop.features.links.di.linksModule
 import pl.masslany.podkop.features.resources.di.resourcesModule
 
@@ -22,6 +23,7 @@ val composeAppModule = module {
         linksModule,
         entriesModule,
         resourcesModule,
+        entryDetailsModule,
     )
 }
 

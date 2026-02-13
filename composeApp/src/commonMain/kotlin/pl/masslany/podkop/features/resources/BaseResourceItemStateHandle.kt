@@ -12,6 +12,7 @@ import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.navigation.AppNavigator
+import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryVoteAction
@@ -114,6 +115,10 @@ open class BaseResourceItemStateHolder(
                 )
             }
         }
+    }
+
+    override fun onEntryClicked(id: Int) {
+        appNavigator.navigateTo(EntryDetailsScreen(id))
     }
 
     override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) {

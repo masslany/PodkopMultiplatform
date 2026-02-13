@@ -50,7 +50,7 @@ private fun EntryItemRenderer(
         Card(
             modifier = modifier
                 .clip(CardDefaults.shape)
-                .clickable { },
+                .clickable { actions.onEntryClicked(state.id) },
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
             ),
@@ -96,7 +96,8 @@ private fun EntryItemRenderer(
         }
     } else {
         EntryItem(
-            modifier = modifier,
+            modifier = modifier
+                .clickable { actions.onEntryClicked(state.id) },
             state = state,
             onProfileClick = { actions.onProfileClicked(it) },
             onVoteUpClick = {
@@ -132,6 +133,18 @@ private fun EntryCommentItemRenderer(
     state: EntryCommentItemState,
     actions: ResourceItemActions,
 ) {
+    EntryCommentItem(
+        modifier = modifier,
+        state = state,
+        onProfileClick = { actions.onProfileClicked(it) },
+        onVoteUpClick = {
+            actions.onEntryCommentVoteUpClick(
+                entryCommentId = state.id,
+                parentEntryId = state.parentId,
+                voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+            )
+        },
+    )
 }
 
 @Composable

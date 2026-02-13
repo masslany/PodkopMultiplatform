@@ -25,7 +25,11 @@ data class NavigationState(
     // Overlays sit on top of everything
     val overlay: OverlayState = OverlayState.None,
 
-    val isBottomBarVisible: Boolean = true,
 ) {
     val isTabMode: Boolean get() = tabState != null
+    val isBottomBarVisible: Boolean get() = if (tabState != null) {
+        tabState.stacks[tabState.currentTabRoot]?.size == 1
+    } else {
+        false
+    }
 }

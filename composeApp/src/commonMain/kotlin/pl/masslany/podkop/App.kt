@@ -26,6 +26,8 @@ import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.features.bottombar.BottomBarRoot
 import pl.masslany.podkop.features.entries.EntriesScreen
 import pl.masslany.podkop.features.entries.EntriesScreenRoot
+import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
+import pl.masslany.podkop.features.entrydetails.EntryDetailsScreenRoot
 import pl.masslany.podkop.features.links.LinksScreen
 import pl.masslany.podkop.features.links.LinksScreenRoot
 import pl.masslany.podkop.features.upcoming.UpcomingScreen
@@ -61,7 +63,11 @@ private fun MainApp(
                                 bottomBarBehavior.heightPx = it.height.toFloat()
                             }
                             .graphicsLayer {
-                                translationY = bottomBarBehavior.offsetPx
+                                translationY = if (state.isBottomBarVisible) {
+                                    bottomBarBehavior.offsetPx
+                                } else {
+                                    bottomBarBehavior.heightPx
+                                }
                             },
                     )
                 }
@@ -94,6 +100,14 @@ private fun MainApp(
                                 paddingValues = contentPadding,
                             )
                         }
+
+                        entry<EntryDetailsScreen> {
+                            EntryDetailsScreenRoot(
+                                id = it.id,
+                                paddingValues = contentPadding,
+                            )
+                        }
+
                         entry<GenericDialog>(
                             metadata = DialogSceneStrategy.dialog(
                                 DialogProperties(),

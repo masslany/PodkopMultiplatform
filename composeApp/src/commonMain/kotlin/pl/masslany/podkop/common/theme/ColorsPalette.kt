@@ -21,6 +21,7 @@ data class ColorsPalette(
     val adultRed: Color = Color.Unspecified,
     val votePositive: Color = Color.Unspecified,
     val voteNegative: Color = Color.Unspecified,
+    val authorComment: Color = Color.Unspecified,
 )
 
 val LightNameOrange = Color(color = 0xFFFF5100)
@@ -35,6 +36,7 @@ val LightHotOrange = Color(color = 0xFFEF713F)
 val LightAdultRed = Color(color = 0xFFE86064)
 val LightVotePositive = Color(color = 0xFF74BD74)
 val LightVoteNegative = Color(color = 0xFFE7625A)
+val LightAuthorComment = Color(color = 0xFF3A3A3A)
 
 val DarkNameOrange = Color(color = 0xFFFE5000)
 val DarkNameBurgundy = Color(color = 0xFFD20000)
@@ -48,6 +50,7 @@ val DarkHotOrange = Color(color = 0xFFEF713F)
 val DarkAdultRed = Color(color = 0xFFE86064)
 val DarkVotePositive = Color(color = 0xFF74BD74)
 val DarkVoteNegative = Color(color = 0xFFE7625A)
+val DarkAuthorComment = Color(color = 0xFFE5E5E5)
 
 val LightColorsPalette = ColorsPalette(
     nameOrange = LightNameOrange,
@@ -62,6 +65,7 @@ val LightColorsPalette = ColorsPalette(
     adultRed = LightAdultRed,
     votePositive = LightVotePositive,
     voteNegative = LightVoteNegative,
+    authorComment = LightAuthorComment,
 )
 
 val DarkColorsPalette = ColorsPalette(
@@ -77,6 +81,7 @@ val DarkColorsPalette = ColorsPalette(
     adultRed = DarkAdultRed,
     votePositive = DarkVotePositive,
     voteNegative = DarkVoteNegative,
+    authorComment = DarkAuthorComment,
 )
 
 val LocalColorsPalette = staticCompositionLocalOf { ColorsPalette() }

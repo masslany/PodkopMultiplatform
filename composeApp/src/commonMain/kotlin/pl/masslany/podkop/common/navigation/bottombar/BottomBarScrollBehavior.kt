@@ -36,10 +36,12 @@ class BottomBarScrollBehavior {
         offsetPx = when {
             // Strong fling → follow direction
             velocity < -SnapFlingVelocityThreshold -> heightPx
+
             velocity > SnapFlingVelocityThreshold -> 0f
 
             // Weak fling / drag release → use position
             offsetPx > halfway -> heightPx
+
             else -> 0f
         }
     }
