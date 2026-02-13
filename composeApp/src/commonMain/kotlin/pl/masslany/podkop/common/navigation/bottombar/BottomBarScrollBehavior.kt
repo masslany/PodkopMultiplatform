@@ -15,6 +15,8 @@ val LocalBottomBarScrollBehavior =
         error("No BottomBarScrollBehavior provided")
     }
 
+private const val SnapFlingVelocityThreshold = 1000f
+
 @Stable
 class BottomBarScrollBehavior {
 
@@ -29,7 +31,17 @@ class BottomBarScrollBehavior {
     }
 
     fun snap(velocity: Float) {
-        offsetPx = if (velocity < 0) heightPx else 0f
+        val halfway = heightPx / 2f
+
+        offsetPx = when {
+            // Strong fling → follow direction
+            velocity < -SnapFlingVelocityThreshold -> heightPx
+            velocity > SnapFlingVelocityThreshold -> 0f
+
+            // Weak fling / drag release → use position
+            offsetPx > halfway -> heightPx
+            else -> 0f
+        }
     }
 }
 
