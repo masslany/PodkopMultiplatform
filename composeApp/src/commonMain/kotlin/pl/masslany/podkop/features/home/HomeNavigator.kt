@@ -56,11 +56,6 @@ class HomeNavigator(private val configProvider: NavigationConfigProvider) : Auto
         return true
     }
 
-    fun currentStack(): ImmutableList<NavTarget> {
-        val currentTab = _state.value.currentTabRoot ?: return persistentListOf()
-        return _state.value.stacks[currentTab] ?: persistentListOf(currentTab)
-    }
-
     override fun close() {
         scope.cancel()
     }

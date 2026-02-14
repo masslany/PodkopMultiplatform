@@ -25,8 +25,8 @@ class HomeViewModel(private val appNavigator: AppNavigator, private val homeNavi
                         labelRes = destination.labelRes,
                     )
                 }.toImmutableList(),
-                currentTabKey = navigatorState.currentTabRoot.toString(),
-                currentStack = homeNavigator.currentStack(),
+                currentTabRoot = navigatorState.currentTabRoot,
+                stacks = navigatorState.stacks,
             )
         }
         .stateIn(viewModelScope, WhileSubscribed(5000), HomeScreenState())

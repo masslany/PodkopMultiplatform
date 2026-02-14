@@ -3,12 +3,16 @@ package pl.masslany.podkop.features.home
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
@@ -22,6 +26,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.navigation.BottomSheetSceneStrategy
 import pl.masslany.podkop.common.navigation.NavTarget
@@ -34,14 +39,33 @@ import pl.masslany.podkop.features.links.LinksScreen
 import pl.masslany.podkop.features.links.LinksScreenRoot
 import pl.masslany.podkop.features.upcoming.UpcomingScreen
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreenRoot(
     modifier: Modifier = Modifier,
 ) {
     val viewModel = koinViewModel<HomeViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { state.destinations.size },
+    )
     val bottomBarBehavior = remember { BottomBarScrollBehavior() }
+
+    val selectedIndex = remember(state.destinations, state.currentTabRoot) {
+        state.destinations.indexOfFirst { it.screen == state.currentTabRoot }
+    }
+
+    LaunchedEffect(selectedIndex) {
+        if (selectedIndex >= 0 && selectedIndex != pagerState.currentPage) {
+            pagerState.animateScrollToPage(selectedIndex)
+        }
+    }
+
+    LaunchedEffect(pagerState.currentPage, state.destinations) {
+        val destination = state.destinations.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
+        viewModel.onTabChanged(destination.screen)
+    }
 
     CompositionLocalProvider(LocalBottomBarScrollBehavior provides bottomBarBehavior) {
         Scaffold(
@@ -63,11 +87,17 @@ fun HomeScreenRoot(
             },
         ) { contentPadding ->
             val holder = rememberSaveableStateHolder()
-            holder.SaveableStateProvider(state.currentTabKey) {
-                HomeNavDisplay(
-                    backStack = state.currentStack,
-                    contentPadding = contentPadding,
-                )
+            HorizontalPager(
+                modifier = Modifier.fillMaxSize(),
+                state = pagerState,
+            ) { page ->
+                val destination = state.destinations.getOrNull(page) ?: return@HorizontalPager
+                holder.SaveableStateProvider(destination.screen.toString()) {
+                    HomeNavDisplay(
+                        backStack = state.stacks[destination.screen] ?: persistentListOf(destination.screen),
+                        contentPadding = contentPadding,
+                    )
+                }
             }
         }
     }
