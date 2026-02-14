@@ -31,9 +31,7 @@ fun App() {
             onBack = { appNavigator.back() },
             entryProvider = entryProvider {
                 entry<HomeScreen> {
-                    HomeScreenRoot(
-                        state = state.homeState,
-                    )
+                    HomeScreenRoot()
                 }
 
                 entry<EntryDetailsScreen> {

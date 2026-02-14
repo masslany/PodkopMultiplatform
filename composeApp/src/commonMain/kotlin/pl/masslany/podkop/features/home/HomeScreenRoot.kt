@@ -9,20 +9,21 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
+import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.navigation.BottomSheetSceneStrategy
-import pl.masslany.podkop.common.navigation.HomeState
 import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.common.navigation.bottombar.BottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
@@ -37,16 +38,19 @@ import pl.masslany.podkop.features.upcoming.UpcomingScreen
 @Composable
 fun HomeScreenRoot(
     modifier: Modifier = Modifier,
-    state: HomeState?,
 ) {
+    val viewModel = koinViewModel<HomeViewModel>()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val bottomBarBehavior = remember { BottomBarScrollBehavior() }
 
     CompositionLocalProvider(LocalBottomBarScrollBehavior provides bottomBarBehavior) {
         Scaffold(
             modifier = modifier.fillMaxSize(),
             bottomBar = {
-                if (state != null) {
+                if (state.destinations.isNotEmpty()) {
                     BottomBarRoot(
+                        destinations = state.destinations,
+                        onScreenChanged = viewModel::onTabChanged,
                         modifier = Modifier
                             .onSizeChanged {
                                 bottomBarBehavior.heightPx = it.height.toFloat()
@@ -59,15 +63,9 @@ fun HomeScreenRoot(
             },
         ) { contentPadding ->
             val holder = rememberSaveableStateHolder()
-            holder.SaveableStateProvider(state?.currentTabRoot.toString()) {
-                val tabStack = if (state == null) {
-                    persistentListOf()
-                } else {
-                    state.stacks[state.currentTabRoot] ?: persistentListOf(state.currentTabRoot)
-                }
-
+            holder.SaveableStateProvider(state.currentTabKey) {
                 HomeNavDisplay(
-                    backStack = tabStack,
+                    backStack = state.currentStack,
                     contentPadding = contentPadding,
                 )
             }

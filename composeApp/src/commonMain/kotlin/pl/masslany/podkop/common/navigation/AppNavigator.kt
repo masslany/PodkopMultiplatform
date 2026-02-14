@@ -2,7 +2,6 @@ package pl.masslany.podkop.common.navigation
 
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +15,8 @@ class AppNavigator(
     private val scope: CoroutineScope,
     private val externalBrowser: ExternalBrowser,
 ) {
+    private val destinationBackHandlers = mutableMapOf<NavTarget, () -> Boolean>()
+
     private val _isReady = MutableStateFlow(false)
     val isReady = _isReady.asStateFlow()
 
@@ -27,13 +28,8 @@ class AppNavigator(
     init {
         scope.launch {
             val startTarget = configProvider.resolveStartDestination()
-
-            if (startTarget == HomeScreen) {
-                initializeHome()
-            } else {
-                _state.update { it.copy(rootStack = persistentListOf(startTarget)) }
-                _isReady.value = true
-            }
+            _state.update { it.copy(rootStack = persistentListOf(startTarget), overlay = OverlayState.None) }
+            _isReady.value = true
         }
     }
 
@@ -49,14 +45,12 @@ class AppNavigator(
         }
     }
 
-    fun switchTab(root: NavTarget) {
-        _state.update { previousState ->
-            if (previousState.homeState != null) {
-                previousState.copy(homeState = previousState.homeState.copy(currentTabRoot = root))
-            } else {
-                previousState
-            }
-        }
+    fun registerBackHandler(destination: NavTarget, handler: () -> Boolean) {
+        destinationBackHandlers[destination] = handler
+    }
+
+    fun unregisterBackHandler(destination: NavTarget) {
+        destinationBackHandlers.remove(destination)
     }
 
     fun dismissOverlay() {
@@ -94,27 +88,21 @@ class AppNavigator(
     fun back(): Boolean {
         var consumed = false
         _state.update { previousState ->
+            val currentDestination = previousState.rootStack.lastOrNull()
+            val destinationBackHandler = currentDestination?.let { destinationBackHandlers[it] }
+            if (destinationBackHandler?.invoke() == true) {
+                consumed = true
+                return@update previousState
+            }
+
             if (previousState.rootStack.size > 1) {
                 consumed = true
                 previousState.copy(
                     rootStack = previousState.rootStack.dropLast(1).toPersistentList(),
                 )
             } else {
-                val homeState = previousState.homeState
-                val firstTab = homeState?.availableDestinations?.firstOrNull()?.root
-
-                if (
-                    previousState.rootStack.lastOrNull() == HomeScreen &&
-                    homeState != null &&
-                    firstTab != null &&
-                    homeState.currentTabRoot != firstTab
-                ) {
-                    consumed = true
-                    previousState.copy(homeState = homeState.copy(currentTabRoot = firstTab))
-                } else {
-                    consumed = false
-                    previousState
-                }
+                consumed = false
+                previousState
             }
         }
         return consumed
@@ -129,26 +117,5 @@ class AppNavigator(
     private fun pushToActiveStack(state: NavigationState, target: NavTarget): NavigationState {
         if (state.rootStack.lastOrNull() == target) return state
         return state.copy(rootStack = (state.rootStack.toMutableList() + target).toPersistentList())
-    }
-
-    private suspend fun initializeHome() {
-        val destinations = configProvider.topLevelDestinations.first()
-        val startDestination = destinations.firstOrNull()?.root
-        val stacks = destinations.associate { it.root to persistentListOf(it.root) }.toPersistentMap()
-
-        _state.update { previousState ->
-            previousState.copy(
-                rootStack = persistentListOf(HomeScreen),
-                homeState = startDestination?.let {
-                    HomeState(
-                        availableDestinations = destinations,
-                        currentTabRoot = it,
-                        stacks = stacks,
-                    )
-                },
-                overlay = OverlayState.None,
-            )
-        }
-        _isReady.value = true
     }
 }

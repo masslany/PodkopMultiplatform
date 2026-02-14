@@ -6,34 +6,31 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
+import pl.masslany.podkop.common.navigation.NavTarget
 
 @Composable
 fun BottomBarRoot(
+    destinations: ImmutableList<BottomBarDestinationState>,
+    onScreenChanged: (NavTarget) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: BottomBarViewModel = koinViewModel()
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
     BottomBar(
         modifier = modifier
             .shadow(
                 elevation = 8.dp,
                 clip = false,
             ),
-        destinations = state.destinations,
-        actions = viewModel,
+        destinations = destinations,
+        onScreenChanged = onScreenChanged,
     )
 }
 
@@ -41,7 +38,7 @@ fun BottomBarRoot(
 private fun BottomBar(
     modifier: Modifier = Modifier,
     destinations: ImmutableList<BottomBarDestinationState>,
-    actions: BottomBarActions,
+    onScreenChanged: (NavTarget) -> Unit,
 ) {
     NavigationBar(
         modifier = modifier,
@@ -54,7 +51,7 @@ private fun BottomBar(
                     },
                 selected = bottomBarDestinationState.isSelected,
                 enabled = bottomBarDestinationState.isEnabled,
-                onClick = { actions.onScreenChanged(bottomBarDestinationState.screen) },
+                onClick = { onScreenChanged(bottomBarDestinationState.screen) },
                 icon = {
                     Icon(
                         painter = painterResource(bottomBarDestinationState.iconRes),
