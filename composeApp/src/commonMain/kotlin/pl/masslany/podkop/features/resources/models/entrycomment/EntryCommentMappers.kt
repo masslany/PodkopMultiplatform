@@ -3,6 +3,7 @@ package pl.masslany.podkop.features.resources.models.entrycomment
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.common.models.AuthorState
+import pl.masslany.podkop.common.models.EmbedImageState
 import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.models.avatar.AvatarState
 import pl.masslany.podkop.common.models.avatar.AvatarType
@@ -50,6 +51,19 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
         )
     }
 
+    val embedUrl = this.media?.photo?.url
+    val embedSource = this.media?.photo?.label
+
+    val embedImageState = if (embedUrl != null) {
+        EmbedImageState(
+            url = embedUrl,
+            source = embedSource.orEmpty(),
+            isAdult = this.adult,
+        )
+    } else {
+        null
+    }
+
     return EntryCommentItemState(
         id = this.id,
         contentType = ResourceType.EntryCommentItem,
@@ -59,6 +73,6 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
         entryContentState = entryContentState,
-        embedImageState = null,
+        embedImageState = embedImageState,
     )
 }
