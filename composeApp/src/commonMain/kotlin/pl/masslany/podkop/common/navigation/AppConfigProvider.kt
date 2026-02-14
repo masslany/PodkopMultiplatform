@@ -17,7 +17,7 @@ import podkop.composeapp.generated.resources.navigation_label_upcoming
 
 class AppConfigProvider : NavigationConfigProvider {
 
-    override suspend fun resolveStartDestination(): NavTarget = MainApp
+    override suspend fun resolveStartDestination(): NavTarget = HomeScreen
 
     override val topLevelDestinations: Flow<ImmutableList<TopLevelDestination>> = flow {
         val links = TopLevelDestination(

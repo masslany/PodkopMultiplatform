@@ -5,7 +5,7 @@ import kotlin.uuid.Uuid
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object MainApp : MainAppTarget
+data object HomeScreen : NavTarget
 
 /**
  * A Universal Dialog implementation.

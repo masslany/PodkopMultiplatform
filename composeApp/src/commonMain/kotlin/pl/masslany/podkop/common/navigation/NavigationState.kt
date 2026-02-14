@@ -9,27 +9,19 @@ sealed interface OverlayState {
     data class Blocking(val target: OverlayTarget) : OverlayState
 }
 
-data class TabState(
-    val availableTabs: ImmutableList<TopLevelDestination>,
+data class HomeState(
+    val availableDestinations: ImmutableList<TopLevelDestination>,
     val currentTabRoot: NavTarget,
-    val stacks: ImmutableMap<NavTarget, ImmutableList<NavTarget>>, // Key: Tab Root, Value: Backstack
+    val stacks: ImmutableMap<NavTarget, ImmutableList<NavTarget>>,
 )
 
 data class NavigationState(
-    // The Global Stack. Holds Login, Onboarding, OR the MainAppTarget.
+    // The Global Stack. Holds screens in a single linear stack, e.g. HomeScreen -> EntryDetailsScreen.
     val rootStack: ImmutableList<NavTarget> = persistentListOf(),
 
-    // Logic for Tabs (Only active if rootStack.last() is MainAppTarget)
-    val tabState: TabState? = null,
+    // State for top-level destinations rendered inside HomeScreen.
+    val homeState: HomeState? = null,
 
     // Overlays sit on top of everything
     val overlay: OverlayState = OverlayState.None,
-
-) {
-    val isTabMode: Boolean get() = tabState != null
-    val isBottomBarVisible: Boolean get() = if (tabState != null) {
-        tabState.stacks[tabState.currentTabRoot]?.size == 1
-    } else {
-        false
-    }
-}
+)

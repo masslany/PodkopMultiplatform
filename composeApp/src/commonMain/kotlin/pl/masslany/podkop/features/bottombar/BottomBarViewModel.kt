@@ -29,10 +29,10 @@ class BottomBarViewModel(private val appNavigator: AppNavigator) :
         val navigationState = appNavigator.state.value
         state.update {
             it.copy(
-                destinations = navigationState.tabState?.availableTabs?.map { topLevelDestination ->
+                destinations = navigationState.homeState?.availableDestinations?.map { topLevelDestination ->
                     BottomBarDestinationState(
                         screen = topLevelDestination.root,
-                        isSelected = navigationState.tabState.currentTabRoot == topLevelDestination.root,
+                        isSelected = navigationState.homeState.currentTabRoot == topLevelDestination.root,
                         isEnabled = topLevelDestination.enabled,
                         labelRes = topLevelDestination.labelRes,
                         iconRes = topLevelDestination.iconRes,
@@ -45,7 +45,7 @@ class BottomBarViewModel(private val appNavigator: AppNavigator) :
     private fun observeNavigator() {
         viewModelScope.launch {
             appNavigator.state.collect {
-                val selectedRoot = it.tabState?.currentTabRoot ?: return@collect
+                val selectedRoot = it.homeState?.currentTabRoot ?: return@collect
 
                 state.update { prev ->
                     prev.copy(

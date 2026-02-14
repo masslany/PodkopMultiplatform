@@ -64,10 +64,5 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         activityHolder.activity = null
         super.onDestroy()
-        if (SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            backCallback?.let {
-                onBackInvokedDispatcher.unregisterOnBackInvokedCallback(it)
-            }
-        }
     }
 }

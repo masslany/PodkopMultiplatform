@@ -1,11 +1,13 @@
 package pl.masslany.podkop.common.navigation
 
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -24,27 +26,8 @@ fun NavigationContent(
     onBack: () -> Unit,
     entryProvider: (NavTarget) -> NavEntry<NavTarget>,
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize(),
-    ) {
-        val rootTarget = state.rootStack.lastOrNull()
-
-        if (rootTarget is MainAppTarget && state.tabState != null) {
-            val holder = rememberSaveableStateHolder()
-            // Save state for switched-out tabs
-            holder.SaveableStateProvider(state.tabState.currentTabRoot.toString()) {
-                val stack = state.tabState.stacks[state.tabState.currentTabRoot]
-                    ?: persistentListOf()
-                if (stack.isNotEmpty()) {
-                    GenericNavDisplay(
-                        backStack = stack,
-                        entryProvider = entryProvider,
-                        onBack = { onBack() },
-                    )
-                }
-            }
-        } else if (rootTarget != null) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (state.rootStack.isNotEmpty()) {
             GenericNavDisplay(
                 backStack = state.rootStack,
                 entryProvider = entryProvider,
@@ -89,6 +72,18 @@ private fun GenericNavDisplay(
         modifier = modifier,
         backStack = backStack,
         sceneStrategy = bottomSheetStrategy then dialogSceneStrategy,
+        transitionSpec = {
+            ContentTransform(
+                targetContentEnter = EnterTransition.None,
+                initialContentExit = ExitTransition.None,
+            )
+        },
+        popTransitionSpec = {
+            ContentTransform(
+                targetContentEnter = EnterTransition.None,
+                initialContentExit = ExitTransition.None,
+            )
+        },
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator(),

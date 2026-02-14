@@ -28,8 +28,8 @@ class AppNavigator(
         scope.launch {
             val startTarget = configProvider.resolveStartDestination()
 
-            if (startTarget is MainAppTarget) {
-                initializeMainApp(startTarget)
+            if (startTarget == HomeScreen) {
+                initializeHome()
             } else {
                 _state.update { it.copy(rootStack = persistentListOf(startTarget)) }
                 _isReady.value = true
@@ -49,33 +49,13 @@ class AppNavigator(
         }
     }
 
-    /**
-     * Completely switches the root context (e.g. Login -> Onboarding -> Main).
-     */
-    fun setRoot(target: NavTarget) {
-        if (target is MainAppTarget) {
-            scope.launch { initializeMainApp(target) }
-        } else {
-            _state.update {
-                it.copy(rootStack = persistentListOf(target), tabState = null, overlay = OverlayState.None)
-            }
-        }
-    }
-
     fun switchTab(root: NavTarget) {
         _state.update { previousState ->
-            if (previousState.tabState != null) {
-                previousState.copy(tabState = previousState.tabState.copy(currentTabRoot = root))
+            if (previousState.homeState != null) {
+                previousState.copy(homeState = previousState.homeState.copy(currentTabRoot = root))
             } else {
                 previousState
             }
-        }
-    }
-
-    fun setBottomBarVisible(visible: Boolean) {
-        println("MEOW setBottomBarVisible $visible")
-        if (_state.value.isBottomBarVisible != visible) {
-            println("MEOW setBottomBarVisible in if")
         }
     }
 
@@ -114,38 +94,23 @@ class AppNavigator(
     fun back(): Boolean {
         var consumed = false
         _state.update { previousState ->
-            // 1. Tab Logic
-            if (previousState.isTabMode && previousState.tabState != null) {
-                val currentRoot = previousState.tabState.currentTabRoot
-                val stack = previousState.tabState.stacks[currentRoot]!!
+            if (previousState.rootStack.size > 1) {
+                consumed = true
+                previousState.copy(
+                    rootStack = previousState.rootStack.dropLast(1).toPersistentList(),
+                )
+            } else {
+                val homeState = previousState.homeState
+                val firstTab = homeState?.availableDestinations?.firstOrNull()?.root
 
-                if (stack.size > 1) {
-                    // There are screens on the current tab's stack - pop the last one
+                if (
+                    previousState.rootStack.lastOrNull() == HomeScreen &&
+                    homeState != null &&
+                    firstTab != null &&
+                    homeState.currentTabRoot != firstTab
+                ) {
                     consumed = true
-                    val newStacks = previousState.tabState.stacks +
-                        (currentRoot to stack.dropLast(1).toPersistentList())
-                    previousState.copy(tabState = previousState.tabState.copy(stacks = newStacks.toPersistentMap()))
-                } else {
-                    // We are at the root of a tab (e.g., "Upcoming")
-                    val firstTab = previousState.tabState.availableTabs.firstOrNull()?.root
-                    if (firstTab != null && currentRoot != firstTab) {
-                        // If not on the first tab, switch back to the first tab (e.g., "Home")
-                        consumed = true
-                        previousState.copy(tabState = previousState.tabState.copy(currentTabRoot = firstTab))
-                    } else {
-                        // Already on the first tab's root, let the system handle exit
-                        consumed = false
-                        previousState
-                    }
-                }
-            }
-            // 2. Root Linear Logic (Non-tab mode)
-            else {
-                if (previousState.rootStack.size > 1) {
-                    consumed = true
-                    previousState.copy(
-                        rootStack = previousState.rootStack.dropLast(1).toPersistentList(),
-                    )
+                    previousState.copy(homeState = homeState.copy(currentTabRoot = firstTab))
                 } else {
                     consumed = false
                     previousState
@@ -162,30 +127,25 @@ class AppNavigator(
     // --- Helpers ---
 
     private fun pushToActiveStack(state: NavigationState, target: NavTarget): NavigationState {
-        return if (state.isTabMode && state.tabState != null) {
-            val currentRoot = state.tabState.currentTabRoot
-            val stack = state.tabState.stacks[currentRoot] ?: persistentListOf(currentRoot)
-            if (stack.lastOrNull() == target) return state // Single Top
-
-            val newStacks = state.tabState.stacks + (currentRoot to (stack + target).toPersistentList())
-            state.copy(tabState = state.tabState.copy(stacks = newStacks.toPersistentMap()))
-        } else {
-            if (state.rootStack.lastOrNull() == target) return state
-            state.copy(rootStack = (state.rootStack.toMutableList() + target).toPersistentList())
-        }
+        if (state.rootStack.lastOrNull() == target) return state
+        return state.copy(rootStack = (state.rootStack.toMutableList() + target).toPersistentList())
     }
 
-    private suspend fun initializeMainApp(mainTarget: MainAppTarget) {
-        val tabs = configProvider.topLevelDestinations.first()
-        if (tabs.isEmpty()) return
+    private suspend fun initializeHome() {
+        val destinations = configProvider.topLevelDestinations.first()
+        val startDestination = destinations.firstOrNull()?.root
+        val stacks = destinations.associate { it.root to persistentListOf(it.root) }.toPersistentMap()
 
-        val startTab = tabs.first().root
-        val initialStacks = tabs.associate { it.root to persistentListOf(it.root) }.toPersistentMap()
-
-        _state.update {
-            it.copy(
-                rootStack = persistentListOf(mainTarget),
-                tabState = TabState(tabs, startTab, initialStacks),
+        _state.update { previousState ->
+            previousState.copy(
+                rootStack = persistentListOf(HomeScreen),
+                homeState = startDestination?.let {
+                    HomeState(
+                        availableDestinations = destinations,
+                        currentTabRoot = it,
+                        stacks = stacks,
+                    )
+                },
                 overlay = OverlayState.None,
             )
         }

@@ -15,12 +15,6 @@ interface NavTarget
 interface OverlayTarget : NavTarget
 
 /**
- * Marker: Represents the "Container" for the logged-in experience.
- * When the Root Stack sees this, it renders the Tab/BottomBar UI.
- */
-interface MainAppTarget : NavTarget
-
-/**
  * Data class defining a tab in the Bottom Navigation Bar.
  */
 data class TopLevelDestination(
