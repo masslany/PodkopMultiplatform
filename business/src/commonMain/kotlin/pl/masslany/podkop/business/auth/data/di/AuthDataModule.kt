@@ -11,7 +11,7 @@ import pl.masslany.podkop.business.auth.domain.AuthRepository
 val authDataModule = module {
     single<AuthApi> { AuthApiClient(get()) }
     single<AuthDataSource> {
-        AuthDataSourceImpl(get(), get())
+        AuthDataSourceImpl(get(), get(), get())
     }
     factory<AuthRepository> { AuthRepositoryImpl(get()) }
 }

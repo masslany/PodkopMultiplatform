@@ -1,14 +1,17 @@
 package pl.masslany.podkop.business.auth.data.network.main
 
+import kotlinx.serialization.json.Json
 import pl.masslany.podkop.business.auth.data.api.AuthDataSource
 import pl.masslany.podkop.business.auth.data.network.api.AuthApi
 import pl.masslany.podkop.business.auth.data.network.models.AuthDto
 import pl.masslany.podkop.business.auth.data.network.models.WykopConnectDto
 import pl.masslany.podkop.common.configstorage.api.ConfigStorage
+import pl.masslany.podkop.common.network.infrastructure.main.isExpiringIn
 
 internal class AuthDataSourceImpl(
     private val authApi: AuthApi,
     private val configStorage: ConfigStorage,
+    private val json: Json,
 ) : AuthDataSource {
     override suspend fun getAuthToken(): Result<AuthDto> {
         val key = configStorage.getApiKey()
@@ -25,9 +28,8 @@ internal class AuthDataSourceImpl(
         if (token.isEmpty()) {
             return true
         }
-        //val jwt = JWT(token)
 
-        return true
+        return token.isExpiringIn(JWT_EXPIRATION_LEEWAY_SECONDS, json)
     }
 
     override suspend fun updateTokens(): Result<Unit> {

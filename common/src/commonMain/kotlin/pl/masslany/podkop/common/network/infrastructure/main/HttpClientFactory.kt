@@ -2,24 +2,21 @@ package pl.masslany.podkop.common.network.infrastructure.main
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.accept
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import pl.masslany.network.infrastructure.bearerTokenInterceptor
 import pl.masslany.podkop.common.configstorage.api.ConfigStorage
 
-class HttpClientFactory(
+internal class HttpClientFactory(
     private val configStorage: ConfigStorage,
+    private val tokenRefreshCoordinator: TokenRefreshCoordinator,
+    private val json: Json,
 ) {
     fun create(): HttpClient {
         return HttpClient(HttpClientEngineProvider.provide()) {
@@ -30,12 +27,7 @@ class HttpClientFactory(
             }
 
             install(ContentNegotiation) {
-                json(
-                    Json {
-                        isLenient = true
-                        ignoreUnknownKeys = true
-                    },
-                )
+                json(json)
             }
 
             install(DefaultRequest) {
@@ -44,29 +36,7 @@ class HttpClientFactory(
 
             install(bearerTokenInterceptor) {
                 this.configStorage = this@HttpClientFactory.configStorage
-            }
-
-            install(HttpRequestRetry) {
-                maxRetries = MAX_RETRY_COUNT
-                retryIf { _, httpResponse -> httpResponse.status == HttpStatusCode.Forbidden }
-                delayMillis { retry -> retry * DELAY_MILLIS }
-                modifyRequest {
-                    runBlocking {
-                        // TODO: Find a way to refresh token on 403
-                        /*
-                         * This still feels like a hacky approach to a scenario where token expires
-                         * during a session. We want to refresh the token seamlessly during it.
-                         * Maybe future me has a better knowledge on how to handle it.
-                         * */
-//                        withContext(Dispatchers.Default) {
-//                            refreshTokensEventReducer.reduce(RefreshAction.Refresh)
-//                        }
-                        val token = configStorage.getBearerToken()
-                        if (token.isNotEmpty()) {
-                            it.headers[HttpHeaders.Authorization] = "Bearer $token"
-                        }
-                    }
-                }
+                this.tokenRefreshCoordinator = this@HttpClientFactory.tokenRefreshCoordinator
             }
 
             install(Logging) {
@@ -78,7 +48,5 @@ class HttpClientFactory(
 
     private companion object {
         const val BASE_URL = "https://wykop.pl/"
-        const val MAX_RETRY_COUNT = 3
-        const val DELAY_MILLIS = 500L
     }
 }

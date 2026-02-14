@@ -2,9 +2,7 @@ package pl.masslany.podkop.features.topbar
 
 import pl.masslany.podkop.common.navigation.AppNavigator
 
-class TopBarActionsHandler(
-    private val appNavigator: AppNavigator,
-) : TopBarActions {
+class TopBarActionsHandler(private val appNavigator: AppNavigator) : TopBarActions {
 
     override fun onTopBarBackClicked() {
         appNavigator.back()
