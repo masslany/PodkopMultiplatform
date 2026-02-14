@@ -21,6 +21,7 @@ fun EntryCommentItem(
     modifier: Modifier = Modifier,
     onProfileClick: (String) -> Unit,
     onVoteUpClick: () -> Unit,
+    onImageClick: (String) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -60,7 +61,7 @@ fun EntryCommentItem(
             Spacer(Modifier.size(8.dp))
             EmbedImage(
                 state = state.embedImageState,
-                onImageClick = { /* no-op */ },
+                onImageClick = { onImageClick(state.embedImageState.url) },
             )
         }
     }

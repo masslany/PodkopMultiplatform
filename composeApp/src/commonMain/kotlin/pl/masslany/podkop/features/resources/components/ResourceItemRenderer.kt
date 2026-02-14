@@ -62,6 +62,7 @@ private fun EntryItemRenderer(
                 EntryItem(
                     state = state,
                     onProfileClick = { actions.onProfileClicked(it) },
+                    onImageClick = { actions.onImageClicked(it) },
                     onVoteUpClick = {
                         actions.onEntryVoteUpClicked(
                             entryId = state.id,
@@ -83,6 +84,7 @@ private fun EntryItemRenderer(
                             ),
                         state = comment,
                         onProfileClick = { actions.onProfileClicked(it) },
+                        onImageClick = { actions.onImageClicked(it) },
                         onVoteUpClick = {
                             actions.onEntryCommentVoteUpClick(
                                 entryCommentId = comment.id,
@@ -100,6 +102,7 @@ private fun EntryItemRenderer(
                 .clickable { actions.onEntryClicked(state.id) },
             state = state,
             onProfileClick = { actions.onProfileClicked(it) },
+            onImageClick = { actions.onImageClicked(it) },
             onVoteUpClick = {
                 actions.onEntryVoteUpClicked(
                     entryId = state.id,
@@ -137,6 +140,7 @@ private fun EntryCommentItemRenderer(
         modifier = modifier,
         state = state,
         onProfileClick = { actions.onProfileClicked(it) },
+        onImageClick = { actions.onImageClicked(it) },
         onVoteUpClick = {
             actions.onEntryCommentVoteUpClick(
                 entryCommentId = state.id,
