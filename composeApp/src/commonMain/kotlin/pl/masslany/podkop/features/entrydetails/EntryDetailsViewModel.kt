@@ -16,13 +16,16 @@ import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.resources.models.toResourceItemState
+import pl.masslany.podkop.features.topbar.TopBarActions
 
 class EntryDetailsViewModel(
     private val id: Int,
     private val entriesRepository: EntriesRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
+    topBarActions: TopBarActions,
 ) : ViewModel(),
     EntryDetailsActions,
+    TopBarActions by topBarActions,
     ResourceItemStateHolder by resourceItemStateHolder {
 
     private val paginator = Paginator(

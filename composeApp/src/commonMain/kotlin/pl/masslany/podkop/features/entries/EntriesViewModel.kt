@@ -21,12 +21,15 @@ import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
+import pl.masslany.podkop.features.topbar.TopBarActions
 
 class EntriesViewModel(
     private val entriesRepository: EntriesRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
+    topBarActions: TopBarActions,
 ) : ViewModel(),
     EntriesActions,
+    TopBarActions by topBarActions,
     ResourceItemStateHolder by resourceItemStateHolder {
 
     private var currentEntriesSortType: EntriesSortType = EntriesSortType.Hot

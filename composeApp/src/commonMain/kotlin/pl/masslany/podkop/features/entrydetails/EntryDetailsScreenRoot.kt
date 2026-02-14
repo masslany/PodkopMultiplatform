@@ -111,7 +111,7 @@ fun EntryDetailsScreenRoot(
             TopAppBar(
                 title = { Text(text = stringResource(resource = Res.string.topbar_label_entry)) },
                 actions = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = viewModel::onTopBarProfileClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_person),
@@ -122,7 +122,7 @@ fun EntryDetailsScreenRoot(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = viewModel::onTopBarBackClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),

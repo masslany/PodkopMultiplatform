@@ -13,6 +13,7 @@ val linksModule = module {
             linksRepository = get(),
             hitsRepository = get(),
             linksResourceItemStateHolder = get(),
+            topBarActions = get(),
         )
     }
     factory<LinksResourceItemStateHolder> {

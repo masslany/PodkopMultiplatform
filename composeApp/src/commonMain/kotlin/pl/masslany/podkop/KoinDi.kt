@@ -13,6 +13,7 @@ import pl.masslany.podkop.features.entrydetails.di.entryDetailsModule
 import pl.masslany.podkop.features.home.di.homeModule
 import pl.masslany.podkop.features.links.di.linksModule
 import pl.masslany.podkop.features.resources.di.resourcesModule
+import pl.masslany.podkop.features.topbar.di.topBarModule
 
 val composeAppModule = module {
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate) }
@@ -24,6 +25,7 @@ val composeAppModule = module {
         entriesModule,
         resourcesModule,
         entryDetailsModule,
+        topBarModule,
     )
 }
 

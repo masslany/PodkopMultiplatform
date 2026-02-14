@@ -121,7 +121,7 @@ fun LinksScreenRoot(
                 title = { Text(text = getTopBarTitle(state.isUpcoming)) },
                 actions = {
                     if (!state.isUpcoming) {
-                        IconButton(onClick = { }) {
+                        IconButton(onClick = viewModel::onTopBarSearchClicked) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = vectorResource(resource = Res.drawable.ic_search),
@@ -131,7 +131,7 @@ fun LinksScreenRoot(
                             )
                         }
                     }
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = viewModel::onTopBarProfileClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_person),

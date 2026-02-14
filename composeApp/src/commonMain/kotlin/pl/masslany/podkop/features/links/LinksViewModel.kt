@@ -21,14 +21,17 @@ import pl.masslany.podkop.common.models.toLinksSortType
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.features.topbar.TopBarActions
 
 class LinksViewModel(
     val isUpcoming: Boolean,
     val linksRepository: LinksRepository,
     val hitsRepository: HitsRepository,
     val linksResourceItemStateHolder: LinksResourceItemStateHolder,
+    topBarActions: TopBarActions,
 ) : ViewModel(),
     LinksActions,
+    TopBarActions by topBarActions,
     LinksResourceItemStateHolder by linksResourceItemStateHolder {
 
     val linksType = if (isUpcoming) LinksType.UPCOMING else LinksType.HOMEPAGE

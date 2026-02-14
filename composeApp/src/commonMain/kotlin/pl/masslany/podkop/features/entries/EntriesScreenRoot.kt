@@ -112,7 +112,7 @@ fun EntriesScreenRoot(
             TopAppBar(
                 title = { Text(text = stringResource(resource = Res.string.topbar_label_entries)) },
                 actions = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = viewModel::onTopBarProfileClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_person),
