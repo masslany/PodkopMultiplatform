@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -40,6 +41,7 @@ import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.profile_log_in_button
 import podkop.composeapp.generated.resources.profile_not_logged_in_message
 import podkop.composeapp.generated.resources.topbar_label_profile
+import podkop.composeapp.generated.resources.topbar_label_settings
 import podkop.composeapp.generated.resources.user_profile_not_logged_in
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,6 +76,15 @@ fun ProfileScreenRoot(
                                 resource = Res.string.accessibility_topbar_back,
                             ),
                         )
+                    }
+                },
+                actions = {
+                    if (state.content is ProfileContentState.CurrentUser ||
+                        state.content is ProfileContentState.LoggedOut
+                    ) {
+                        TextButton(onClick = viewModel::onTopBarSettingsClicked) {
+                            Text(text = stringResource(resource = Res.string.topbar_label_settings))
+                        }
                     }
                 },
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),

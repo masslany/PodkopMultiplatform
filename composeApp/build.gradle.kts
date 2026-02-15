@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.lifecycle.viewmodel.navigation3)
             implementation(libs.kotlinx.collections.immutable)
             implementation(libs.coil.compose)
+            implementation(libs.coil.gif)
             implementation(libs.coil.network.ktor)
             implementation(libs.kotlinx.datetime)
             implementation(libs.multiplatform.markdown.renderer)

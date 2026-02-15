@@ -14,8 +14,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -28,17 +30,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberConstraintsSizeResolver
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
+import coil3.request.SuccessResult
 import coil3.size.Scale
 import dev.chrisbanes.haze.hazeEffect
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.models.EmbedImageState
+import pl.masslany.podkop.common.settings.LocalAppSettings
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.embed_adult_image
+import podkop.composeapp.generated.resources.embed_gif_badge
 import podkop.composeapp.generated.resources.embed_image_source
 
 @Composable
@@ -47,9 +53,56 @@ fun EmbedImage(
     state: EmbedImageState,
     onImageClick: () -> Unit,
 ) {
+    val appSettings = LocalAppSettings.current
     val context = LocalPlatformContext.current
     val sizeResolver = rememberConstraintsSizeResolver()
-    var isAdultOverlayVisible by rememberSaveable { mutableStateOf(state.isAdult) }
+    val isGifAutoplayEnabled by appSettings.autoplayGifs.collectAsStateWithLifecycle(initialValue = true)
+    var isAdultOverlayVisible by rememberSaveable(state.url) { mutableStateOf(state.isAdult) }
+    var isGifPlaybackEnabled by rememberSaveable(state.url) { mutableStateOf(false) }
+    var latestSuccessResult by remember(state.url) { mutableStateOf<SuccessResult?>(null) }
+
+    LaunchedEffect(state.url, state.isGif, isGifAutoplayEnabled) {
+        isGifPlaybackEnabled = !state.isGif || isGifAutoplayEnabled
+    }
+
+    LaunchedEffect(isGifPlaybackEnabled, latestSuccessResult) {
+        val result = latestSuccessResult ?: return@LaunchedEffect
+        if (state.isGif) {
+            setImageAnimationPlaying(
+                image = result.image,
+                isPlaying = isGifPlaybackEnabled,
+            )
+        }
+    }
+
+    val isGifOverlayVisible = state.isGif && !isGifAutoplayEnabled && !isGifPlaybackEnabled
+    val imageModifier = Modifier
+        .then(sizeResolver)
+        .fillMaxWidth()
+        .heightIn(min = 120.dp)
+        .clickable {
+            when {
+                isAdultOverlayVisible -> {
+                    isAdultOverlayVisible = false
+                }
+
+                isGifOverlayVisible -> {
+                    isGifPlaybackEnabled = true
+                }
+
+                else -> {
+                    onImageClick()
+                }
+            }
+        }
+        .then(
+            if (isAdultOverlayVisible) {
+                Modifier.hazeEffect { blurEnabled = true }
+            } else {
+                Modifier
+            },
+        )
+
     Column(
         modifier = modifier
             .background(
@@ -60,24 +113,7 @@ fun EmbedImage(
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             AsyncImage(
-                modifier = Modifier
-                    .then(sizeResolver)
-                    .fillMaxWidth()
-                    .heightIn(min = 120.dp)
-                    .clickable {
-                        if (isAdultOverlayVisible) {
-                            isAdultOverlayVisible = false
-                        } else {
-                            onImageClick()
-                        }
-                    }
-                    .then(
-                        if (isAdultOverlayVisible) {
-                            Modifier.hazeEffect { blurEnabled = true }
-                        } else {
-                            Modifier
-                        },
-                    ),
+                modifier = imageModifier,
                 model = ImageRequest.Builder(context)
                     .data(state.url)
                     .memoryCacheKey(state.url)
@@ -88,9 +124,39 @@ fun EmbedImage(
                     .scale(Scale.FIT)
                     .size(sizeResolver)
                     .build(),
+                onSuccess = { success ->
+                    latestSuccessResult = success.result
+                    if (state.isGif) {
+                        setImageAnimationPlaying(
+                            image = success.result.image,
+                            isPlaying = isGifPlaybackEnabled,
+                        )
+                    }
+                },
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
             )
+
+            if (isGifOverlayVisible && !isAdultOverlayVisible) {
+                Text(
+                    text = stringResource(resource = Res.string.embed_gif_badge),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .background(
+                            color = Color.Black.copy(alpha = 0.65f),
+                            shape = RoundedCornerShape(4.dp),
+                        )
+                        .padding(
+                            horizontal = 8.dp,
+                            vertical = 2.dp,
+                        ),
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+
             if (isAdultOverlayVisible) {
                 Text(
                     text = stringResource(resource = Res.string.embed_adult_image),

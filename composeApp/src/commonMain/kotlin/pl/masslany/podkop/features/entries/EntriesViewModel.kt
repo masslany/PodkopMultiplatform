@@ -215,7 +215,7 @@ class EntriesViewModel(
             entriesRepository.getEntries(
                 page = 1,
                 limit = null,
-                entriesSortType = EntriesSortType.Hot,
+                entriesSortType = sortType.toEntriesSortType(),
                 hotSortType = HotSortType.TwelveHours,
                 category = null,
                 bucket = null,

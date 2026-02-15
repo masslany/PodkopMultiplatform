@@ -21,6 +21,8 @@
     <!-- Settings -->
     <string name="settings_headline_theme">Motyw</string>
     <string name="settings_body_dynamic_colors">Dynamiczne kolory</string>
+    <string name="settings_headline_media">Media</string>
+    <string name="settings_body_gif_autoplay">Autoodtwarzanie GIF-ów</string>
 
     <!-- Accessibility -->
     <string name="accessibility_topbar_add">Dodaj</string>
@@ -95,6 +97,7 @@
     <!-- Embed image -->
     <string name="embed_image_source">źródło: %1$s</string>
     <string name="embed_adult_image">Materiał zawiera treści +18. \n Kliknij aby pokazać.</string>
+    <string name="embed_gif_badge">GIF</string>
 
     <!-- Link details screen -->
     <string name="links_details_screen_no_comments">Brak komentarzy</string>

@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.common.configstorage.api.ConfigStorage
 import pl.masslany.podkop.common.navigation.AppNavigator
+import pl.masslany.podkop.features.settings.SettingsScreen
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 class ProfileViewModel(
@@ -52,6 +53,10 @@ class ProfileViewModel(
                     println("DBG --> failed to resolve wykop connect url: $it")
                 }
         }
+    }
+
+    fun onTopBarSettingsClicked() {
+        appNavigator.navigateTo(SettingsScreen)
     }
 
     private suspend fun resolveContentState(): ProfileContentState {

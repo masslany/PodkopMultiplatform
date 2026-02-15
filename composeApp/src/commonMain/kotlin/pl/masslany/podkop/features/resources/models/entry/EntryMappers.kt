@@ -11,6 +11,7 @@ import pl.masslany.podkop.common.models.avatar.AvatarState
 import pl.masslany.podkop.common.models.avatar.AvatarType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
+import pl.masslany.podkop.common.models.isGifImage
 import pl.masslany.podkop.common.models.toHighlightedTagProfileMarkdown
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.models.toPublishedTimeType
@@ -55,12 +56,17 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
     }
     val embedUrl = this.media?.photo?.url
     val embedSource = this.media?.photo?.label
+    val embedMimeType = this.media?.photo?.mimeType
 
     val embedImageState = if (embedUrl != null) {
         EmbedImageState(
             url = embedUrl,
             source = embedSource.orEmpty(),
             isAdult = this.adult,
+            isGif = isGifImage(
+                url = embedUrl,
+                mimeType = embedMimeType,
+            ),
         )
     } else {
         null
@@ -109,12 +115,17 @@ private fun Comment.toEntryCommentItemState(): EntryCommentItemState {
 
     val embedUrl = this.media.photo?.url
     val embedSource = this.media.photo?.label
+    val embedMimeType = this.media.photo?.mimeType
 
     val embedImageState = if (embedUrl != null) {
         EmbedImageState(
             url = embedUrl,
             source = embedSource.orEmpty(),
             isAdult = this.adult,
+            isGif = isGifImage(
+                url = embedUrl,
+                mimeType = embedMimeType,
+            ),
         )
     } else {
         null
