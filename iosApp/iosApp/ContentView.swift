@@ -2,14 +2,53 @@ import UIKit
 import SwiftUI
 import ComposeApp
 
+final class IOSStartupViewModel: ObservableObject {
+    @Published var startupState: IOSAppStartupState = .initializing
+
+    let viewControllerHolder: IOSViewControllerHolder
+
+    private let helper = IOSDependencyHelper()
+    private var key = ""
+    private var secret = ""
+    private var started = false
+
+    init() {
+        self.viewControllerHolder = helper.viewControllerHolder()
+    }
+
+    func startIfNeeded(key: String, secret: String) {
+        self.key = key
+        self.secret = secret
+
+        guard !started else { return }
+        started = true
+
+        helper.startAndObserveStartupState(
+            key: key,
+            secret: secret,
+            onStateChanged: { [weak self] state in
+                self?.startupState = state
+            }
+        )
+    }
+
+    func retry() {
+        helper.start(key: key, secret: secret)
+    }
+
+    deinit {
+        helper.stopObservingStartupState()
+    }
+}
+
 struct ComposeView: UIViewControllerRepresentable {
+    let viewControllerHolder: IOSViewControllerHolder
+
     func makeUIViewController(context: Context) -> UIViewController {
         let controller = MainViewControllerKt.MainViewController()
+        controller.view.backgroundColor = .systemBackground
 
-        let helper = IOSDependencyHelper()
-        let holder = helper.viewControllerHolder()
-
-        holder.provider = { controller }
+        viewControllerHolder.provider = { controller }
 
         return controller
     }
@@ -18,11 +57,31 @@ struct ComposeView: UIViewControllerRepresentable {
 }
 
 struct ContentView: View {
+    @StateObject private var startupViewModel = IOSStartupViewModel()
+
+    private var key: String {
+        Bundle.main.object(forInfoDictionaryKey: "WYKOP_KEY") as? String ?? ""
+    }
+
+    private var secret: String {
+        Bundle.main.object(forInfoDictionaryKey: "WYKOP_SECRET") as? String ?? ""
+    }
+
     var body: some View {
-        ComposeView()
-            .ignoresSafeArea()
+        Group {
+            switch startupViewModel.startupState {
+            case .ready:
+                ComposeView(viewControllerHolder: startupViewModel.viewControllerHolder)
+                    .ignoresSafeArea()
+            case .error:
+                VStack(spacing: 16) {}
+            default:
+                VStack(spacing: 16) {}
+            }
+        }
+        .onAppear {
+            startupViewModel.startIfNeeded(key: key, secret: secret)
+        }
     }
 }
-
-
 

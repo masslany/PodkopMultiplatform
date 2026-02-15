@@ -10,12 +10,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
         KoinHelperKt.doInitKoinIos()
 
-        let key = Bundle.main.object(forInfoDictionaryKey: "WYKOP_KEY") as? String ?? ""
-        let secret = Bundle.main.object(forInfoDictionaryKey: "WYKOP_SECRET") as? String ?? ""
-
-        let helper = IOSDependencyHelper()
-        helper.start(key: key, secret: secret)
-
         return true
     }
 }
