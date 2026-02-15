@@ -48,7 +48,16 @@ open class BaseResourceItemStateHolder(
 
     override fun appendData(data: List<ResourceItem>) {
         _items.update { list ->
-            (list + data.map { it.toResourceItemState(isUpcoming) }).toImmutableList()
+            val existingIds = list
+                .mapTo(mutableSetOf()) { it.id }
+
+            val uniqueNewItems = data
+                .asSequence()
+                .filter { item -> existingIds.add(item.id) }
+                .map { item -> item.toResourceItemState(isUpcoming) }
+                .toList()
+
+            (list + uniqueNewItems).toImmutableList()
         }
     }
 
