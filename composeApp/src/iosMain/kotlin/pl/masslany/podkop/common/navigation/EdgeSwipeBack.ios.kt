@@ -11,7 +11,7 @@ import kotlin.math.abs
 
 actual fun Modifier.edgeSwipeBackGesture(
     enabled: Boolean,
-    navigationInput: DirectNavigationEventInput?
+    navigationInput: DirectNavigationEventInput?,
 ): Modifier {
     if (!enabled) return this
 

@@ -18,10 +18,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
-import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
-import coil3.request.crossfade
 import org.jetbrains.compose.resources.painterResource
 import pl.masslany.podkop.common.models.avatar.AvatarState
 import pl.masslany.podkop.common.models.avatar.AvatarType
@@ -53,38 +52,23 @@ fun Avatar(
 fun AvatarImageTypeRouter(avatarType: AvatarType) {
     when (avatarType) {
         is AvatarType.NetworkImage -> {
-            SubcomposeAsyncImage(
+            Box(
                 modifier = Modifier
                     .size(36.dp)
-                    .clip(MaterialTheme.shapes.small),
-                model = ImageRequest.Builder(LocalPlatformContext.current)
-                    .data(avatarType.url)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.FillBounds,
-                loading = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
-                    )
-                },
-                error = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
-                    ) {
-                        Image(
-                            modifier = Modifier.fillMaxSize(),
-                            painter = painterResource(resource = Res.drawable.ic_profile),
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                        )
-                    }
-                },
-            )
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
+            ) {
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = ImageRequest.Builder(LocalPlatformContext.current)
+                        .data(avatarType.url)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.FillBounds,
+                    error = painterResource(resource = Res.drawable.ic_profile),
+                    placeholder = painterResource(resource = Res.drawable.ic_profile),
+                )
+            }
         }
 
         AvatarType.NoAvatar -> {
