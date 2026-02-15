@@ -11,8 +11,7 @@ import kotlin.math.abs
 
 actual fun Modifier.edgeSwipeBackGesture(
     enabled: Boolean,
-    navigationInput: DirectNavigationEventInput?,
-    onBack: () -> Unit,
+    navigationInput: DirectNavigationEventInput?
 ): Modifier {
     if (!enabled) return this
 
@@ -67,11 +66,7 @@ actual fun Modifier.edgeSwipeBackGesture(
 
             if (started) {
                 if (currentProgress >= completionThreshold) {
-                    if (navigationInput != null) {
-                        navigationInput.backCompleted()
-                    } else {
-                        onBack()
-                    }
+                    navigationInput?.backCompleted()
                 } else {
                     navigationInput?.backCancelled()
                 }

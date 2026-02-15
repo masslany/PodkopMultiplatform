@@ -6,5 +6,4 @@ import androidx.navigationevent.DirectNavigationEventInput
 expect fun Modifier.edgeSwipeBackGesture(
     enabled: Boolean,
     navigationInput: DirectNavigationEventInput?,
-    onBack: () -> Unit,
 ): Modifier

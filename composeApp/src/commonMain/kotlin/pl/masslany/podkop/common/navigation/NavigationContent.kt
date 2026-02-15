@@ -74,7 +74,6 @@ private fun GenericNavDisplay(
         modifier = modifier.edgeSwipeBackGesture(
             enabled = canNavigateBack,
             navigationInput = navigationInput,
-            onBack = onBack,
         ),
         backStack = backStack,
         sceneStrategy = bottomSheetStrategy then dialogSceneStrategy,
