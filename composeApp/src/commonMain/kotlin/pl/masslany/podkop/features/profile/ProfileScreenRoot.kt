@@ -1,9 +1,11 @@
 package pl.masslany.podkop.features.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,9 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -36,6 +40,7 @@ import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.profile_log_in_button
 import podkop.composeapp.generated.resources.profile_not_logged_in_message
 import podkop.composeapp.generated.resources.topbar_label_profile
+import podkop.composeapp.generated.resources.user_profile_not_logged_in
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,6 +118,13 @@ private fun ProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
+                    Image(
+                        modifier = Modifier.size(240.dp),
+                        painter = painterResource(resource = Res.drawable.user_profile_not_logged_in),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
                     Text(text = stringResource(resource = Res.string.profile_not_logged_in_message))
                     Button(onClick = actions::onLoginClicked) {
                         Text(text = stringResource(resource = Res.string.profile_log_in_button))

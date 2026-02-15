@@ -27,7 +27,7 @@ class ProfileViewModel(
         .stateIn(
             scope = viewModelScope,
             started = WhileSubscribed(5000),
-            initialValue = ProfileScreenState.initial
+            initialValue = ProfileScreenState.initial,
         )
 
     init {

@@ -1,9 +1,6 @@
 package pl.masslany.podkop.features.profile
 
-data class ProfileScreenState(
-    val isLoading: Boolean,
-    val content: ProfileContentState,
-) {
+data class ProfileScreenState(val isLoading: Boolean, val content: ProfileContentState) {
     companion object Companion {
         val initial = ProfileScreenState(
             isLoading = true,

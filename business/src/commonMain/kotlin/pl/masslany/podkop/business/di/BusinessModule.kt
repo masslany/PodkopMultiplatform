@@ -8,6 +8,8 @@ import pl.masslany.podkop.business.hits.data.di.hitsDataModule
 import pl.masslany.podkop.business.hits.data.network.di.hitsNetworkModule
 import pl.masslany.podkop.business.links.data.di.linksDataModule
 import pl.masslany.podkop.business.links.data.network.di.linksNetworkModule
+import pl.masslany.podkop.business.profile.data.di.profileDataModule
+import pl.masslany.podkop.business.profile.data.network.di.profileNetworkModule
 import pl.masslany.podkop.business.startup.infrastructure.di.startupModule
 import pl.masslany.podkop.commonModule
 
@@ -21,6 +23,8 @@ val businessModule = module {
         hitsNetworkModule,
         entriesDataModule,
         entriesNetworkModule,
+        profileDataModule,
+        profileNetworkModule,
         startupModule,
     )
 }
