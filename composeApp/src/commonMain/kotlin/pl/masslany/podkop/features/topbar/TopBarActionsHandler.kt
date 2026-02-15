@@ -1,6 +1,7 @@
 package pl.masslany.podkop.features.topbar
 
 import pl.masslany.podkop.common.navigation.AppNavigator
+import pl.masslany.podkop.features.profile.ProfileScreen
 
 class TopBarActionsHandler(private val appNavigator: AppNavigator) : TopBarActions {
 
@@ -9,7 +10,7 @@ class TopBarActionsHandler(private val appNavigator: AppNavigator) : TopBarActio
     }
 
     override fun onTopBarProfileClicked() {
-        // TODO: Navigate to profile screen when it exists.
+        appNavigator.navigateTo(ProfileScreen(username = null))
     }
 
     override fun onTopBarSearchClicked() {

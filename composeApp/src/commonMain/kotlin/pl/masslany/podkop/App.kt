@@ -32,6 +32,8 @@ import pl.masslany.podkop.features.entrydetails.EntryDetailsScreenRoot
 import pl.masslany.podkop.features.home.HomeScreenRoot
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreenRoot
+import pl.masslany.podkop.features.profile.ProfileScreen
+import pl.masslany.podkop.features.profile.ProfileScreenRoot
 
 @Composable
 fun App() {
@@ -77,6 +79,13 @@ fun App() {
                     entry<ImageViewerScreen> {
                         ImageViewerScreenRoot(
                             imageUrl = it.imageUrl,
+                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<ProfileScreen> {
+                        ProfileScreenRoot(
+                            username = it.username,
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )
                     }

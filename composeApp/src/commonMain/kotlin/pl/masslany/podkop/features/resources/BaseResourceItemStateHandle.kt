@@ -14,6 +14,7 @@ import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
+import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryVoteAction
@@ -94,7 +95,7 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onProfileClicked(username: String) {
-        println("DBG ---> ic_profile clicked: $username")
+        appNavigator.navigateTo(ProfileScreen(username = username))
     }
 
     override fun onImageClicked(url: String) {
