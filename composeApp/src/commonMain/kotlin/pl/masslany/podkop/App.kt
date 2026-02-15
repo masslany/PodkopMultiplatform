@@ -16,6 +16,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.DialogSceneStrategy
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
+import pl.masslany.podkop.business.startup.api.StartupManager
+import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.components.dialog.DefaultGenericDialog
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.GenericDialog
@@ -34,10 +36,16 @@ import pl.masslany.podkop.features.imageviewer.ImageViewerScreenRoot
 @Composable
 fun App() {
     PodkopTheme {
+        val startupManager = koinInject<StartupManager>()
         val appNavigator = koinInject<AppNavigator>()
         val snackbarManager = koinInject<SnackbarManager>()
+        val startupState by startupManager.state.collectAsStateWithLifecycle()
         val state by appNavigator.state.collectAsStateWithLifecycle()
         val snackbarHostState = remember { SnackbarHostState() }
+
+        if (startupState !is AppState.Ready) {
+            return@PodkopTheme
+        }
 
         LaunchedEffect(snackbarManager) {
             snackbarManager.events.collect { event ->
