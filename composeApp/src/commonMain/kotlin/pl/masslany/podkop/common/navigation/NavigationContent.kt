@@ -67,9 +67,15 @@ private fun GenericNavDisplay(
 ) {
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavTarget>() }
     val dialogSceneStrategy = remember { DialogSceneStrategy<NavTarget>() }
+    val canNavigateBack = backStack.size > 1
+    val navigationInput = rememberPlatformBackNavigationInput(enabled = canNavigateBack)
 
     NavDisplay(
-        modifier = modifier,
+        modifier = modifier.edgeSwipeBackGesture(
+            enabled = canNavigateBack,
+            navigationInput = navigationInput,
+            onBack = onBack,
+        ),
         backStack = backStack,
         sceneStrategy = bottomSheetStrategy then dialogSceneStrategy,
         transitionSpec = {
