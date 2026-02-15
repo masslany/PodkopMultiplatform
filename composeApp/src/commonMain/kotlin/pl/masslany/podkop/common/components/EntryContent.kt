@@ -1,6 +1,7 @@
 package pl.masslany.podkop.common.components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -22,8 +23,14 @@ import com.mikepenz.markdown.compose.elements.MarkdownText
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
+import com.mikepenz.markdown.model.MarkdownState
+import com.mikepenz.markdown.model.ReferenceLinkHandlerImpl
+import com.mikepenz.markdown.model.markdownAnimations
+import com.mikepenz.markdown.model.rememberMarkdownState
 import com.mikepenz.markdown.utils.codeSpanStyle
 import org.jetbrains.compose.resources.stringResource
+import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import org.intellij.markdown.parser.MarkdownParser
 import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.theme.colorsPalette
 import podkop.composeapp.generated.resources.Res
@@ -36,8 +43,10 @@ fun EntryContent(state: EntryContentState) {
     when (state) {
         is EntryContentState.Content -> {
             if (state.content.isNotEmpty()) {
+                val markdownState = rememberEntryMarkdownState(state.content)
                 Markdown(
-                    content = state.content,
+                    markdownState = markdownState,
+                    modifier = Modifier.fillMaxWidth(),
                     components = spoilerComponents,
                     colors = markdownColor(
                         text = MaterialTheme.colorScheme.onSurface,
@@ -51,6 +60,9 @@ fun EntryContent(state: EntryContentState) {
                                 color = MaterialTheme.colorsPalette.tagBlue,
                             ).toSpanStyle(),
                         ),
+                    ),
+                    animations = markdownAnimations(
+                        animateTextSize = { this },
                     ),
                 )
             }
@@ -74,36 +86,62 @@ fun EntryContent(state: EntryContentState) {
     }
 }
 
+@Composable
+private fun rememberEntryMarkdownState(content: String): MarkdownState {
+    val flavour = remember { GFMFlavourDescriptor() }
+    val parser = remember(flavour) { MarkdownParser(flavour) }
+    val referenceLinkHandler = remember { ReferenceLinkHandlerImpl() }
+
+    return rememberMarkdownState(
+        content = content,
+        retainState = true,
+        flavour = flavour,
+        parser = parser,
+        referenceLinkHandler = referenceLinkHandler,
+    )
+}
+
 private val spoilerComponents = markdownComponents(
     paragraph = { config ->
         val content = config.content
         val node = config.node
         val typography = config.typography
         val annotator = LocalMarkdownAnnotator.current
+        val codeSpanStyle = typography.codeSpanStyle
 
-        val isSpoiler = content.substring(node.startOffset, node.endOffset).startsWith("!")
+        val isSpoiler = content.getOrNull(node.startOffset) == '!'
 
         if (isSpoiler) {
-            var revealed by remember { mutableStateOf(false) }
+            var revealed by remember(content, node.startOffset) { mutableStateOf(false) }
 
             if (revealed) {
-                // Remove the ! from the start
-                val settings = DefaultAnnotatorSettings(
-                    annotator = annotator,
-                    linkTextSpanStyle = typography.textLink,
-                    codeSpanStyle = typography.codeSpanStyle,
-                )
+                // Build annotated content once and remove the leading "!" marker.
+                val strippedText = remember(
+                    content,
+                    node.startOffset,
+                    node.endOffset,
+                    typography.paragraph,
+                    typography.textLink,
+                    codeSpanStyle,
+                    annotator,
+                ) {
+                    val settings = DefaultAnnotatorSettings(
+                        annotator = annotator,
+                        linkTextSpanStyle = typography.textLink,
+                        codeSpanStyle = codeSpanStyle,
+                    )
 
-                val fullAnnotatedString = content.buildMarkdownAnnotatedString(
-                    textNode = node,
-                    style = typography.paragraph,
-                    annotatorSettings = settings,
-                )
+                    val fullAnnotatedString = content.buildMarkdownAnnotatedString(
+                        textNode = node,
+                        style = typography.paragraph,
+                        annotatorSettings = settings,
+                    )
 
-                val strippedText = if (fullAnnotatedString.length > 1) {
-                    fullAnnotatedString.subSequence(1, fullAnnotatedString.length)
-                } else {
-                    fullAnnotatedString
+                    if (fullAnnotatedString.length > 1) {
+                        fullAnnotatedString.subSequence(1, fullAnnotatedString.length)
+                    } else {
+                        fullAnnotatedString
+                    }
                 }
 
                 MarkdownText(
