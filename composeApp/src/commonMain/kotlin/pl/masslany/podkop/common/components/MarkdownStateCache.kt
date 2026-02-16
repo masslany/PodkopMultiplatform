@@ -21,6 +21,18 @@ class MarkdownStateCache(private val maxCacheSize: Int = MAX_CACHE_SIZE) {
     private val lock = Mutex()
     private val parser = MarkdownParser(GFMFlavourDescriptor())
 
+    fun getNow(content: String): State.Success? {
+        if (!lock.tryLock()) {
+            return null
+        }
+
+        return try {
+            cache[content]
+        } finally {
+            lock.unlock()
+        }
+    }
+
     suspend fun get(content: String): State.Success? = lock.withLock {
         cache[content]
     }

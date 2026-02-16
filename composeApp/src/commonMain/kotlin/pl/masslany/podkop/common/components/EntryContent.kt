@@ -63,6 +63,14 @@ fun EntryContent(state: EntryContentState) {
                     animations = markdownAnimations(
                         animateTextSize = { this },
                     ),
+                    loading = { modifier ->
+                        Text(
+                            modifier = modifier,
+                            text = state.content,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    },
                 )
             }
         }
@@ -88,12 +96,15 @@ fun EntryContent(state: EntryContentState) {
 @Composable
 private fun rememberCachedEntryMarkdownState(content: String): State.Success? {
     val cache = LocalMarkdownStateCache.current
-    return produceState<State.Success?>(
-        initialValue = null,
+    val initialValue = remember(content, cache) { cache.getNow(content) }
+    return produceState(
+        initialValue = initialValue,
         key1 = content,
         key2 = cache,
     ) {
-        value = cache.get(content)
+        if (value == null) {
+            value = cache.get(content)
+        }
         if (value == null) {
             value = withContext(Dispatchers.Default) { cache.getOrParse(content) }
         }
