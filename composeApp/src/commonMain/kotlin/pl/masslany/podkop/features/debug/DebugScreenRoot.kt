@@ -1,9 +1,8 @@
-package pl.masslany.podkop.features.settings
+package pl.masslany.podkop.features.debug
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -11,20 +10,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
@@ -34,20 +31,19 @@ import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_topbar_back
+import podkop.composeapp.generated.resources.debug_entry_button_open
+import podkop.composeapp.generated.resources.debug_entry_hint
+import podkop.composeapp.generated.resources.debug_entry_title
+import podkop.composeapp.generated.resources.debug_entry_validation_error
 import podkop.composeapp.generated.resources.ic_arrow_back
-import podkop.composeapp.generated.resources.settings_body_gif_autoplay
-import podkop.composeapp.generated.resources.settings_body_open_debug
-import podkop.composeapp.generated.resources.settings_button_open_debug
-import podkop.composeapp.generated.resources.settings_headline_debug
-import podkop.composeapp.generated.resources.settings_headline_media
-import podkop.composeapp.generated.resources.topbar_label_settings
+import podkop.composeapp.generated.resources.topbar_label_debug
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreenRoot(
+fun DebugScreenRoot(
     paddingValues: PaddingValues,
 ) {
-    val viewModel = koinViewModel<SettingsViewModel>()
+    val viewModel = koinViewModel<DebugViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -60,7 +56,7 @@ fun SettingsScreenRoot(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(resource = Res.string.topbar_label_settings))
+                    Text(text = stringResource(resource = Res.string.topbar_label_debug))
                 },
                 navigationIcon = {
                     IconButton(onClick = viewModel::onTopBarBackClicked) {
@@ -90,54 +86,31 @@ fun SettingsScreenRoot(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = stringResource(resource = Res.string.settings_headline_media),
+                text = stringResource(resource = Res.string.debug_entry_title),
                 style = MaterialTheme.typography.titleMedium,
             )
 
-            Row(
+            OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(resource = Res.string.settings_body_gif_autoplay),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-                val autoplayGifs = state.autoplayGifs
-                if (autoplayGifs == null) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp,
-                    )
-                } else {
-                    Switch(
-                        checked = autoplayGifs,
-                        onCheckedChange = viewModel::onAutoplayGifsChanged,
-                    )
-                }
-            }
-
-            if (state.showDebugTools) {
-                Text(
-                    text = stringResource(resource = Res.string.settings_headline_debug),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = stringResource(resource = Res.string.settings_body_open_debug),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                    TextButton(
-                        onClick = viewModel::onDebugToolsClicked,
-                    ) {
-                        Text(text = stringResource(resource = Res.string.settings_button_open_debug))
+                value = state.entryIdInput,
+                onValueChange = viewModel::onEntryIdChanged,
+                singleLine = true,
+                label = {
+                    Text(text = stringResource(resource = Res.string.debug_entry_hint))
+                },
+                isError = state.isEntryIdInvalid,
+                supportingText = {
+                    if (state.isEntryIdInvalid) {
+                        Text(text = stringResource(resource = Res.string.debug_entry_validation_error))
                     }
-                }
+                },
+            )
+
+            Button(
+                onClick = viewModel::onOpenEntryClicked,
+                enabled = state.entryIdInput.isNotBlank(),
+            ) {
+                Text(text = stringResource(resource = Res.string.debug_entry_button_open))
             }
         }
     }

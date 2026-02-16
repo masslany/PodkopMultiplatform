@@ -9,6 +9,7 @@
     <string name="topbar_label_upcoming">Wykopalisko</string>
     <string name="topbar_label_entries">Mikroblog</string>
     <string name="topbar_label_settings">Ustawienia</string>
+    <string name="topbar_label_debug">Debug</string>
     <string name="topbar_label_profile">Profil</string>
     <string name="topbar_label_entry">Wpis</string>
     <string name="topbar_label_search">Szukaj</string>
@@ -23,6 +24,15 @@
     <string name="settings_body_dynamic_colors">Dynamiczne kolory</string>
     <string name="settings_headline_media">Media</string>
     <string name="settings_body_gif_autoplay">Autoodtwarzanie GIF-ów</string>
+    <string name="settings_headline_debug">Debug</string>
+    <string name="settings_body_open_debug">Narzędzia debug</string>
+    <string name="settings_button_open_debug">Otwórz</string>
+
+    <!-- Debug -->
+    <string name="debug_entry_title">Przejdź do wpisu</string>
+    <string name="debug_entry_hint">ID wpisu</string>
+    <string name="debug_entry_button_open">Przejdź</string>
+    <string name="debug_entry_validation_error">Niepoprawne ID wpisu</string>
 
     <!-- Accessibility -->
     <string name="accessibility_topbar_add">Dodaj</string>

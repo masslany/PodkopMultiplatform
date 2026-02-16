@@ -93,10 +93,10 @@ private fun rememberCachedEntryMarkdownState(content: String): State.Success? {
         key1 = content,
         key2 = cache,
     ) {
-    value = cache.get(content)
-    if (value == null) {
-        value = withContext(Dispatchers.Default) { cache.getOrParse(content) }
-    }
+        value = cache.get(content)
+        if (value == null) {
+            value = withContext(Dispatchers.Default) { cache.getOrParse(content) }
+        }
     }.value
 }
 

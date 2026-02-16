@@ -8,6 +8,7 @@ val settingsModule = module {
     viewModel {
         SettingsViewModel(
             appSettings = get(),
+            appNavigator = get(),
             topBarActions = get(),
         )
     }

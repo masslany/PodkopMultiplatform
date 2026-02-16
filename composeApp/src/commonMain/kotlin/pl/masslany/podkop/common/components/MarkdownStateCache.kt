@@ -16,9 +16,7 @@ private const val MAX_CACHE_SIZE = 300
  * Simple in-memory LRU cache for parsed markdown states.
  * It helps avoid re-parsing when list items are revisited during scrolling.
  */
-class MarkdownStateCache(
-    private val maxCacheSize: Int = MAX_CACHE_SIZE,
-) {
+class MarkdownStateCache(private val maxCacheSize: Int = MAX_CACHE_SIZE) {
     private val cache = linkedMapOf<String, State.Success>()
     private val lock = Mutex()
     private val parser = MarkdownParser(GFMFlavourDescriptor())

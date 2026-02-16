@@ -7,4 +7,6 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 interface SettingsActions : TopBarActions {
 
     fun onAutoplayGifsChanged(enabled: Boolean)
+
+    fun onDebugToolsClicked()
 }
