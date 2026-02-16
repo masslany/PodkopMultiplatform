@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -46,6 +47,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.components.DropdownMenu
+import pl.masslany.podkop.common.components.LocalMarkdownStateCache
+import pl.masslany.podkop.common.components.rememberMarkdownStateCache
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
@@ -95,98 +98,103 @@ fun EntriesScreenRoot(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val markdownStateCache = rememberMarkdownStateCache()
 
-    Box(
-        modifier = Modifier
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            )
-            .fillMaxSize()
-            .nestedScroll(bottomBarScrollBehavior.nestedScrollConnection())
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+    CompositionLocalProvider(
+        LocalMarkdownStateCache provides markdownStateCache,
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
+        Box(
+            modifier = Modifier
+                .padding(
+                    start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+                    end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+                )
+                .fillMaxSize()
+                .nestedScroll(bottomBarScrollBehavior.nestedScrollConnection())
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
         ) {
-            TopAppBar(
-                title = { Text(text = stringResource(resource = Res.string.topbar_label_entries)) },
-                actions = {
-                    IconButton(onClick = viewModel::onTopBarProfileClicked) {
-                        Icon(
-                            modifier = Modifier.size(24.dp),
-                            imageVector = vectorResource(resource = Res.drawable.ic_person),
-                            contentDescription = stringResource(
-                                resource = Res.string.accessibility_topbar_profile,
-                            ),
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
-            )
-
-            PullToRefreshBox(
-                isRefreshing = state.isRefreshing,
-                onRefresh = { viewModel.onRefresh(state.sortMenuState.selected) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+            Column(
+                modifier = Modifier.fillMaxSize(),
             ) {
-                if (state.isLoading) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
+                TopAppBar(
+                    title = { Text(text = stringResource(resource = Res.string.topbar_label_entries)) },
+                    actions = {
+                        IconButton(onClick = viewModel::onTopBarProfileClicked) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = vectorResource(resource = Res.drawable.ic_person),
+                                contentDescription = stringResource(
+                                    resource = Res.string.accessibility_topbar_profile,
+                                ),
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                    windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                )
+
+                PullToRefreshBox(
+                    isRefreshing = state.isRefreshing,
+                    onRefresh = { viewModel.onRefresh(state.sortMenuState.selected) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                ) {
+                    if (state.isLoading) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.align(Alignment.Center),
+                            )
+                        }
+                    } else {
+                        EntriesScreen(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            state = state,
+                            actions = viewModel,
+                            lazyListState = lazyListState,
                         )
                     }
-                } else {
-                    EntriesScreen(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        state = state,
-                        actions = viewModel,
-                        lazyListState = lazyListState,
+                }
+            }
+
+            AnimatedVisibility(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        end = 16.dp,
+                        bottom = 16.dp + bottomPadding,
+                    ),
+                visible = showFab,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                FloatingActionButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            scrollBehavior.state.heightOffset = 0f
+                            scrollBehavior.state.contentOffset = 0f
+                            lazyListState.animateScrollToItem(0)
+                        }
+                    },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = vectorResource(resource = Res.drawable.ic_keyboard_arrow_up),
+                        contentDescription = stringResource(
+                            resource = Res.string.accessibility_fab_scroll_to_top,
+                        ),
                     )
                 }
             }
-        }
 
-        AnimatedVisibility(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(
-                    end = 16.dp,
-                    bottom = 16.dp + bottomPadding,
-                ),
-            visible = showFab,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            FloatingActionButton(
-                onClick = {
-                    coroutineScope.launch {
-                        scrollBehavior.state.heightOffset = 0f
-                        scrollBehavior.state.contentOffset = 0f
-                        lazyListState.animateScrollToItem(0)
-                    }
-                },
-            ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = vectorResource(resource = Res.drawable.ic_keyboard_arrow_up),
-                    contentDescription = stringResource(
-                        resource = Res.string.accessibility_fab_scroll_to_top,
-                    ),
-                )
-            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .height(bottomPadding),
+            )
         }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .fillMaxWidth()
-                .height(bottomPadding),
-        )
     }
 }
 

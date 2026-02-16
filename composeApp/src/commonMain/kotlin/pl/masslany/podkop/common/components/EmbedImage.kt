@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -26,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -60,6 +63,9 @@ fun EmbedImage(
     var isAdultOverlayVisible by rememberSaveable(state.url) { mutableStateOf(state.isAdult) }
     var isGifPlaybackEnabled by rememberSaveable(state.url) { mutableStateOf(false) }
     var latestSuccessResult by remember(state.url) { mutableStateOf<SuccessResult?>(null) }
+    var hasLoadedImage by remember(state.url) { mutableStateOf(false) }
+    var isImageLoading by remember(state.url) { mutableStateOf(true) }
+    var aspectRatio by rememberSaveable(state.url, state.width, state.height) { mutableStateOf(state.aspectRatio) }
 
     LaunchedEffect(state.url, state.isGif, isGifAutoplayEnabled) {
         isGifPlaybackEnabled = !state.isGif || isGifAutoplayEnabled
@@ -76,10 +82,26 @@ fun EmbedImage(
     }
 
     val isGifOverlayVisible = state.isGif && !isGifAutoplayEnabled && !isGifPlaybackEnabled
-    val imageModifier = Modifier
+    val imageContainerModifier = Modifier
         .then(sizeResolver)
         .fillMaxWidth()
-        .heightIn(min = 120.dp)
+        .then(
+            if (aspectRatio != null) {
+                Modifier.aspectRatio(aspectRatio!!)
+            } else {
+                Modifier.heightIn(min = 120.dp)
+            },
+        )
+        .onSizeChanged { size ->
+            if (hasLoadedImage && size.width > 0 && size.height > 0) {
+                val measuredRatio = size.width.toFloat() / size.height.toFloat()
+                if (measuredRatio.isFinite() && measuredRatio > 0f) {
+                    if (aspectRatio != measuredRatio) {
+                        aspectRatio = measuredRatio
+                    }
+                }
+            }
+        }
         .clickable {
             when {
                 isAdultOverlayVisible -> {
@@ -112,30 +134,48 @@ fun EmbedImage(
             .padding(8.dp),
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            AsyncImage(
-                modifier = imageModifier,
-                model = ImageRequest.Builder(context)
-                    .data(state.url)
-                    .memoryCacheKey(state.url)
-                    .diskCacheKey(state.url)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .networkCachePolicy(CachePolicy.ENABLED)
-                    .scale(Scale.FIT)
-                    .size(sizeResolver)
-                    .build(),
-                onSuccess = { success ->
-                    latestSuccessResult = success.result
-                    if (state.isGif) {
-                        setImageAnimationPlaying(
-                            image = success.result.image,
-                            isPlaying = isGifPlaybackEnabled,
-                        )
-                    }
-                },
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-            )
+            Box(modifier = imageContainerModifier) {
+                if (isImageLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp),
+                                shape = RoundedCornerShape(6.dp),
+                            ),
+                    )
+                }
+
+                AsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    model = ImageRequest.Builder(context)
+                        .data(state.url)
+                        .memoryCacheKey(state.url)
+                        .diskCacheKey(state.url)
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .networkCachePolicy(CachePolicy.ENABLED)
+                        .scale(Scale.FIT)
+                        .size(sizeResolver)
+                        .build(),
+                    onSuccess = { success ->
+                        hasLoadedImage = true
+                        isImageLoading = false
+                        latestSuccessResult = success.result
+                        if (state.isGif) {
+                            setImageAnimationPlaying(
+                                image = success.result.image,
+                                isPlaying = isGifPlaybackEnabled,
+                            )
+                        }
+                    },
+                    onError = {
+                        isImageLoading = false
+                    },
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                )
+            }
 
             if (isGifOverlayVisible && !isAdultOverlayVisible) {
                 Text(

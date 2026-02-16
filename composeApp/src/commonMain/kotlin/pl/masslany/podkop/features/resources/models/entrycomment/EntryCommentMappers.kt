@@ -55,6 +55,8 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
     val embedUrl = this.media?.photo?.url
     val embedSource = this.media?.photo?.label
     val embedMimeType = this.media?.photo?.mimeType
+    val embedWidth = this.media?.photo?.width
+    val embedHeight = this.media?.photo?.height
 
     val embedImageState = if (embedUrl != null) {
         EmbedImageState(
@@ -65,6 +67,8 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
                 url = embedUrl,
                 mimeType = embedMimeType,
             ),
+            width = embedWidth,
+            height = embedHeight,
         )
     } else {
         null

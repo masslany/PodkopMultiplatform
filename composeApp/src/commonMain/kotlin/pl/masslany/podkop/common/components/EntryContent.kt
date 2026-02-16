@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -23,14 +24,12 @@ import com.mikepenz.markdown.compose.elements.MarkdownText
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
-import com.mikepenz.markdown.model.MarkdownState
-import com.mikepenz.markdown.model.ReferenceLinkHandlerImpl
+import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.markdownAnimations
-import com.mikepenz.markdown.model.rememberMarkdownState
 import com.mikepenz.markdown.utils.codeSpanStyle
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
-import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
-import org.intellij.markdown.parser.MarkdownParser
 import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.theme.colorsPalette
 import podkop.composeapp.generated.resources.Res
@@ -43,9 +42,9 @@ fun EntryContent(state: EntryContentState) {
     when (state) {
         is EntryContentState.Content -> {
             if (state.content.isNotEmpty()) {
-                val markdownState = rememberEntryMarkdownState(state.content)
+                val markdownState = rememberCachedEntryMarkdownState(state.content)
                 Markdown(
-                    markdownState = markdownState,
+                    state = markdownState ?: State.Loading(),
                     modifier = Modifier.fillMaxWidth(),
                     components = spoilerComponents,
                     colors = markdownColor(
@@ -87,18 +86,18 @@ fun EntryContent(state: EntryContentState) {
 }
 
 @Composable
-private fun rememberEntryMarkdownState(content: String): MarkdownState {
-    val flavour = remember { GFMFlavourDescriptor() }
-    val parser = remember(flavour) { MarkdownParser(flavour) }
-    val referenceLinkHandler = remember { ReferenceLinkHandlerImpl() }
-
-    return rememberMarkdownState(
-        content = content,
-        retainState = true,
-        flavour = flavour,
-        parser = parser,
-        referenceLinkHandler = referenceLinkHandler,
-    )
+private fun rememberCachedEntryMarkdownState(content: String): State.Success? {
+    val cache = LocalMarkdownStateCache.current
+    return produceState<State.Success?>(
+        initialValue = null,
+        key1 = content,
+        key2 = cache,
+    ) {
+    value = cache.get(content)
+    if (value == null) {
+        value = withContext(Dispatchers.Default) { cache.getOrParse(content) }
+    }
+    }.value
 }
 
 private val spoilerComponents = markdownComponents(
