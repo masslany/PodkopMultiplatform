@@ -3,6 +3,8 @@ package pl.masslany.podkop.common.navigation.bottombar
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.geometry.Offset
@@ -25,6 +27,16 @@ class BottomBarScrollBehavior {
 
     var heightPx by mutableFloatStateOf(0f)
 
+    constructor()
+
+    internal constructor(
+        offsetPx: Float,
+        heightPx: Float,
+    ) {
+        this.offsetPx = offsetPx
+        this.heightPx = heightPx
+    }
+
     fun onScroll(delta: Float) {
         offsetPx = (offsetPx + delta)
             .coerceIn(0f, heightPx)
@@ -44,6 +56,19 @@ class BottomBarScrollBehavior {
 
             else -> 0f
         }
+    }
+
+    companion object {
+        val Saver: Saver<BottomBarScrollBehavior, *> =
+            listSaver(
+                save = { listOf(it.offsetPx, it.heightPx) },
+                restore = {
+                    BottomBarScrollBehavior(
+                        offsetPx = it[0],
+                        heightPx = it[1],
+                    )
+                },
+            )
     }
 }
 

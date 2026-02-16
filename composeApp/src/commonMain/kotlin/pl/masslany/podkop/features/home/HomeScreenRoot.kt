@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -44,7 +45,9 @@ fun HomeScreenRoot(
     val viewModel = koinViewModel<HomeViewModel>()
     val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val bottomBarBehavior = remember { BottomBarScrollBehavior() }
+    val bottomBarBehavior = rememberSaveable(saver = BottomBarScrollBehavior.Saver) {
+        BottomBarScrollBehavior()
+    }
 
     CompositionLocalProvider(LocalBottomBarScrollBehavior provides bottomBarBehavior) {
         Scaffold(

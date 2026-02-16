@@ -1,6 +1,7 @@
 package pl.masslany.podkop.features.imageviewer
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -50,6 +51,7 @@ import podkop.composeapp.generated.resources.ic_download
 
 private const val MinScale = 1f
 private const val MaxScale = 5f
+private const val ScaleResetThreshold = 1.01f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -132,18 +134,42 @@ private fun ZoomableImage(
                     val updatedScale = (scale * zoom).coerceIn(MinScale, MaxScale)
 
                     scale = updatedScale
-                    if (updatedScale == MinScale) {
-                        offset = Offset.Zero
-                    } else {
-                        val maxX = (containerSize.width * (updatedScale - 1f)) / 2f
-                        val maxY = (containerSize.height * (updatedScale - 1f)) / 2f
-
-                        offset = Offset(
-                            x = (offset.x + pan.x).coerceIn(-maxX, maxX),
-                            y = (offset.y + pan.y).coerceIn(-maxY, maxY),
-                        )
-                    }
+                    offset = clampOffsetForScale(
+                        containerSize = containerSize,
+                        scale = updatedScale,
+                        offset = offset + pan,
+                    )
                 }
+            }
+            .pointerInput(containerSize, scale) {
+                detectTapGestures(
+                    onDoubleTap = { tapOffset ->
+                        val currentScale = scale
+                        val shouldResetZoom = currentScale > ScaleResetThreshold
+                        val updatedScale = if (shouldResetZoom) {
+                            MinScale
+                        } else {
+                            (currentScale * 2f).coerceIn(MinScale, MaxScale)
+                        }
+
+                        scale = updatedScale
+                        offset = if (shouldResetZoom) {
+                            Offset.Zero
+                        } else {
+                            clampOffsetForScale(
+                                containerSize = containerSize,
+                                scale = updatedScale,
+                                offset = calculateOffsetForDoubleTap(
+                                    containerSize = containerSize,
+                                    tapOffset = tapOffset,
+                                    currentOffset = offset,
+                                    currentScale = currentScale,
+                                    updatedScale = updatedScale,
+                                ),
+                            )
+                        }
+                    },
+                )
             },
     ) {
         AsyncImage(
@@ -161,4 +187,44 @@ private fun ZoomableImage(
             contentScale = ContentScale.Fit,
         )
     }
+}
+
+private fun clampOffsetForScale(
+    containerSize: IntSize,
+    scale: Float,
+    offset: Offset,
+): Offset {
+    if (scale <= MinScale) {
+        return Offset.Zero
+    }
+
+    val maxX = (containerSize.width * (scale - 1f)) / 2f
+    val maxY = (containerSize.height * (scale - 1f)) / 2f
+    return Offset(
+        x = offset.x.coerceIn(-maxX, maxX),
+        y = offset.y.coerceIn(-maxY, maxY),
+    )
+}
+
+private fun calculateOffsetForDoubleTap(
+    containerSize: IntSize,
+    tapOffset: Offset,
+    currentOffset: Offset,
+    currentScale: Float,
+    updatedScale: Float,
+): Offset {
+    if (currentScale <= 0f) {
+        return Offset.Zero
+    }
+
+    val center = Offset(
+        x = containerSize.width / 2f,
+        y = containerSize.height / 2f,
+    )
+    val tapFromCenter = tapOffset - center
+    val contentPoint = (tapFromCenter - currentOffset) / currentScale
+    return Offset(
+        x = -contentPoint.x * updatedScale,
+        y = -contentPoint.y * updatedScale,
+    )
 }

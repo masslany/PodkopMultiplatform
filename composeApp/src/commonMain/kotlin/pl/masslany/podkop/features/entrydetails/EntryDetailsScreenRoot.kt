@@ -37,7 +37,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -56,8 +55,6 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import pl.masslany.podkop.common.components.LocalMarkdownStateCache
-import pl.masslany.podkop.common.components.rememberMarkdownStateCache
 import pl.masslany.podkop.common.extensions.isAuthorReply
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -104,101 +101,96 @@ fun EntryDetailsScreenRoot(
         }
     }
     val coroutineScope = rememberCoroutineScope()
-    val markdownStateCache = rememberMarkdownStateCache()
 
-    CompositionLocalProvider(
-        LocalMarkdownStateCache provides markdownStateCache,
-    ) {
-        Scaffold(
-            modifier = Modifier
-                .padding(
-                    start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                    end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-                )
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = stringResource(resource = Res.string.topbar_label_entry)) },
-                    actions = {
-                        IconButton(onClick = viewModel::onTopBarProfileClicked) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = vectorResource(resource = Res.drawable.ic_person),
-                                contentDescription = stringResource(
-                                    resource = Res.string.accessibility_topbar_profile,
-                                ),
-                            )
-                        }
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = viewModel::onTopBarBackClicked) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
-                                contentDescription = stringResource(
-                                    resource = Res.string.accessibility_topbar_back,
-                                ),
-                            )
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                    windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
-                )
-            },
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState)
-            },
-            floatingActionButton = {
-                AnimatedVisibility(
-                    visible = showFab,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
-                    FloatingActionButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                scrollBehavior.state.heightOffset = 0f
-                                scrollBehavior.state.contentOffset = 0f
-                                lazyListState.animateScrollToItem(0)
-                            }
-                        },
-                    ) {
+    Scaffold(
+        modifier = Modifier
+            .padding(
+                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+            )
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(resource = Res.string.topbar_label_entry)) },
+                actions = {
+                    IconButton(onClick = viewModel::onTopBarProfileClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
-                            imageVector = vectorResource(resource = Res.drawable.ic_keyboard_arrow_up),
+                            imageVector = vectorResource(resource = Res.drawable.ic_person),
                             contentDescription = stringResource(
-                                resource = Res.string.accessibility_fab_scroll_to_top,
+                                resource = Res.string.accessibility_topbar_profile,
                             ),
                         )
                     }
-                }
-            },
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        ) { innerPaddingValues ->
-            PullToRefreshBox(
-                isRefreshing = state.isRefreshing,
-                onRefresh = { viewModel.onRefresh() },
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = innerPaddingValues.calculateTopPadding()),
-            ) {
-                if (state.isLoading) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.align(Alignment.Center),
+                },
+                navigationIcon = {
+                    IconButton(onClick = viewModel::onTopBarBackClicked) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
+                            contentDescription = stringResource(
+                                resource = Res.string.accessibility_topbar_back,
+                            ),
                         )
                     }
-                } else {
-                    EntryDetailsScreen(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        state = state,
-                        actions = viewModel,
-                        lazyListState = lazyListState,
+                },
+                scrollBehavior = scrollBehavior,
+                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+            )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = showFab,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                FloatingActionButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            scrollBehavior.state.heightOffset = 0f
+                            scrollBehavior.state.contentOffset = 0f
+                            lazyListState.animateScrollToItem(0)
+                        }
+                    },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = vectorResource(resource = Res.drawable.ic_keyboard_arrow_up),
+                        contentDescription = stringResource(
+                            resource = Res.string.accessibility_fab_scroll_to_top,
+                        ),
                     )
                 }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+    ) { innerPaddingValues ->
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { viewModel.onRefresh() },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = innerPaddingValues.calculateTopPadding()),
+        ) {
+            if (state.isLoading) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
+            } else {
+                EntryDetailsScreen(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    state = state,
+                    actions = viewModel,
+                    lazyListState = lazyListState,
+                )
             }
         }
     }
