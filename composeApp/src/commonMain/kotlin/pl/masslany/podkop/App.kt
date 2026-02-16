@@ -19,9 +19,7 @@ import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
-import pl.masslany.podkop.common.components.LocalMarkdownStateCache
 import pl.masslany.podkop.common.components.dialog.DefaultGenericDialog
-import pl.masslany.podkop.common.components.rememberMarkdownStateCache
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.navigation.HomeScreen
@@ -55,7 +53,6 @@ fun App() {
         val startupState by startupManager.state.collectAsStateWithLifecycle()
         val state by appNavigator.state.collectAsStateWithLifecycle()
         val snackbarHostState = remember { SnackbarHostState() }
-        val markdownStateCache = rememberMarkdownStateCache()
 
         if (startupState !is AppState.Ready) {
             return@PodkopTheme
@@ -75,7 +72,6 @@ fun App() {
         CompositionLocalProvider(
             LocalAppSnackbarHostState provides snackbarHostState,
             LocalAppSettings provides appSettings,
-            LocalMarkdownStateCache provides markdownStateCache,
         ) {
             NavigationContent(
                 state = state,

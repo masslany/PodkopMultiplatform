@@ -10,6 +10,7 @@ val resourcesModule = module {
             linksRepository = get(),
             entriesRepository = get(),
             appNavigator = get(),
+            dispatcherProvider = get(),
         )
     }
 }

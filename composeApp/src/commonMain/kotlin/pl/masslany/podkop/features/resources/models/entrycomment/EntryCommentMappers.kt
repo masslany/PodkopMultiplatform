@@ -10,7 +10,7 @@ import pl.masslany.podkop.common.models.avatar.AvatarType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
 import pl.masslany.podkop.common.models.isGifImage
-import pl.masslany.podkop.common.models.toHighlightedTagProfileMarkdown
+import pl.masslany.podkop.common.models.toEntryContentState
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.models.toPublishedTimeType
 import pl.masslany.podkop.common.models.vote.toVoteState
@@ -44,12 +44,8 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
 
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
-
         Deleted.Moderator -> EntryContentState.DeletedByModerator
-
-        Deleted.None -> EntryContentState.Content(
-            content = this.content.toHighlightedTagProfileMarkdown(),
-        )
+        Deleted.None -> this.content.toEntryContentState()
     }
 
     val embedUrl = this.media?.photo?.url

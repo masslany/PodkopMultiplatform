@@ -8,9 +8,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
+import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
@@ -25,6 +29,7 @@ open class BaseResourceItemStateHolder(
     private val linksRepository: LinksRepository,
     private val entriesRepository: EntriesRepository,
     private val appNavigator: AppNavigator,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ResourceItemStateHolder {
 
     private val _items = MutableStateFlow<ImmutableList<ResourceItemState>>(persistentListOf())
@@ -33,6 +38,7 @@ open class BaseResourceItemStateHolder(
     protected var scope: CoroutineScope? = null
 
     private var isUpcoming: Boolean = false
+    private val updateMutex = Mutex()
 
     override fun init(
         scope: CoroutineScope,
@@ -42,22 +48,30 @@ open class BaseResourceItemStateHolder(
         this.isUpcoming = isUpcoming
     }
 
-    override fun updateData(data: List<ResourceItem>) {
-        _items.value = data.map { it.toResourceItemState(isUpcoming) }.toImmutableList()
+    override suspend fun updateData(data: List<ResourceItem>) {
+        updateMutex.withLock {
+            withContext(dispatcherProvider.default) {
+                _items.value = data.map { it.toResourceItemState(isUpcoming) }.toImmutableList()
+            }
+        }
     }
 
-    override fun appendData(data: List<ResourceItem>) {
-        _items.update { list ->
-            val existingIds = list
-                .mapTo(mutableSetOf()) { it.id }
+    override suspend fun appendData(data: List<ResourceItem>) {
+        updateMutex.withLock {
+            withContext(dispatcherProvider.default) {
+                _items.update { list ->
+                    val existingIds = list
+                        .mapTo(mutableSetOf()) { it.id }
 
-            val uniqueNewItems = data
-                .asSequence()
-                .filter { item -> existingIds.add(item.id) }
-                .map { item -> item.toResourceItemState(isUpcoming) }
-                .toList()
+                    val uniqueNewItems = data
+                        .asSequence()
+                        .filter { item -> existingIds.add(item.id) }
+                        .map { item -> item.toResourceItemState(isUpcoming) }
+                        .toList()
 
-            (list + uniqueNewItems).toImmutableList()
+                    (list + uniqueNewItems).toImmutableList()
+                }
+            }
         }
     }
 
@@ -170,17 +184,17 @@ open class BaseResourceItemStateHolder(
     }
 
     // This is open so specialized handlers can update multiple lists
-    open fun notifyItemUpdated(newState: ResourceItem) {
-        _items.update { list ->
-            list.map {
-                if (it.id ==
-                    newState.id
-                ) {
-                    newState.toResourceItemState(isUpcoming)
-                } else {
-                    it
-                }
-            }.toImmutableList()
+    open suspend fun notifyItemUpdated(newState: ResourceItem) {
+        updateMutex.withLock {
+            _items.update { list ->
+                list.map {
+                    if (it.id == newState.id) {
+                        newState.toResourceItemState(isUpcoming)
+                    } else {
+                        it
+                    }
+                }.toImmutableList()
+            }
         }
     }
 }

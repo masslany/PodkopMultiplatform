@@ -10,7 +10,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Resources
 
 class Paginator(
     private val scope: CoroutineScope,
-    private val onNewItems: (items: List<ResourceItem>) -> Unit,
+    private val onNewItems: suspend (items: List<ResourceItem>) -> Unit,
     private val loader: suspend (PageRequest) -> Result<Resources>,
 ) {
 

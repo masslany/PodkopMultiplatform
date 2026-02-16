@@ -9,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -24,11 +23,8 @@ import com.mikepenz.markdown.compose.elements.MarkdownText
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
-import com.mikepenz.markdown.model.State
 import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.utils.codeSpanStyle
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.theme.colorsPalette
@@ -42,9 +38,8 @@ fun EntryContent(state: EntryContentState) {
     when (state) {
         is EntryContentState.Content -> {
             if (state.content.isNotEmpty()) {
-                val markdownState = rememberCachedEntryMarkdownState(state.content)
                 Markdown(
-                    state = markdownState ?: State.Loading(),
+                    state = state.markdownState,
                     modifier = Modifier.fillMaxWidth(),
                     components = spoilerComponents,
                     colors = markdownColor(
@@ -63,14 +58,6 @@ fun EntryContent(state: EntryContentState) {
                     animations = markdownAnimations(
                         animateTextSize = { this },
                     ),
-                    loading = { modifier ->
-                        Text(
-                            modifier = modifier,
-                            text = state.content,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    },
                 )
             }
         }
@@ -91,24 +78,6 @@ fun EntryContent(state: EntryContentState) {
             )
         }
     }
-}
-
-@Composable
-private fun rememberCachedEntryMarkdownState(content: String): State.Success? {
-    val cache = LocalMarkdownStateCache.current
-    val initialValue = remember(content, cache) { cache.getNow(content) }
-    return produceState(
-        initialValue = initialValue,
-        key1 = content,
-        key2 = cache,
-    ) {
-        if (value == null) {
-            value = cache.get(content)
-        }
-        if (value == null) {
-            value = withContext(Dispatchers.Default) { cache.getOrParse(content) }
-        }
-    }.value
 }
 
 private val spoilerComponents = markdownComponents(

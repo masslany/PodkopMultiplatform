@@ -10,6 +10,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
+import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.links.hits.models.toHitItemState
 import pl.masslany.podkop.features.resources.BaseResourceItemStateHolder
@@ -19,10 +20,12 @@ class LinksResourceItemStateHolderImpl(
     linksRepository: LinksRepository,
     entriesRepository: EntriesRepository,
     appNavigator: AppNavigator,
+    dispatcherProvider: DispatcherProvider,
 ) : BaseResourceItemStateHolder(
     entriesRepository = entriesRepository,
     linksRepository = linksRepository,
     appNavigator = appNavigator,
+    dispatcherProvider = dispatcherProvider,
 ),
     LinksResourceItemStateHolder {
 
@@ -38,7 +41,7 @@ class LinksResourceItemStateHolderImpl(
         }
     }
 
-    override fun notifyItemUpdated(newState: ResourceItem) {
+    override suspend fun notifyItemUpdated(newState: ResourceItem) {
         super.notifyItemUpdated(newState)
         _hits.update { list ->
             list.map {

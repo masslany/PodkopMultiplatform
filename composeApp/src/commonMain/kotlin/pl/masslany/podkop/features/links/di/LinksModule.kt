@@ -21,6 +21,7 @@ val linksModule = module {
             linksRepository = get(),
             entriesRepository = get(),
             appNavigator = get(),
+            dispatcherProvider = get(),
         )
     }
 }
