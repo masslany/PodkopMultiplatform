@@ -1,20 +1,26 @@
 package pl.masslany.podkop.features.resources.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.features.links.hits.HitItem
 import pl.masslany.podkop.features.links.hits.models.HitItemState
 import pl.masslany.podkop.features.resources.ResourceItemActions
@@ -23,6 +29,8 @@ import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
+import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.comment_button_show_comments
 
 @Composable
 fun ResourceItemRenderer(
@@ -93,6 +101,24 @@ private fun EntryItemRenderer(
                             )
                         },
                     )
+                }
+                if (state.isShowCommentsButtonVisible) {
+                    Spacer(Modifier.size(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        OutlinedButton(
+                            onClick = { actions.onEntryClicked(state.id) },
+                        ) {
+                            Text(
+                                text = stringResource(
+                                    resource = Res.string.comment_button_show_comments,
+                                    state.totalCommentsCount,
+                                ),
+                            )
+                        }
+                    }
                 }
             }
         }

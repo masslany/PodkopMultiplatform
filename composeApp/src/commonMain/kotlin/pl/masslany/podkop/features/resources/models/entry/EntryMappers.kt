@@ -77,6 +77,7 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
         contentType = ResourceType.EntryItem,
         authorState = authorState,
         avatarState = avatarState,
+        totalCommentsCount = this.comments?.count ?: 0,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         comments = this.comments?.items
             ?.map { it.toEntryCommentItemState() }

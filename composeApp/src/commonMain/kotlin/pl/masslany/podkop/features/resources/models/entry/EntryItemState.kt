@@ -16,6 +16,7 @@ data class EntryItemState(
     override val contentType: ResourceType,
     val avatarState: AvatarState,
     val authorState: AuthorState?,
+    val totalCommentsCount: Int,
     val comments: ImmutableList<EntryCommentItemState>,
     val entryContentState: EntryContentState,
     val publishedTimeType: PublishedTimeType?,
@@ -25,4 +26,7 @@ data class EntryItemState(
 //    val repliesPaginationState: CommentPaginationState,
 //    val showMoreCommentsButtonState: ShowMoreCommentsButtonState,
 //    val surveyState: SurveyState,
-) : ResourceItemState
+) : ResourceItemState {
+    val isShowCommentsButtonVisible: Boolean
+        get() = comments.isNotEmpty() && totalCommentsCount > comments.size
+}
