@@ -23,7 +23,7 @@ import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryVoteAction
-import pl.masslany.podkop.features.resources.models.link.LinkItemState
+import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 import pl.masslany.podkop.features.resources.models.toResourceItemState
 
 open class BaseResourceItemStateHolder(
@@ -79,9 +79,9 @@ open class BaseResourceItemStateHolder(
     override fun onLinkVoteClicked(id: Int, voted: Boolean) {
         scope?.launch {
             val result = if (voted) {
-                linksRepository.voteOnLink(linkId = id)
-            } else {
                 linksRepository.removeVoteOnLink(linkId = id)
+            } else {
+                linksRepository.voteOnLink(linkId = id)
             }
 
             result.onSuccess {
@@ -95,15 +95,6 @@ open class BaseResourceItemStateHolder(
                     }
             }
         }
-    }
-
-    fun onLinkCommentVoted(
-        linkId: Int,
-        commentId: Int,
-        voted: Boolean,
-    ) {
-        val item = (_items.value.find { it.id == linkId } as? LinkItemState)
-        // todo think this through
     }
 
     override fun onLinkClicked(id: Int) {
@@ -129,18 +120,18 @@ open class BaseResourceItemStateHolder(
     override fun onEntryVoteUpClicked(entryId: Int, voted: Boolean) {
         scope?.launch {
             val result = if (voted) {
-                entriesRepository.voteUp(entryId)
-            } else {
                 entriesRepository.removeVoteUp(entryId)
+            } else {
+                entriesRepository.voteUp(entryId)
             }
 
             result.onSuccess {
                 updateEntryVote(
                     entryId = entryId,
                     action = if (voted) {
-                        EntryVoteAction.VoteUp
-                    } else {
                         EntryVoteAction.RemoveVoteUp
+                    } else {
+                        EntryVoteAction.VoteUp
                     },
                 )
             }
@@ -152,6 +143,33 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) {
+    }
+
+    override fun onLinkCommentVoteUpClick(linkId: Int, commentId: Int, voted: Boolean) {
+        scope?.launch {
+            val result = if (voted) {
+                linksRepository.removeVoteOnLinkComment(
+                    linkId = linkId,
+                    commentId = commentId,
+                )
+            } else {
+                linksRepository.voteOnLinkComment(
+                    linkId = linkId,
+                    commentId = commentId,
+                )
+            }
+
+            result.onSuccess {
+                updateLinkCommentVote(
+                    commentId = commentId,
+                    action = if (voted) {
+                        LinkCommentVoteAction.RemoveVoteUp
+                    } else {
+                        LinkCommentVoteAction.VoteUp
+                    },
+                )
+            }
+        }
     }
 
     private fun updateEntryVote(
@@ -170,6 +188,25 @@ open class BaseResourceItemStateHolder(
             }
 
             entry.copy(voteState = newVoteState)
+        }
+    }
+
+    private fun updateLinkCommentVote(
+        commentId: Int,
+        action: LinkCommentVoteAction,
+    ) {
+        updateItem(commentId) { item ->
+            val comment = item as? LinkCommentItemState ?: return@updateItem item
+
+            val newVoteState = when (action) {
+                LinkCommentVoteAction.VoteUp ->
+                    comment.voteState.increaseVoteUp()
+
+                LinkCommentVoteAction.RemoveVoteUp ->
+                    comment.voteState.removeVoteUp()
+            }
+
+            comment.copy(voteState = newVoteState)
         }
     }
 
@@ -197,5 +234,10 @@ open class BaseResourceItemStateHolder(
                 }.toImmutableList()
             }
         }
+    }
+
+    private enum class LinkCommentVoteAction {
+        VoteUp,
+        RemoveVoteUp,
     }
 }

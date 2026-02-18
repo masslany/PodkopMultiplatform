@@ -1,0 +1,145 @@
+package pl.masslany.podkop.features.resources.models.linkcomment
+
+import pl.masslany.podkop.business.common.domain.models.common.Comment
+import pl.masslany.podkop.business.common.domain.models.common.Deleted
+import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
+import pl.masslany.podkop.common.models.AuthorState
+import pl.masslany.podkop.common.models.EmbedImageState
+import pl.masslany.podkop.common.models.EntryContentState
+import pl.masslany.podkop.common.models.avatar.AvatarState
+import pl.masslany.podkop.common.models.avatar.AvatarType
+import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
+import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
+import pl.masslany.podkop.common.models.isGifImage
+import pl.masslany.podkop.common.models.toEntryContentState
+import pl.masslany.podkop.common.models.toNameColorType
+import pl.masslany.podkop.common.models.toPublishedTimeType
+import pl.masslany.podkop.common.models.vote.toVoteState
+import pl.masslany.podkop.features.resources.models.ResourceType
+
+internal fun ResourceItem.toLinkCommentItemState(linkIdOverride: Int? = null): LinkCommentItemState {
+    val author = this.author
+    val authorState = author?.let {
+        AuthorState(
+            name = it.username,
+            color = it.color.toNameColorType(),
+        )
+    }
+
+    val avatarState = if (author != null) {
+        AvatarState(
+            type = if (author.avatar.isNotEmpty()) {
+                AvatarType.NetworkImage(author.avatar)
+            } else {
+                AvatarType.NoAvatar
+            },
+            genderIndicatorType = author.gender.toGenderIndicatorType(),
+        )
+    } else {
+        AvatarState(
+            type = AvatarType.NoAvatar,
+            genderIndicatorType = GenderIndicatorType.Unspecified,
+        )
+    }
+
+    val entryContentState = when (this.deleted) {
+        Deleted.Author -> EntryContentState.DeletedByAuthor
+        Deleted.Moderator -> EntryContentState.DeletedByModerator
+        Deleted.None -> this.content.toEntryContentState()
+    }
+
+    val embedUrl = this.media?.photo?.url
+    val embedSource = this.media?.photo?.label
+    val embedMimeType = this.media?.photo?.mimeType
+    val embedWidth = this.media?.photo?.width
+    val embedHeight = this.media?.photo?.height
+
+    val embedImageState = if (embedUrl != null) {
+        EmbedImageState(
+            url = embedUrl,
+            source = embedSource.orEmpty(),
+            isAdult = this.adult,
+            isGif = isGifImage(
+                url = embedUrl,
+                mimeType = embedMimeType,
+            ),
+            width = embedWidth,
+            height = embedHeight,
+        )
+    } else {
+        null
+    }
+
+    val resolvedLinkId = linkIdOverride ?: this.parent?.linkId ?: this.parent?.id ?: 0
+    val resolvedParentId = this.parent?.id ?: 0
+
+    return LinkCommentItemState(
+        id = this.id,
+        contentType = ResourceType.LinkCommentItem,
+        linkId = resolvedLinkId,
+        parentId = resolvedParentId,
+        avatarState = avatarState,
+        authorState = authorState,
+        entryContentState = entryContentState,
+        publishedTimeType = this.createdAt?.toPublishedTimeType(),
+        voteState = this.toVoteState(),
+        embedImageState = embedImageState,
+    )
+}
+
+internal fun Comment.toLinkCommentItemState(linkId: Int): LinkCommentItemState {
+    val authorState = AuthorState(
+        name = this.author.username,
+        color = this.author.color.toNameColorType(),
+    )
+
+    val avatarState = AvatarState(
+        type = if (this.author.avatar.isNotEmpty()) {
+            AvatarType.NetworkImage(this.author.avatar)
+        } else {
+            AvatarType.NoAvatar
+        },
+        genderIndicatorType = this.author.gender.toGenderIndicatorType(),
+    )
+
+    val entryContentState = when (this.deleted) {
+        Deleted.Author -> EntryContentState.DeletedByAuthor
+        Deleted.Moderator -> EntryContentState.DeletedByModerator
+        Deleted.None -> this.content.toEntryContentState()
+    }
+
+    val embedUrl = this.media.photo?.url
+    val embedSource = this.media.photo?.label
+    val embedMimeType = this.media.photo?.mimeType
+    val embedWidth = this.media.photo?.width
+    val embedHeight = this.media.photo?.height
+
+    val embedImageState = if (embedUrl != null) {
+        EmbedImageState(
+            url = embedUrl,
+            source = embedSource.orEmpty(),
+            isAdult = this.adult,
+            isGif = isGifImage(
+                url = embedUrl,
+                mimeType = embedMimeType,
+            ),
+            width = embedWidth,
+            height = embedHeight,
+        )
+    } else {
+        null
+    }
+
+    return LinkCommentItemState(
+        id = this.id,
+        contentType = ResourceType.LinkCommentItem,
+        linkId = linkId,
+        parentId = this.parentId,
+        avatarState = avatarState,
+        authorState = authorState,
+        entryContentState = entryContentState,
+        publishedTimeType = this.createdAt?.toPublishedTimeType(),
+        voteState = this.toVoteState(),
+        embedImageState = embedImageState,
+    )
+}

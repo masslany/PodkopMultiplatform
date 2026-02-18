@@ -12,6 +12,7 @@
     <string name="topbar_label_debug">Debug</string>
     <string name="topbar_label_profile">Profil</string>
     <string name="topbar_label_entry">Wpis</string>
+    <string name="topbar_label_link">Znalezisko</string>
     <string name="topbar_label_search">Szukaj</string>
 
     <!-- Links screen -->
@@ -113,6 +114,7 @@
     <!-- Link details screen -->
     <string name="links_details_screen_no_comments">Brak komentarzy</string>
     <string name="links_details_screen_error_loading_comments">Wystąpił problem podczas wczytywania komentarzy</string>
+    <string name="links_details_screen_error_loading_related">Wystąpił problem podczas wczytywania powiązanych</string>
     <string name="links_details_screen_related_label">Powiązane</string>
     <string name="links_details_screen_no_related">Brak powiązanych</string>
 

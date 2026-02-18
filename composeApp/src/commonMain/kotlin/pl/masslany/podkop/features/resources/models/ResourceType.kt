@@ -5,4 +5,6 @@ enum class ResourceType {
     HitItem,
     EntryItem,
     EntryCommentItem,
+    LinkCommentItem,
+    RelatedItem,
 }

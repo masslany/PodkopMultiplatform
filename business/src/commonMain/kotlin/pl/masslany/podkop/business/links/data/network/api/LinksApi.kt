@@ -35,4 +35,8 @@ interface LinksApi {
     suspend fun voteOnLink(linkId: Int): Result<Unit>
 
     suspend fun removeVoteOnLink(linkId: Int): Result<Unit>
+
+    suspend fun voteOnLinkComment(linkId: Int, commentId: Int): Result<Unit>
+
+    suspend fun removeVoteOnLinkComment(linkId: Int, commentId: Int): Result<Unit>
 }

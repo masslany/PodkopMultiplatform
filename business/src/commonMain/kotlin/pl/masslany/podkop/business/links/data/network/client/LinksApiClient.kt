@@ -139,4 +139,30 @@ class LinksApiClient(
             onFailure = { Result.failure(it) },
         )
     }
+
+    override suspend fun voteOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/links/$linkId/comments/$commentId/votes/up",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun removeVoteOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.DELETE,
+                path = "api/v3/links/$linkId/comments/$commentId/votes",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
 }

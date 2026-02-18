@@ -211,7 +211,7 @@ private fun EntryDetailsScreen(
             bottom = WindowInsets
                 .systemBars
                 .asPaddingValues()
-                .calculateBottomPadding(),
+                .calculateBottomPadding() + 16.dp,
         ),
     ) {
         if (state.entry != null) {

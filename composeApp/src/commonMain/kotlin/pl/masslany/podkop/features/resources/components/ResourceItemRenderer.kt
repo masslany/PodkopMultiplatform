@@ -29,6 +29,7 @@ import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
+import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.comment_button_show_comments
 
@@ -43,6 +44,7 @@ fun ResourceItemRenderer(
         is EntryItemState -> EntryItemRenderer(modifier, state, actions, config)
         is LinkItemState -> LinkItemRenderer(modifier, state, actions)
         is EntryCommentItemState -> EntryCommentItemRenderer(modifier, state, actions)
+        is LinkCommentItemState -> LinkCommentItemRenderer(modifier, state, actions)
         is HitItemState -> HitItemRenderer(modifier, state, actions)
     }
 }
@@ -188,5 +190,26 @@ private fun HitItemRenderer(
         state = state,
         onItemClick = { actions.onLinkClicked(state.id) },
         onVoteClick = { actions.onLinkVoteClicked(state.id, state.countState.isVoted) },
+    )
+}
+
+@Composable
+private fun LinkCommentItemRenderer(
+    modifier: Modifier,
+    state: LinkCommentItemState,
+    actions: ResourceItemActions,
+) {
+    LinkCommentItem(
+        modifier = modifier,
+        state = state,
+        onProfileClick = { actions.onProfileClicked(it) },
+        onImageClick = { actions.onImageClicked(it) },
+        onVoteUpClick = {
+            actions.onLinkCommentVoteUpClick(
+                linkId = state.linkId,
+                commentId = state.id,
+                voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+            )
+        },
     )
 }

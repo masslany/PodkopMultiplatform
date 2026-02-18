@@ -52,4 +52,12 @@ class LinksDataSourceImpl(
     override suspend fun removeVoteOnLink(linkId: Int): Result<Unit> {
         return linksApi.removeVoteOnLink(linkId)
     }
+
+    override suspend fun voteOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
+        return linksApi.voteOnLinkComment(linkId, commentId)
+    }
+
+    override suspend fun removeVoteOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
+        return linksApi.removeVoteOnLinkComment(linkId, commentId)
+    }
 }

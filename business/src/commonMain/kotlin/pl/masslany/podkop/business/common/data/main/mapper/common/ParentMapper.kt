@@ -5,6 +5,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Parent
 
 fun ParentDto.toParent(): Parent {
     return Parent(
-        id = this.id
+        id = this.id,
+        linkId = this.link?.id,
     )
 }
