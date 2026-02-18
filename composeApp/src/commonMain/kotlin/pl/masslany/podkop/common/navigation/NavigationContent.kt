@@ -1,7 +1,7 @@
 package pl.masslany.podkop.common.navigation
 
-import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.LinearEasing
