@@ -37,6 +37,8 @@ import pl.masslany.podkop.features.entrydetails.EntryDetailsScreenRoot
 import pl.masslany.podkop.features.home.HomeScreenRoot
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreenRoot
+import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
+import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenRoot
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.ProfileScreenRoot
 import pl.masslany.podkop.features.settings.SettingsScreen
@@ -83,6 +85,13 @@ fun App() {
 
                     entry<EntryDetailsScreen> {
                         EntryDetailsScreenRoot(
+                            id = it.id,
+                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<LinkDetailsScreen> {
+                        LinkDetailsScreenRoot(
                             id = it.id,
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )

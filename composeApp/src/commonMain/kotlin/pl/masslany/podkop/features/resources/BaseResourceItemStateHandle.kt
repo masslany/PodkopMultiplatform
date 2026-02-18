@@ -18,6 +18,7 @@ import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
+import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
@@ -106,7 +107,7 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onLinkClicked(id: Int) {
-        println("DBG ---> link clicked: $id")
+        appNavigator.navigateTo(LinkDetailsScreen(id))
     }
 
     override fun onLinkUrlClicked(url: String) {

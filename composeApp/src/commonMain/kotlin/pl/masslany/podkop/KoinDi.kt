@@ -17,6 +17,7 @@ import pl.masslany.podkop.features.entries.di.entriesModule
 import pl.masslany.podkop.features.entrydetails.di.entryDetailsModule
 import pl.masslany.podkop.features.home.di.homeModule
 import pl.masslany.podkop.features.imageviewer.di.imageViewerModule
+import pl.masslany.podkop.features.linkdetails.di.linkDetailsModule
 import pl.masslany.podkop.features.links.di.linksModule
 import pl.masslany.podkop.features.profile.di.profileModule
 import pl.masslany.podkop.features.resources.di.resourcesModule
@@ -36,6 +37,7 @@ val composeAppModule = module {
         resourcesModule,
         debugModule,
         entryDetailsModule,
+        linkDetailsModule,
         imageViewerModule,
         profileModule,
         settingsModule,
