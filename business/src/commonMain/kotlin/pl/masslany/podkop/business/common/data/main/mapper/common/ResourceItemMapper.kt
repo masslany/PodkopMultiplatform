@@ -23,6 +23,7 @@ fun List<ResourceItemDto>.toResourceItemList(): List<ResourceItem> {
             media = it.media?.toMedia(),
             name = it.name.orEmpty(),
             parent = it.parent?.toParent(),
+            parentId = it.parentId,
             publishedAt = it.publishedAt,
             recommended = it.recommended ?: false,
             resource = it.resource.toResource(),

@@ -10,6 +10,7 @@ import pl.masslany.podkop.common.models.TitleState
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.models.toPublishedTimeType
 import pl.masslany.podkop.features.resources.models.ResourceType
+import pl.masslany.podkop.features.resources.models.linkcomment.toLinkCommentItemState
 
 internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
     val titleState = this.title.ifBlank { null }?.let {
@@ -66,6 +67,11 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
     }.toImmutableList()
 
     val commentCount = this.comments?.count ?: 0
+    val comments = this.comments
+        ?.items
+        .orEmpty()
+        .map { it.toLinkCommentItemState(linkId = this.id) }
+        .toImmutableList()
 
     val publishedTimeType = if (isUpcoming) {
         this.createdAt?.toPublishedTimeType()
@@ -84,6 +90,7 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
         sourceUrl = sourceUrl.orEmpty(),
         imageUrl = imageUrl,
         tags = tags,
+        comments = comments,
         commentCount = commentCount,
         publishedTimeType = publishedTimeType,
     )

@@ -19,6 +19,7 @@ data class ResourceItem(
     val media: Media?,
     val name: String,
     val parent: Parent?,
+    val parentId: Int? = null,
     val publishedAt: LocalDateTime?,
     val recommended: Boolean,
     val resource: Resource,

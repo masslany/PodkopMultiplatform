@@ -23,6 +23,8 @@ import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryVoteAction
+import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
+import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 import pl.masslany.podkop.features.resources.models.toResourceItemState
 
@@ -216,8 +218,58 @@ open class BaseResourceItemStateHolder(
     ) {
         _items.update { list ->
             list.map { item ->
-                if (item.id == id) updater(item) else item
+                mapItemWithNestedState(
+                    item = item,
+                    id = id,
+                    updater = updater,
+                )
             }.toImmutableList()
+        }
+    }
+
+    private fun mapItemWithNestedState(
+        item: ResourceItemState,
+        id: Int,
+        updater: (ResourceItemState) -> ResourceItemState,
+    ): ResourceItemState {
+        val updatedItem = if (item.id == id) {
+            updater(item)
+        } else {
+            item
+        }
+
+        return when (updatedItem) {
+            is EntryItemState -> {
+                updatedItem.copy(
+                    comments = updatedItem.comments
+                        .map { comment ->
+                            mapItemWithNestedState(comment, id, updater) as? EntryCommentItemState ?: comment
+                        }
+                        .toImmutableList(),
+                )
+            }
+
+            is LinkItemState -> {
+                updatedItem.copy(
+                    comments = updatedItem.comments
+                        .map { comment ->
+                            mapItemWithNestedState(comment, id, updater) as? LinkCommentItemState ?: comment
+                        }
+                        .toImmutableList(),
+                )
+            }
+
+            is LinkCommentItemState -> {
+                updatedItem.copy(
+                    replies = updatedItem.replies
+                        .map { reply ->
+                            mapItemWithNestedState(reply, id, updater) as? LinkCommentItemState ?: reply
+                        }
+                        .toImmutableList(),
+                )
+            }
+
+            else -> updatedItem
         }
     }
 

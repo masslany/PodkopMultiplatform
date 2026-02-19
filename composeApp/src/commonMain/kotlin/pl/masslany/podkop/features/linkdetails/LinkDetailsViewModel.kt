@@ -146,15 +146,10 @@ class LinkDetailsViewModel(
         _commentRepliesStateById.update { previousState ->
             previousState.mapValues { (_, itemState) ->
                 itemState.copy(
-                    replies = itemState.replies
-                        .map { reply ->
-                            if (reply.id == commentId) {
-                                reply.applyVoteUp(voted = voted)
-                            } else {
-                                reply
-                            }
-                        }
-                        .toImmutableList(),
+                    replies = itemState.replies.applyVoteById(
+                        commentId = commentId,
+                        voted = voted,
+                    ),
                 )
             }
         }
@@ -417,9 +412,7 @@ class LinkDetailsViewModel(
         }
     }
 
-    private fun buildInitialCommentRepliesState(items: List<ResourceItem>): Map<Int, CommentRepliesState> = items.associate {
-            item,
-        ->
+    private fun buildInitialCommentRepliesState(items: List<ResourceItem>): Map<Int, CommentRepliesState> = items.associate { item ->
         val replies = item.comments
             ?.items
             .orEmpty()
@@ -512,3 +505,25 @@ private fun LinkCommentItemState.applyVoteUp(voted: Boolean): LinkCommentItemSta
         voteState.increaseVoteUp()
     },
 )
+
+private fun ImmutableList<LinkCommentItemState>.applyVoteById(
+    commentId: Int,
+    voted: Boolean,
+): ImmutableList<LinkCommentItemState> = this.map { comment ->
+    comment.applyVoteById(commentId = commentId, voted = voted)
+}.toImmutableList()
+
+private fun LinkCommentItemState.applyVoteById(commentId: Int, voted: Boolean): LinkCommentItemState {
+    val updated = if (this.id == commentId) {
+        this.applyVoteUp(voted)
+    } else {
+        this
+    }
+
+    return updated.copy(
+        replies = updated.replies.applyVoteById(
+            commentId = commentId,
+            voted = voted,
+        ),
+    )
+}

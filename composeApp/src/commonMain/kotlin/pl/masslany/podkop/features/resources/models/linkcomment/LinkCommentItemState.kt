@@ -1,5 +1,6 @@
 package pl.masslany.podkop.features.resources.models.linkcomment
 
+import kotlinx.collections.immutable.ImmutableList
 import pl.masslany.podkop.common.models.AuthorState
 import pl.masslany.podkop.common.models.EmbedImageState
 import pl.masslany.podkop.common.models.EntryContentState
@@ -20,4 +21,5 @@ data class LinkCommentItemState(
     val publishedTimeType: PublishedTimeType?,
     val voteState: VoteState,
     val embedImageState: EmbedImageState?,
+    val replies: ImmutableList<LinkCommentItemState>,
 ) : ResourceItemState

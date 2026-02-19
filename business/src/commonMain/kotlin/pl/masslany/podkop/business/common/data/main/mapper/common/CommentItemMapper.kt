@@ -12,7 +12,7 @@ fun List<CommentItemDto>.toCommentList(): List<Comment> {
             adult = it.adult,
             archive = it.archive,
             author = it.author.toAuthor(),
-            comments = null,
+            comments = it.comments?.toComments(),
             createdAt = it.createdAt,
             deletable = it.deletable,
             editable = it.editable,

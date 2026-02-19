@@ -9,6 +9,7 @@ import pl.masslany.podkop.common.models.TagItem
 import pl.masslany.podkop.common.models.TitleState
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.ResourceType
+import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 
 data class LinkItemState(
     override val id: Int,
@@ -23,4 +24,5 @@ data class LinkItemState(
     val commentCount: Int,
     val imageUrl: String,
     val tags: ImmutableList<TagItem>,
+    val comments: ImmutableList<LinkCommentItemState>,
 ) : ResourceItemState

@@ -206,6 +206,7 @@ private fun LinkItemPreview() {
                     TagItem("#test2", true),
                     TagItem("#test3", false),
                 ),
+                comments = persistentListOf(),
                 commentCount = 10,
                 publishedTimeType = PublishedTimeType.Now,
                 contentType = ResourceType.LinkItem,

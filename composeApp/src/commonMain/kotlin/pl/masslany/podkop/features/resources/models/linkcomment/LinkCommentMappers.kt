@@ -1,5 +1,6 @@
 package pl.masslany.podkop.features.resources.models.linkcomment
 
+import kotlinx.collections.immutable.toImmutableList
 import pl.masslany.podkop.business.common.domain.models.common.Comment
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
@@ -71,7 +72,12 @@ internal fun ResourceItem.toLinkCommentItemState(linkIdOverride: Int? = null): L
     }
 
     val resolvedLinkId = linkIdOverride ?: this.parent?.linkId ?: this.parent?.id ?: 0
-    val resolvedParentId = this.parent?.id ?: 0
+    val resolvedParentId = this.parentId ?: -1
+    val replies = this.comments
+        ?.items
+        .orEmpty()
+        .map { it.toLinkCommentItemState(linkId = resolvedLinkId) }
+        .toImmutableList()
 
     return LinkCommentItemState(
         id = this.id,
@@ -84,6 +90,7 @@ internal fun ResourceItem.toLinkCommentItemState(linkIdOverride: Int? = null): L
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
         embedImageState = embedImageState,
+        replies = replies,
     )
 }
 
@@ -129,6 +136,11 @@ internal fun Comment.toLinkCommentItemState(linkId: Int): LinkCommentItemState {
     } else {
         null
     }
+    val replies = this.comments
+        ?.items
+        .orEmpty()
+        .map { it.toLinkCommentItemState(linkId = linkId) }
+        .toImmutableList()
 
     return LinkCommentItemState(
         id = this.id,
@@ -141,5 +153,6 @@ internal fun Comment.toLinkCommentItemState(linkId: Int): LinkCommentItemState {
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
         embedImageState = embedImageState,
+        replies = replies,
     )
 }
