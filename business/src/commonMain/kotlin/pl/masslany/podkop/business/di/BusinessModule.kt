@@ -11,6 +11,8 @@ import pl.masslany.podkop.business.links.data.network.di.linksNetworkModule
 import pl.masslany.podkop.business.profile.data.di.profileDataModule
 import pl.masslany.podkop.business.profile.data.network.di.profileNetworkModule
 import pl.masslany.podkop.business.startup.infrastructure.di.startupModule
+import pl.masslany.podkop.business.tags.data.di.tagsDataModule
+import pl.masslany.podkop.business.tags.data.network.di.tagsNetworkModule
 import pl.masslany.podkop.commonModule
 
 val businessModule = module {
@@ -25,6 +27,8 @@ val businessModule = module {
         entriesNetworkModule,
         profileDataModule,
         profileNetworkModule,
+        tagsDataModule,
+        tagsNetworkModule,
         startupModule,
     )
 }
