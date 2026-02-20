@@ -56,16 +56,21 @@ sealed interface ProfileSubActionType {
     }
 }
 
-fun ProfileSubActionType.isResourceBacked(): Boolean = when (this) {
-    ProfileSubActionType.Followers,
-    ProfileSubActionType.FollowingTags,
-    ProfileSubActionType.FollowingUsers,
-    -> false
+fun ProfileSubActionType.isResourceBacked(): Boolean {
+    return when (this) {
+        ProfileSubActionType.Followers,
+        ProfileSubActionType.FollowingTags,
+        ProfileSubActionType.FollowingUsers,
+            -> false
 
-    else -> true
+        else -> true
+    }
 }
 
-fun ProfileSubActionType.isObservedUsers(): Boolean =
-    this == ProfileSubActionType.Followers || this == ProfileSubActionType.FollowingUsers
+fun ProfileSubActionType.isObservedUsers(): Boolean {
+    return this == ProfileSubActionType.Followers || this == ProfileSubActionType.FollowingUsers
+}
 
-fun ProfileSubActionType.isObservedTags(): Boolean = this == ProfileSubActionType.FollowingTags
+fun ProfileSubActionType.isObservedTags(): Boolean {
+    return this == ProfileSubActionType.FollowingTags
+}

@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -60,7 +63,6 @@ import pl.masslany.podkop.features.profile.models.ProfileContentState
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
 import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
-import pl.masslany.podkop.features.profile.models.ProfileSummaryType
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import podkop.composeapp.generated.resources.Res
@@ -193,6 +195,7 @@ fun ProfileScreenRoot(
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPaddingValues ->
 
         if (state.isLoading) {
@@ -263,7 +266,12 @@ private fun ProfileLoadedContent(
         modifier = Modifier.fillMaxSize(),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(bottom = 16.dp),
+        contentPadding = PaddingValues(
+            bottom = WindowInsets
+                .systemBars
+                .asPaddingValues()
+                .calculateBottomPadding() + 16.dp,
+        ),
     ) {
         item(
             key = "ProfileHeader",
@@ -285,7 +293,7 @@ private fun ProfileLoadedContent(
             Spacer(modifier = Modifier.size(8.dp))
         }
 
-        if (content.selectedSummaryType != ProfileSummaryType.Actions) {
+        if (content.subActionState.items.size > 1) {
             item(
                 key = "ProfileSubActionDropdown",
             ) {
