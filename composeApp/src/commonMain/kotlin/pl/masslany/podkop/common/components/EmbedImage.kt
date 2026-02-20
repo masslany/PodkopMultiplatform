@@ -267,7 +267,7 @@ fun EmbedImage(
                 Text(
                     text = stringResource(resource = Res.string.embed_adult_image),
                     modifier = Modifier.align(Alignment.Center),
-                    color = Color.White,
+                    color = Color.Black,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium
                         .copy(
@@ -282,7 +282,7 @@ fun EmbedImage(
                 Text(
                     text = stringResource(resource = Res.string.embed_adult_image),
                     modifier = Modifier.align(Alignment.Center),
-                    color = Color.Black,
+                    color = Color.White,
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                 )
