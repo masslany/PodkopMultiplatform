@@ -55,6 +55,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isAuthorReply
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -288,16 +289,7 @@ private fun EntryDetailsScreen(
             item(
                 key = "PaginationLoadingIndicator",
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.CenterVertically),
-                    )
-                }
+                PaginationLoadingIndicator()
             }
         }
     }

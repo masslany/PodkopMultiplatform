@@ -4,11 +4,15 @@ import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.profile.data.main.mapper.toObservedTags
+import pl.masslany.podkop.business.profile.data.main.mapper.toObservedUsers
 import pl.masslany.podkop.business.profile.data.api.ProfileDataSource
 import pl.masslany.podkop.business.profile.data.main.mapper.toProfile
 import pl.masslany.podkop.business.profile.data.main.mapper.toProfileShort
 import pl.masslany.podkop.business.profile.data.main.mapper.toUsersAutoComplete
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
+import pl.masslany.podkop.business.profile.domain.models.ObservedTags
+import pl.masslany.podkop.business.profile.domain.models.ObservedUsers
 import pl.masslany.podkop.business.profile.domain.models.Profile
 import pl.masslany.podkop.business.profile.domain.models.ProfileShort
 import pl.masslany.podkop.business.profile.domain.models.UsersAutoComplete
@@ -123,22 +127,34 @@ class ProfileRepositoryImpl(
     override suspend fun getProfileObservedTags(
         username: String,
         page: Int,
-    ): Result<Resources> {
-        return getProfileResources { profileDataSource.getProfileObservedTags(username, page) }
+    ): Result<ObservedTags> {
+        return withContext(dispatcherProvider.io) {
+            profileDataSource.getProfileObservedTags(username, page).mapCatching {
+                it.toObservedTags()
+            }
+        }
     }
 
     override suspend fun getProfileObservedUsersFollowing(
         username: String,
         page: Int,
-    ): Result<Resources> {
-        return getProfileResources { profileDataSource.getProfileObservedUsersFollowing(username, page) }
+    ): Result<ObservedUsers> {
+        return withContext(dispatcherProvider.io) {
+            profileDataSource.getProfileObservedUsersFollowing(username, page).mapCatching {
+                it.toObservedUsers()
+            }
+        }
     }
 
     override suspend fun getProfileObservedUsersFollowers(
         username: String,
         page: Int,
-    ): Result<Resources> {
-        return getProfileResources { profileDataSource.getProfileObservedUsersFollowers(username, page) }
+    ): Result<ObservedUsers> {
+        return withContext(dispatcherProvider.io) {
+            profileDataSource.getProfileObservedUsersFollowers(username, page).mapCatching {
+                it.toObservedUsers()
+            }
+        }
     }
 
     private suspend fun getProfileResources(

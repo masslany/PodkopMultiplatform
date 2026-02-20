@@ -1,6 +1,8 @@
 package pl.masslany.podkop.business.profile.domain.main
 
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.profile.domain.models.ObservedTags
+import pl.masslany.podkop.business.profile.domain.models.ObservedUsers
 import pl.masslany.podkop.business.profile.domain.models.Profile
 import pl.masslany.podkop.business.profile.domain.models.ProfileShort
 import pl.masslany.podkop.business.profile.domain.models.UsersAutoComplete
@@ -67,15 +69,15 @@ interface ProfileRepository {
     suspend fun getProfileObservedTags(
         username: String,
         page: Int,
-    ): Result<Resources>
+    ): Result<ObservedTags>
 
     suspend fun getProfileObservedUsersFollowing(
         username: String,
         page: Int,
-    ): Result<Resources>
+    ): Result<ObservedUsers>
 
     suspend fun getProfileObservedUsersFollowers(
         username: String,
         page: Int,
-    ): Result<Resources>
+    ): Result<ObservedUsers>
 }

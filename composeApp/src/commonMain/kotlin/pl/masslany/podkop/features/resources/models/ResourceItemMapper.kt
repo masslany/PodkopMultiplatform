@@ -13,5 +13,5 @@ fun ResourceItem.toResourceItemState(isUpcoming: Boolean = false): ResourceItemS
         Resource.Link -> this.toLinkItemState(isUpcoming)
         Resource.EntryComment -> this.toEntryCommentItemState()
         Resource.LinkComment -> this.toLinkCommentItemState()
-        else -> throw UnsupportedOperationException()
+        else -> throw UnsupportedOperationException("Unsupported resource type ${this.resource}")
     }

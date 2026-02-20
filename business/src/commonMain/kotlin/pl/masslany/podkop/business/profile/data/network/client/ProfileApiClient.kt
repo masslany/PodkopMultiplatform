@@ -2,6 +2,8 @@ package pl.masslany.podkop.business.profile.data.network.client
 
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.profile.data.network.api.ProfileApi
+import pl.masslany.podkop.business.profile.data.network.models.ObservedTagsResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ObservedUsersResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileShortDto
 import pl.masslany.podkop.business.profile.data.network.models.UsersAutoCompleteResponseDto
@@ -73,7 +75,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "actions",
@@ -84,7 +86,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "entries/added",
@@ -95,7 +97,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "entries/voted",
@@ -106,7 +108,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "entries/commented",
@@ -117,7 +119,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "links/added",
@@ -128,7 +130,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "links/published",
@@ -139,7 +141,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "links/up",
@@ -150,7 +152,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "links/down",
@@ -161,7 +163,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "links/commented",
@@ -172,7 +174,7 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        return getProfileResources(
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "links/related",
@@ -182,8 +184,8 @@ class ProfileApiClient(
     override suspend fun getProfileObservedTags(
         username: String,
         page: Int,
-    ): Result<ResourceResponseDto> {
-        return getProfileResources(
+    ): Result<ObservedTagsResponseDto> {
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "observed/tags",
@@ -193,8 +195,8 @@ class ProfileApiClient(
     override suspend fun getProfileObservedUsersFollowing(
         username: String,
         page: Int,
-    ): Result<ResourceResponseDto> {
-        return getProfileResources(
+    ): Result<ObservedUsersResponseDto> {
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "observed/users/following",
@@ -204,26 +206,26 @@ class ProfileApiClient(
     override suspend fun getProfileObservedUsersFollowers(
         username: String,
         page: Int,
-    ): Result<ResourceResponseDto> {
-        return getProfileResources(
+    ): Result<ObservedUsersResponseDto> {
+        return getProfileList(
             username = username,
             page = page,
             endpoint = "observed/users/followers",
         )
     }
 
-    private suspend fun getProfileResources(
+    private suspend inline fun <reified T> getProfileList(
         username: String,
         page: Int,
         endpoint: String,
-    ): Result<ResourceResponseDto> {
+    ): Result<T> {
         val queryParams =
             mutableMapOf(
                 "page" to page.toString(),
             )
 
         val request =
-            Request<ResourceResponseDto>(
+            Request<T>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/profile/users/$username/$endpoint",
                 queryParameters = queryParams,

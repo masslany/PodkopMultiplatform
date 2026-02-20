@@ -53,8 +53,20 @@
     <string name="profile_summary_links">Znaleziska</string>
     <string name="profile_summary_entries">Mikroblog</string>
     <string name="profile_summary_followers">Obserwujący</string>
+    <string name="profile_summary_following">Obserwuje</string>
     <string name="profile_summary_following_users">Obserwowani użytkownicy</string>
     <string name="profile_summary_following_tags">Obserwowane tagi</string>
+    <string name="profile_sub_action_all">Wszystkie</string>
+    <string name="profile_sub_action_added">Dodane</string>
+    <string name="profile_sub_action_voted">Plusowane</string>
+    <string name="profile_sub_action_commented">Komentowane</string>
+    <string name="profile_sub_action_published">Opublikowane</string>
+    <string name="profile_sub_action_up">Wykopane</string>
+    <string name="profile_sub_action_down">Zakopane</string>
+    <string name="profile_sub_action_related">Powiązane</string>
+    <string name="profile_sub_action_followers">Obserwujący</string>
+    <string name="profile_sub_action_following_users">Użytkownicy</string>
+    <string name="profile_sub_action_following_tags">Tagi</string>
     <plurals name="profile_header_days_since">
         <item quantity="one">%1$d dzień</item>
         <item quantity="other">%1$d dni</item>
@@ -72,6 +84,8 @@
     <string name="profile_header_ago">temu</string>
     <string name="profile_header_joined">Dołączył</string>
     <string name="profile_header_whitespace">\u0020</string>
+    <string name="profile_no_observed_tags">Brak obserwowanych tagów do wyświetlenia</string>
+    <string name="profile_no_observed_users">Brak obserwowanych użytkowników do wyświetlenia</string>
 
     <!-- Dropdown menu -->
     <string name="dropdown_menu_label_active">Aktywne</string>

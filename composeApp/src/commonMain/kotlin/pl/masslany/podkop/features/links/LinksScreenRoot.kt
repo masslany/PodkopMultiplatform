@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -47,6 +46,7 @@ import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
+import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
@@ -266,16 +266,7 @@ private fun LinksScreen(
             item(
                 key = "PaginationLoadingIndicator",
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.CenterVertically),
-                    )
-                }
+                PaginationLoadingIndicator()
             }
         }
     }

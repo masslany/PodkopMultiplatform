@@ -3,6 +3,8 @@ package pl.masslany.podkop.business.profile.data.network.main
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.profile.data.api.ProfileDataSource
 import pl.masslany.podkop.business.profile.data.network.api.ProfileApi
+import pl.masslany.podkop.business.profile.data.network.models.ObservedTagsResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ObservedUsersResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileShortDto
 import pl.masslany.podkop.business.profile.data.network.models.UsersAutoCompleteResponseDto
@@ -99,21 +101,21 @@ class ProfileDataSourceImpl(
     override suspend fun getProfileObservedTags(
         username: String,
         page: Int,
-    ): Result<ResourceResponseDto> {
+    ): Result<ObservedTagsResponseDto> {
         return profileApi.getProfileObservedTags(username, page)
     }
 
     override suspend fun getProfileObservedUsersFollowing(
         username: String,
         page: Int,
-    ): Result<ResourceResponseDto> {
+    ): Result<ObservedUsersResponseDto> {
         return profileApi.getProfileObservedUsersFollowing(username, page)
     }
 
     override suspend fun getProfileObservedUsersFollowers(
         username: String,
         page: Int,
-    ): Result<ResourceResponseDto> {
+    ): Result<ObservedUsersResponseDto> {
         return profileApi.getProfileObservedUsersFollowers(username, page)
     }
 }

@@ -31,8 +31,8 @@ import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.components.GenderIndicator
 import pl.masslany.podkop.common.components.toComposeColor
-import pl.masslany.podkop.features.profile.MemberSinceState
-import pl.masslany.podkop.features.profile.ProfileHeaderState
+import pl.masslany.podkop.features.profile.models.MemberSinceState
+import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_profile
 import podkop.composeapp.generated.resources.profile_header_ago

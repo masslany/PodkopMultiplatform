@@ -4,14 +4,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.business.common.domain.models.common.PaginatedData
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
-import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
-import pl.masslany.podkop.business.common.domain.models.common.Resources
 
-class Paginator(
+class Paginator<T>(
     private val scope: CoroutineScope,
-    private val onNewItems: suspend (items: List<ResourceItem>) -> Unit,
-    private val loader: suspend (PageRequest) -> Result<Resources>,
+    private val onNewItems: suspend (items: List<T>) -> Unit,
+    private val loader: suspend (PageRequest) -> Result<PaginatedData<T>>,
 ) {
 
     private val _state = MutableStateFlow<PaginatorState>(PaginatorState.Idle)
@@ -60,6 +59,7 @@ class Paginator(
                     total = resources.pagination?.total
                     nextPage++
 
+                    emittedCount += resources.data.size
                     onNewItems(resources.data)
 
                     _state.value =

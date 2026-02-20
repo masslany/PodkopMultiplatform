@@ -1,59 +1,80 @@
 package pl.masslany.podkop.features.profile
 
-import androidx.compose.foundation.Image
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
-import org.jetbrains.compose.resources.painterResource
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
+import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
+import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
+import pl.masslany.podkop.features.profile.components.ObservedTagItem
+import pl.masslany.podkop.features.profile.components.ObservedUserItem
+import pl.masslany.podkop.features.profile.components.ProfileErrorContent
 import pl.masslany.podkop.features.profile.components.ProfileHeader
+import pl.masslany.podkop.features.profile.components.ProfileLoggedOutContent
+import pl.masslany.podkop.features.profile.components.ProfileSubActionDropdown
 import pl.masslany.podkop.features.profile.components.ProfileSummary
+import pl.masslany.podkop.features.profile.models.ProfileContentState
+import pl.masslany.podkop.features.profile.models.ProfileListContentState
+import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
+import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
+import pl.masslany.podkop.features.profile.models.ProfileSummaryType
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.accessibility_topbar_settings
-import podkop.composeapp.generated.resources.generic_error_body
-import podkop.composeapp.generated.resources.generic_error_title
 import podkop.composeapp.generated.resources.ic_arrow_back
+import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_settings
-import podkop.composeapp.generated.resources.profile_log_in_button
-import podkop.composeapp.generated.resources.profile_not_logged_in_message
-import podkop.composeapp.generated.resources.refresh_button
+import podkop.composeapp.generated.resources.profile_no_observed_tags
+import podkop.composeapp.generated.resources.profile_no_observed_users
 import podkop.composeapp.generated.resources.topbar_label_profile
-import podkop.composeapp.generated.resources.user_profile_not_logged_in
+
+private const val FabItemsOffset = 10
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +85,29 @@ fun ProfileScreenRoot(
     val viewModel = koinViewModel<ProfileViewModel>(
         parameters = { parametersOf(username) },
     )
+    val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val lazyListState = rememberLazyListPaginator(
+        shouldPaginate = { lastVisibleIndex, totalItems ->
+            viewModel.shouldPaginate(lastVisibleIndex, totalItems)
+        },
+        paginate = {
+            viewModel.paginate()
+        },
+    )
+    val isScrollingUp = lazyListState.isScrollingUp()
+    val showFab by remember(isScrollingUp) {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > FabItemsOffset && isScrollingUp
+        }
+    }
+    val showProfileName by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemScrollOffset > 0
+        }
+    }
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         modifier = Modifier
@@ -72,11 +115,27 @@ fun ProfileScreenRoot(
             .padding(
                 start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
                 end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            ),
+            )
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(resource = Res.string.topbar_label_profile))
+                    when (state.content) {
+                        is ProfileContentState.Loaded -> {
+                            if (showProfileName) {
+                                val profileLabel = stringResource(resource = Res.string.topbar_label_profile)
+                                val username = (state.content as? ProfileContentState.Loaded)?.header?.username
+                                Text(text = username ?: profileLabel)
+                            }
+                        }
+                        ProfileContentState.Error -> {
+                            Text(text = stringResource(resource = Res.string.topbar_label_profile))
+                        }
+                        ProfileContentState.LoggedOut -> {
+                            Text(text = stringResource(resource = Res.string.topbar_label_profile))
+                        }
+                        ProfileContentState.Empty -> Unit
+                    }
                 },
                 navigationIcon = {
                     IconButton(onClick = viewModel::onTopBarBackClicked) {
@@ -102,8 +161,36 @@ fun ProfileScreenRoot(
                         }
                     }
                 },
-                scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
+                scrollBehavior = scrollBehavior,
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = showFab,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                FloatingActionButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            scrollBehavior.state.heightOffset = 0f
+                            scrollBehavior.state.contentOffset = 0f
+                            lazyListState.animateScrollToItem(0)
+                        }
+                    },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = vectorResource(resource = Res.drawable.ic_keyboard_arrow_up),
+                        contentDescription = stringResource(
+                            resource = Res.string.accessibility_fab_scroll_to_top,
+                        ),
+                    )
+                }
+            }
         },
         containerColor = MaterialTheme.colorScheme.surface,
     ) { innerPaddingValues ->
@@ -121,6 +208,7 @@ fun ProfileScreenRoot(
                     .padding(paddingValues = innerPaddingValues),
                 state = state,
                 actions = viewModel,
+                lazyListState = lazyListState,
             )
         }
     }
@@ -131,6 +219,7 @@ private fun ProfileScreen(
     modifier: Modifier = Modifier,
     state: ProfileScreenState,
     actions: ProfileActions,
+    lazyListState: LazyListState,
 ) {
     Box(
         modifier = modifier,
@@ -140,19 +229,24 @@ private fun ProfileScreen(
             ProfileContentState.Empty -> Unit
 
             ProfileContentState.LoggedOut -> {
-                ProfileLoggedOutContent(actions = actions)
+                ProfileLoggedOutContent(
+                    onLoginClicked = actions::onLoginClicked,
+                )
             }
 
             is ProfileContentState.Loaded -> {
                 ProfileLoadedContent(
                     content = content,
-                    resources = state.resources,
+                    state = state,
                     actions = actions,
+                    lazyListState = lazyListState,
                 )
             }
 
             ProfileContentState.Error -> {
-                ProfileErrorContent(actions = actions)
+                ProfileErrorContent(
+                    onRetryClicked = actions::onRetryClicked,
+                )
             }
         }
     }
@@ -161,11 +255,13 @@ private fun ProfileScreen(
 @Composable
 private fun ProfileLoadedContent(
     content: ProfileContentState.Loaded,
-    resources: ImmutableList<ResourceItemState>,
+    state: ProfileScreenState,
     actions: ProfileActions,
+    lazyListState: LazyListState,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
+        state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(bottom = 16.dp),
     ) {
@@ -183,15 +279,89 @@ private fun ProfileLoadedContent(
         ) {
             ProfileSummary(
                 summary = content.summary,
+                selectedType = content.selectedSummaryType,
+                onSelected = actions::onSummarySelected,
             )
             Spacer(modifier = Modifier.size(8.dp))
         }
 
-        items(
-            items = resources,
-            key = { item -> "${item.contentType}_${item.id}" },
-            contentType = { item -> item.contentType },
-        ) { resource ->
+        if (content.selectedSummaryType != ProfileSummaryType.Actions) {
+            item(
+                key = "ProfileSubActionDropdown",
+            ) {
+                ProfileSubActionDropdown(
+                    subActionState = content.subActionState,
+                    actions = actions,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+            }
+        }
+
+        if (state.isResourcesLoading) {
+            item(
+                key = "ResourcesLoadingIndicator",
+            ) {
+                PaginationLoadingIndicator()
+            }
+        }
+
+        renderListContent(
+            listContent = state.listContent,
+            actions = actions,
+        )
+
+        if (state.isPaginating) {
+            item(
+                key = "PaginationLoadingIndicator",
+            ) {
+                PaginationLoadingIndicator()
+            }
+        }
+    }
+}
+
+private fun LazyListScope.renderListContent(
+    listContent: ProfileListContentState,
+    actions: ProfileActions,
+) {
+    when (listContent) {
+        ProfileListContentState.Empty -> Unit
+
+        is ProfileListContentState.Resources -> {
+            renderResources(
+                resources = listContent.items,
+                actions = actions,
+            )
+        }
+
+        is ProfileListContentState.ObservedUsers -> {
+            renderObservedUsers(
+                users = listContent.items,
+                actions = actions,
+            )
+        }
+
+        is ProfileListContentState.ObservedTags -> {
+            renderObservedTags(
+                tags = listContent.items,
+                actions = actions,
+            )
+        }
+    }
+}
+
+private fun LazyListScope.renderResources(
+    resources: ImmutableList<ResourceItemState>,
+    actions: ProfileActions,
+) {
+    if (resources.isEmpty()) return
+
+    resources.forEach { resource ->
+        item(
+            key = "${resource.contentType}_${resource.id}",
+            contentType = resource.contentType,
+        ) {
             ResourceItemRenderer(
                 modifier = Modifier
                     .padding(horizontal = 16.dp),
@@ -202,48 +372,74 @@ private fun ProfileLoadedContent(
     }
 }
 
-@Composable
-private fun ProfileLoggedOutContent(actions: ProfileActions) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Image(
-            modifier = Modifier.size(240.dp),
-            painter = painterResource(resource = Res.drawable.user_profile_not_logged_in),
-            contentDescription = null,
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-        )
-        Spacer(modifier = Modifier.size(8.dp))
-        Text(text = stringResource(resource = Res.string.profile_not_logged_in_message))
-        Button(onClick = actions::onLoginClicked) {
-            Text(text = stringResource(resource = Res.string.profile_log_in_button))
+private fun LazyListScope.renderObservedUsers(
+    users: ImmutableList<ProfileObservedUserItemState>,
+    actions: ProfileActions,
+) {
+    if (users.isEmpty()) {
+        item(
+            key = "no_observed_users",
+            contentType = "no_observed_users",
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = stringResource(resource = Res.string.profile_no_observed_users),
+                )
+            }
+        }
+    } else {
+        users.forEach { user ->
+            item(
+                key = "observed_user_${user.username}",
+                contentType = "observed_user",
+            ) {
+                ObservedUserItem(
+                    user = user,
+                    onClick = { actions.onProfileClicked(user.username) },
+                )
+            }
         }
     }
 }
 
-@Composable
-private fun ProfileErrorContent(actions: ProfileActions) {
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Text(
-            text = stringResource(resource = Res.string.generic_error_title),
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            text = stringResource(resource = Res.string.generic_error_body),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-        )
-        Button(onClick = actions::onRetryClicked) {
-            Text(
-                text = stringResource(resource = Res.string.refresh_button),
-            )
+private fun LazyListScope.renderObservedTags(
+    tags: ImmutableList<ProfileObservedTagItemState>,
+    actions: ProfileActions,
+) {
+    if (tags.isEmpty()) {
+        item(
+            key = "no_observed_tags",
+            contentType = "no_observed_tags",
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = stringResource(resource = Res.string.profile_no_observed_tags),
+                )
+            }
+        }
+    } else {
+        tags.forEach { tag ->
+            item(
+                key = "observed_tag_${tag.name}",
+                contentType = "observed_tag",
+            ) {
+                ObservedTagItem(
+                    tag = tag,
+                    onClick = { actions.onTagClicked(tag.name) },
+                )
+            }
         }
     }
 }

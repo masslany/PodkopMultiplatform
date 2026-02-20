@@ -1,6 +1,8 @@
 package pl.masslany.podkop.business.profile.data.network.api
 
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ObservedTagsResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ObservedUsersResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileShortDto
 import pl.masslany.podkop.business.profile.data.network.models.UsersAutoCompleteResponseDto
@@ -67,15 +69,15 @@ interface ProfileApi {
     suspend fun getProfileObservedTags(
         username: String,
         page: Int,
-    ): Result<ResourceResponseDto>
+    ): Result<ObservedTagsResponseDto>
 
     suspend fun getProfileObservedUsersFollowing(
         username: String,
         page: Int,
-    ): Result<ResourceResponseDto>
+    ): Result<ObservedUsersResponseDto>
 
     suspend fun getProfileObservedUsersFollowers(
         username: String,
         page: Int,
-    ): Result<ResourceResponseDto>
+    ): Result<ObservedUsersResponseDto>
 }
