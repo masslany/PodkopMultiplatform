@@ -28,6 +28,7 @@ import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentIte
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 import pl.masslany.podkop.features.resources.models.toResourceItemState
+import pl.masslany.podkop.features.tag.TagScreen
 
 open class BaseResourceItemStateHolder(
     private val linksRepository: LinksRepository,
@@ -111,6 +112,7 @@ open class BaseResourceItemStateHolder(
 
     override fun onTagClicked(tag: String) {
         logger.debug("Tag clicked: $tag")
+        appNavigator.navigateTo(TagScreen(tag = tag))
     }
 
     override fun onProfileClicked(username: String) {

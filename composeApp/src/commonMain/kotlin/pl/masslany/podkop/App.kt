@@ -43,6 +43,8 @@ import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.ProfileScreenRoot
 import pl.masslany.podkop.features.settings.SettingsScreen
 import pl.masslany.podkop.features.settings.SettingsScreenRoot
+import pl.masslany.podkop.features.tag.TagScreen
+import pl.masslany.podkop.features.tag.TagScreenRoot
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -119,6 +121,13 @@ fun App() {
 
                     entry<DebugScreen> {
                         DebugScreenRoot(
+                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<TagScreen> {
+                        TagScreenRoot(
+                            tag = it.tag,
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )
                     }
