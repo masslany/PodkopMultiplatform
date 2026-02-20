@@ -14,6 +14,7 @@ import pl.masslany.podkop.business.hits.domain.models.request.HitsSortType
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksType
+import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.models.toDropdownMenuItemType
@@ -24,10 +25,11 @@ import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 class LinksViewModel(
-    val isUpcoming: Boolean,
-    val linksRepository: LinksRepository,
-    val hitsRepository: HitsRepository,
-    val linksResourceItemStateHolder: LinksResourceItemStateHolder,
+    private val isUpcoming: Boolean,
+    private val linksRepository: LinksRepository,
+    private val hitsRepository: HitsRepository,
+    private val linksResourceItemStateHolder: LinksResourceItemStateHolder,
+    private val logger: AppLogger,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     LinksActions,
@@ -105,7 +107,7 @@ class LinksViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to load links", it)
                 }
 
             if (!isUpcoming) {
@@ -114,7 +116,7 @@ class LinksViewModel(
                         linksResourceItemStateHolder.updateHits(it.data)
                     }
                     .onFailure {
-                        println("DBG --> failed to load hits with $it")
+                        logger.error("Failed to load hits", it)
                     }
             }
         }
@@ -147,7 +149,7 @@ class LinksViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to load links for sort type $sortType", it)
                 }
         }
     }
@@ -190,12 +192,15 @@ class LinksViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to refresh links for sort type $sortType", it)
                 }
         }
     }
 
-    override fun shouldPaginate(lastVisibleIndex: Int?, totalItems: Int): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
+    override fun shouldPaginate(
+        lastVisibleIndex: Int?,
+        totalItems: Int,
+    ): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
 
     override fun paginate() {
         paginator.paginate()

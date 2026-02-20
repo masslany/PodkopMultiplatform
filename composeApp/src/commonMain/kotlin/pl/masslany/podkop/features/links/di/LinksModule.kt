@@ -13,6 +13,7 @@ val linksModule = module {
             linksRepository = get(),
             hitsRepository = get(),
             linksResourceItemStateHolder = get(),
+            logger = get(),
             topBarActions = get(),
         )
     }
@@ -22,6 +23,7 @@ val linksModule = module {
             entriesRepository = get(),
             appNavigator = get(),
             dispatcherProvider = get(),
+            logger = get(),
         )
     }
 }

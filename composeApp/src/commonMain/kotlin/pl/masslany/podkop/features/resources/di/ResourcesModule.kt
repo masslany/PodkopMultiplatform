@@ -11,6 +11,7 @@ val resourcesModule = module {
             entriesRepository = get(),
             appNavigator = get(),
             dispatcherProvider = get(),
+            logger = get(),
         )
     }
 }

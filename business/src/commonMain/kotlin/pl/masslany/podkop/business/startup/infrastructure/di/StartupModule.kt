@@ -8,7 +8,8 @@ val startupModule = module {
     single<StartupManager> {
         StartupManagerImpl(
             configStorage = get(),
-            authRepository = get()
+            authRepository = get(),
+            logger = get(),
         )
     }
 }

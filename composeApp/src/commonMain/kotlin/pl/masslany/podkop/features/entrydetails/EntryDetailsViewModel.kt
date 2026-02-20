@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
+import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
@@ -22,6 +23,7 @@ class EntryDetailsViewModel(
     private val id: Int,
     private val entriesRepository: EntriesRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
+    private val logger: AppLogger,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     EntryDetailsActions,
@@ -49,7 +51,7 @@ class EntryDetailsViewModel(
         resourceItemStateHolder.items,
         paginator.state,
     ) { state, comments, paginator ->
-        println("DBG ---> $comments")
+        logger.debug("Entry details comments updated: $comments")
         state.copy(
             comments = comments,
             isPaginating = paginator is PaginatorState.Loading,
@@ -72,7 +74,7 @@ class EntryDetailsViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to load entry details for id=$id", it)
                 }
 
             entriesRepository.getEntryComments(
@@ -89,7 +91,7 @@ class EntryDetailsViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to load entry comments for id=$id", it)
                 }
         }
     }
@@ -118,12 +120,15 @@ class EntryDetailsViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to refresh entries in entry details for id=$id", it)
                 }
         }
     }
 
-    override fun shouldPaginate(lastVisibleIndex: Int?, totalItems: Int): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
+    override fun shouldPaginate(
+        lastVisibleIndex: Int?,
+        totalItems: Int,
+    ): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
 
     override fun paginate() {
         paginator.paginate()

@@ -15,6 +15,7 @@ import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.common.configstorage.api.ConfigStorage
+import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
@@ -42,6 +43,7 @@ class ProfileViewModel(
     private val profileRepository: ProfileRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val appNavigator: AppNavigator,
+    private val logger: AppLogger,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     ProfileActions,
@@ -147,7 +149,7 @@ class ProfileViewModel(
                     appNavigator.openExternalLink(connectUrl)
                 }
                 .onFailure {
-                    println("DBG --> failed to resolve wykop connect url: $it")
+                    logger.error("Failed to resolve wykop connect url", it)
                 }
         }
     }
@@ -237,7 +239,10 @@ class ProfileViewModel(
         }
     }
 
-    override fun shouldPaginate(lastVisibleIndex: Int?, totalItems: Int): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
+    override fun shouldPaginate(
+        lastVisibleIndex: Int?,
+        totalItems: Int,
+    ): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
 
     override fun paginate() {
         if (_state.value.isResourcesLoading) return
@@ -327,7 +332,7 @@ class ProfileViewModel(
                     content = ProfileContentState.Error,
                 )
             }
-            println("DBG --> failed to load profile with $it")
+            logger.error("Failed to load profile", it)
         }
     }
 
@@ -402,7 +407,7 @@ class ProfileViewModel(
                     isResourcesLoading = false,
                 )
             }
-            println("DBG --> failed to load profile resources for $subActionType with $it")
+            logger.error("Failed to load profile resources for $subActionType", it)
         }
     }
 

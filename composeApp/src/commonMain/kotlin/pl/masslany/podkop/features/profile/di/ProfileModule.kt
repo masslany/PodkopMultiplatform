@@ -13,6 +13,7 @@ val profileModule = module {
             profileRepository = get(),
             resourceItemStateHolder = get(),
             appNavigator = get(),
+            logger = get(),
             topBarActions = get(),
         )
     }

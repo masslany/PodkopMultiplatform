@@ -14,6 +14,7 @@ val mainModule = module {
         ExternalBrowser(
             activityProvider = { get<AndroidActivityHolder>().activity },
             application = androidApplication(),
+            logger = get(),
         )
     }
 

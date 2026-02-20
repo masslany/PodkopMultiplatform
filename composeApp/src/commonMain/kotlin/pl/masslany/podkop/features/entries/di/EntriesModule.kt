@@ -9,6 +9,7 @@ val entriesModule = module {
         EntriesViewModel(
             entriesRepository = get(),
             resourceItemStateHolder = get(),
+            logger = get(),
             topBarActions = get(),
         )
     }

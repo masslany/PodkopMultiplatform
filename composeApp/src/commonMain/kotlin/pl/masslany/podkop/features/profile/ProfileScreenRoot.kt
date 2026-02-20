@@ -130,12 +130,15 @@ fun ProfileScreenRoot(
                                 Text(text = username ?: profileLabel)
                             }
                         }
+
                         ProfileContentState.Error -> {
                             Text(text = stringResource(resource = Res.string.topbar_label_profile))
                         }
+
                         ProfileContentState.LoggedOut -> {
                             Text(text = stringResource(resource = Res.string.topbar_label_profile))
                         }
+
                         ProfileContentState.Empty -> Unit
                     }
                 },

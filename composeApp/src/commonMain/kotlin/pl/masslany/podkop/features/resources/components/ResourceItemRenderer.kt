@@ -150,7 +150,6 @@ private fun LinkItemRenderer(
     Column(
         modifier = modifier,
     ) {
-        println("MEOW link comments = ${state.comments}")
         LinkItem(
             state = state,
             onLinkClick = { actions.onLinkClicked(state.id) },

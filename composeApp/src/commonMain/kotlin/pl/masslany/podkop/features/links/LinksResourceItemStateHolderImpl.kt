@@ -11,6 +11,7 @@ import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
+import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.links.hits.models.toHitItemState
 import pl.masslany.podkop.features.resources.BaseResourceItemStateHolder
@@ -21,11 +22,13 @@ class LinksResourceItemStateHolderImpl(
     entriesRepository: EntriesRepository,
     appNavigator: AppNavigator,
     dispatcherProvider: DispatcherProvider,
+    logger: AppLogger,
 ) : BaseResourceItemStateHolder(
     entriesRepository = entriesRepository,
     linksRepository = linksRepository,
     appNavigator = appNavigator,
     dispatcherProvider = dispatcherProvider,
+    logger = logger,
 ),
     LinksResourceItemStateHolder {
 

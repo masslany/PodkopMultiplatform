@@ -33,6 +33,7 @@ kotlin {
 
         androidMain.dependencies {
             api(libs.ktor.client.okhttp)
+            implementation(libs.timber)
         }
         
         iosMain.dependencies {

@@ -27,6 +27,7 @@ val iOSModule = module {
     single {
         ExternalBrowser(
             viewControllerProvider = get<IOSViewControllerHolder>().provider,
+            logger = get(),
         )
     }
     single { ImageDownloader() }

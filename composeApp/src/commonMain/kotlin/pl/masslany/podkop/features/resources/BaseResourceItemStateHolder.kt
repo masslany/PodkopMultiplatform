@@ -15,6 +15,7 @@ import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
+import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
@@ -33,6 +34,7 @@ open class BaseResourceItemStateHolder(
     private val entriesRepository: EntriesRepository,
     private val appNavigator: AppNavigator,
     private val dispatcherProvider: DispatcherProvider,
+    private val logger: AppLogger,
 ) : ResourceItemStateHolder {
 
     private val _items = MutableStateFlow<ImmutableList<ResourceItemState>>(persistentListOf())
@@ -89,11 +91,11 @@ open class BaseResourceItemStateHolder(
             result.onSuccess {
                 linksRepository.getLink(id)
                     .onSuccess {
-                        println("DBG ---> link updated: $it")
+                        logger.debug("Link updated: $it")
                         notifyItemUpdated(it.data)
                     }
                     .onFailure {
-                        println("DBG ---> link updated failed: $it")
+                        logger.error("Link update fetch failed for id=$id", it)
                     }
             }
         }
@@ -108,7 +110,7 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onTagClicked(tag: String) {
-        println("DBG ---> tag clicked: $tag")
+        logger.debug("Tag clicked: $tag")
     }
 
     override fun onProfileClicked(username: String) {

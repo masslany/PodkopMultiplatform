@@ -10,6 +10,7 @@ val entryDetailsModule = module {
             id = params.get<Int>(),
             entriesRepository = get(),
             resourceItemStateHolder = get(),
+            logger = get(),
             topBarActions = get(),
         )
     }

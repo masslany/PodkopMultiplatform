@@ -5,8 +5,13 @@ import android.app.Application
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import pl.masslany.podkop.common.logging.api.AppLogger
 
-actual class ExternalBrowser(private val activityProvider: () -> Activity?, private val application: Application) {
+actual class ExternalBrowser(
+    private val activityProvider: () -> Activity?,
+    private val application: Application,
+    private val logger: AppLogger,
+) {
 
     actual fun open(url: String) {
         val uri = url.toUri()
@@ -20,7 +25,7 @@ actual class ExternalBrowser(private val activityProvider: () -> Activity?, priv
                     .launchUrl(activity, uri)
                 return
             } catch (e: Exception) {
-                println("CustomTabsIntent.Builder.build() failed with $e")
+                logger.warn("Custom tabs failed, falling back to default browser", e)
             }
         }
 
@@ -31,7 +36,7 @@ actual class ExternalBrowser(private val activityProvider: () -> Activity?, priv
         try {
             application.startActivity(intent)
         } catch (e: Exception) {
-            println("application.startActivity failed with $e")
+            logger.error("application.startActivity failed for url=$url", e)
         }
     }
 }

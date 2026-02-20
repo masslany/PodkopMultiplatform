@@ -5,10 +5,12 @@ import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.configstorage.api.ConfigStorage
+import pl.masslany.podkop.common.logging.api.AppLogger
 
 internal class StartupManagerImpl(
     private val configStorage: ConfigStorage,
     private val authRepository: AuthRepository,
+    private val logger: AppLogger,
 ): StartupManager {
     override val state = MutableStateFlow<AppState>(AppState.Initializing)
 
@@ -21,7 +23,7 @@ internal class StartupManagerImpl(
                     state.emit(AppState.Ready)
                 },
                 onFailure = {
-                    println("Failed to get auth token $it")
+                    logger.error("Failed to get auth token", it)
                     state.emit(AppState.Error)
                 }
             )

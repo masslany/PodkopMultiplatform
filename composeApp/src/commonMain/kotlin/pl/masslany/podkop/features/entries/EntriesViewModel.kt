@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
+import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.models.toDropdownMenuItemType
@@ -26,6 +27,7 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 class EntriesViewModel(
     private val entriesRepository: EntriesRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
+    private val logger: AppLogger,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     EntriesActions,
@@ -111,7 +113,7 @@ class EntriesViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to load entries", it)
                 }
         }
     }
@@ -144,7 +146,7 @@ class EntriesViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to load entries for sort type $sortType", it)
                 }
         }
     }
@@ -189,7 +191,7 @@ class EntriesViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to load hot entries for sort type $sortType", it)
                 }
         }
     }
@@ -230,12 +232,15 @@ class EntriesViewModel(
                     }
                 }
                 .onFailure {
-                    println("DBG --> failed to load links with $it")
+                    logger.error("Failed to refresh entries for sort type $sortType", it)
                 }
         }
     }
 
-    override fun shouldPaginate(lastVisibleIndex: Int?, totalItems: Int): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
+    override fun shouldPaginate(
+        lastVisibleIndex: Int?,
+        totalItems: Int,
+    ): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
 
     override fun paginate() {
         paginator.paginate()
