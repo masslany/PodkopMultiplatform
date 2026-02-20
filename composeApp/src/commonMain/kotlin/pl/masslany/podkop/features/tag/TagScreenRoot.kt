@@ -56,6 +56,7 @@ import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
+import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -68,6 +69,7 @@ import podkop.composeapp.generated.resources.accessibility_topbar_profile
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_person
+import podkop.composeapp.generated.resources.tag_details_screen_error_loading_tags
 
 private const val FabItemsOffset = 10
 private val TagBannerHeight = 160.dp
@@ -189,6 +191,13 @@ fun TagScreenRoot(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 }
+            } else if (state.isError) {
+                GenericErrorScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
+                    onRefreshClicked = viewModel::onRefresh,
+                )
             } else {
                 TagScreen(
                     modifier = Modifier.fillMaxSize(),
@@ -248,6 +257,18 @@ private fun TagScreen(
                 text = "#${state.tag}",
                 style = MaterialTheme.typography.headlineSmall,
             )
+        }
+
+        if (state.isTagContentError) {
+            item(
+                key = "TagContentError",
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = stringResource(resource = Res.string.tag_details_screen_error_loading_tags),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
         }
 
         item(

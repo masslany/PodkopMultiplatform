@@ -55,6 +55,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isAuthorReply
 import pl.masslany.podkop.common.extensions.isScrollingUp
@@ -67,6 +68,7 @@ import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.accessibility_topbar_profile
+import podkop.composeapp.generated.resources.entry_details_screen_error_loading_comments
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_person
@@ -184,6 +186,13 @@ fun EntryDetailsScreenRoot(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 }
+            } else if (state.isError) {
+                GenericErrorScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Alignment.Center),
+                    onRefreshClicked = viewModel::onRefresh,
+                )
             } else {
                 EntryDetailsScreen(
                     modifier = Modifier
@@ -231,6 +240,18 @@ private fun EntryDetailsScreen(
                     )
                     Spacer(modifier = Modifier.height(32.dp))
                 }
+            }
+        }
+
+        if (state.isCommentsError) {
+            item(
+                key = "CommentsContextError",
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = stringResource(resource = Res.string.entry_details_screen_error_loading_comments),
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
         }
 

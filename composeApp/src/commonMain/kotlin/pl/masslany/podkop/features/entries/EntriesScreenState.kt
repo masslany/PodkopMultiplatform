@@ -8,6 +8,7 @@ import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 data class EntriesScreenState(
     val isLoading: Boolean,
+    val isError: Boolean,
     val isRefreshing: Boolean,
     val entries: ImmutableList<ResourceItemState>,
     val sortMenuState: DropdownMenuState,
@@ -17,6 +18,7 @@ data class EntriesScreenState(
     companion object Companion {
         val initial = EntriesScreenState(
             isLoading = true,
+            isError = false,
             isRefreshing = false,
             entries = persistentListOf(),
             sortMenuState = DropdownMenuState.initial,
@@ -71,6 +73,10 @@ data class EntriesScreenState(
 
     fun updateLoading(isLoading: Boolean) = this.copy(
         isLoading = isLoading,
+    )
+
+    fun updateError(isError: Boolean) = this.copy(
+        isError = isError,
     )
 
     fun updateRefreshing(isRefreshing: Boolean) = this.copy(

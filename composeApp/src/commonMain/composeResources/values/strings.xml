@@ -142,6 +142,10 @@
     <string name="tag_details_screen_observed_button">Obserwowany</string>
     <string name="tag_details_screen_no_results_label">Brak wyników</string>
     <string name="tag_details_screen_error_label">Wystąpił problem podczas wczytywania danych</string>
+    <string name="tag_details_screen_error_loading_tags">Wystąpił problem podczas wczytywania tagu</string>
+
+    <!-- Entry details -->
+    <string name="entry_details_screen_error_loading_comments">Wystąpił problem podczas wczytywania komentarzy</string>
 
     <!-- Search -->
     <string name="search_screen_text_field_placeholder">Wyszukaj użytkownika, tag...</string>

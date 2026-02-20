@@ -21,6 +21,8 @@ import pl.masslany.podkop.common.models.toHotSortType
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.snackbar.SnackbarManager
+import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -28,6 +30,7 @@ class EntriesViewModel(
     private val entriesRepository: EntriesRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
+    private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     EntriesActions,
@@ -41,6 +44,10 @@ class EntriesViewModel(
         scope = viewModelScope,
         onNewItems = { data ->
             resourceItemStateHolder.appendData(data)
+        },
+        onError = {
+            logger.error("Failed to load paginated entries", it)
+            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         entriesRepository.getEntries(
@@ -109,11 +116,18 @@ class EntriesViewModel(
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
+                            .updateError(false)
                             .updateRefreshing(false)
                     }
                 }
                 .onFailure {
                     logger.error("Failed to load entries", it)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateError(true)
+                            .updateRefreshing(false)
+                    }
                 }
         }
     }
@@ -125,6 +139,7 @@ class EntriesViewModel(
         _state.update { previousState ->
             previousState
                 .updateSortMenuSelected(sortType, hotSortTypes)
+                .updateError(false)
                 .updateRefreshing(true)
         }
         viewModelScope.launch {
@@ -142,11 +157,20 @@ class EntriesViewModel(
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
+                            .updateError(false)
                             .updateRefreshing(false)
                     }
                 }
                 .onFailure {
                     logger.error("Failed to load entries for sort type $sortType", it)
+                    val shouldShowErrorScreen = state.value.entries.isEmpty()
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                            .updateError(shouldShowErrorScreen)
+                    }
+                    snackbarManager.tryEmitGenericError()
                 }
         }
     }
@@ -170,6 +194,7 @@ class EntriesViewModel(
         _state.update { previousState ->
             previousState
                 .updateHotSortMenuSelected(sortType)
+                .updateError(false)
                 .updateRefreshing(true)
         }
         viewModelScope.launch {
@@ -187,11 +212,20 @@ class EntriesViewModel(
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
+                            .updateError(false)
                             .updateRefreshing(false)
                     }
                 }
                 .onFailure {
                     logger.error("Failed to load hot entries for sort type $sortType", it)
+                    val shouldShowErrorScreen = state.value.entries.isEmpty()
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                            .updateError(shouldShowErrorScreen)
+                    }
+                    snackbarManager.tryEmitGenericError()
                 }
         }
     }
@@ -211,6 +245,7 @@ class EntriesViewModel(
     override fun onRefresh(sortType: DropdownMenuItemType) {
         _state.update { previousState ->
             previousState
+                .updateError(false)
                 .updateRefreshing(true)
         }
         viewModelScope.launch {
@@ -228,11 +263,20 @@ class EntriesViewModel(
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
+                            .updateError(false)
                             .updateRefreshing(false)
                     }
                 }
                 .onFailure {
                     logger.error("Failed to refresh entries for sort type $sortType", it)
+                    val shouldShowErrorScreen = state.value.entries.isEmpty()
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                            .updateError(shouldShowErrorScreen)
+                    }
+                    snackbarManager.tryEmitGenericError()
                 }
         }
     }

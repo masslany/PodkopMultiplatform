@@ -22,6 +22,8 @@ import pl.masslany.podkop.common.models.toLinksSortType
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.snackbar.SnackbarManager
+import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 class LinksViewModel(
@@ -30,6 +32,7 @@ class LinksViewModel(
     private val hitsRepository: HitsRepository,
     private val linksResourceItemStateHolder: LinksResourceItemStateHolder,
     private val logger: AppLogger,
+    private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     LinksActions,
@@ -43,6 +46,10 @@ class LinksViewModel(
         scope = viewModelScope,
         onNewItems = { data ->
             linksResourceItemStateHolder.appendData(data)
+        },
+        onError = {
+            logger.error("Failed to load paginated links", it)
+            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         linksRepository.getLinks(
@@ -103,11 +110,18 @@ class LinksViewModel(
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
+                            .updateError(false)
                             .updateRefreshing(false)
                     }
                 }
                 .onFailure {
                     logger.error("Failed to load links", it)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateError(true)
+                            .updateRefreshing(false)
+                    }
                 }
 
             if (!isUpcoming) {
@@ -128,6 +142,7 @@ class LinksViewModel(
         _state.update { previousState ->
             previousState
                 .updateSortMenuSelected(sortType)
+                .updateError(false)
                 .updateRefreshing(true)
         }
         viewModelScope.launch {
@@ -145,11 +160,20 @@ class LinksViewModel(
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
+                            .updateError(false)
                             .updateRefreshing(false)
                     }
                 }
                 .onFailure {
                     logger.error("Failed to load links for sort type $sortType", it)
+                    val shouldShowErrorScreen = state.value.links.isEmpty()
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                            .updateError(shouldShowErrorScreen)
+                    }
+                    snackbarManager.tryEmitGenericError()
                 }
         }
     }
@@ -171,6 +195,7 @@ class LinksViewModel(
 
         _state.update { previousState ->
             previousState
+                .updateError(false)
                 .updateRefreshing(true)
         }
         viewModelScope.launch {
@@ -188,11 +213,20 @@ class LinksViewModel(
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
+                            .updateError(false)
                             .updateRefreshing(false)
                     }
                 }
                 .onFailure {
                     logger.error("Failed to refresh links for sort type $sortType", it)
+                    val shouldShowErrorScreen = state.value.links.isEmpty()
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                            .updateError(shouldShowErrorScreen)
+                    }
+                    snackbarManager.tryEmitGenericError()
                 }
         }
     }

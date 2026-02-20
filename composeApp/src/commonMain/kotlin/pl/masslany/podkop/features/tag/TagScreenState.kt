@@ -10,7 +10,9 @@ data class TagScreenState(
     val tag: String,
     val bannerUrl: String,
     val isLoading: Boolean,
+    val isError: Boolean,
     val isRefreshing: Boolean,
+    val isTagContentError: Boolean,
     val resources: ImmutableList<ResourceItemState>,
     val sortMenuState: DropdownMenuState,
     val typeMenuState: DropdownMenuState,
@@ -21,7 +23,9 @@ data class TagScreenState(
             tag = "",
             bannerUrl = "",
             isLoading = true,
+            isError = false,
             isRefreshing = false,
+            isTagContentError = false,
             resources = persistentListOf(),
             sortMenuState = DropdownMenuState.initial,
             typeMenuState = DropdownMenuState.initial,
@@ -77,6 +81,14 @@ data class TagScreenState(
 
     fun updateLoading(isLoading: Boolean) = this.copy(
         isLoading = isLoading,
+    )
+
+    fun updateError(isError: Boolean) = this.copy(
+        isError = isError,
+    )
+
+    fun updateTagContentError(isTagContentError: Boolean) = this.copy(
+        isTagContentError = isTagContentError,
     )
 
     fun updateRefreshing(isRefreshing: Boolean) = this.copy(

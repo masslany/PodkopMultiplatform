@@ -14,6 +14,7 @@ val profileModule = module {
             resourceItemStateHolder = get(),
             appNavigator = get(),
             logger = get(),
+            snackbarManager = get(),
             topBarActions = get(),
         )
     }

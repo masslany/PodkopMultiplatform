@@ -48,13 +48,13 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.profile.components.ObservedTagItem
 import pl.masslany.podkop.features.profile.components.ObservedUserItem
-import pl.masslany.podkop.features.profile.components.ProfileErrorContent
 import pl.masslany.podkop.features.profile.components.ProfileHeader
 import pl.masslany.podkop.features.profile.components.ProfileLoggedOutContent
 import pl.masslany.podkop.features.profile.components.ProfileSubActionDropdown
@@ -250,8 +250,8 @@ private fun ProfileScreen(
             }
 
             ProfileContentState.Error -> {
-                ProfileErrorContent(
-                    onRetryClicked = actions::onRetryClicked,
+                GenericErrorScreen(
+                    onRefreshClicked = actions::onRetryClicked,
                 )
             }
         }

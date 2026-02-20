@@ -46,6 +46,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.components.DropdownMenu
+import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
@@ -139,6 +140,13 @@ fun EntriesScreenRoot(
                             modifier = Modifier.align(Alignment.Center),
                         )
                     }
+                } else if (state.isError) {
+                    GenericErrorScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center),
+                        onRefreshClicked = { viewModel.onRefresh(state.sortMenuState.selected) },
+                    )
                 } else {
                     EntriesScreen(
                         modifier = Modifier

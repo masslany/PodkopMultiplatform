@@ -18,11 +18,14 @@ import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
+import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.snackbar.SnackbarManager
+import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.linkdetails.models.LinkDetailsCommentItemState
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
@@ -36,6 +39,8 @@ class LinkDetailsViewModel(
     private val id: Int,
     private val linksRepository: LinksRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
+    private val logger: AppLogger,
+    private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     LinkDetailsActions,
@@ -71,6 +76,10 @@ class LinkDetailsViewModel(
         onNewItems = { data ->
             resourceItemStateHolder.appendData(data)
             appendCommentsRepliesState(data)
+        },
+        onError = {
+            logger.error("Failed to load paginated comments for link id=$id", it)
+            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         linksRepository.getComments(
@@ -216,10 +225,15 @@ class LinkDetailsViewModel(
                         )
                 }
             }.onFailure {
+                logger.error(
+                    "Failed to load replies for link id=$id, commentId=$commentId, page=$nextPage",
+                    it,
+                )
                 _commentRepliesStateById.update { previousState ->
                     val current = previousState[commentId] ?: return@update previousState
                     previousState + (commentId to current.copy(isLoadingReplies = false))
                 }
+                snackbarManager.tryEmitGenericError()
             }
         }
     }
@@ -256,6 +270,7 @@ class LinkDetailsViewModel(
         _state.update { previousState ->
             previousState.copy(
                 isLoading = !isRefreshing,
+                isError = false,
                 isRefreshing = isRefreshing,
                 commentsState = previousState.commentsState.toLoading(),
                 relatedState = LinkDetailsRelatedState.Loading,
@@ -280,7 +295,7 @@ class LinkDetailsViewModel(
                     linksRepository.getRelatedLinks(linkId = id)
                 }
 
-                linkDeferred.await()
+                val isLinkLoaded = linkDeferred.await()
                     .onSuccess { link ->
                         _state.update { previousState ->
                             previousState.copy(
@@ -288,11 +303,17 @@ class LinkDetailsViewModel(
                             )
                         }
                     }
+                    .onFailure {
+                        logger.error("Failed to load link details for id=$id", it)
+                    }
+                    .isSuccess
 
                 commentsDeferred.await().onSuccess { comments ->
                     onCommentsPageOneLoaded(comments)
                 }.onFailure {
+                    logger.error("Failed to load comments for link id=$id", it)
                     onCommentsPageOneLoadFailed()
+                    snackbarManager.tryEmitGenericError()
                 }
 
                 relatedDeferred.await()
@@ -312,12 +333,20 @@ class LinkDetailsViewModel(
                         }
                     }
                     .onFailure {
+                        logger.error("Failed to load related links for link id=$id", it)
                         _state.update { previousState ->
                             previousState.copy(
                                 relatedState = LinkDetailsRelatedState.Error,
                             )
                         }
+                        snackbarManager.tryEmitGenericError()
                     }
+
+                _state.update { previousState ->
+                    previousState.copy(
+                        isError = !isLinkLoaded,
+                    )
+                }
             }
 
             _state.update { previousState ->
@@ -340,7 +369,9 @@ class LinkDetailsViewModel(
             ).onSuccess { comments ->
                 onCommentsPageOneLoaded(comments)
             }.onFailure {
+                logger.error("Failed to load comments page one for link id=$id", it)
                 onCommentsPageOneLoadFailed()
+                snackbarManager.tryEmitGenericError()
             }
         }
     }

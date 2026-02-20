@@ -10,6 +10,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Pagination
 class Paginator<T>(
     private val scope: CoroutineScope,
     private val onNewItems: suspend (items: List<T>) -> Unit,
+    private val onError: suspend (Throwable) -> Unit = {},
     private val loader: suspend (PageRequest) -> Result<PaginatedData<T>>,
 ) {
 
@@ -71,6 +72,7 @@ class Paginator<T>(
                 }
                 .onFailure {
                     _state.value = PaginatorState.Error(it)
+                    onError(it)
                 }
         }
     }

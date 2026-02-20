@@ -11,6 +11,7 @@ val tagModule = module {
             tagsRepository = get(),
             resourceItemStateHolder = get(),
             logger = get(),
+            snackbarManager = get(),
             topBarActions = get(),
         )
     }

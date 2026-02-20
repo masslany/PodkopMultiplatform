@@ -11,6 +11,7 @@ val entriesModule = module {
             resourceItemStateHolder = get(),
             logger = get(),
             topBarActions = get(),
+            snackbarManager = get(),
         )
     }
 }

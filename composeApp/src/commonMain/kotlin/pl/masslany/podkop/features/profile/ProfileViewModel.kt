@@ -20,6 +20,8 @@ import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.pagination.toPage
+import pl.masslany.podkop.common.snackbar.SnackbarManager
+import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.profile.models.ProfileContentState
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileListItem
@@ -44,6 +46,7 @@ class ProfileViewModel(
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
+    private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     ProfileActions,
@@ -79,6 +82,10 @@ class ProfileViewModel(
                     items = mergedItems,
                 )
             }
+        },
+        onError = {
+            logger.error("Failed to load paginated profile list for $selectedSubActionType", it)
+            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val username = profileUsername

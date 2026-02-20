@@ -1,4 +1,4 @@
-package pl.masslany.podkop.features.profile.components
+package pl.masslany.podkop.common.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,13 +18,12 @@ import podkop.composeapp.generated.resources.generic_error_title
 import podkop.composeapp.generated.resources.refresh_button
 
 @Composable
-fun ProfileErrorContent(
+fun GenericErrorScreen(
+    onRefreshClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    onRetryClicked: () -> Unit,
 ) {
     Column(
-        modifier = modifier
-            .padding(horizontal = 24.dp),
+        modifier = modifier.padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -38,10 +37,8 @@ fun ProfileErrorContent(
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
         )
-        Button(onClick = onRetryClicked) {
-            Text(
-                text = stringResource(resource = Res.string.refresh_button),
-            )
+        Button(onClick = onRefreshClicked) {
+            Text(text = stringResource(resource = Res.string.refresh_button))
         }
     }
 }

@@ -5,6 +5,7 @@ import pl.masslany.podkop.features.resources.models.link.LinkItemState
 
 data class LinkDetailsScreenState(
     val isLoading: Boolean,
+    val isError: Boolean,
     val isRefreshing: Boolean,
     val link: LinkItemState?,
     val commentsState: LinkDetailsCommentsState,
@@ -13,6 +14,7 @@ data class LinkDetailsScreenState(
     companion object Companion {
         val initial = LinkDetailsScreenState(
             isLoading = true,
+            isError = false,
             isRefreshing = false,
             link = null,
             commentsState = LinkDetailsCommentsState.Loading(

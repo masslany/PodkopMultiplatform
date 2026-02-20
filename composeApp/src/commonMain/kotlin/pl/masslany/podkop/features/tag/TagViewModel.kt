@@ -18,6 +18,8 @@ import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.snackbar.SnackbarManager
+import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -26,6 +28,7 @@ class TagViewModel(
     private val tagsRepository: TagsRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
+    private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     TagActions,
@@ -39,6 +42,10 @@ class TagViewModel(
         scope = viewModelScope,
         onNewItems = { data ->
             resourceItemStateHolder.appendData(data)
+        },
+        onError = {
+            logger.error("Failed to load paginated tag stream for $tag", it)
+            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         tagsRepository.getTagStream(
@@ -89,6 +96,7 @@ class TagViewModel(
         }
 
         loadTagDetails()
+        loadTagStream()
     }
 
     override fun onSortSelected(sortType: DropdownMenuItemType) {
@@ -96,6 +104,7 @@ class TagViewModel(
         _state.update { previousState ->
             previousState
                 .updateSortMenuSelected(sortType)
+                .updateError(false)
                 .updateRefreshing(true)
         }
         loadTagStream()
@@ -118,6 +127,7 @@ class TagViewModel(
         _state.update { previousState ->
             previousState
                 .updateTypeMenuSelected(type)
+                .updateError(false)
                 .updateRefreshing(true)
         }
         loadTagStream()
@@ -137,8 +147,11 @@ class TagViewModel(
 
     override fun onRefresh() {
         _state.update { previousState ->
-            previousState.updateRefreshing(true)
+            previousState
+                .updateError(false)
+                .updateRefreshing(true)
         }
+        loadTagDetails()
         loadTagStream()
     }
 
@@ -156,14 +169,19 @@ class TagViewModel(
             tagsRepository.getTagDetails(tagName = tag)
                 .onSuccess { details ->
                     _state.update { previousState ->
-                        previousState.updateBannerUrl(
-                            details.media?.photo?.url ?: details.media?.embed?.thumbnail.orEmpty(),
-                        )
+                        previousState
+                            .updateBannerUrl(
+                                details.media?.photo?.url ?: details.media?.embed?.thumbnail.orEmpty(),
+                            )
+                            .updateTagContentError(false)
                     }
-                    loadTagStream()
                 }
                 .onFailure {
                     logger.error("Failed to load tag details for $tag", it)
+                    _state.update { previousState ->
+                        previousState.updateTagContentError(true)
+                    }
+                    snackbarManager.tryEmitGenericError()
                 }
         }
     }
@@ -183,16 +201,20 @@ class TagViewModel(
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
+                            .updateError(false)
                             .updateRefreshing(false)
                     }
                 }
                 .onFailure {
                     logger.error("Failed to load tag stream for $tag", it)
+                    val shouldShowErrorScreen = state.value.resources.isEmpty()
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
+                            .updateError(shouldShowErrorScreen)
                             .updateRefreshing(false)
                     }
+                    snackbarManager.tryEmitGenericError()
                 }
         }
     }

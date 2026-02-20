@@ -2,6 +2,8 @@ package pl.masslany.podkop.features.entrydetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.combine
@@ -9,12 +11,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
-import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
-import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.snackbar.SnackbarManager
+import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.resources.models.toResourceItemState
 import pl.masslany.podkop.features.topbar.TopBarActions
@@ -24,6 +26,7 @@ class EntryDetailsViewModel(
     private val entriesRepository: EntriesRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
+    private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     EntryDetailsActions,
@@ -34,6 +37,10 @@ class EntryDetailsViewModel(
         scope = viewModelScope,
         onNewItems = { data ->
             resourceItemStateHolder.appendData(data)
+        },
+        onError = {
+            logger.error("Failed to load paginated entry comments for id=$id", it)
+            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         entriesRepository.getEntryComments(
@@ -60,68 +67,71 @@ class EntryDetailsViewModel(
 
     init {
         resourceItemStateHolder.init(viewModelScope)
-
-        _state.update { previousState ->
-            previousState
-                .updateLoading(true)
-        }
-
-        viewModelScope.launch {
-            entriesRepository.getEntry(entryId = id)
-                .onSuccess {
-                    _state.update { previousState ->
-                        previousState.copy(entry = it.toResourceItemState())
-                    }
-                }
-                .onFailure {
-                    logger.error("Failed to load entry details for id=$id", it)
-                }
-
-            entriesRepository.getEntryComments(
-                entryId = id,
-                page = 1,
-            )
-                .onSuccess {
-                    resourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
-                    _state.update { previousState ->
-                        previousState
-                            .updateLoading(false)
-                            .updateRefreshing(false)
-                    }
-                }
-                .onFailure {
-                    logger.error("Failed to load entry comments for id=$id", it)
-                }
-        }
+        loadContent(isRefreshing = false)
     }
 
     override fun onRefresh() {
+        loadContent(isRefreshing = true)
+    }
+
+    private fun loadContent(isRefreshing: Boolean) {
         _state.update { previousState ->
             previousState
-                .updateRefreshing(true)
+                .updateLoading(!isRefreshing)
+                .updateError(false)
+                .updateCommentsError(false)
+                .updateRefreshing(isRefreshing)
         }
+
         viewModelScope.launch {
-            entriesRepository.getEntries(
-                page = 1,
-                limit = null,
-                entriesSortType = EntriesSortType.Hot,
-                hotSortType = HotSortType.TwelveHours,
-                category = null,
-                bucket = null,
-            )
-                .onSuccess {
-                    resourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
-                    _state.update { previousState ->
-                        previousState
-                            .updateLoading(false)
-                            .updateRefreshing(false)
+            coroutineScope {
+                val entryDeferred = async {
+                    entriesRepository.getEntry(entryId = id)
+                }
+                val commentsDeferred = async {
+                    entriesRepository.getEntryComments(
+                        entryId = id,
+                        page = 1,
+                    )
+                }
+
+                val isEntryLoaded = entryDeferred.await()
+                    .onSuccess {
+                        _state.update { previousState ->
+                            previousState.copy(entry = it.toResourceItemState())
+                        }
                     }
+                    .onFailure {
+                        logger.error("Failed to load entry details for id=$id", it)
+                    }
+                    .isSuccess
+
+                commentsDeferred.await()
+                    .onSuccess { comments ->
+                        resourceItemStateHolder.updateData(comments.data)
+                        paginator.setup(comments.pagination, comments.data.size)
+                        _state.update { previousState ->
+                            previousState.updateCommentsError(false)
+                        }
+                    }
+                    .onFailure {
+                        logger.error("Failed to load entry comments for id=$id", it)
+                        _state.update { previousState ->
+                            previousState.updateCommentsError(true)
+                        }
+                        snackbarManager.tryEmitGenericError()
+                    }
+
+                _state.update { previousState ->
+                    previousState.updateError(!isEntryLoaded)
                 }
-                .onFailure {
-                    logger.error("Failed to refresh entries in entry details for id=$id", it)
-                }
+            }
+
+            _state.update { previousState ->
+                previousState
+                    .updateLoading(false)
+                    .updateRefreshing(false)
+            }
         }
     }
 
