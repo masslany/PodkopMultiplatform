@@ -61,6 +61,7 @@ fun LinkItem(
     onTagClick: (String) -> Unit,
     onSourceClick: () -> Unit,
     onProfileClicked: (String) -> Unit,
+    onUrlClicked: (String) -> Unit,
     onImageClicked: (String) -> Unit,
     onLinkCommentVoteUpClick: (linkId: Int, commentId: Int, voted: Boolean) -> Unit,
 ) {
@@ -192,6 +193,8 @@ fun LinkItem(
                             modifier = Modifier.padding(start = 16.dp),
                             state = comment,
                             onProfileClick = { onProfileClicked(it) },
+                            onTagClick = { onTagClick(it) },
+                            onUrlClick = { onUrlClicked(it) },
                             onImageClick = { onImageClicked(it) },
                             onVoteUpClick = {
                                 onLinkCommentVoteUpClick(
@@ -254,6 +257,7 @@ private fun LinkItemPreview() {
             onAuthorClick = {},
             onSourceClick = {},
             onProfileClicked = {},
+            onUrlClicked = {},
             onImageClicked = {},
             onLinkCommentVoteUpClick = { _, _, _ -> },
         )

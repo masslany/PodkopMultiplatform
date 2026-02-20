@@ -20,6 +20,8 @@ fun EntryItem(
     state: EntryItemState,
     modifier: Modifier = Modifier,
     onProfileClick: (String) -> Unit,
+    onTagClick: (String) -> Unit,
+    onUrlClick: (String) -> Unit,
     onVoteUpClick: () -> Unit,
     onImageClick: (String) -> Unit,
 ) {
@@ -56,7 +58,12 @@ fun EntryItem(
             )
         }
         Spacer(Modifier.size(8.dp))
-        EntryContent(state = state.entryContentState)
+        EntryContent(
+            state = state.entryContentState,
+            onProfileClick = onProfileClick,
+            onTagClick = onTagClick,
+            onUrlClick = onUrlClick,
+        )
         state.embedImageState?.let {
             Spacer(Modifier.size(8.dp))
             EmbedImage(

@@ -493,6 +493,8 @@ private fun LinkDetailsCommentItem(
                     modifier = Modifier.fillMaxWidth(),
                     state = state.comment,
                     onProfileClick = { actions.onProfileClicked(it) },
+                    onTagClick = { actions.onTagClicked(it) },
+                    onUrlClick = { actions.onLinkUrlClicked(it) },
                     onVoteUpClick = {
                         actions.onLinkCommentVoteUpClick(
                             linkId = state.comment.linkId,
@@ -515,6 +517,8 @@ private fun LinkDetailsCommentItem(
                             .fillMaxWidth(),
                         state = reply,
                         onProfileClick = { actions.onProfileClicked(it) },
+                        onTagClick = { actions.onTagClicked(it) },
+                        onUrlClick = { actions.onLinkUrlClicked(it) },
                         onVoteUpClick = {
                             actions.onLinkCommentVoteUpClick(
                                 linkId = reply.linkId,

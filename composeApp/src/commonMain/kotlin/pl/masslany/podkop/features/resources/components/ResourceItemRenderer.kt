@@ -72,6 +72,8 @@ private fun EntryItemRenderer(
                 EntryItem(
                     state = state,
                     onProfileClick = { actions.onProfileClicked(it) },
+                    onTagClick = { actions.onTagClicked(it) },
+                    onUrlClick = { actions.onLinkUrlClicked(it) },
                     onImageClick = { actions.onImageClicked(it) },
                     onVoteUpClick = {
                         actions.onEntryVoteUpClicked(
@@ -94,6 +96,8 @@ private fun EntryItemRenderer(
                             ),
                         state = comment,
                         onProfileClick = { actions.onProfileClicked(it) },
+                        onTagClick = { actions.onTagClicked(it) },
+                        onUrlClick = { actions.onLinkUrlClicked(it) },
                         onImageClick = { actions.onImageClicked(it) },
                         onVoteUpClick = {
                             actions.onEntryCommentVoteUpClick(
@@ -130,6 +134,8 @@ private fun EntryItemRenderer(
                 .clickable { actions.onEntryClicked(state.id) },
             state = state,
             onProfileClick = { actions.onProfileClicked(it) },
+            onTagClick = { actions.onTagClicked(it) },
+            onUrlClick = { actions.onLinkUrlClicked(it) },
             onImageClick = { actions.onImageClicked(it) },
             onVoteUpClick = {
                 actions.onEntryVoteUpClicked(
@@ -158,6 +164,7 @@ private fun LinkItemRenderer(
             onTagClick = { actions.onTagClicked(it) },
             onSourceClick = { actions.onLinkUrlClicked(state.sourceUrl) },
             onProfileClicked = { actions.onProfileClicked(it) },
+            onUrlClicked = { actions.onLinkUrlClicked(it) },
             onImageClicked = { actions.onImageClicked(it) },
             onLinkCommentVoteUpClick = { linkId, commentId, voted ->
                 actions.onLinkCommentVoteUpClick(
@@ -180,6 +187,8 @@ private fun EntryCommentItemRenderer(
         modifier = modifier,
         state = state,
         onProfileClick = { actions.onProfileClicked(it) },
+        onTagClick = { actions.onTagClicked(it) },
+        onUrlClick = { actions.onLinkUrlClicked(it) },
         onImageClick = { actions.onImageClicked(it) },
         onVoteUpClick = {
             actions.onEntryCommentVoteUpClick(
@@ -215,6 +224,8 @@ private fun LinkCommentItemRenderer(
         modifier = modifier,
         state = state,
         onProfileClick = { actions.onProfileClicked(it) },
+        onTagClick = { actions.onTagClicked(it) },
+        onUrlClick = { actions.onLinkUrlClicked(it) },
         onImageClick = { actions.onImageClicked(it) },
         onVoteUpClick = {
             actions.onLinkCommentVoteUpClick(

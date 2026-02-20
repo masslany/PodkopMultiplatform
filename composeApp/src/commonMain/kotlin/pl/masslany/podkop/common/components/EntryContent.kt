@@ -7,11 +7,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,31 +38,65 @@ import podkop.composeapp.generated.resources.comment_label_removed_by_author
 import podkop.composeapp.generated.resources.comment_label_removed_by_moderator
 
 @Composable
-fun EntryContent(state: EntryContentState) {
+fun EntryContent(
+    state: EntryContentState,
+    onProfileClick: (String) -> Unit,
+    onTagClick: (String) -> Unit,
+    onUrlClick: (String) -> Unit,
+) {
+    val profileClickHandler by rememberUpdatedState(onProfileClick)
+    val tagClickHandler by rememberUpdatedState(onTagClick)
+    val urlClickHandler by rememberUpdatedState(onUrlClick)
+    val uriHandler = remember {
+        object : UriHandler {
+            override fun openUri(uri: String) {
+                when {
+                    uri.startsWith("@") -> {
+                        uri.removePrefix("@")
+                            .takeIf(String::isNotBlank)
+                            ?.let(profileClickHandler)
+                            ?: urlClickHandler(uri)
+                    }
+
+                    uri.startsWith("#") -> {
+                        uri.removePrefix("#")
+                            .takeIf(String::isNotBlank)
+                            ?.let(tagClickHandler)
+                            ?: urlClickHandler(uri)
+                    }
+
+                    else -> urlClickHandler(uri)
+                }
+            }
+        }
+    }
+
     when (state) {
         is EntryContentState.Content -> {
             if (state.content.isNotEmpty()) {
-                Markdown(
-                    state = state.markdownState,
-                    modifier = Modifier.fillMaxWidth(),
-                    components = spoilerComponents,
-                    colors = markdownColor(
-                        text = MaterialTheme.colorScheme.onSurface,
-                    ),
-                    typography = markdownTypography(
-                        text = MaterialTheme.typography.bodySmall,
-                        paragraph = MaterialTheme.typography.bodySmall,
-                        textLink = TextLinkStyles(
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorsPalette.tagBlue,
-                            ).toSpanStyle(),
+                CompositionLocalProvider(LocalUriHandler provides uriHandler) {
+                    Markdown(
+                        state = state.markdownState,
+                        modifier = Modifier.fillMaxWidth(),
+                        components = spoilerComponents,
+                        colors = markdownColor(
+                            text = MaterialTheme.colorScheme.onSurface,
                         ),
-                    ),
-                    animations = markdownAnimations(
-                        animateTextSize = { this },
-                    ),
-                )
+                        typography = markdownTypography(
+                            text = MaterialTheme.typography.bodySmall,
+                            paragraph = MaterialTheme.typography.bodySmall,
+                            textLink = TextLinkStyles(
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorsPalette.tagBlue,
+                                ).toSpanStyle(),
+                            ),
+                        ),
+                        animations = markdownAnimations(
+                            animateTextSize = { this },
+                        ),
+                    )
+                }
             }
         }
 
