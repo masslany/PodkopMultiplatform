@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,20 +29,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.features.profile.components.ProfileHeader
+import pl.masslany.podkop.features.profile.components.ProfileSummary
+import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
+import pl.masslany.podkop.features.resources.models.ResourceItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.accessibility_topbar_settings
+import podkop.composeapp.generated.resources.generic_error_body
+import podkop.composeapp.generated.resources.generic_error_title
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_settings
 import podkop.composeapp.generated.resources.profile_log_in_button
 import podkop.composeapp.generated.resources.profile_not_logged_in_message
+import podkop.composeapp.generated.resources.refresh_button
 import podkop.composeapp.generated.resources.topbar_label_profile
 import podkop.composeapp.generated.resources.user_profile_not_logged_in
 
@@ -79,9 +90,7 @@ fun ProfileScreenRoot(
                     }
                 },
                 actions = {
-                    if (state.content is ProfileContentState.CurrentUser ||
-                        state.content is ProfileContentState.LoggedOut
-                    ) {
+                    if (state.content.shouldShowSettingsButton()) {
                         IconButton(onClick = viewModel::onTopBarSettingsClicked) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
@@ -131,31 +140,117 @@ private fun ProfileScreen(
             ProfileContentState.Empty -> Unit
 
             ProfileContentState.LoggedOut -> {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    Image(
-                        modifier = Modifier.size(240.dp),
-                        painter = painterResource(resource = Res.drawable.user_profile_not_logged_in),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(text = stringResource(resource = Res.string.profile_not_logged_in_message))
-                    Button(onClick = actions::onLoginClicked) {
-                        Text(text = stringResource(resource = Res.string.profile_log_in_button))
-                    }
-                }
+                ProfileLoggedOutContent(actions = actions)
             }
 
-            ProfileContentState.CurrentUser -> {
-                Text(text = "Profile (current user)")
+            is ProfileContentState.Loaded -> {
+                ProfileLoadedContent(
+                    content = content,
+                    resources = state.resources,
+                    actions = actions,
+                )
             }
 
-            is ProfileContentState.User -> {
-                Text(text = "Profile @${content.username}")
+            ProfileContentState.Error -> {
+                ProfileErrorContent(actions = actions)
             }
         }
     }
 }
+
+@Composable
+private fun ProfileLoadedContent(
+    content: ProfileContentState.Loaded,
+    resources: ImmutableList<ResourceItemState>,
+    actions: ProfileActions,
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(bottom = 16.dp),
+    ) {
+        item(
+            key = "ProfileHeader",
+        ) {
+            ProfileHeader(
+                state = content.header,
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+        }
+
+        item(
+            key = "ProfileSummary",
+        ) {
+            ProfileSummary(
+                summary = content.summary,
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+        }
+
+        items(
+            items = resources,
+            key = { item -> "${item.contentType}_${item.id}" },
+            contentType = { item -> item.contentType },
+        ) { resource ->
+            ResourceItemRenderer(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp),
+                state = resource,
+                actions = actions,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileLoggedOutContent(actions: ProfileActions) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Image(
+            modifier = Modifier.size(240.dp),
+            painter = painterResource(resource = Res.drawable.user_profile_not_logged_in),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+        )
+        Spacer(modifier = Modifier.size(8.dp))
+        Text(text = stringResource(resource = Res.string.profile_not_logged_in_message))
+        Button(onClick = actions::onLoginClicked) {
+            Text(text = stringResource(resource = Res.string.profile_log_in_button))
+        }
+    }
+}
+
+@Composable
+private fun ProfileErrorContent(actions: ProfileActions) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Text(
+            text = stringResource(resource = Res.string.generic_error_title),
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            text = stringResource(resource = Res.string.generic_error_body),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+        )
+        Button(onClick = actions::onRetryClicked) {
+            Text(
+                text = stringResource(resource = Res.string.refresh_button),
+            )
+        }
+    }
+}
+
+private fun ProfileContentState.shouldShowSettingsButton(): Boolean =
+    when (this) {
+        ProfileContentState.LoggedOut -> true
+        is ProfileContentState.Loaded -> isCurrentUser
+        else -> false
+    }

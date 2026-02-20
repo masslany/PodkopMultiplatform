@@ -10,6 +10,8 @@ val profileModule = module {
             username = params.getOrNull<String>(),
             configStorage = get(),
             authRepository = get(),
+            profileRepository = get(),
+            resourceItemStateHolder = get(),
             appNavigator = get(),
             topBarActions = get(),
         )

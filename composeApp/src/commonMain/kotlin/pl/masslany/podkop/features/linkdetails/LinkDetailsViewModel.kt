@@ -412,7 +412,9 @@ class LinkDetailsViewModel(
         }
     }
 
-    private fun buildInitialCommentRepliesState(items: List<ResourceItem>): Map<Int, CommentRepliesState> = items.associate { item ->
+    private fun buildInitialCommentRepliesState(items: List<ResourceItem>): Map<Int, CommentRepliesState> = items.associate {
+            item,
+        ->
         val replies = item.comments
             ?.items
             .orEmpty()
