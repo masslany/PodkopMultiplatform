@@ -8,6 +8,9 @@ val tagModule = module {
     viewModel { params ->
         TagViewModel(
             tag = params.get<String>(),
+            tagsRepository = get(),
+            resourceItemStateHolder = get(),
+            logger = get(),
             topBarActions = get(),
         )
     }

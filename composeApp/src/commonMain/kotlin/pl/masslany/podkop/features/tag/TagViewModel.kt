@@ -1,22 +1,199 @@
 package pl.masslany.podkop.features.tag
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import pl.masslany.podkop.business.tags.domain.main.TagsRepository
+import pl.masslany.podkop.business.tags.domain.models.request.TagsSort
+import pl.masslany.podkop.business.tags.domain.models.request.TagsType
+import pl.masslany.podkop.common.logging.api.AppLogger
+import pl.masslany.podkop.common.models.DropdownMenuItemType
+import pl.masslany.podkop.common.models.DropdownMenuState
+import pl.masslany.podkop.common.pagination.PageRequest
+import pl.masslany.podkop.common.pagination.Paginator
+import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
-class TagViewModel(tag: String, topBarActions: TopBarActions) :
-    ViewModel(),
+class TagViewModel(
+    private val tag: String,
+    private val tagsRepository: TagsRepository,
+    private val resourceItemStateHolder: ResourceItemStateHolder,
+    private val logger: AppLogger,
+    topBarActions: TopBarActions,
+) : ViewModel(),
     TagActions,
-    TopBarActions by topBarActions {
+    TopBarActions by topBarActions,
+    ResourceItemStateHolder by resourceItemStateHolder {
+
+    private var currentSort: TagsSort = TagsSort.All
+    private var currentType: TagsType = TagsType.All
+
+    private val paginator = Paginator(
+        scope = viewModelScope,
+        onNewItems = { data ->
+            resourceItemStateHolder.appendData(data)
+        },
+    ) { request ->
+        tagsRepository.getTagStream(
+            tagName = tag,
+            page = when (request) {
+                is PageRequest.Index -> request.page
+                is PageRequest.Cursor -> request.key
+            },
+            limit = null,
+            sort = currentSort,
+            type = currentType,
+        )
+    }
 
     private val _state = MutableStateFlow(TagScreenState.initial)
-    val state = _state.asStateFlow()
+    val state = combine(
+        _state,
+        resourceItemStateHolder.items,
+        paginator.state,
+    ) { state, resources, paginator ->
+        state.copy(
+            resources = resources,
+            isPaginating = paginator is PaginatorState.Loading,
+        )
+    }.stateIn(viewModelScope, WhileSubscribed(5000), TagScreenState.initial)
 
     init {
+        resourceItemStateHolder.init(viewModelScope)
+
         _state.update { previousState ->
-            previousState.copy(tag = tag)
+            previousState.copy(
+                tag = tag,
+                sortMenuState = DropdownMenuState(
+                    items = tagsRepository.getTagsSorts()
+                        .map { it.toDropdownMenuItemType() }
+                        .toImmutableList(),
+                    selected = currentSort.toDropdownMenuItemType(),
+                    expanded = false,
+                ),
+                typeMenuState = DropdownMenuState(
+                    items = tagsRepository.getTagsTypes()
+                        .map { it.toDropdownMenuItemType() }
+                        .toImmutableList(),
+                    selected = currentType.toDropdownMenuItemType(),
+                    expanded = false,
+                ),
+            )
+        }
+
+        loadTagDetails()
+    }
+
+    override fun onSortSelected(sortType: DropdownMenuItemType) {
+        currentSort = sortType.toTagsSort()
+        _state.update { previousState ->
+            previousState
+                .updateSortMenuSelected(sortType)
+                .updateRefreshing(true)
+        }
+        loadTagStream()
+    }
+
+    override fun onSortExpandedChanged(expanded: Boolean) {
+        _state.update { previousState ->
+            previousState.updateSortMenuExpanded(expanded)
+        }
+    }
+
+    override fun onSortDismissed() {
+        _state.update { previousState ->
+            previousState.updateSortMenuExpanded(false)
+        }
+    }
+
+    override fun onTypeSelected(type: DropdownMenuItemType) {
+        currentType = type.toTagsType()
+        _state.update { previousState ->
+            previousState
+                .updateTypeMenuSelected(type)
+                .updateRefreshing(true)
+        }
+        loadTagStream()
+    }
+
+    override fun onTypeExpandedChanged(expanded: Boolean) {
+        _state.update { previousState ->
+            previousState.updateTypeMenuExpanded(expanded)
+        }
+    }
+
+    override fun onTypeDismissed() {
+        _state.update { previousState ->
+            previousState.updateTypeMenuExpanded(false)
+        }
+    }
+
+    override fun onRefresh() {
+        _state.update { previousState ->
+            previousState.updateRefreshing(true)
+        }
+        loadTagStream()
+    }
+
+    override fun shouldPaginate(
+        lastVisibleIndex: Int?,
+        totalItems: Int,
+    ): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
+
+    override fun paginate() {
+        paginator.paginate()
+    }
+
+    private fun loadTagDetails() {
+        viewModelScope.launch {
+            tagsRepository.getTagDetails(tagName = tag)
+                .onSuccess { details ->
+                    _state.update { previousState ->
+                        previousState.updateBannerUrl(
+                            details.media?.photo?.url ?: details.media?.embed?.thumbnail.orEmpty(),
+                        )
+                    }
+                    loadTagStream()
+                }
+                .onFailure {
+                    logger.error("Failed to load tag details for $tag", it)
+                }
+        }
+    }
+
+    private fun loadTagStream() {
+        viewModelScope.launch {
+            tagsRepository.getTagStream(
+                tagName = tag,
+                page = 1,
+                limit = null,
+                sort = currentSort,
+                type = currentType,
+            )
+                .onSuccess {
+                    resourceItemStateHolder.updateData(it.data)
+                    paginator.setup(it.pagination, it.data.size)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                    }
+                }
+                .onFailure {
+                    logger.error("Failed to load tag stream for $tag", it)
+                    _state.update { previousState ->
+                        previousState
+                            .updateLoading(false)
+                            .updateRefreshing(false)
+                    }
+                }
         }
     }
 }
