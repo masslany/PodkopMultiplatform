@@ -147,15 +147,28 @@ private fun LinkItemRenderer(
     state: LinkItemState,
     actions: ResourceItemActions,
 ) {
-    LinkItem(
+    Column(
         modifier = modifier,
-        state = state,
-        onLinkClick = { actions.onLinkClicked(state.id) },
-        onVoteClick = { actions.onLinkVoteClicked(state.id, state.countState.isVoted) },
-        onAuthorClick = { actions.onProfileClicked(it) },
-        onTagClick = { actions.onTagClicked(it) },
-        onSourceClick = { actions.onLinkUrlClicked(state.sourceUrl) },
-    )
+    ) {
+        println("MEOW link comments = ${state.comments}")
+        LinkItem(
+            state = state,
+            onLinkClick = { actions.onLinkClicked(state.id) },
+            onVoteClick = { actions.onLinkVoteClicked(state.id, state.countState.isVoted) },
+            onAuthorClick = { actions.onProfileClicked(it) },
+            onTagClick = { actions.onTagClicked(it) },
+            onSourceClick = { actions.onLinkUrlClicked(state.sourceUrl) },
+            onProfileClicked = { actions.onProfileClicked(it) },
+            onImageClicked = { actions.onImageClicked(it) },
+            onLinkCommentVoteUpClick = { linkId, commentId, voted ->
+                actions.onLinkCommentVoteUpClick(
+                    linkId = linkId,
+                    commentId = commentId,
+                    voted = voted,
+                )
+            },
+        )
+    }
 }
 
 @Composable

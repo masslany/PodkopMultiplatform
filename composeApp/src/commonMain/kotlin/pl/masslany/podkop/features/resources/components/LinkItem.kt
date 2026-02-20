@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -58,6 +60,9 @@ fun LinkItem(
     onAuthorClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onSourceClick: () -> Unit,
+    onProfileClicked: (String) -> Unit,
+    onImageClicked: (String) -> Unit,
+    onLinkCommentVoteUpClick: (linkId: Int, commentId: Int, voted: Boolean) -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -168,7 +173,39 @@ fun LinkItem(
                     Spacer(modifier = Modifier.size(8.dp))
                     CommentCount(count = state.commentCount)
                 }
-                Spacer(modifier = Modifier.size(16.dp))
+                if (state.comments.isEmpty()) {
+                    Spacer(modifier = Modifier.size(16.dp))
+                }
+            }
+            if (state.comments.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp),
+                ) {
+                    state.comments.forEachIndexed { index, comment ->
+                        HorizontalDivider(
+                            thickness = Dp.Hairline,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                        )
+                        Spacer(Modifier.size(12.dp))
+                        LinkCommentItem(
+                            modifier = Modifier.padding(start = 16.dp),
+                            state = comment,
+                            onProfileClick = { onProfileClicked(it) },
+                            onImageClick = { onImageClicked(it) },
+                            onVoteUpClick = {
+                                onLinkCommentVoteUpClick(
+                                    comment.linkId,
+                                    comment.id,
+                                    comment.voteState.positiveVoteButtonState?.isVoted ?: false,
+                                )
+                            },
+                        )
+                        if (index != state.comments.lastIndex) {
+                            Spacer(Modifier.size(12.dp))
+                        }
+                    }
+                }
             }
         }
     }
@@ -216,6 +253,9 @@ private fun LinkItemPreview() {
             onLinkClick = {},
             onAuthorClick = {},
             onSourceClick = {},
+            onProfileClicked = {},
+            onImageClicked = {},
+            onLinkCommentVoteUpClick = { _, _, _ -> },
         )
     }
 }
