@@ -18,4 +18,64 @@ interface ProfileApi {
         username: String,
         page: Int,
     ): Result<ResourceResponseDto>
+
+    suspend fun getProfileEntriesAdded(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileEntriesVoted(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileEntriesCommented(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileLinksAdded(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileLinksPublished(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileLinksUp(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileLinksDown(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileLinksCommented(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileLinksRelated(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileObservedTags(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileObservedUsersFollowing(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
+
+    suspend fun getProfileObservedUsersFollowers(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto>
 }

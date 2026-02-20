@@ -73,13 +73,159 @@ class ProfileApiClient(
         username: String,
         page: Int,
     ): Result<ResourceResponseDto> {
-        val queryParams = mutableMapOf<String, String>()
-        queryParams["page"] = page.toString()
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "actions",
+        )
+    }
+
+    override suspend fun getProfileEntriesAdded(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "entries/added",
+        )
+    }
+
+    override suspend fun getProfileEntriesVoted(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "entries/voted",
+        )
+    }
+
+    override suspend fun getProfileEntriesCommented(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "entries/commented",
+        )
+    }
+
+    override suspend fun getProfileLinksAdded(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "links/added",
+        )
+    }
+
+    override suspend fun getProfileLinksPublished(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "links/published",
+        )
+    }
+
+    override suspend fun getProfileLinksUp(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "links/up",
+        )
+    }
+
+    override suspend fun getProfileLinksDown(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "links/down",
+        )
+    }
+
+    override suspend fun getProfileLinksCommented(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "links/commented",
+        )
+    }
+
+    override suspend fun getProfileLinksRelated(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "links/related",
+        )
+    }
+
+    override suspend fun getProfileObservedTags(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "observed/tags",
+        )
+    }
+
+    override suspend fun getProfileObservedUsersFollowing(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "observed/users/following",
+        )
+    }
+
+    override suspend fun getProfileObservedUsersFollowers(
+        username: String,
+        page: Int,
+    ): Result<ResourceResponseDto> {
+        return getProfileResources(
+            username = username,
+            page = page,
+            endpoint = "observed/users/followers",
+        )
+    }
+
+    private suspend fun getProfileResources(
+        username: String,
+        page: Int,
+        endpoint: String,
+    ): Result<ResourceResponseDto> {
+        val queryParams =
+            mutableMapOf(
+                "page" to page.toString(),
+            )
 
         val request =
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
-                path = "api/v3/profile/users/$username/actions",
+                path = "api/v3/profile/users/$username/$endpoint",
                 queryParameters = queryParams,
             )
 

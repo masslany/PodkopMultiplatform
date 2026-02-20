@@ -18,4 +18,64 @@ interface ProfileRepository {
         username: String,
         page: Int,
     ): Result<Resources>
+
+    suspend fun getProfileEntriesAdded(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileEntriesVoted(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileEntriesCommented(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileLinksAdded(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileLinksPublished(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileLinksUp(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileLinksDown(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileLinksCommented(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileLinksRelated(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileObservedTags(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileObservedUsersFollowing(
+        username: String,
+        page: Int,
+    ): Result<Resources>
+
+    suspend fun getProfileObservedUsersFollowers(
+        username: String,
+        page: Int,
+    ): Result<Resources>
 }
