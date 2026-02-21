@@ -3,6 +3,7 @@ package pl.masslany.podkop.common.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,7 +17,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,13 +45,14 @@ import coil3.request.SuccessResult
 import coil3.size.Scale
 import dev.chrisbanes.haze.hazeEffect
 import org.jetbrains.compose.resources.stringResource
-import pl.masslany.podkop.common.extensions.rememberWindowSizeClass
 import pl.masslany.podkop.common.models.EmbedImageState
 import pl.masslany.podkop.common.settings.LocalAppSettings
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.embed_adult_image
 import podkop.composeapp.generated.resources.embed_gif_badge
 import podkop.composeapp.generated.resources.embed_image_source
+
+private val MediumMinWidth = 600.dp
 
 @Composable
 fun EmbedImage(
@@ -70,12 +71,6 @@ fun EmbedImage(
     var isImageLoading by remember(state.url) { mutableStateOf(true) }
     var isPlatformGifReady by remember(state.url) { mutableStateOf(false) }
     var aspectRatio by rememberSaveable(state.url, state.width, state.height) { mutableStateOf(state.aspectRatio) }
-    val windowSizeClass = rememberWindowSizeClass()
-    val imageWidthFraction = if (windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium) {
-        0.5f
-    } else {
-        1f
-    }
 
     LaunchedEffect(state.url, state.isGif, isGifAutoplayEnabled) {
         isGifPlaybackEnabled = !state.isGif || isGifAutoplayEnabled
@@ -141,27 +136,29 @@ fun EmbedImage(
             },
         )
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth(imageWidthFraction)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-                shape = RoundedCornerShape(8.dp),
-            )
-            .padding(8.dp),
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Box(modifier = imageContainerModifier) {
-                if (isImageLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp),
-                                shape = RoundedCornerShape(6.dp),
-                            ),
-                    )
-                }
+    BoxWithConstraints(modifier = modifier) {
+        val imageWidthFraction = if (maxWidth >= MediumMinWidth) 0.5f else 1f
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(imageWidthFraction)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                    shape = RoundedCornerShape(8.dp),
+                )
+                .padding(8.dp),
+        ) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Box(modifier = imageContainerModifier) {
+                    if (isImageLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp),
+                                    shape = RoundedCornerShape(6.dp),
+                                ),
+                        )
+                    }
 
                 if (usePlatformGifRenderer) {
                     AsyncImage(
@@ -296,17 +293,18 @@ fun EmbedImage(
                 )
             }
         }
-        Spacer(modifier = Modifier.size(4.dp))
-        Text(
-            text = stringResource(
-                resource = Res.string.embed_image_source,
-                state.source,
-            ),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Normal,
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+            Spacer(modifier = Modifier.size(4.dp))
+            Text(
+                text = stringResource(
+                    resource = Res.string.embed_image_source,
+                    state.source,
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
