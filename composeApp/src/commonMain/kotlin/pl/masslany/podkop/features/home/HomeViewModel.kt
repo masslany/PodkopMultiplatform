@@ -10,6 +10,8 @@ import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.HomeScreen
 import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.features.bottombar.BottomBarDestinationState
+import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
+import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 
 class HomeViewModel(private val appNavigator: AppNavigator, private val homeNavigator: HomeNavigator) : ViewModel() {
 
@@ -37,6 +39,35 @@ class HomeViewModel(private val appNavigator: AppNavigator, private val homeNavi
 
     fun onTabChanged(destination: NavTarget) {
         homeNavigator.onTabChanged(destination)
+    }
+
+    fun onLinkClicked(id: Int, useInlineDetails: Boolean) {
+        if (useInlineDetails) {
+            homeNavigator.navigateToLinkDetails(id)
+        } else {
+            appNavigator.navigateTo(LinkDetailsScreen(id))
+        }
+    }
+
+    fun onEntryClicked(id: Int, useInlineDetails: Boolean) {
+        if (useInlineDetails) {
+            homeNavigator.navigateToEntryDetails(id)
+        } else {
+            appNavigator.navigateTo(EntryDetailsScreen(id))
+        }
+    }
+
+    fun onInlineDetailsModeChanged(enabled: Boolean) {
+        if (!enabled) {
+            homeNavigator.detachCurrentInlineDetailsDestination()?.let { destination ->
+                appNavigator.navigateTo(destination)
+            }
+            homeNavigator.clearInlineDetailsDestinations()
+        }
+    }
+
+    fun onBackPressedInHome() {
+        homeNavigator.onBack()
     }
 
     override fun onCleared() {

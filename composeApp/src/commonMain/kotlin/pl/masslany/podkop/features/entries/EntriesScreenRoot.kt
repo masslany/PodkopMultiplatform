@@ -66,9 +66,22 @@ private const val FabItemsOffset = 10
 @Composable
 fun EntriesScreenRoot(
     paddingValues: PaddingValues,
+    onEntryClicked: ((Int) -> Unit)? = null,
 ) {
     val viewModel = koinViewModel<EntriesViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val actions = remember(viewModel, onEntryClicked) {
+        object : EntriesActions by viewModel {
+            override fun onEntryClicked(id: Int) {
+                val navigationOverride = onEntryClicked
+                if (navigationOverride != null) {
+                    navigationOverride(id)
+                } else {
+                    viewModel.onEntryClicked(id)
+                }
+            }
+        }
+    }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
@@ -152,7 +165,7 @@ fun EntriesScreenRoot(
                         modifier = Modifier
                             .fillMaxSize(),
                         state = state,
-                        actions = viewModel,
+                        actions = actions,
                         lazyListState = lazyListState,
                     )
                 }

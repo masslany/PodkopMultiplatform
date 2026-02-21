@@ -16,6 +16,7 @@ composeMultiplatform = "1.10.1"
 datastorePreferences = "1.2.0"
 foundation = "1.10.1"
 haze = "1.7.2"
+jetbrainsAdaptive = "1.2.0"
 junit = "4.13.2"
 kotlin = "2.3.10"
 
@@ -44,6 +45,8 @@ kotlinter = "5.4.2"
 timber = "5.0.1"
 
 [libraries]
+adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "jetbrainsAdaptive" }
+adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "jetbrainsAdaptive" }
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
@@ -91,6 +94,7 @@ androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", versi
 jetbrains-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "navigation3-ui" }
 
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "compose-material3" }
+compose-material3-window-sizes = { module = "org.jetbrains.compose.material3:material3-window-size-class", version.ref = "compose-material3" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-runtime" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-ui" }
 compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-ui" }
@@ -100,6 +104,7 @@ lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:l
 
 multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdown-renderer", version.ref = "multiplatformMarkdownRenderer" }
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
+org-jetbrains-compose-material3-adaptive-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "jetbrainsAdaptive" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 [bundles]

@@ -71,11 +71,23 @@ private const val FabItemsOffset = 10
 fun LinksScreenRoot(
     isUpcoming: Boolean,
     paddingValues: PaddingValues,
+    onLinkClicked: ((Int) -> Unit)? = null,
 ) {
     val viewModel = koinViewModel<LinksViewModel>(
         parameters = { parametersOf(isUpcoming) },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val actions = remember(viewModel, onLinkClicked) {
+        object : LinksActions by viewModel {
+            override fun onLinkClicked(id: Int) {
+                if (onLinkClicked != null) {
+                    onLinkClicked(id)
+                } else {
+                    viewModel.onLinkClicked(id)
+                }
+            }
+        }
+    }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
@@ -170,7 +182,7 @@ fun LinksScreenRoot(
                         modifier = Modifier
                             .fillMaxSize(),
                         state = state,
-                        actions = viewModel,
+                        actions = actions,
                         lazyListState = lazyListState,
                     )
                 }

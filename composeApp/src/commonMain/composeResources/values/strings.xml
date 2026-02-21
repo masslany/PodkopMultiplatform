@@ -20,6 +20,10 @@
     <string name="links_screen_label_hits_error">Wystąpił problem podczas wczytywania</string>
     <string name="links_screen_label_adult_rating">18+</string>
 
+    <!-- Home -->
+    <string name="home_link_details_placeholder_title">Wybierz element z listy</string>
+    <string name="home_link_details_placeholder_body">Tutaj zobaczysz szczegóły wybranego elementu.</string>
+
     <!-- Settings -->
     <string name="settings_headline_theme">Motyw</string>
     <string name="settings_body_dynamic_colors">Dynamiczne kolory</string>

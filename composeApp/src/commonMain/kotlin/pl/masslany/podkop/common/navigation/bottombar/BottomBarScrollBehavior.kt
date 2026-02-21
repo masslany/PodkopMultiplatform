@@ -13,8 +13,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
 
 val LocalBottomBarScrollBehavior =
-    staticCompositionLocalOf<BottomBarScrollBehavior> {
-        error("No BottomBarScrollBehavior provided")
+    staticCompositionLocalOf {
+        BottomBarScrollBehavior()
     }
 
 private const val SnapFlingVelocityThreshold = 1000f
@@ -40,6 +40,11 @@ class BottomBarScrollBehavior {
     fun onScroll(delta: Float) {
         offsetPx = (offsetPx + delta)
             .coerceIn(0f, heightPx)
+    }
+
+    fun reset() {
+        offsetPx = 0f
+        heightPx = 0f
     }
 
     fun snap(velocity: Float) {

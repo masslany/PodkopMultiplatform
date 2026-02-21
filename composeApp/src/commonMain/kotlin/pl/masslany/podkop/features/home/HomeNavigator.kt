@@ -4,6 +4,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,11 @@ import kotlinx.coroutines.launch
 import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.common.navigation.NavigationConfigProvider
 import pl.masslany.podkop.common.navigation.TopLevelDestination
+import pl.masslany.podkop.features.entries.EntriesScreen
+import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
+import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
+import pl.masslany.podkop.features.links.LinksScreen
+import pl.masslany.podkop.features.upcoming.UpcomingScreen
 
 data class HomeNavigatorState(
     val destinations: ImmutableList<TopLevelDestination> = persistentListOf(),
@@ -46,13 +52,98 @@ class HomeNavigator(private val configProvider: NavigationConfigProvider) : Auto
         }
     }
 
+    fun navigateToLinkDetails(id: Int) {
+        navigateToCurrentTab(LinkDetailsScreen(id))
+    }
+
+    fun navigateToEntryDetails(id: Int) {
+        navigateToCurrentTab(EntryDetailsScreen(id))
+    }
+
+    fun clearInlineDetailsDestinations() {
+        _state.update { previous ->
+            val updatedStacks = previous.stacks
+                .mapValues { (root, stack) ->
+                    val filteredStack = stack
+                        .filterNot { destination -> destination.isInlineDetailsTarget() }
+                        .toPersistentList()
+
+                    if (filteredStack.isEmpty()) {
+                        persistentListOf(root)
+                    } else {
+                        filteredStack
+                    }
+                }
+                .toPersistentMap()
+
+            if (updatedStacks == previous.stacks) {
+                previous
+            } else {
+                previous.copy(stacks = updatedStacks)
+            }
+        }
+    }
+
+    fun detachCurrentInlineDetailsDestination(): NavTarget? {
+        var detachedDestination: NavTarget? = null
+
+        _state.update { previous ->
+            val currentTab = previous.currentTabRoot ?: return@update previous
+            val currentStack = previous.stacks[currentTab] ?: persistentListOf(currentTab)
+            val inlineDetailsDestination = currentStack.lastOrNull()
+                ?.takeIf { destination -> destination.isInlineDetailsTarget() }
+                ?: return@update previous
+
+            detachedDestination = inlineDetailsDestination
+            val filteredStack = currentStack
+                .filterNot { destination -> destination.isInlineDetailsTarget() }
+            val updatedStack = if (filteredStack.isEmpty()) {
+                persistentListOf(currentTab)
+            } else {
+                filteredStack.toPersistentList()
+            }
+            val updatedStacks = previous.stacks
+                .toMutableMap()
+                .apply {
+                    this[currentTab] = updatedStack
+                }
+                .toPersistentMap()
+
+            previous.copy(stacks = updatedStacks)
+        }
+
+        return detachedDestination
+    }
+
     fun onBack(): Boolean {
         val currentState = _state.value
-        val firstTab = currentState.destinations.firstOrNull()?.root ?: return false
         val currentTab = currentState.currentTabRoot ?: return false
-        if (currentTab == firstTab) return false
+        val currentStack = currentState.stacks[currentTab] ?: persistentListOf(currentTab)
 
-        _state.update { it.copy(currentTabRoot = firstTab) }
+        if (currentStack.size > 1) {
+            _state.update { previous ->
+                val stack = previous.stacks[currentTab] ?: return@update previous
+                val updatedStacks = previous.stacks
+                    .toMutableMap()
+                    .apply {
+                        this[currentTab] = stack.dropLast(1).toPersistentList()
+                    }
+                    .toPersistentMap()
+                previous.copy(
+                    stacks = updatedStacks,
+                )
+            }
+            return true
+        }
+
+        val firstTab = currentState.destinations.firstOrNull()?.root ?: return false
+        if (currentTab == firstTab) {
+            return false
+        }
+
+        _state.update { previous ->
+            previous.copy(currentTabRoot = firstTab)
+        }
         return true
     }
 
@@ -63,6 +154,37 @@ class HomeNavigator(private val configProvider: NavigationConfigProvider) : Auto
 
     override fun close() {
         scope.cancel()
+    }
+
+    private fun navigateToCurrentTab(target: NavTarget) {
+        _state.update { previous ->
+            val currentTab = previous.currentTabRoot ?: return@update previous
+            if (target.isInlineDetailsTarget() && !currentTab.supportsInlineDetails()) {
+                return@update previous
+            }
+
+            val currentStack = previous.stacks[currentTab] ?: persistentListOf(currentTab)
+            val normalizedStack = if (target.isInlineDetailsTarget()) {
+                currentStack.filterNot { destination -> destination.isInlineDetailsTarget() }
+            } else {
+                currentStack
+            }
+
+            if (normalizedStack.lastOrNull() == target) {
+                return@update previous
+            }
+
+            val updatedStacks = previous.stacks
+                .toMutableMap()
+                .apply {
+                    this[currentTab] = (normalizedStack + target).toPersistentList()
+                }
+                .toPersistentMap()
+
+            previous.copy(
+                stacks = updatedStacks,
+            )
+        }
     }
 
     private fun updateDestinations(destinations: ImmutableList<TopLevelDestination>) {
@@ -90,3 +212,8 @@ class HomeNavigator(private val configProvider: NavigationConfigProvider) : Auto
         }
     }
 }
+
+private fun NavTarget.supportsInlineDetails(): Boolean =
+    this is LinksScreen || this is UpcomingScreen || this is EntriesScreen
+
+private fun NavTarget.isInlineDetailsTarget(): Boolean = this is LinkDetailsScreen || this is EntryDetailsScreen

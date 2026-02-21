@@ -61,6 +61,8 @@ import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
+import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.linkdetails.components.LinkDetailsHeader
@@ -88,6 +90,7 @@ private const val FabItemsOffset = 10
 fun LinkDetailsScreenRoot(
     id: Int,
     paddingValues: PaddingValues,
+    showTopBar: Boolean = true,
 ) {
     val viewModel = koinViewModel<LinkDetailsViewModel>(
         parameters = { parametersOf(id) },
@@ -96,6 +99,7 @@ fun LinkDetailsScreenRoot(
     val snackbarHostState = LocalAppSnackbarHostState.current
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
     val lazyListState = rememberLazyListPaginator(
         shouldPaginate = { lastVisibleIndex, totalItems ->
             viewModel.shouldPaginate(lastVisibleIndex, totalItems)
@@ -116,52 +120,63 @@ fun LinkDetailsScreenRoot(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val scaffoldModifier = Modifier
+        .padding(
+            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+        )
+        .fillMaxSize()
+        .let { baseModifier ->
+            if (showTopBar) {
+                baseModifier
+                    .nestedScroll(scrollBehavior.nestedScrollConnection)
+            } else {
+                baseModifier
+                    .nestedScroll(bottomBarScrollBehavior.nestedScrollConnection())
+            }
+        }
 
     Scaffold(
-        modifier = Modifier
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            )
-            .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = scaffoldModifier,
         topBar = {
-            TopAppBar(
-                title = {
-                    if (showTitle) {
-                        Text(
-                            text = state.link?.titleState?.title.orEmpty(),
-                            maxLines = 1,
-                            style = MaterialTheme.typography.titleSmall,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = viewModel::onTopBarProfileClicked) {
-                        Icon(
-                            modifier = Modifier.size(24.dp),
-                            imageVector = vectorResource(resource = Res.drawable.ic_person),
-                            contentDescription = stringResource(
-                                resource = Res.string.accessibility_topbar_profile,
-                            ),
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = viewModel::onTopBarBackClicked) {
-                        Icon(
-                            modifier = Modifier.size(24.dp),
-                            imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
-                            contentDescription = stringResource(
-                                resource = Res.string.accessibility_topbar_back,
-                            ),
-                        )
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
-            )
+            if (showTopBar) {
+                TopAppBar(
+                    title = {
+                        if (showTitle) {
+                            Text(
+                                text = state.link?.titleState?.title.orEmpty(),
+                                maxLines = 1,
+                                style = MaterialTheme.typography.titleSmall,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = viewModel::onTopBarProfileClicked) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = vectorResource(resource = Res.drawable.ic_person),
+                                contentDescription = stringResource(
+                                    resource = Res.string.accessibility_topbar_profile,
+                                ),
+                            )
+                        }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = viewModel::onTopBarBackClicked) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
+                                contentDescription = stringResource(
+                                    resource = Res.string.accessibility_topbar_back,
+                                ),
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                    windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                )
+            }
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
