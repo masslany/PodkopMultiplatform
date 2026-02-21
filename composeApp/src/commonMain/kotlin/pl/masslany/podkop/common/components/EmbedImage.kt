@@ -16,6 +16,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +45,7 @@ import coil3.request.SuccessResult
 import coil3.size.Scale
 import dev.chrisbanes.haze.hazeEffect
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.extensions.rememberWindowSizeClass
 import pl.masslany.podkop.common.models.EmbedImageState
 import pl.masslany.podkop.common.settings.LocalAppSettings
 import podkop.composeapp.generated.resources.Res
@@ -68,6 +70,12 @@ fun EmbedImage(
     var isImageLoading by remember(state.url) { mutableStateOf(true) }
     var isPlatformGifReady by remember(state.url) { mutableStateOf(false) }
     var aspectRatio by rememberSaveable(state.url, state.width, state.height) { mutableStateOf(state.aspectRatio) }
+    val windowSizeClass = rememberWindowSizeClass()
+    val imageWidthFraction = if (windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium) {
+        0.5f
+    } else {
+        1f
+    }
 
     LaunchedEffect(state.url, state.isGif, isGifAutoplayEnabled) {
         isGifPlaybackEnabled = !state.isGif || isGifAutoplayEnabled
@@ -93,7 +101,6 @@ fun EmbedImage(
     val isGifOverlayVisible = state.isGif && !isGifAutoplayEnabled && !isGifPlaybackEnabled
     val imageContainerModifier = Modifier
         .then(sizeResolver)
-        .fillMaxWidth()
         .then(
             if (aspectRatio != null) {
                 Modifier.aspectRatio(aspectRatio!!)
@@ -136,6 +143,7 @@ fun EmbedImage(
 
     Column(
         modifier = modifier
+            .fillMaxWidth(imageWidthFraction)
             .background(
                 color = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
                 shape = RoundedCornerShape(8.dp),

@@ -19,8 +19,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -35,10 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -49,6 +44,7 @@ import androidx.navigation3.ui.NavDisplay
 import kotlinx.collections.immutable.ImmutableList
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import pl.masslany.podkop.common.extensions.rememberWindowSizeClass
 import pl.masslany.podkop.common.navigation.BottomSheetSceneStrategy
 import pl.masslany.podkop.common.navigation.HomeListDetailSceneStrategy
 import pl.masslany.podkop.common.navigation.NavTarget
@@ -184,23 +180,6 @@ fun HomeScreenRoot(
                 }
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-@Composable
-private fun rememberWindowSizeClass(): WindowSizeClass {
-    val windowInfo = LocalWindowInfo.current
-    val density = LocalDensity.current
-    return remember(windowInfo.containerSize, density) {
-        WindowSizeClass.calculateFromSize(
-            size = with(density) {
-                DpSize(
-                    width = windowInfo.containerSize.width.toDp(),
-                    height = windowInfo.containerSize.height.toDp(),
-                )
-            },
-        )
     }
 }
 
