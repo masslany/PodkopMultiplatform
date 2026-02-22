@@ -12,6 +12,7 @@ import org.koin.dsl.module
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
+import pl.masslany.podkop.common.deeplink.AppDeepLinkHandler
 import pl.masslany.podkop.common.navigation.ExternalBrowser
 import pl.masslany.podkop.common.platform.ImageDownloader
 import pl.masslany.podkop.initKoin
@@ -36,6 +37,7 @@ val iOSModule = module {
 class IOSDependencyHelper : KoinComponent {
     val startupManager: StartupManager by inject()
     val dispatcherProvider: DispatcherProvider by inject()
+    val appDeepLinkHandler: AppDeepLinkHandler by inject()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var startupStateJob: Job? = null
@@ -67,6 +69,10 @@ class IOSDependencyHelper : KoinComponent {
     fun stopObservingStartupState() {
         startupStateJob?.cancel()
         startupStateJob = null
+    }
+
+    fun handleDeepLink(url: String) {
+        appDeepLinkHandler.onIncomingUrl(url)
     }
 
     fun viewControllerHolder(): IOSViewControllerHolder = getKoin().get()

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.hits.domain.main.HitsRepository
 import pl.masslany.podkop.business.hits.domain.models.request.HitsSortType
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
@@ -28,6 +29,7 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 
 class LinksViewModel(
     private val isUpcoming: Boolean,
+    private val authRepository: AuthRepository,
     private val linksRepository: LinksRepository,
     private val hitsRepository: HitsRepository,
     private val linksResourceItemStateHolder: LinksResourceItemStateHolder,
@@ -97,7 +99,7 @@ class LinksViewModel(
 
         viewModelScope.launch {
             linksRepository.getLinks(
-                page = 1,
+                page = resolveFirstPageParam(),
                 limit = null,
                 linksSortType = selectedLinksSortType,
                 linksType = linksType,
@@ -147,7 +149,7 @@ class LinksViewModel(
         }
         viewModelScope.launch {
             linksRepository.getLinks(
-                page = 1,
+                page = resolveFirstPageParam(),
                 limit = null,
                 linksSortType = selectedLinksSortType,
                 linksType = linksType,
@@ -200,7 +202,7 @@ class LinksViewModel(
         }
         viewModelScope.launch {
             linksRepository.getLinks(
-                page = 1,
+                page = resolveFirstPageParam(),
                 limit = null,
                 linksSortType = selectedLinksSortType,
                 linksType = linksType,
@@ -238,5 +240,13 @@ class LinksViewModel(
 
     override fun paginate() {
         paginator.paginate()
+    }
+
+    private suspend fun resolveFirstPageParam(): Any? {
+        return if (authRepository.isLoggedIn()) {
+            null
+        } else {
+            1
+        }
     }
 }

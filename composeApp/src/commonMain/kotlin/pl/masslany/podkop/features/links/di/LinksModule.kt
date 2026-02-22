@@ -10,6 +10,7 @@ val linksModule = module {
     viewModel { params ->
         LinksViewModel(
             isUpcoming = params.get<Boolean>(),
+            authRepository = get(),
             linksRepository = get(),
             hitsRepository = get(),
             linksResourceItemStateHolder = get(),

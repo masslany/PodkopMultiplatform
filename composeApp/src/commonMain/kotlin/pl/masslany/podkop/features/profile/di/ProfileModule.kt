@@ -8,8 +8,8 @@ val profileModule = module {
     viewModel { params ->
         ProfileViewModel(
             username = params.getOrNull<String>(),
-            configStorage = get(),
             authRepository = get(),
+            authSessionEvents = get(),
             profileRepository = get(),
             resourceItemStateHolder = get(),
             appNavigator = get(),

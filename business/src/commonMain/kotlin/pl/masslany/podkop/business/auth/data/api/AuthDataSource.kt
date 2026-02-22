@@ -4,9 +4,16 @@ import pl.masslany.podkop.business.auth.data.network.models.AuthDto
 import pl.masslany.podkop.business.auth.data.network.models.WykopConnectDto
 
 interface AuthDataSource {
+    suspend fun isLoggedIn(): Boolean
+
     suspend fun getAuthToken(): Result<AuthDto>
 
     suspend fun getWykopConnect(): Result<WykopConnectDto>
+
+    suspend fun storeSessionTokens(
+        token: String,
+        refreshToken: String,
+    )
 
     suspend fun shouldUpdateTokens(): Boolean
 

@@ -13,6 +13,10 @@ internal class AuthDataSourceImpl(
     private val configStorage: ConfigStorage,
     private val json: Json,
 ) : AuthDataSource {
+    override suspend fun isLoggedIn(): Boolean {
+        return configStorage.getRefreshToken().isNotBlank()
+    }
+
     override suspend fun getAuthToken(): Result<AuthDto> {
         val key = configStorage.getApiKey()
         val secret = configStorage.getApiSecret()
@@ -21,6 +25,14 @@ internal class AuthDataSourceImpl(
 
     override suspend fun getWykopConnect(): Result<WykopConnectDto> {
         return authApi.getWykopConnect()
+    }
+
+    override suspend fun storeSessionTokens(
+        token: String,
+        refreshToken: String,
+    ) {
+        configStorage.storeBearerToken(token)
+        configStorage.storeRefreshToken(refreshToken)
     }
 
     override suspend fun shouldUpdateTokens(): Boolean {

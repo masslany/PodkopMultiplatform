@@ -7,6 +7,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import pl.masslany.podkop.business.di.businessModule
+import pl.masslany.podkop.common.deeplink.di.deepLinkModule
 import pl.masslany.podkop.common.navigation.di.navigationModule
 import pl.masslany.podkop.common.settings.AppSettings
 import pl.masslany.podkop.common.settings.AppSettingsImpl
@@ -32,6 +33,7 @@ val composeAppModule = module {
 
     includes(
         navigationModule,
+        deepLinkModule,
         homeModule,
         linksModule,
         entriesModule,

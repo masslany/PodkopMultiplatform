@@ -1,5 +1,6 @@
 package pl.masslany.podkop
 
+import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
@@ -13,11 +14,13 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import pl.masslany.podkop.business.startup.models.AppState
+import pl.masslany.podkop.common.deeplink.AppDeepLinkHandler
 import pl.masslany.podkop.common.navigation.AppNavigator
 
 class MainActivity : ComponentActivity() {
 
     private val appNavigator: AppNavigator by inject()
+    private val appDeepLinkHandler: AppDeepLinkHandler by inject()
     private val activityHolder: AndroidActivityHolder by inject()
 
     private val viewModel by viewModel<MainActivityViewModel>()
@@ -34,10 +37,17 @@ class MainActivity : ComponentActivity() {
         activityHolder.activity = this
 
         registerOnBackCallback()
+        handleDeepLinkIntent(intent)
 
         setContent {
             App()
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleDeepLinkIntent(intent)
     }
 
     private fun registerOnBackCallback() {
@@ -64,5 +74,9 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         activityHolder.activity = null
         super.onDestroy()
+    }
+
+    private fun handleDeepLinkIntent(intent: Intent?) {
+        appDeepLinkHandler.onIncomingUrl(intent?.dataString)
     }
 }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
@@ -27,6 +28,7 @@ import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 class EntriesViewModel(
+    private val authRepository: AuthRepository,
     private val entriesRepository: EntriesRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
@@ -103,7 +105,7 @@ class EntriesViewModel(
 
         viewModelScope.launch {
             entriesRepository.getEntries(
-                page = 1,
+                page = resolveFirstPageParam(),
                 limit = null,
                 entriesSortType = currentEntriesSortType,
                 hotSortType = currentHotSortType,
@@ -144,7 +146,7 @@ class EntriesViewModel(
         }
         viewModelScope.launch {
             entriesRepository.getEntries(
-                page = 1,
+                page = resolveFirstPageParam(),
                 limit = null,
                 entriesSortType = sortType.toEntriesSortType(),
                 hotSortType = currentHotSortType,
@@ -199,7 +201,7 @@ class EntriesViewModel(
         }
         viewModelScope.launch {
             entriesRepository.getEntries(
-                page = 1,
+                page = resolveFirstPageParam(),
                 limit = null,
                 entriesSortType = currentEntriesSortType,
                 hotSortType = sortType.toHotSortType(),
@@ -250,7 +252,7 @@ class EntriesViewModel(
         }
         viewModelScope.launch {
             entriesRepository.getEntries(
-                page = 1,
+                page = resolveFirstPageParam(),
                 limit = null,
                 entriesSortType = sortType.toEntriesSortType(),
                 hotSortType = HotSortType.TwelveHours,
@@ -288,5 +290,13 @@ class EntriesViewModel(
 
     override fun paginate() {
         paginator.paginate()
+    }
+
+    private suspend fun resolveFirstPageParam(): Any? {
+        return if (authRepository.isLoggedIn()) {
+            null
+        } else {
+            1
+        }
     }
 }

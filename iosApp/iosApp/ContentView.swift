@@ -36,6 +36,10 @@ final class IOSStartupViewModel: ObservableObject {
         helper.start(key: key, secret: secret)
     }
 
+    func handleIncomingUrl(_ url: URL) {
+        helper.handleDeepLink(url: url.absoluteString)
+    }
+
     deinit {
         helper.stopObservingStartupState()
     }
@@ -82,6 +86,12 @@ struct ContentView: View {
         .onAppear {
             startupViewModel.startIfNeeded(key: key, secret: secret)
         }
+        .onOpenURL { url in
+            startupViewModel.handleIncomingUrl(url)
+        }
+        .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+            guard let url = userActivity.webpageURL else { return }
+            startupViewModel.handleIncomingUrl(url)
+        }
     }
 }
-

@@ -7,6 +7,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -14,7 +15,8 @@ import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
-import pl.masslany.podkop.common.configstorage.api.ConfigStorage
+import pl.masslany.podkop.common.deeplink.AuthSessionEvent
+import pl.masslany.podkop.common.deeplink.AuthSessionEvents
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
@@ -40,8 +42,8 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 
 class ProfileViewModel(
     private val username: String?,
-    private val configStorage: ConfigStorage,
     private val authRepository: AuthRepository,
+    private val authSessionEvents: AuthSessionEvents,
     private val profileRepository: ProfileRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val appNavigator: AppNavigator,
@@ -144,6 +146,7 @@ class ProfileViewModel(
 
     init {
         resourceItemStateHolder.init(viewModelScope)
+        observeAuthSessionChanges()
         viewModelScope.launch {
             loadData()
         }
@@ -258,6 +261,18 @@ class ProfileViewModel(
         paginator.paginate()
     }
 
+    private fun observeAuthSessionChanges() {
+        if (!username.isNullOrBlank()) return
+
+        viewModelScope.launch {
+            authSessionEvents.events.collect { event ->
+                when (event) {
+                    AuthSessionEvent.TokensUpdated -> loadData()
+                }
+            }
+        }
+    }
+
     private suspend fun loadData() {
         listCache.clear()
         resourcesLoadRequestId = 0
@@ -278,7 +293,7 @@ class ProfileViewModel(
         val requestedUsername = username?.trim()?.takeIf { it.isNotEmpty() }
         val isCurrentUserProfile = requestedUsername == null
 
-        if (isCurrentUserProfile && configStorage.getRefreshToken().isBlank()) {
+        if (isCurrentUserProfile && !authRepository.isLoggedIn()) {
             listOwner.value = null
             observedListContent.value = ProfileListContentState.Empty
             resourceItemStateHolder.updateData(emptyList())
