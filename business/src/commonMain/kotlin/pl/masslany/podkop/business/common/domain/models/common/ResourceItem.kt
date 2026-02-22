@@ -27,6 +27,6 @@ data class ResourceItem(
     val source: Source?,
     val tags: List<String>,
     val title: String,
-    val voted: Boolean,
+    val voted: Voted,
     val votes: Votes?,
 )

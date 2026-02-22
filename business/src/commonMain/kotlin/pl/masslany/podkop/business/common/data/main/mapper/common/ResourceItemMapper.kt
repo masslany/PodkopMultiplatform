@@ -31,7 +31,7 @@ fun List<ResourceItemDto>.toResourceItemList(): List<ResourceItem> {
             source = it.source?.toSource(),
             tags = it.tags ?: emptyList(),
             title = it.title.orEmpty(),
-            voted = it.voted == 1,
+            voted = it.voted.toVoted(),
             votes = it.votes?.toVotes(),
         )
     }

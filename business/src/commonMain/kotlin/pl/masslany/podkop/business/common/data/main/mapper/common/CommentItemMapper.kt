@@ -21,7 +21,7 @@ fun List<CommentItemDto>.toCommentList(): List<Comment> {
             resource = it.resource.toResource(),
             slug = it.slug,
             tags = it.tags,
-            voted = it.voted,
+            voted = it.voted.toVoted(),
             votes = it.votes.toVotes(),
             content = it.content,
             blacklist = it.blacklist,

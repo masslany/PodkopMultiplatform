@@ -22,6 +22,6 @@ data class Comment(
     val resource: Resource,
     val slug: String,
     val tags: List<String>,
-    val voted: Int,
+    val voted: Voted,
     val votes: Votes,
 )

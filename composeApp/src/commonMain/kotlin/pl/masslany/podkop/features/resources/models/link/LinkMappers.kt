@@ -2,6 +2,7 @@ package pl.masslany.podkop.features.resources.models.link
 
 import kotlinx.collections.immutable.toImmutableList
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
+import pl.masslany.podkop.business.common.domain.models.common.Voted
 import pl.masslany.podkop.common.models.AuthorState
 import pl.masslany.podkop.common.models.CountState
 import pl.masslany.podkop.common.models.DescriptionState
@@ -35,7 +36,7 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
         CountState(
             count = votes.up.toString(),
             isHot = this.hot,
-            isVoted = this.voted,
+            isVoted = this.voted != Voted.None,
             canVote = canVote,
         )
     } else {
