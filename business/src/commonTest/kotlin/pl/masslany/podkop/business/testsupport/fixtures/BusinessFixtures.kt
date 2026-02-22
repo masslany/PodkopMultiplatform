@@ -1,6 +1,12 @@
 package pl.masslany.podkop.business.testsupport.fixtures
 
 import kotlinx.datetime.LocalDateTime
+import pl.masslany.podkop.business.auth.data.network.models.AuthDto
+import pl.masslany.podkop.business.auth.data.network.models.AuthDtoData
+import pl.masslany.podkop.business.auth.data.network.models.RefreshDto
+import pl.masslany.podkop.business.auth.data.network.models.RefreshResponseData
+import pl.masslany.podkop.business.auth.data.network.models.WykopConnectDto
+import pl.masslany.podkop.business.auth.data.network.models.WykopConnectDtoData
 import pl.masslany.podkop.business.common.data.network.models.comments.CommentItemDto
 import pl.masslany.podkop.business.common.data.network.models.comments.LocationDto
 import pl.masslany.podkop.business.common.data.network.models.comments.ParentDto
@@ -82,6 +88,28 @@ import pl.masslany.podkop.business.tags.domain.models.TagsAutoCompleteItem
  */
 object BusinessFixtures {
     val dateTime: LocalDateTime = LocalDateTime.parse("2024-01-02T03:04:05")
+
+    fun authDto(
+        token: String = "auth-token",
+    ): AuthDto = AuthDto(
+        data = AuthDtoData(token = token),
+    )
+
+    fun refreshDto(
+        token: String = "new-token",
+        refreshToken: String = "new-refresh-token",
+    ): RefreshDto = RefreshDto(
+        data = RefreshResponseData(
+            refreshToken = refreshToken,
+            token = token,
+        ),
+    )
+
+    fun wykopConnectDto(
+        connectUrl: String = "https://example.com/connect",
+    ): WykopConnectDto = WykopConnectDto(
+        data = WykopConnectDtoData(connectUrl = connectUrl),
+    )
 
     fun commonActionsDto(
         create: Boolean? = true,

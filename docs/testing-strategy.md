@@ -24,6 +24,7 @@ Shared test utilities should live inside the module being tested under `testsupp
 Current structure in `business` module:
 
 - `business/src/commonTest/kotlin/pl/masslany/podkop/business/testsupport/fixtures`
+- `business/src/commonTest/kotlin/pl/masslany/podkop/business/testsupport/fakes`
 
 Planned structure as tests expand:
 
@@ -43,6 +44,21 @@ Convention:
 
 - In test files, use a meaningful alias like `Fixtures` (not `F`).
 - Avoid creating large one-off object graphs directly inside tests when a shared fixture builder exists.
+
+### Fakes
+
+Fakes are shared, hand-written test doubles that should:
+
+- Be deterministic
+- Expose simple stubbing points (usually mutable `Result`/value fields)
+- Record calls/arguments for assertions
+- Fail fast when a required stub is missing
+
+Current shared fakes in `business` tests include:
+
+- Dispatcher provider fake
+- In-memory key-value storage fake
+- Recording data-source fakes for repository tests (`Auth`, `Entries`, `Hits`, `Links`, `Profile`, `Tags`)
 
 ## Naming Conventions
 
@@ -105,13 +121,15 @@ Completed:
 - Introduced centralized `business` test fixtures (`BusinessFixtures`)
 - Added unit tests for all business mappers (common/profile/tags/link mappers)
 - Standardized mapper test names to Kotlin backtick format
+- Added centralized repository fakes (`testsupport/fakes`)
+- Added repository tests for all business repositories (`Auth`, `Entries`, `Hits`, `Links`, `Profile`, `Tags`)
 
 ## Next Recommended Targets
 
-1. Business repositories (`*RepositoryImpl`) with fake data sources
-2. Startup/auth business logic classes
-3. Compose feature view models (with fakes for dependencies)
-4. Parser/utility classes in other modules using the same conventions (`sut`, backtick names)
+1. Startup/auth business logic classes
+2. Compose feature view models (with fakes for dependencies)
+3. Parser/utility classes in other modules using the same conventions (`sut`, backtick names)
+4. Add shared fake helpers for repeated patterns (queued results, call assertions) only when duplication appears
 
 ## Maintenance Rules
 

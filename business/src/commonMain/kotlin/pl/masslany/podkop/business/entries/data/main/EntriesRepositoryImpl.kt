@@ -84,14 +84,14 @@ class EntriesRepositoryImpl(
 
     override suspend fun getLastUpdated(): Instant {
         return withContext(dispatcherProvider.io) {
-            val long = keyValueStorage.getLong(ENTRIES_LAST_UPDATED_KEY) ?: Clock.System.now().epochSeconds
+            val long = keyValueStorage.getLong(ENTRIES_LAST_UPDATED_KEY) ?: Clock.System.now().toEpochMilliseconds()
 
-            Instant.fromEpochSeconds(long)
+            Instant.fromEpochMilliseconds(long)
         }
     }
 
     override suspend fun setLastUpdated(lastUpdated: Instant) {
-        val epochSeconds = lastUpdated.epochSeconds
+        val epochSeconds = lastUpdated.toEpochMilliseconds()
 
         keyValueStorage.putLong(ENTRIES_LAST_UPDATED_KEY, epochSeconds)
     }
