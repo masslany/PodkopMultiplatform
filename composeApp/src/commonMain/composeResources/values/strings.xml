@@ -32,6 +32,7 @@
     <string name="settings_option_theme_dark">Ciemny</string>
     <string name="settings_headline_media">Media</string>
     <string name="settings_body_gif_autoplay">Autoodtwarzanie GIF-ów</string>
+    <string name="settings_headline_account">Konto</string>
     <string name="settings_headline_debug">Debug</string>
     <string name="settings_body_open_debug">Narzędzia debug</string>
     <string name="settings_button_open_debug">Otwórz</string>
@@ -56,6 +57,7 @@
     <!-- Profile -->
     <string name="profile_not_logged_in_message">Nie jesteś zalogowany</string>
     <string name="profile_log_in_button">Zaloguj się</string>
+    <string name="profile_log_out_button">Wyloguj się</string>
     <string name="profile_summary_actions">Akcje</string>
     <string name="profile_summary_links">Znaleziska</string>
     <string name="profile_summary_entries">Mikroblog</string>

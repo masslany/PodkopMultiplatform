@@ -14,4 +14,6 @@ interface SettingsActions : TopBarActions {
     fun onDynamicColorsChanged(enabled: Boolean)
 
     fun onDebugToolsClicked()
+
+    fun onLogoutClicked()
 }

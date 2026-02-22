@@ -1,10 +1,7 @@
 package pl.masslany.podkop.common.deeplink
 
 internal sealed interface AppDeepLink {
-    data class LoginCallback(
-        val token: String,
-        val refreshToken: String,
-    ) : AppDeepLink
+    data class LoginCallback(val token: String, val refreshToken: String) : AppDeepLink
 
     data class LinkDetails(val id: Int) : AppDeepLink
 

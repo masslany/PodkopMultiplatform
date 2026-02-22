@@ -49,23 +49,19 @@ internal class AppDeepLinkParser {
         )
     }
 
-    private fun extractId(segment: String): Int? {
-        return ID_PREFIX_REGEX.find(segment)
-            ?.value
-            ?.toIntOrNull()
+    private fun extractId(segment: String): Int? = ID_PREFIX_REGEX.find(segment)
+        ?.value
+        ?.toIntOrNull()
+
+    private fun normalizeUrl(rawUrl: String): String = if (SCHEME_SEPARATOR in rawUrl) {
+        rawUrl
+    } else {
+        "https://$rawUrl"
     }
 
-    private fun normalizeUrl(rawUrl: String): String {
-        return if (SCHEME_SEPARATOR in rawUrl) {
-            rawUrl
-        } else {
-            "https://$rawUrl"
-        }
-    }
-
-    private fun String?.orNonBlankFallback(other: String?): String? {
-        return this?.takeIf { it.isNotBlank() } ?: other?.takeIf { it.isNotBlank() }
-    }
+    private fun String?.orNonBlankFallback(other: String?): String? = this?.takeIf {
+        it.isNotBlank()
+    } ?: other?.takeIf { it.isNotBlank() }
 
     internal companion object {
         const val TOKEN = "token"

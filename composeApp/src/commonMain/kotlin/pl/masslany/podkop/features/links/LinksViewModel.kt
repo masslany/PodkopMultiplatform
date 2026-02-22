@@ -242,11 +242,9 @@ class LinksViewModel(
         paginator.paginate()
     }
 
-    private suspend fun resolveFirstPageParam(): Any? {
-        return if (authRepository.isLoggedIn()) {
-            null
-        } else {
-            1
-        }
+    private suspend fun resolveFirstPageParam(): Any? = if (authRepository.isLoggedIn()) {
+        null
+    } else {
+        1
     }
 }

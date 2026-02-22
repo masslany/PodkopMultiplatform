@@ -1,11 +1,16 @@
 package pl.masslany.podkop.common.components.dialog
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.navigation.AppNavigator
+import pl.masslany.podkop.common.navigation.DialogText
 import pl.masslany.podkop.common.navigation.GenericDialog
+import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.allStringResources
 
 @Composable
 fun DefaultGenericDialog(
@@ -14,23 +19,32 @@ fun DefaultGenericDialog(
 ) {
     AlertDialog(
         onDismissRequest = { navigator.back() },
-        title = { Text(dialog.title) },
-        text = dialog.description?.let { { Text(it) } },
+        title = { Text(dialog.title.resolve()) },
+        text = dialog.description?.let { dialogText ->
+            {
+                Text(
+                    text = dialogText.resolve(),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+            }
+        },
         confirmButton = {
-            TextButton(onClick = {
-                // Send TRUE as result
-                navigator.sendResult(dialog.key, true)
-            }) {
-                Text(dialog.positiveText)
+            TextButton(
+                onClick = {
+                    navigator.sendResult(dialog.key, true)
+                },
+            ) {
+                Text(dialog.positiveText.resolve())
             }
         },
         dismissButton = if (dialog.negativeText != null) {
             {
-                TextButton(onClick = {
-                    // Send FALSE as result
-                    navigator.sendResult(dialog.key, false)
-                }) {
-                    Text(dialog.negativeText)
+                TextButton(
+                    onClick = {
+                        navigator.sendResult(dialog.key, false)
+                    },
+                ) {
+                    Text(dialog.negativeText.resolve())
                 }
             }
         } else {
@@ -38,3 +52,21 @@ fun DefaultGenericDialog(
         },
     )
 }
+
+@Composable
+private fun DialogText.resolve(): String =
+    when (this) {
+        is DialogText.Raw -> value
+
+        /**
+         * `DialogText.Resource` stores only a serializable resource key. We need to restore the
+         * generated `StringResource` instance before calling `stringResource(...)`.
+         *
+         * `Res.allStringResources` is the Compose-generated registry for this module.
+         */
+        is DialogText.Resource -> stringResource(
+            resource = requireNotNull(Res.allStringResources[key]) {
+                "Missing string resource for key: $key"
+            },
+        )
+    }

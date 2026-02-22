@@ -54,4 +54,4 @@ internal class BearerTokenInterceptorPluginConfig {
     lateinit var tokenRefreshCoordinator: TokenRefreshCoordinator
 }
 
-private val SKIPPED_PATH_SEGMENTS = setOf("auth", "refresh-token", "logout")
+private val SKIPPED_PATH_SEGMENTS = setOf("auth", "refresh-token")

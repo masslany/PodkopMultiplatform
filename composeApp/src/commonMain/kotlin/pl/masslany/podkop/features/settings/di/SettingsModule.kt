@@ -7,8 +7,12 @@ import pl.masslany.podkop.features.settings.SettingsViewModel
 val settingsModule = module {
     viewModel {
         SettingsViewModel(
+            authRepository = get(),
+            authSessionEvents = get(),
             appSettings = get(),
             appNavigator = get(),
+            logger = get(),
+            snackbarManager = get(),
             topBarActions = get(),
         )
     }

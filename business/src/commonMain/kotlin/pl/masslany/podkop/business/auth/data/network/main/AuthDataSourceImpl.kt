@@ -61,11 +61,16 @@ internal class AuthDataSourceImpl(
     }
 
     override suspend fun logout(): Result<Unit> {
-        return authApi.logout().also {
-            getAuthToken().mapCatching {
-                configStorage.storeBearerToken(it.data.token)
-                updateTokens()
-            }
+        return runCatching {
+            // Try to revoke the authenticated session first while auth tokens are still available.
+            authApi.logout()
+
+            // Local logout state is driven by the refresh token presence.
+            configStorage.storeRefreshToken("")
+
+            getAuthToken()
+                .onSuccess { configStorage.storeBearerToken(it.data.token) }
+                .onFailure { configStorage.storeBearerToken("") }
         }
     }
 

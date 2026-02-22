@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,10 +41,12 @@ import pl.masslany.podkop.common.settings.ThemeOverride
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.ic_arrow_back
+import podkop.composeapp.generated.resources.profile_log_out_button
 import podkop.composeapp.generated.resources.settings_body_dynamic_colors
 import podkop.composeapp.generated.resources.settings_body_gif_autoplay
 import podkop.composeapp.generated.resources.settings_body_open_debug
 import podkop.composeapp.generated.resources.settings_button_open_debug
+import podkop.composeapp.generated.resources.settings_headline_account
 import podkop.composeapp.generated.resources.settings_headline_debug
 import podkop.composeapp.generated.resources.settings_headline_media
 import podkop.composeapp.generated.resources.settings_headline_theme
@@ -175,6 +180,27 @@ fun SettingsScreenRoot(
                     ) {
                         Text(text = stringResource(resource = Res.string.settings_button_open_debug))
                     }
+                }
+            }
+
+            if (state.showLogoutButton) {
+                Text(
+                    text = stringResource(resource = Res.string.settings_headline_account),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .widthIn(max = 600.dp)
+                        .align(Alignment.CenterHorizontally),
+                    onClick = viewModel::onLogoutClicked,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError,
+                    ),
+                ) {
+                    Text(text = stringResource(resource = Res.string.profile_log_out_button))
                 }
             }
         }
