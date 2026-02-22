@@ -1,6 +1,7 @@
 package pl.masslany.podkop
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.systemBars
@@ -26,6 +27,7 @@ import pl.masslany.podkop.common.navigation.HomeScreen
 import pl.masslany.podkop.common.navigation.NavigationContent
 import pl.masslany.podkop.common.settings.AppSettings
 import pl.masslany.podkop.common.settings.LocalAppSettings
+import pl.masslany.podkop.common.settings.ThemeOverride
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
@@ -49,11 +51,22 @@ import pl.masslany.podkop.features.tag.TagScreenRoot
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun App() {
-    PodkopTheme {
-        val startupManager = koinInject<StartupManager>()
-        val appNavigator = koinInject<AppNavigator>()
-        val snackbarManager = koinInject<SnackbarManager>()
-        val appSettings = koinInject<AppSettings>()
+    val startupManager = koinInject<StartupManager>()
+    val appNavigator = koinInject<AppNavigator>()
+    val snackbarManager = koinInject<SnackbarManager>()
+    val appSettings = koinInject<AppSettings>()
+    val themeOverride by appSettings.themeOverride.collectAsStateWithLifecycle(initialValue = ThemeOverride.AUTO)
+    val dynamicColorsEnabled by appSettings.dynamicColorsEnabled.collectAsStateWithLifecycle(initialValue = true)
+    val darkTheme = when (themeOverride) {
+        ThemeOverride.AUTO -> isSystemInDarkTheme()
+        ThemeOverride.LIGHT -> false
+        ThemeOverride.DARK -> true
+    }
+
+    PodkopTheme(
+        darkTheme = darkTheme,
+        dynamicColor = dynamicColorsEnabled,
+    ) {
         val startupState by startupManager.state.collectAsStateWithLifecycle()
         val state by appNavigator.state.collectAsStateWithLifecycle()
         val snackbarHostState = remember { SnackbarHostState() }

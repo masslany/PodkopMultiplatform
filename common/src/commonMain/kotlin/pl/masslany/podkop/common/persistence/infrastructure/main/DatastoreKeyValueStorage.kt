@@ -24,6 +24,12 @@ class DatastoreKeyValueStorage(
         return dataStore.data.firstOrNull()?.get(stringPreferencesKey(key))
     }
 
+    override fun observeString(key: String): Flow<String?> {
+        return dataStore.data.map { preferences ->
+            preferences[stringPreferencesKey(key)]
+        }
+    }
+
     override suspend fun putBoolean(key: String, value: Boolean) {
         dataStore.edit { preferences ->
             preferences[booleanPreferencesKey(key)] = value

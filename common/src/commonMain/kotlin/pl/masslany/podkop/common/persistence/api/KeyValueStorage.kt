@@ -10,6 +10,8 @@ interface KeyValueStorage {
 
     suspend fun getString(key: String): String?
 
+    fun observeString(key: String): Flow<String?>
+
     suspend fun putBoolean(
         key: String,
         value: Boolean,

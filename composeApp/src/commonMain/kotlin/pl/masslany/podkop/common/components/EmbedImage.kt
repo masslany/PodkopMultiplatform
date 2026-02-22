@@ -160,139 +160,139 @@ fun EmbedImage(
                         )
                     }
 
-                if (usePlatformGifRenderer) {
-                    AsyncImage(
-                        modifier = Modifier.fillMaxSize(),
-                        model = ImageRequest.Builder(context)
-                            .data(state.url)
-                            .memoryCacheKey(state.url)
-                            .diskCacheKey(state.url)
-                            .memoryCachePolicy(CachePolicy.ENABLED)
-                            .diskCachePolicy(CachePolicy.ENABLED)
-                            .networkCachePolicy(CachePolicy.ENABLED)
-                            .scale(Scale.FIT)
-                            .size(sizeResolver)
-                            .build(),
-                        onSuccess = {
-                            hasLoadedImage = true
-                            isImageLoading = false
-                            latestSuccessResult = it.result
-                        },
-                        onError = {
-                            isImageLoading = false
-                        },
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                    )
-
-                    PlatformGifImage(
-                        modifier = Modifier.fillMaxSize(),
-                        url = state.url,
-                        onSuccess = {
-                            hasLoadedImage = true
-                            isPlatformGifReady = true
-                            isImageLoading = false
-                        },
-                        onError = {
-                            isImageLoading = false
-                        },
-                    )
-                } else {
-                    AsyncImage(
-                        modifier = Modifier.fillMaxSize(),
-                        model = ImageRequest.Builder(context)
-                            .data(state.url)
-                            .memoryCacheKey(state.url)
-                            .diskCacheKey(state.url)
-                            .memoryCachePolicy(CachePolicy.ENABLED)
-                            .diskCachePolicy(CachePolicy.ENABLED)
-                            .networkCachePolicy(CachePolicy.ENABLED)
-                            .scale(Scale.FIT)
-                            .size(sizeResolver)
-                            .build(),
-                        onSuccess = { success ->
-                            hasLoadedImage = true
-                            isImageLoading = false
-                            latestSuccessResult = success.result
-                            if (state.isGif) {
-                                setImageAnimationPlaying(
-                                    image = success.result.image,
-                                    isPlaying = isGifPlaybackEnabled,
-                                )
-                            }
-                        },
-                        onError = {
-                            isImageLoading = false
-                        },
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                    )
-                }
-            }
-
-            if (usePlatformGifRenderer && !isPlatformGifReady && !isAdultOverlayVisible) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .background(
-                            color = Color.Black.copy(alpha = 0.45f),
-                            shape = RoundedCornerShape(24.dp),
+                    if (usePlatformGifRenderer) {
+                        AsyncImage(
+                            modifier = Modifier.fillMaxSize(),
+                            model = ImageRequest.Builder(context)
+                                .data(state.url)
+                                .memoryCacheKey(state.url)
+                                .diskCacheKey(state.url)
+                                .memoryCachePolicy(CachePolicy.ENABLED)
+                                .diskCachePolicy(CachePolicy.ENABLED)
+                                .networkCachePolicy(CachePolicy.ENABLED)
+                                .scale(Scale.FIT)
+                                .size(sizeResolver)
+                                .build(),
+                            onSuccess = {
+                                hasLoadedImage = true
+                                isImageLoading = false
+                                latestSuccessResult = it.result
+                            },
+                            onError = {
+                                isImageLoading = false
+                            },
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
                         )
-                        .padding(8.dp),
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = Color.White,
-                    )
-                }
-            }
 
-            if (isGifOverlayVisible && !isAdultOverlayVisible) {
-                Text(
-                    text = stringResource(resource = Res.string.embed_gif_badge),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(8.dp)
-                        .background(
-                            color = Color.Black.copy(alpha = 0.65f),
-                            shape = RoundedCornerShape(4.dp),
+                        PlatformGifImage(
+                            modifier = Modifier.fillMaxSize(),
+                            url = state.url,
+                            onSuccess = {
+                                hasLoadedImage = true
+                                isPlatformGifReady = true
+                                isImageLoading = false
+                            },
+                            onError = {
+                                isImageLoading = false
+                            },
                         )
-                        .padding(
-                            horizontal = 8.dp,
-                            vertical = 2.dp,
-                        ),
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
+                    } else {
+                        AsyncImage(
+                            modifier = Modifier.fillMaxSize(),
+                            model = ImageRequest.Builder(context)
+                                .data(state.url)
+                                .memoryCacheKey(state.url)
+                                .diskCacheKey(state.url)
+                                .memoryCachePolicy(CachePolicy.ENABLED)
+                                .diskCachePolicy(CachePolicy.ENABLED)
+                                .networkCachePolicy(CachePolicy.ENABLED)
+                                .scale(Scale.FIT)
+                                .size(sizeResolver)
+                                .build(),
+                            onSuccess = { success ->
+                                hasLoadedImage = true
+                                isImageLoading = false
+                                latestSuccessResult = success.result
+                                if (state.isGif) {
+                                    setImageAnimationPlaying(
+                                        image = success.result.image,
+                                        isPlaying = isGifPlaybackEnabled,
+                                    )
+                                }
+                            },
+                            onError = {
+                                isImageLoading = false
+                            },
+                            contentDescription = null,
+                            contentScale = ContentScale.Fit,
+                        )
+                    }
+                }
 
-            if (isAdultOverlayVisible) {
-                Text(
-                    text = stringResource(resource = Res.string.embed_adult_image),
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Color.Black,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
-                        .copy(
-                            drawStyle = Stroke(
-                                miter = 10f,
-                                width = 6f,
-                                join = StrokeJoin.Round,
+                if (usePlatformGifRenderer && !isPlatformGifReady && !isAdultOverlayVisible) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .background(
+                                color = Color.Black.copy(alpha = 0.45f),
+                                shape = RoundedCornerShape(24.dp),
+                            )
+                            .padding(8.dp),
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = Color.White,
+                        )
+                    }
+                }
+
+                if (isGifOverlayVisible && !isAdultOverlayVisible) {
+                    Text(
+                        text = stringResource(resource = Res.string.embed_gif_badge),
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .background(
+                                color = Color.Black.copy(alpha = 0.65f),
+                                shape = RoundedCornerShape(4.dp),
+                            )
+                            .padding(
+                                horizontal = 8.dp,
+                                vertical = 2.dp,
                             ),
-                        ),
-                )
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
 
-                Text(
-                    text = stringResource(resource = Res.string.embed_adult_image),
-                    modifier = Modifier.align(Alignment.Center),
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                if (isAdultOverlayVisible) {
+                    Text(
+                        text = stringResource(resource = Res.string.embed_adult_image),
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color.Black,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium
+                            .copy(
+                                drawStyle = Stroke(
+                                    miter = 10f,
+                                    width = 6f,
+                                    join = StrokeJoin.Round,
+                                ),
+                            ),
+                    )
+
+                    Text(
+                        text = stringResource(resource = Res.string.embed_adult_image),
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
             }
-        }
             Spacer(modifier = Modifier.size(4.dp))
             Text(
                 text = stringResource(
