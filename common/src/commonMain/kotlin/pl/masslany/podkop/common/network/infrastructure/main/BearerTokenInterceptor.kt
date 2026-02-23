@@ -7,6 +7,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import pl.masslany.podkop.common.configstorage.api.ConfigStorage
+import pl.masslany.podkop.common.network.models.request.REQUEST_HEADER_SKIP_AUTH
 
 const val BEARER_TOKEN_INTERCEPTOR = "BEARER_TOKEN_INTERCEPTOR"
 
@@ -19,6 +20,12 @@ internal val bearerTokenInterceptor =
         val tokenRefreshCoordinator = pluginConfig.tokenRefreshCoordinator
 
         suspend fun Send.Sender.proceedWithToken(request: HttpRequestBuilder): HttpClientCall {
+            val shouldSkipAuth = request.headers[REQUEST_HEADER_SKIP_AUTH] == "true"
+            if (shouldSkipAuth) {
+                request.headers.remove(REQUEST_HEADER_SKIP_AUTH)
+                return proceed(request)
+            }
+
             if (request.url.pathSegments.any { it in SKIPPED_PATH_SEGMENTS }) {
                 return proceed(request)
             }

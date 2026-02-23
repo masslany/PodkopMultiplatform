@@ -12,4 +12,5 @@ interface ResourceItemStateHolder : ResourceItemActions {
     fun init(scope: CoroutineScope, isUpcoming: Boolean = false)
     suspend fun updateData(data: List<ResourceItem>)
     suspend fun appendData(data: List<ResourceItem>)
+    suspend fun notifyItemUpdated(newState: ResourceItem)
 }

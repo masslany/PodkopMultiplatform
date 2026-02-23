@@ -12,10 +12,15 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
+import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.logging.api.AppLogger
+import pl.masslany.podkop.common.models.embed.EmbedContentState
+import pl.masslany.podkop.common.models.embed.EmbedContentType
+import pl.masslany.podkop.common.models.embed.TwitterEmbedState
+import pl.masslany.podkop.common.models.embed.toTwitterEmbedPreviewState
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
@@ -36,6 +41,7 @@ open class BaseResourceItemStateHolder(
     private val appNavigator: AppNavigator,
     private val dispatcherProvider: DispatcherProvider,
     private val logger: AppLogger,
+    private val twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
 ) : ResourceItemStateHolder {
 
     private val _items = MutableStateFlow<ImmutableList<ResourceItemState>>(persistentListOf())
@@ -121,6 +127,68 @@ open class BaseResourceItemStateHolder(
 
     override fun onImageClicked(url: String) {
         appNavigator.navigateTo(ImageViewerScreen(imageUrl = url))
+    }
+
+    override fun onEmbedPreviewClicked(
+        itemId: Int,
+        state: EmbedContentState,
+    ) {
+        when (state.type) {
+            EmbedContentType.Youtube,
+            EmbedContentType.Streamable,
+            EmbedContentType.Other,
+            -> {
+                appNavigator.openExternalLink(state.url)
+                return
+            }
+
+            EmbedContentType.Twitter -> {
+                when (state.twitterState) {
+                    null -> {
+                        appNavigator.openExternalLink(state.url)
+                    }
+
+                    TwitterEmbedState.Loading -> Unit
+
+                    is TwitterEmbedState.Loaded,
+                    TwitterEmbedState.Error,
+                    -> {
+                        appNavigator.openExternalLink(state.url)
+                    }
+
+                    TwitterEmbedState.Preview -> {
+                        scope?.launch {
+                            updateTwitterEmbedState(
+                                itemId = itemId,
+                                embedKey = state.key,
+                                newState = TwitterEmbedState.Loading,
+                            )
+
+                            val result = twitterEmbedPreviewRepository.getTweet(state.url)
+                            result
+                                .onSuccess { tweet ->
+                                    updateTwitterEmbedState(
+                                        itemId = itemId,
+                                        embedKey = state.key,
+                                        newState = TwitterEmbedState.Loaded(tweet.toTwitterEmbedPreviewState()),
+                                    )
+                                }
+                                .onFailure { error ->
+                                    logger.error(
+                                        message = "Twitter embed preview fetch failed for itemId=$itemId url=${state.url}",
+                                        throwable = error,
+                                    )
+                                    updateTwitterEmbedState(
+                                        itemId = itemId,
+                                        embedKey = state.key,
+                                        newState = TwitterEmbedState.Error,
+                                    )
+                                }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onEntryVoteUpClicked(entryId: Int, voted: Boolean) {
@@ -231,6 +299,38 @@ open class BaseResourceItemStateHolder(
         }
     }
 
+    private fun updateTwitterEmbedState(
+        itemId: Int,
+        embedKey: String,
+        newState: TwitterEmbedState,
+    ) {
+        updateItem(itemId) { item ->
+            when (item) {
+                is EntryItemState -> item.copy(
+                    embedContentState = item.embedContentState
+                        .updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState),
+                )
+
+                is EntryCommentItemState -> item.copy(
+                    embedContentState = item.embedContentState
+                        .updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState),
+                )
+
+                is LinkItemState -> item.copy(
+                    embedContentState = item.embedContentState
+                        .updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState),
+                )
+
+                is LinkCommentItemState -> item.copy(
+                    embedContentState = item.embedContentState
+                        .updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState),
+                )
+
+                else -> item
+            }
+        }
+    }
+
     private fun mapItemWithNestedState(
         item: ResourceItemState,
         id: Int,
@@ -278,7 +378,7 @@ open class BaseResourceItemStateHolder(
     }
 
     // This is open so specialized handlers can update multiple lists
-    open suspend fun notifyItemUpdated(newState: ResourceItem) {
+    override suspend fun notifyItemUpdated(newState: ResourceItem) {
         updateMutex.withLock {
             _items.update { list ->
                 list.map {
@@ -296,4 +396,15 @@ open class BaseResourceItemStateHolder(
         VoteUp,
         RemoveVoteUp,
     }
+}
+
+private fun EmbedContentState?.updateTwitterEmbedStateIfMatches(
+    embedKey: String,
+    newState: TwitterEmbedState,
+): EmbedContentState? {
+    val current = this ?: return null
+    if (current.type != EmbedContentType.Twitter) return current
+    if (current.key != embedKey) return current
+
+    return current.copy(twitterState = newState)
 }

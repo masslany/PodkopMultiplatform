@@ -5,6 +5,7 @@ import pl.masslany.podkop.common.models.EmbedImageState
 import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.models.PublishedTimeType
 import pl.masslany.podkop.common.models.avatar.AvatarState
+import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.models.vote.VoteState
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.ResourceType
@@ -19,4 +20,5 @@ data class EntryCommentItemState(
     val publishedTimeType: PublishedTimeType?,
     val voteState: VoteState,
     val embedImageState: EmbedImageState?,
+    val embedContentState: EmbedContentState? = null,
 ) : ResourceItemState

@@ -2,6 +2,8 @@ package pl.masslany.podkop.common.network.models.request
 
 import kotlin.jvm.JvmField
 
+const val REQUEST_HEADER_SKIP_AUTH = "X-Podkop-Skip-Auth"
+
 data class Request<T>(
     val method: HttpMethod,
     val path: String,

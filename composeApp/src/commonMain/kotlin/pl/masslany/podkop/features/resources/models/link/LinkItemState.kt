@@ -7,6 +7,7 @@ import pl.masslany.podkop.common.models.DescriptionState
 import pl.masslany.podkop.common.models.PublishedTimeType
 import pl.masslany.podkop.common.models.TagItem
 import pl.masslany.podkop.common.models.TitleState
+import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.ResourceType
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
@@ -25,4 +26,5 @@ data class LinkItemState(
     val imageUrl: String,
     val tags: ImmutableList<TagItem>,
     val comments: ImmutableList<LinkCommentItemState>,
+    val embedContentState: EmbedContentState? = null,
 ) : ResourceItemState

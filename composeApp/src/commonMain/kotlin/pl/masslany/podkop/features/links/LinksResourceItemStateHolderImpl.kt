@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
+import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
@@ -23,12 +24,14 @@ class LinksResourceItemStateHolderImpl(
     appNavigator: AppNavigator,
     dispatcherProvider: DispatcherProvider,
     logger: AppLogger,
+    twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
 ) : BaseResourceItemStateHolder(
     entriesRepository = entriesRepository,
     linksRepository = linksRepository,
     appNavigator = appNavigator,
     dispatcherProvider = dispatcherProvider,
     logger = logger,
+    twitterEmbedPreviewRepository = twitterEmbedPreviewRepository,
 ),
     LinksResourceItemStateHolder {
 

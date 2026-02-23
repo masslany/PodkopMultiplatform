@@ -26,6 +26,7 @@ val linksModule = module {
             appNavigator = get(),
             dispatcherProvider = get(),
             logger = get(),
+            twitterEmbedPreviewRepository = get(),
         )
     }
 }

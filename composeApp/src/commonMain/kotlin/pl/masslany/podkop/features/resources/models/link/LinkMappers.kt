@@ -8,6 +8,7 @@ import pl.masslany.podkop.common.models.CountState
 import pl.masslany.podkop.common.models.DescriptionState
 import pl.masslany.podkop.common.models.TagItem
 import pl.masslany.podkop.common.models.TitleState
+import pl.masslany.podkop.common.models.embed.toEmbedContentState
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.models.toPublishedTimeType
 import pl.masslany.podkop.features.resources.models.ResourceType
@@ -94,5 +95,6 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
         comments = comments,
         commentCount = commentCount,
         publishedTimeType = publishedTimeType,
+        embedContentState = this.media?.embed.toEmbedContentState(),
     )
 }

@@ -152,7 +152,7 @@ class EntriesRepositoryImplTest {
 
         val actual = sut.getLastUpdated()
 
-        assertEquals(Instant.fromEpochSeconds(1234), actual)
+        assertEquals(Instant.fromEpochMilliseconds(1234), actual)
     }
 
     @Test
@@ -172,7 +172,7 @@ class EntriesRepositoryImplTest {
     fun `set last updated stores epoch seconds under repository key`() = runBlocking {
         val keyValueStorage = FakeKeyValueStorage()
         val sut = createSut(keyValueStorage = keyValueStorage)
-        val instant = Instant.fromEpochSeconds(999)
+        val instant = Instant.fromEpochMilliseconds(999)
 
         sut.setLastUpdated(instant)
 

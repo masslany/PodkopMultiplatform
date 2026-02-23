@@ -75,6 +75,7 @@ private fun EntryItemRenderer(
                     onTagClick = { actions.onTagClicked(it) },
                     onUrlClick = { actions.onLinkUrlClicked(it) },
                     onImageClick = { actions.onImageClicked(it) },
+                    onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
                     onVoteUpClick = {
                         actions.onEntryVoteUpClicked(
                             entryId = state.id,
@@ -99,6 +100,7 @@ private fun EntryItemRenderer(
                         onTagClick = { actions.onTagClicked(it) },
                         onUrlClick = { actions.onLinkUrlClicked(it) },
                         onImageClick = { actions.onImageClicked(it) },
+                        onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(comment.id, embed) },
                         onVoteUpClick = {
                             actions.onEntryCommentVoteUpClick(
                                 entryCommentId = comment.id,
@@ -137,6 +139,7 @@ private fun EntryItemRenderer(
             onTagClick = { actions.onTagClicked(it) },
             onUrlClick = { actions.onLinkUrlClicked(it) },
             onImageClick = { actions.onImageClicked(it) },
+            onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
             onVoteUpClick = {
                 actions.onEntryVoteUpClicked(
                     entryId = state.id,
@@ -166,6 +169,7 @@ private fun LinkItemRenderer(
             onProfileClicked = { actions.onProfileClicked(it) },
             onUrlClicked = { actions.onLinkUrlClicked(it) },
             onImageClicked = { actions.onImageClicked(it) },
+            onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
             onLinkCommentVoteUpClick = { linkId, commentId, voted ->
                 actions.onLinkCommentVoteUpClick(
                     linkId = linkId,
@@ -190,6 +194,7 @@ private fun EntryCommentItemRenderer(
         onTagClick = { actions.onTagClicked(it) },
         onUrlClick = { actions.onLinkUrlClicked(it) },
         onImageClick = { actions.onImageClicked(it) },
+        onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
         onVoteUpClick = {
             actions.onEntryCommentVoteUpClick(
                 entryCommentId = state.id,
@@ -227,6 +232,7 @@ private fun LinkCommentItemRenderer(
         onTagClick = { actions.onTagClicked(it) },
         onUrlClick = { actions.onLinkUrlClicked(it) },
         onImageClick = { actions.onImageClicked(it) },
+        onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
         onVoteUpClick = {
             actions.onLinkCommentVoteUpClick(
                 linkId = state.linkId,

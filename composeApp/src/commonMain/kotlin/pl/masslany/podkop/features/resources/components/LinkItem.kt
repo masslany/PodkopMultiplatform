@@ -39,6 +39,7 @@ import pl.masslany.podkop.common.components.Published
 import pl.masslany.podkop.common.components.Source
 import pl.masslany.podkop.common.components.Tag
 import pl.masslany.podkop.common.components.Title
+import pl.masslany.podkop.common.components.embed.EmbedContent
 import pl.masslany.podkop.common.models.AuthorState
 import pl.masslany.podkop.common.models.CountState
 import pl.masslany.podkop.common.models.DescriptionState
@@ -46,6 +47,7 @@ import pl.masslany.podkop.common.models.NameColorType
 import pl.masslany.podkop.common.models.PublishedTimeType
 import pl.masslany.podkop.common.models.TagItem
 import pl.masslany.podkop.common.models.TitleState
+import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.features.resources.models.ResourceType
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
@@ -63,6 +65,7 @@ fun LinkItem(
     onProfileClicked: (String) -> Unit,
     onUrlClicked: (String) -> Unit,
     onImageClicked: (String) -> Unit,
+    onEmbedPreviewClick: (EmbedContentState) -> Unit,
     onLinkCommentVoteUpClick: (linkId: Int, commentId: Int, voted: Boolean) -> Unit,
 ) {
     Card(
@@ -128,6 +131,14 @@ fun LinkItem(
                     }
                 }
                 Spacer(modifier = Modifier.size(8.dp))
+                state.embedContentState?.let {
+                    EmbedContent(
+                        state = state.embedContentState,
+                        onPreviewClick = { onEmbedPreviewClick(state.embedContentState) },
+                        onFetchedContentClick = { onUrlClicked(state.embedContentState.url) },
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                }
                 FlowRow {
                     state.authorState?.let {
                         Author(
@@ -203,6 +214,7 @@ fun LinkItem(
                                     comment.voteState.positiveVoteButtonState?.isVoted ?: false,
                                 )
                             },
+                            onEmbedPreviewClick = { embed -> onEmbedPreviewClick(embed) },
                         )
                         if (index != state.comments.lastIndex) {
                             Spacer(Modifier.size(12.dp))
@@ -260,6 +272,7 @@ private fun LinkItemPreview() {
             onUrlClicked = {},
             onImageClicked = {},
             onLinkCommentVoteUpClick = { _, _, _ -> },
+            onEmbedPreviewClick = {},
         )
     }
 }

@@ -526,6 +526,7 @@ private fun LinkDetailsCommentItem(
                         )
                     },
                     onImageClick = { actions.onImageClicked(it) },
+                    onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.comment.id, embed) },
                 )
 
                 state.replies.forEach { reply ->
@@ -550,6 +551,7 @@ private fun LinkDetailsCommentItem(
                             )
                         },
                         onImageClick = { actions.onImageClicked(it) },
+                        onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(reply.id, embed) },
                     )
                 }
 

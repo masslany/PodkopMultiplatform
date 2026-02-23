@@ -11,6 +11,7 @@ import pl.masslany.podkop.common.models.avatar.AvatarState
 import pl.masslany.podkop.common.models.avatar.AvatarType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
+import pl.masslany.podkop.common.models.embed.toEmbedContentState
 import pl.masslany.podkop.common.models.isGifImage
 import pl.masslany.podkop.common.models.toEntryContentState
 import pl.masslany.podkop.common.models.toNameColorType
@@ -86,6 +87,7 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
         voteState = this.toVoteState(),
         entryContentState = entryContentState,
         embedImageState = embedImageState,
+        embedContentState = this.media?.embed.toEmbedContentState(),
     )
 }
 
@@ -142,5 +144,6 @@ private fun Comment.toEntryCommentItemState(): EntryCommentItemState {
         voteState = this.toVoteState(),
         entryContentState = entryContentState,
         embedImageState = embedImageState,
+        embedContentState = this.media.embed.toEmbedContentState(),
     )
 }

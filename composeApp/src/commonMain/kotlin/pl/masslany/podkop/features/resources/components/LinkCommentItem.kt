@@ -12,7 +12,9 @@ import pl.masslany.podkop.common.components.Avatar
 import pl.masslany.podkop.common.components.EmbedImage
 import pl.masslany.podkop.common.components.EntryContent
 import pl.masslany.podkop.common.components.Published
+import pl.masslany.podkop.common.components.embed.EmbedContent
 import pl.masslany.podkop.common.components.vote.Vote
+import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 
 @Composable
@@ -24,6 +26,7 @@ fun LinkCommentItem(
     onUrlClick: (String) -> Unit,
     onVoteUpClick: () -> Unit,
     onImageClick: (String) -> Unit,
+    onEmbedPreviewClick: (EmbedContentState) -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -69,6 +72,14 @@ fun LinkCommentItem(
             EmbedImage(
                 state = state.embedImageState,
                 onImageClick = { onImageClick(state.embedImageState.url) },
+            )
+        }
+        state.embedContentState?.let {
+            Spacer(Modifier.size(8.dp))
+            EmbedContent(
+                state = state.embedContentState,
+                onPreviewClick = { onEmbedPreviewClick(state.embedContentState) },
+                onFetchedContentClick = { onUrlClick(state.embedContentState.url) },
             )
         }
     }

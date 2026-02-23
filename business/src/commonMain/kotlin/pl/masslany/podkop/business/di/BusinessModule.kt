@@ -2,6 +2,8 @@ package pl.masslany.podkop.business.di
 
 import org.koin.dsl.module
 import pl.masslany.podkop.business.auth.data.di.authDataModule
+import pl.masslany.podkop.business.embeds.data.di.twitterEmbedPreviewDataModule
+import pl.masslany.podkop.business.embeds.data.network.di.twitterEmbedPreviewNetworkModule
 import pl.masslany.podkop.business.entries.data.di.entriesDataModule
 import pl.masslany.podkop.business.entries.data.network.di.entriesNetworkModule
 import pl.masslany.podkop.business.hits.data.di.hitsDataModule
@@ -21,6 +23,8 @@ val businessModule = module {
         linksDataModule,
         linksNetworkModule,
         authDataModule,
+        twitterEmbedPreviewDataModule,
+        twitterEmbedPreviewNetworkModule,
         hitsDataModule,
         hitsNetworkModule,
         entriesDataModule,
