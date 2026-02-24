@@ -12,6 +12,7 @@ import pl.masslany.podkop.common.components.Avatar
 import pl.masslany.podkop.common.components.EmbedImage
 import pl.masslany.podkop.common.components.EntryContent
 import pl.masslany.podkop.common.components.Published
+import pl.masslany.podkop.common.components.Survey
 import pl.masslany.podkop.common.components.embed.EmbedContent
 import pl.masslany.podkop.common.components.vote.Vote
 import pl.masslany.podkop.common.models.embed.EmbedContentState
@@ -67,6 +68,12 @@ fun EntryItem(
             onTagClick = onTagClick,
             onUrlClick = onUrlClick,
         )
+        state.surveyState?.let {
+            Spacer(Modifier.size(8.dp))
+            Survey(
+                state = it,
+            )
+        }
         state.embedImageState?.let {
             Spacer(Modifier.size(8.dp))
             EmbedImage(

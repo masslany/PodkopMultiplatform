@@ -13,6 +13,7 @@ import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
 import pl.masslany.podkop.common.models.embed.toEmbedContentState
 import pl.masslany.podkop.common.models.isGifImage
+import pl.masslany.podkop.common.models.survey.toSurveyState
 import pl.masslany.podkop.common.models.toEntryContentState
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.models.toPublishedTimeType
@@ -86,6 +87,7 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
             .toImmutableList(),
         voteState = this.toVoteState(),
         entryContentState = entryContentState,
+        surveyState = this.media?.survey.toSurveyState(),
         embedImageState = embedImageState,
         embedContentState = this.media?.embed.toEmbedContentState(),
     )
