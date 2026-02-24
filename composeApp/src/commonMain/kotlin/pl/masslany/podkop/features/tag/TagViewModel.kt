@@ -22,7 +22,10 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 class TagViewModel(
     private val tag: String,
     private val tagsRepository: TagsRepository,
@@ -37,6 +40,7 @@ class TagViewModel(
 
     private var currentSort: TagsSort = TagsSort.All
     private var currentType: TagsType = TagsType.All
+    private val screenInstanceId = Uuid.random().toString()
 
     private val paginator = Paginator(
         scope = viewModelScope,
@@ -60,7 +64,9 @@ class TagViewModel(
         )
     }
 
-    private val _state = MutableStateFlow(TagScreenState.initial)
+    private val _state = MutableStateFlow(
+        TagScreenState.initial.copy(screenInstanceId = screenInstanceId),
+    )
     val state = combine(
         _state,
         resourceItemStateHolder.items,
@@ -70,7 +76,11 @@ class TagViewModel(
             resources = resources,
             isPaginating = paginator is PaginatorState.Loading,
         )
-    }.stateIn(viewModelScope, WhileSubscribed(5000), TagScreenState.initial)
+    }.stateIn(
+        viewModelScope,
+        WhileSubscribed(5000),
+        TagScreenState.initial.copy(screenInstanceId = screenInstanceId),
+    )
 
     init {
         resourceItemStateHolder.init(viewModelScope)

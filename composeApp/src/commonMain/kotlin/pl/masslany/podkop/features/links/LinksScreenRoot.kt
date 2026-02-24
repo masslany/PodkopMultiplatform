@@ -92,6 +92,7 @@ fun LinksScreenRoot(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
     val lazyListState = rememberLazyListPaginator(
+        resetStateKey = state.screenInstanceId,
         shouldPaginate = { lastVisibleIndex, totalItems ->
             viewModel.shouldPaginate(lastVisibleIndex, totalItems)
         },

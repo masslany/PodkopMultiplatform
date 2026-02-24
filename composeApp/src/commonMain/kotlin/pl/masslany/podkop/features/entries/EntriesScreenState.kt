@@ -7,6 +7,7 @@ import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 data class EntriesScreenState(
+    val screenInstanceId: String,
     val isLoading: Boolean,
     val isError: Boolean,
     val isRefreshing: Boolean,
@@ -17,6 +18,7 @@ data class EntriesScreenState(
 ) {
     companion object Companion {
         val initial = EntriesScreenState(
+            screenInstanceId = "",
             isLoading = true,
             isError = false,
             isRefreshing = false,

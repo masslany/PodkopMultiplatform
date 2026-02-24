@@ -26,7 +26,10 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 class EntriesViewModel(
     private val authRepository: AuthRepository,
     private val entriesRepository: EntriesRepository,
@@ -41,6 +44,7 @@ class EntriesViewModel(
 
     private var currentEntriesSortType: EntriesSortType = EntriesSortType.Hot
     private var currentHotSortType: HotSortType = HotSortType.TwelveHours
+    private val screenInstanceId = Uuid.random().toString()
 
     private val paginator = Paginator(
         scope = viewModelScope,
@@ -65,7 +69,9 @@ class EntriesViewModel(
         )
     }
 
-    private val _state = MutableStateFlow(EntriesScreenState.initial)
+    private val _state = MutableStateFlow(
+        EntriesScreenState.initial.copy(screenInstanceId = screenInstanceId),
+    )
     val state = combine(
         _state,
         resourceItemStateHolder.items,
@@ -75,7 +81,11 @@ class EntriesViewModel(
             entries = entries,
             isPaginating = paginator is PaginatorState.Loading,
         )
-    }.stateIn(viewModelScope, WhileSubscribed(5000), EntriesScreenState.initial)
+    }.stateIn(
+        viewModelScope,
+        WhileSubscribed(5000),
+        EntriesScreenState.initial.copy(screenInstanceId = screenInstanceId),
+    )
 
     private val entriesSortTypes = entriesRepository.getEntriesSortTypes()
         .map { entriesSortType -> entriesSortType.toDropdownMenuItemType() }

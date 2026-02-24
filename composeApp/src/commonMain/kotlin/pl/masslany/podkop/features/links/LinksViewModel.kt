@@ -26,7 +26,10 @@ import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.topbar.TopBarActions
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 class LinksViewModel(
     private val isUpcoming: Boolean,
     private val authRepository: AuthRepository,
@@ -43,6 +46,7 @@ class LinksViewModel(
 
     val linksType = if (isUpcoming) LinksType.UPCOMING else LinksType.HOMEPAGE
     var selectedLinksSortType = if (isUpcoming) LinksSortType.Active else LinksSortType.Newest
+    private val screenInstanceId = Uuid.random().toString()
 
     private val paginator = Paginator(
         scope = viewModelScope,
@@ -67,7 +71,9 @@ class LinksViewModel(
         )
     }
 
-    private val _state = MutableStateFlow(LinksScreenState.initial)
+    private val _state = MutableStateFlow(
+        LinksScreenState.initial.copy(screenInstanceId = screenInstanceId),
+    )
     val state = combine(
         _state,
         linksResourceItemStateHolder.items,
@@ -79,7 +85,11 @@ class LinksViewModel(
             hits = hits,
             isPaginating = paginator is PaginatorState.Loading,
         )
-    }.stateIn(viewModelScope, WhileSubscribed(5000), LinksScreenState.initial)
+    }.stateIn(
+        viewModelScope,
+        WhileSubscribed(5000),
+        LinksScreenState.initial.copy(screenInstanceId = screenInstanceId),
+    )
 
     init {
         linksResourceItemStateHolder.init(viewModelScope, isUpcoming)

@@ -1,18 +1,21 @@
 package pl.masslany.podkop.common.pagination
 
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.saveable.rememberSaveable
 import kotlinx.coroutines.launch
 
 @Composable
 fun rememberLazyListPaginator(
+    resetStateKey: Any? = null,
     shouldPaginate: (lastVisibleIndex: Int?, totalItems: Int) -> Boolean,
     paginate: () -> Unit,
 ): LazyListState {
-    val lazyListState = rememberLazyListState()
+    val lazyListState = rememberSaveable(resetStateKey, saver = LazyListState.Saver) {
+        LazyListState()
+    }
     Paginator(
         paginate = paginate,
         shouldPaginate = shouldPaginate,

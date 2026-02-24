@@ -7,6 +7,7 @@ import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 data class TagScreenState(
+    val screenInstanceId: String,
     val tag: String,
     val bannerUrl: String,
     val isLoading: Boolean,
@@ -20,6 +21,7 @@ data class TagScreenState(
 ) {
     companion object {
         val initial = TagScreenState(
+            screenInstanceId = "",
             tag = "",
             bannerUrl = "",
             isLoading = true,

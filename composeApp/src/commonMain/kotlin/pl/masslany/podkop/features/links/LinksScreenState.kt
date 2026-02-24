@@ -7,6 +7,7 @@ import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 data class LinksScreenState(
+    val screenInstanceId: String,
     val isLoading: Boolean,
     val isError: Boolean,
     val isRefreshing: Boolean,
@@ -18,6 +19,7 @@ data class LinksScreenState(
 ) {
     companion object {
         val initial = LinksScreenState(
+            screenInstanceId = "",
             isLoading = true,
             isError = false,
             isRefreshing = false,

@@ -86,6 +86,7 @@ fun TagScreenRoot(
     val snackbarHostState = LocalAppSnackbarHostState.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val lazyListState = rememberLazyListPaginator(
+        resetStateKey = state.screenInstanceId,
         shouldPaginate = { lastVisibleIndex, totalItems ->
             viewModel.shouldPaginate(lastVisibleIndex, totalItems)
         },
