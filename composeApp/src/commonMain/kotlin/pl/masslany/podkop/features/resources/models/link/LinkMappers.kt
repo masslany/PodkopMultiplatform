@@ -95,6 +95,5 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
         comments = comments,
         commentCount = commentCount,
         publishedTimeType = publishedTimeType,
-        embedContentState = this.media?.embed.toEmbedContentState(),
     )
 }
