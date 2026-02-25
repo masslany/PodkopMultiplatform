@@ -43,6 +43,8 @@ import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenRoot
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.ProfileScreenRoot
+import pl.masslany.podkop.features.search.SearchScreen
+import pl.masslany.podkop.features.search.SearchScreenRoot
 import pl.masslany.podkop.features.settings.SettingsScreen
 import pl.masslany.podkop.features.settings.SettingsScreenRoot
 import pl.masslany.podkop.features.tag.TagScreen
@@ -128,6 +130,12 @@ fun App() {
 
                     entry<SettingsScreen> {
                         SettingsScreenRoot(
+                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<SearchScreen> {
+                        SearchScreenRoot(
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )
                     }

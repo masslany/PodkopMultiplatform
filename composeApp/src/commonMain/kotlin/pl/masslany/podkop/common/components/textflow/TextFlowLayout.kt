@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import kotlin.math.max
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.preview.PreviewFixtures
-import kotlin.math.max
 
 /**
  * The material-independent composable to draw a text which flows around an "obstacle". Obstacle can be placed to the

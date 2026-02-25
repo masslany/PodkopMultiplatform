@@ -158,6 +158,8 @@
 
     <!-- Search -->
     <string name="search_screen_text_field_placeholder">Wyszukaj użytkownika, tag...</string>
+    <string name="search_screen_empty_prompt">Wpisz frazę, aby rozpocząć wyszukiwanie</string>
+    <string name="search_screen_min_query_hint">Wpisz co najmniej %1$d znaki</string>
     <string name="search_screen_tags_result_label">Tagi</string>
     <string name="search_screen_users_result_label">Użytkownicy</string>
     <string name="search_screen_users_result_failure">Wystąpił błąd podczas wczytywania użytkowników</string>

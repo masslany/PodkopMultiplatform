@@ -22,6 +22,7 @@ import pl.masslany.podkop.features.linkdetails.di.linkDetailsModule
 import pl.masslany.podkop.features.links.di.linksModule
 import pl.masslany.podkop.features.profile.di.profileModule
 import pl.masslany.podkop.features.resources.di.resourcesModule
+import pl.masslany.podkop.features.search.di.searchModule
 import pl.masslany.podkop.features.settings.di.settingsModule
 import pl.masslany.podkop.features.tag.di.tagModule
 import pl.masslany.podkop.features.topbar.di.topBarModule
@@ -43,6 +44,7 @@ val composeAppModule = module {
         linkDetailsModule,
         imageViewerModule,
         profileModule,
+        searchModule,
         settingsModule,
         tagModule,
         topBarModule,

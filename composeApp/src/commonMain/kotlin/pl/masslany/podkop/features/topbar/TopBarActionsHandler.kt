@@ -2,6 +2,7 @@ package pl.masslany.podkop.features.topbar
 
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.profile.ProfileScreen
+import pl.masslany.podkop.features.search.SearchScreen
 
 class TopBarActionsHandler(private val appNavigator: AppNavigator) : TopBarActions {
 
@@ -14,6 +15,6 @@ class TopBarActionsHandler(private val appNavigator: AppNavigator) : TopBarActio
     }
 
     override fun onTopBarSearchClicked() {
-        // TODO: Navigate to search screen when it exists.
+        appNavigator.navigateTo(SearchScreen)
     }
 }
