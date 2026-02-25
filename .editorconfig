@@ -44,3 +44,8 @@ ktlint_standard_function-call-spacing = disabled
 # 10. Use the Android Studio/IntelliJ style instead of "Ktlint Official".
 # The 'official' style is significantly more aggressive about collapsing chains.
 ktlint_code_style = android_studio
+
+# Compose uses PascalCase for @Composable functions.
+# Some code also uses @Preview and @OptIn above @Composable.
+ktlint_function_naming_ignore_when_annotated_with = Composable,Preview,OptIn
+ktlint_standard_function-naming_ignore_when_annotated_with = Composable,Preview,OptIn

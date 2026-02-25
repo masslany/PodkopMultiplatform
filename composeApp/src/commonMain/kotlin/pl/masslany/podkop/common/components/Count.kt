@@ -22,10 +22,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import pl.masslany.podkop.common.models.CountState
-import pl.masslany.podkop.common.theme.PodkopTheme
+import pl.masslany.podkop.common.preview.CountStateProvider
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.theme.colorsPalette
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_fire
@@ -106,17 +108,10 @@ private fun backgroundColorRouter(color: Color, isVoted: Boolean): Color = if (i
 
 @Preview
 @Composable
-private fun CountPreview() {
-    PodkopTheme {
-        Count(
-            modifier = Modifier,
-            state = CountState(
-                count = "1",
-                isHot = true,
-                isVoted = false,
-                canVote = true,
-            ),
-            onClick = {},
-        )
+private fun CountPreview(
+    @PreviewParameter(CountStateProvider::class) state: CountState,
+) {
+    PodkopPreview(darkTheme = false) {
+        Count(state = state, onClick = {})
     }
 }

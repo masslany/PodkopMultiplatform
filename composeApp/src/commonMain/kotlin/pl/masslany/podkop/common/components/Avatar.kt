@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -24,6 +25,8 @@ import coil3.request.ImageRequest
 import org.jetbrains.compose.resources.painterResource
 import pl.masslany.podkop.common.models.avatar.AvatarState
 import pl.masslany.podkop.common.models.avatar.AvatarType
+import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
+import pl.masslany.podkop.common.preview.PodkopPreview
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_profile
 
@@ -81,5 +84,41 @@ fun AvatarImageTypeRouter(avatarType: AvatarType) {
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun AvatarPreviewNetwork() {
+    PodkopPreview(darkTheme = false) {
+        Avatar(
+            state = AvatarState(
+                type = AvatarType.NetworkImage("https://picsum.photos/seed/avatar-preview/96/96"),
+                genderIndicatorType = GenderIndicatorType.Male,
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun AvatarPreviewNoAvatar() {
+    PodkopPreview(darkTheme = true) {
+        Avatar(
+            state = AvatarState(
+                type = AvatarType.NoAvatar,
+                genderIndicatorType = GenderIndicatorType.Unspecified,
+            ),
+            onClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun AvatarImageTypeRouterPreview() {
+    PodkopPreview(darkTheme = false) {
+        AvatarImageTypeRouter(avatarType = AvatarType.NoAvatar)
     }
 }

@@ -10,8 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.preview.PodkopPreview
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.generic_error_body
 import podkop.composeapp.generated.resources.generic_error_title
@@ -40,5 +42,16 @@ fun GenericErrorScreen(
         Button(onClick = onRefreshClicked) {
             Text(text = stringResource(resource = Res.string.refresh_button))
         }
+    }
+}
+
+@Preview
+@Composable
+private fun GenericErrorScreenPreview() {
+    PodkopPreview(darkTheme = false) {
+        GenericErrorScreen(
+            modifier = Modifier.padding(16.dp),
+            onRefreshClicked = {},
+        )
     }
 }

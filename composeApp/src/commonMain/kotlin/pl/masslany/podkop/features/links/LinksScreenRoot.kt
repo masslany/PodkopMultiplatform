@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -37,6 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -52,7 +55,10 @@ import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.links.hits.HitsList
+import pl.masslany.podkop.features.links.preview.LinksScreenStateProvider
+import pl.masslany.podkop.features.links.preview.NoOpLinksActions
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
@@ -64,11 +70,11 @@ import podkop.composeapp.generated.resources.ic_search
 import podkop.composeapp.generated.resources.topbar_label_homepage
 import podkop.composeapp.generated.resources.topbar_label_upcoming
 
-private const val FabItemsOffset = 10
+private const val FAB_ITEMS_OFFSET = 10
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LinksScreenRoot(
+internal fun LinksScreenRoot(
     isUpcoming: Boolean,
     paddingValues: PaddingValues,
     onLinkClicked: ((Int) -> Unit)? = null,
@@ -89,8 +95,6 @@ fun LinksScreenRoot(
         }
     }
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
     val lazyListState = rememberLazyListPaginator(
         resetStateKey = state.screenInstanceId,
         shouldPaginate = { lastVisibleIndex, totalItems ->
@@ -100,10 +104,29 @@ fun LinksScreenRoot(
             viewModel.paginate()
         },
     )
+    LinksScreenContent(
+        paddingValues = paddingValues,
+        state = state,
+        actions = actions,
+        lazyListState = lazyListState,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LinksScreenContent(
+    paddingValues: PaddingValues,
+    state: LinksScreenState,
+    actions: LinksActions,
+    lazyListState: LazyListState,
+    modifier: Modifier = Modifier,
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
     val isScrollingUp = lazyListState.isScrollingUp()
     val showFab by remember(isScrollingUp) {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex > FabItemsOffset && isScrollingUp
+            lazyListState.firstVisibleItemIndex > FAB_ITEMS_OFFSET && isScrollingUp
         }
     }
     val density = LocalDensity.current
@@ -117,8 +140,9 @@ fun LinksScreenRoot(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(
                 start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
                 end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
@@ -134,7 +158,7 @@ fun LinksScreenRoot(
                 title = { Text(text = getTopBarTitle(state.isUpcoming)) },
                 actions = {
                     if (!state.isUpcoming) {
-                        IconButton(onClick = viewModel::onTopBarSearchClicked) {
+                        IconButton(onClick = actions::onTopBarSearchClicked) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = vectorResource(resource = Res.drawable.ic_search),
@@ -144,7 +168,7 @@ fun LinksScreenRoot(
                             )
                         }
                     }
-                    IconButton(onClick = viewModel::onTopBarProfileClicked) {
+                    IconButton(onClick = actions::onTopBarProfileClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_person),
@@ -160,7 +184,7 @@ fun LinksScreenRoot(
 
             PullToRefreshBox(
                 isRefreshing = state.isRefreshing,
-                onRefresh = { viewModel.onRefresh(state.sortMenuState.selected) },
+                onRefresh = { actions.onRefresh(state.sortMenuState.selected) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -176,10 +200,10 @@ fun LinksScreenRoot(
                         modifier = Modifier
                             .fillMaxSize()
                             .align(Alignment.Center),
-                        onRefreshClicked = { viewModel.onRefresh(state.sortMenuState.selected) },
+                        onRefreshClicked = { actions.onRefresh(state.sortMenuState.selected) },
                     )
                 } else {
-                    LinksScreen(
+                    LinksScreenList(
                         modifier = Modifier
                             .fillMaxSize(),
                         state = state,
@@ -231,7 +255,7 @@ fun LinksScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LinksScreen(
+private fun LinksScreenList(
     modifier: Modifier = Modifier,
     state: LinksScreenState,
     actions: LinksActions,
@@ -298,4 +322,19 @@ private fun getTopBarTitle(isUpcoming: Boolean): String = if (isUpcoming) {
     stringResource(resource = Res.string.topbar_label_upcoming)
 } else {
     stringResource(resource = Res.string.topbar_label_homepage)
+}
+
+@Preview
+@Composable
+private fun LinksScreenContentPreview(
+    @PreviewParameter(LinksScreenStateProvider::class) state: LinksScreenState,
+) {
+    PodkopPreview(darkTheme = false) {
+        LinksScreenContent(
+            paddingValues = PaddingValues(),
+            state = state,
+            actions = NoOpLinksActions,
+            lazyListState = rememberLazyListState(),
+        )
+    }
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mikepenz.markdown.annotator.DefaultAnnotatorSettings
 import com.mikepenz.markdown.annotator.buildMarkdownAnnotatedString
@@ -31,6 +32,9 @@ import com.mikepenz.markdown.model.markdownAnimations
 import com.mikepenz.markdown.utils.codeSpanStyle
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.models.EntryContentState
+import pl.masslany.podkop.common.models.toEntryContentState
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.PreviewFixtures
 import pl.masslany.podkop.common.theme.colorsPalette
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.comment_button_show_spoiler
@@ -186,3 +190,29 @@ private val spoilerComponents = markdownComponents(
         }
     },
 )
+
+@Preview
+@Composable
+private fun EntryContentPreviewContent() {
+    PodkopPreview(darkTheme = false) {
+        EntryContent(
+            state = PreviewFixtures.LONG_BODY.toEntryContentState(),
+            onProfileClick = {},
+            onTagClick = {},
+            onUrlClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun EntryContentPreviewDeleted() {
+    PodkopPreview(darkTheme = true) {
+        EntryContent(
+            state = EntryContentState.DeletedByModerator,
+            onProfileClick = {},
+            onTagClick = {},
+            onUrlClick = {},
+        )
+    }
+}

@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -33,6 +34,9 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import pl.masslany.podkop.common.components.embed.MediumMinWidth
 import pl.masslany.podkop.common.models.embed.TwitterEmbedPreviewState
+import pl.masslany.podkop.common.models.embed.TwitterEmbedState
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.PreviewFixtures
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_comment
 import podkop.composeapp.generated.resources.ic_favorite
@@ -169,6 +173,21 @@ private fun TwitterStat(
             text = count.toString(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TwitterTweetCardPreview() {
+    val tweet = PreviewFixtures.embedStateTwitterLoaded()
+        .twitterState
+        .let { (it as TwitterEmbedState.Loaded).tweet }
+    PodkopPreview(darkTheme = false) {
+        TwitterTweetCard(
+            modifier = Modifier.padding(16.dp),
+            tweet = tweet,
+            onClick = {},
         )
     }
 }

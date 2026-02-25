@@ -175,7 +175,8 @@ open class BaseResourceItemStateHolder(
                                 }
                                 .onFailure { error ->
                                     logger.error(
-                                        message = "Twitter embed preview fetch failed for itemId=$itemId url=${state.url}",
+                                        message = "Twitter embed preview fetch failed for itemId=$itemId " +
+                                            "url=${state.url}",
                                         throwable = error,
                                     )
                                     updateTwitterEmbedState(

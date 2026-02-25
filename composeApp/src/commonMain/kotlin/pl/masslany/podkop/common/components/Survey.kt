@@ -28,10 +28,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.models.survey.AnswerState
 import pl.masslany.podkop.common.models.survey.SurveyState
+import pl.masslany.podkop.common.preview.PodkopPreview
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.survey_answers_count
 import podkop.composeapp.generated.resources.survey_hide_results
@@ -47,9 +50,9 @@ fun Survey(
         modifier = modifier
             .background(
                 color = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
             )
-            .padding(8.dp)
+            .padding(8.dp),
     ) {
         Spacer(modifier = Modifier.size(4.dp))
         Text(
@@ -61,7 +64,7 @@ fun Survey(
         )
         Spacer(modifier = Modifier.size(8.dp))
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             state.answers.forEach { answer ->
                 AnswerItem(state = answer, showResults)
@@ -71,7 +74,7 @@ fun Survey(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             Text(
                 text = stringResource(
@@ -84,7 +87,7 @@ fun Survey(
             )
             TextButton(
                 onClick = { showResults = !showResults },
-                contentPadding = PaddingValues(8.dp)
+                contentPadding = PaddingValues(8.dp),
             ) {
                 Text(
                     text = resultsLabel(showResults),
@@ -108,11 +111,11 @@ private fun AnswerItem(
             modifier = Modifier
                 .background(
                     color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
                 )
                 .animateContentSize()
                 .fillMaxWidth(widthFraction)
-                .height(48.dp)
+                .height(48.dp),
         )
         Row(
             modifier = Modifier
@@ -130,7 +133,7 @@ private fun AnswerItem(
                             Modifier.weight(1f)
                         } else {
                             Modifier
-                        }
+                        },
                     ),
                 text = state.text,
                 style = MaterialTheme.typography.bodySmall,
@@ -155,19 +158,49 @@ private fun AnswerItem(
 private fun backgroundWidthFraction(
     state: AnswerState,
     showResults: Boolean,
-): Float {
-    return if (showResults) {
-        state.percentageFraction
-    } else {
-        1f
-    }
-}
+): Float = if (showResults) state.percentageFraction else 1f
 
 @Composable
-private fun resultsLabel(showResults: Boolean): String {
-    return if (showResults) {
+private fun resultsLabel(showResults: Boolean): String =
+    if (showResults) {
         stringResource(resource = Res.string.survey_hide_results)
     } else {
         stringResource(resource = Res.string.survey_show_results)
+    }
+
+@Preview
+@Composable
+private fun SurveyPreview() {
+    PodkopPreview(darkTheme = false) {
+        Survey(
+            modifier = Modifier.padding(16.dp),
+            state = SurveyState(
+                question = "Which state should previews cover?",
+                answers = persistentListOf(
+                    AnswerState(
+                        isSelected = true,
+                        text = "Loading / error / empty",
+                        count = 128,
+                        percentageFraction = 0.64f,
+                        percentage = "64",
+                    ),
+                    AnswerState(
+                        isSelected = false,
+                        text = "Content variations",
+                        count = 52,
+                        percentageFraction = 0.26f,
+                        percentage = "26",
+                    ),
+                    AnswerState(
+                        isSelected = false,
+                        text = "Dark mode",
+                        count = 20,
+                        percentageFraction = 0.10f,
+                        percentage = "10",
+                    ),
+                ),
+                count = 200,
+            ),
+        )
     }
 }

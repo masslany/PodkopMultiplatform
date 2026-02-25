@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -28,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -40,6 +42,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
@@ -52,6 +56,7 @@ import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.profile.components.ObservedTagItem
 import pl.masslany.podkop.features.profile.components.ObservedUserItem
@@ -63,6 +68,8 @@ import pl.masslany.podkop.features.profile.models.ProfileContentState
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
 import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
+import pl.masslany.podkop.features.profile.preview.NoOpProfileActions
+import pl.masslany.podkop.features.profile.preview.ProfileScreenStateProvider
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import podkop.composeapp.generated.resources.Res
@@ -76,11 +83,11 @@ import podkop.composeapp.generated.resources.profile_no_observed_tags
 import podkop.composeapp.generated.resources.profile_no_observed_users
 import podkop.composeapp.generated.resources.topbar_label_profile
 
-private const val FabItemsOffset = 10
+private const val FAB_ITEMS_OFFSET = 10
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreenRoot(
+internal fun ProfileScreenRoot(
     username: String?,
     paddingValues: PaddingValues,
 ) {
@@ -89,7 +96,6 @@ fun ProfileScreenRoot(
     )
     val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val lazyListState = rememberLazyListPaginator(
         shouldPaginate = { lastVisibleIndex, totalItems ->
             viewModel.shouldPaginate(lastVisibleIndex, totalItems)
@@ -98,10 +104,31 @@ fun ProfileScreenRoot(
             viewModel.paginate()
         },
     )
+
+    ProfileScreenContent(
+        paddingValues = paddingValues,
+        state = state,
+        actions = viewModel,
+        lazyListState = lazyListState,
+        snackbarHostState = snackbarHostState,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileScreenContent(
+    paddingValues: PaddingValues,
+    state: ProfileScreenState,
+    actions: ProfileActions,
+    lazyListState: LazyListState,
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val isScrollingUp = lazyListState.isScrollingUp()
     val showFab by remember(isScrollingUp) {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex > FabItemsOffset && isScrollingUp
+            lazyListState.firstVisibleItemIndex > FAB_ITEMS_OFFSET && isScrollingUp
         }
     }
     val showProfileName by remember {
@@ -112,7 +139,7 @@ fun ProfileScreenRoot(
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(
                 start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
@@ -143,7 +170,7 @@ fun ProfileScreenRoot(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = viewModel::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
@@ -155,7 +182,7 @@ fun ProfileScreenRoot(
                 },
                 actions = {
                     if (state.content.shouldShowSettingsButton()) {
-                        IconButton(onClick = viewModel::onTopBarSettingsClicked) {
+                        IconButton(onClick = actions::onTopBarSettingsClicked) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = vectorResource(resource = Res.drawable.ic_settings),
@@ -208,12 +235,12 @@ fun ProfileScreenRoot(
                 )
             }
         } else {
-            ProfileScreen(
+            ProfileScreenBody(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues = innerPaddingValues),
                 state = state,
-                actions = viewModel,
+                actions = actions,
                 lazyListState = lazyListState,
             )
         }
@@ -221,7 +248,7 @@ fun ProfileScreenRoot(
 }
 
 @Composable
-private fun ProfileScreen(
+private fun ProfileScreenBody(
     modifier: Modifier = Modifier,
     state: ProfileScreenState,
     actions: ProfileActions,
@@ -461,3 +488,19 @@ private fun ProfileContentState.shouldShowSettingsButton(): Boolean =
         is ProfileContentState.Loaded -> isCurrentUser
         else -> false
     }
+
+@Preview
+@Composable
+private fun ProfileScreenContentPreview(
+    @PreviewParameter(ProfileScreenStateProvider::class) state: ProfileScreenState,
+) {
+    PodkopPreview(darkTheme = false) {
+        ProfileScreenContent(
+            paddingValues = PaddingValues(),
+            state = state,
+            actions = NoOpProfileActions,
+            lazyListState = rememberLazyListState(),
+            snackbarHostState = remember { SnackbarHostState() },
+        )
+    }
+}

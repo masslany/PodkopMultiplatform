@@ -2,14 +2,19 @@ package pl.masslany.podkop.common.components.vote
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import pl.masslany.podkop.common.models.vote.VoteState
 import pl.masslany.podkop.common.models.vote.VoteValueType
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.VoteStateProvider
 import pl.masslany.podkop.common.theme.colorsPalette
 
 @Composable
@@ -68,5 +73,28 @@ fun VoteValue(voteValueType: VoteValueType) {
                 style = MaterialTheme.typography.labelLarge,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun VotePreview(
+    @PreviewParameter(VoteStateProvider::class) state: VoteState,
+) {
+    PodkopPreview(darkTheme = false) {
+        Vote(
+            modifier = Modifier.padding(16.dp),
+            state = state,
+            onVoteUpClick = {},
+            onVoteDownClick = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun VoteValuePreview() {
+    PodkopPreview(darkTheme = false) {
+        VoteValue(voteValueType = VoteValueType.Positive("42"))
     }
 }

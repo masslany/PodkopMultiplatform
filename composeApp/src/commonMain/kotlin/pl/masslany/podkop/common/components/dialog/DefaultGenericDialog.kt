@@ -13,7 +13,7 @@ import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.allStringResources
 
 @Composable
-fun DefaultGenericDialog(
+internal fun DefaultGenericDialog(
     dialog: GenericDialog,
     navigator: AppNavigator,
 ) {
@@ -58,12 +58,9 @@ private fun DialogText.resolve(): String =
     when (this) {
         is DialogText.Raw -> value
 
-        /**
-         * `DialogText.Resource` stores only a serializable resource key. We need to restore the
-         * generated `StringResource` instance before calling `stringResource(...)`.
-         *
-         * `Res.allStringResources` is the Compose-generated registry for this module.
-         */
+        // `DialogText.Resource` stores only a serializable resource key. We need to restore the
+        // generated `StringResource` instance before calling `stringResource(...)`.
+        // `Res.allStringResources` is the Compose-generated registry for this module.
         is DialogText.Resource -> stringResource(
             resource = requireNotNull(Res.allStringResources[key]) {
                 "Missing string resource for key: $key"

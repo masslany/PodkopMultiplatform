@@ -16,6 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -28,7 +30,9 @@ import pl.masslany.podkop.common.components.Dot
 import pl.masslany.podkop.common.components.Source
 import pl.masslany.podkop.common.components.Tag
 import pl.masslany.podkop.common.components.Title
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
+import pl.masslany.podkop.features.resources.preview.LinkItemStateProvider
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -115,5 +119,22 @@ fun LinkDetailsHeader(
             }
         }
         Spacer(modifier = Modifier.size(8.dp))
+    }
+}
+
+@Preview
+@Composable
+private fun LinkDetailsHeaderPreview(
+    @PreviewParameter(LinkItemStateProvider::class) state: LinkItemState,
+) {
+    PodkopPreview(darkTheme = false) {
+        LinkDetailsHeader(
+            modifier = Modifier.padding(bottom = 16.dp),
+            state = state,
+            onLinkClick = {},
+            onVoteClick = {},
+            onAuthorClick = {},
+            onTagClick = {},
+        )
     }
 }

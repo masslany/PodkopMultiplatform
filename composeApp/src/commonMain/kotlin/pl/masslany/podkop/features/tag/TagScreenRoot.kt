@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -28,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -44,11 +46,13 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
-import coil3.request.ImageRequest.Builder
+import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -60,8 +64,11 @@ import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
+import pl.masslany.podkop.features.tag.preview.NoOpTagActions
+import pl.masslany.podkop.features.tag.preview.TagScreenStateProvider
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
@@ -71,12 +78,12 @@ import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_person
 import podkop.composeapp.generated.resources.tag_details_screen_error_loading_tags
 
-private const val FabItemsOffset = 10
-private val TagBannerHeight = 160.dp
+private const val FAB_ITEMS_OFFSET = 10
+private val TAG_BANNER_HEIGHT = 160.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TagScreenRoot(
+internal fun TagScreenRoot(
     tag: String,
     paddingValues: PaddingValues,
 ) {
@@ -84,7 +91,6 @@ fun TagScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val snackbarHostState = LocalAppSnackbarHostState.current
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val lazyListState = rememberLazyListPaginator(
         resetStateKey = state.screenInstanceId,
         shouldPaginate = { lastVisibleIndex, totalItems ->
@@ -94,10 +100,30 @@ fun TagScreenRoot(
             viewModel.paginate()
         },
     )
+    TagScreenContent(
+        paddingValues = paddingValues,
+        state = state,
+        actions = viewModel,
+        lazyListState = lazyListState,
+        snackbarHostState = snackbarHostState,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TagScreenContent(
+    paddingValues: PaddingValues,
+    state: TagScreenState,
+    actions: TagActions,
+    lazyListState: LazyListState,
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val isScrollingUp = lazyListState.isScrollingUp()
     val showFab by remember(isScrollingUp) {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex > FabItemsOffset && isScrollingUp
+            lazyListState.firstVisibleItemIndex > FAB_ITEMS_OFFSET && isScrollingUp
         }
     }
     val showTitle by remember {
@@ -108,7 +134,7 @@ fun TagScreenRoot(
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(
                 start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
@@ -123,7 +149,7 @@ fun TagScreenRoot(
                     }
                 },
                 actions = {
-                    IconButton(onClick = viewModel::onTopBarProfileClicked) {
+                    IconButton(onClick = actions::onTopBarProfileClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_person),
@@ -134,7 +160,7 @@ fun TagScreenRoot(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = viewModel::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
@@ -181,7 +207,7 @@ fun TagScreenRoot(
     ) { innerPaddingValues ->
         PullToRefreshBox(
             isRefreshing = state.isRefreshing,
-            onRefresh = viewModel::onRefresh,
+            onRefresh = actions::onRefresh,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = innerPaddingValues.calculateTopPadding()),
@@ -197,13 +223,13 @@ fun TagScreenRoot(
                     modifier = Modifier
                         .fillMaxSize()
                         .align(Alignment.Center),
-                    onRefreshClicked = viewModel::onRefresh,
+                    onRefreshClicked = actions::onRefresh,
                 )
             } else {
-                TagScreen(
+                TagScreenList(
                     modifier = Modifier.fillMaxSize(),
                     state = state,
-                    actions = viewModel,
+                    actions = actions,
                     lazyListState = lazyListState,
                 )
             }
@@ -213,7 +239,7 @@ fun TagScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TagScreen(
+private fun TagScreenList(
     modifier: Modifier = Modifier,
     state: TagScreenState,
     actions: TagActions,
@@ -238,8 +264,8 @@ private fun TagScreen(
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(TagBannerHeight),
-                model = Builder(LocalPlatformContext.current)
+                    .height(TAG_BANNER_HEIGHT),
+                model = ImageRequest.Builder(LocalPlatformContext.current)
                     .data(state.bannerUrl)
                     .crossfade(true)
                     .build(),
@@ -319,5 +345,21 @@ private fun TagScreen(
                 PaginationLoadingIndicator()
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun TagScreenContentPreview(
+    @PreviewParameter(TagScreenStateProvider::class) state: TagScreenState,
+) {
+    PodkopPreview(darkTheme = false) {
+        TagScreenContent(
+            paddingValues = PaddingValues(),
+            state = state,
+            actions = NoOpTagActions,
+            lazyListState = rememberLazyListState(),
+            snackbarHostState = remember { SnackbarHostState() },
+        )
     }
 }

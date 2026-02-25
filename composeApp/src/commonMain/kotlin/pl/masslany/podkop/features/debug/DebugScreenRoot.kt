@@ -24,11 +24,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.features.debug.preview.DebugScreenStateProvider
+import pl.masslany.podkop.features.debug.preview.NoOpDebugActions
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.debug_entry_button_open
@@ -40,14 +45,29 @@ import podkop.composeapp.generated.resources.topbar_label_debug
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DebugScreenRoot(
+internal fun DebugScreenRoot(
     paddingValues: PaddingValues,
 ) {
     val viewModel = koinViewModel<DebugViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    DebugScreenContent(
+        paddingValues = paddingValues,
+        state = state,
+        actions = viewModel,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DebugScreenContent(
+    paddingValues: PaddingValues,
+    state: DebugScreenState,
+    actions: DebugActions,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(
                 start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
@@ -59,7 +79,7 @@ fun DebugScreenRoot(
                     Text(text = stringResource(resource = Res.string.topbar_label_debug))
                 },
                 navigationIcon = {
-                    IconButton(onClick = viewModel::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
@@ -93,7 +113,7 @@ fun DebugScreenRoot(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.entryIdInput,
-                onValueChange = viewModel::onEntryIdChanged,
+                onValueChange = actions::onEntryIdChanged,
                 singleLine = true,
                 label = {
                     Text(text = stringResource(resource = Res.string.debug_entry_hint))
@@ -107,11 +127,25 @@ fun DebugScreenRoot(
             )
 
             Button(
-                onClick = viewModel::onOpenEntryClicked,
+                onClick = actions::onOpenEntryClicked,
                 enabled = state.entryIdInput.isNotBlank(),
             ) {
                 Text(text = stringResource(resource = Res.string.debug_entry_button_open))
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun DebugScreenContentPreview(
+    @PreviewParameter(DebugScreenStateProvider::class) state: DebugScreenState,
+) {
+    PodkopPreview(darkTheme = false) {
+        DebugScreenContent(
+            paddingValues = PaddingValues(),
+            state = state,
+            actions = NoOpDebugActions,
+        )
     }
 }

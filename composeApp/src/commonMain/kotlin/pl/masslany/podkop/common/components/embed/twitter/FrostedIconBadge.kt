@@ -16,9 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import pl.masslany.podkop.common.preview.PodkopPreview
+import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.ic_x_logo
 
 private val OverlayBadgeSize = 56.dp
 private val OverlayBadgeForegroundSize = 50.dp
@@ -104,5 +108,21 @@ fun FrostedLoadingBadge(modifier: Modifier = Modifier) {
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun FrostedIconBadgePreview() {
+    PodkopPreview(darkTheme = false) {
+        FrostedIconBadge(iconRes = Res.drawable.ic_x_logo)
+    }
+}
+
+@Preview
+@Composable
+private fun FrostedLoadingBadgePreview() {
+    PodkopPreview(darkTheme = false) {
+        FrostedLoadingBadge()
     }
 }

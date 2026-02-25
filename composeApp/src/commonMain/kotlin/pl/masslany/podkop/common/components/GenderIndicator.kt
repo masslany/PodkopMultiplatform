@@ -7,7 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.theme.colorsPalette
 
 @Composable
@@ -27,4 +29,15 @@ fun GenderIndicatorType.toComposeColor(): Color = when (this) {
     GenderIndicatorType.Female -> MaterialTheme.colorsPalette.genderPink
     GenderIndicatorType.Male -> MaterialTheme.colorsPalette.genderBlue
     GenderIndicatorType.Unspecified -> MaterialTheme.colorsPalette.genderGray
+}
+
+@Preview
+@Composable
+private fun GenderIndicatorPreview() {
+    PodkopPreview(darkTheme = false) {
+        GenderIndicator(
+            type = GenderIndicatorType.Female,
+            modifier = Modifier,
+        )
+    }
 }

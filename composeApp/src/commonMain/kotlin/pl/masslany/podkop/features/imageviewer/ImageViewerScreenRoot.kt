@@ -17,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -34,6 +35,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,20 +45,23 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
+import pl.masslany.podkop.features.imageviewer.preview.ImageViewerScreenStateProvider
+import pl.masslany.podkop.features.imageviewer.preview.NoOpImageViewerActions
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.accessibility_topbar_downloads
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_download
 
-private const val MinScale = 1f
-private const val MaxScale = 5f
-private const val ScaleResetThreshold = 1.01f
+private const val MAX_SCALE = 5f
+private const val MIN_SCALE = 1f
+private const val SCALE_RESET_THRESHOLD = 1.01f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ImageViewerScreenRoot(
+internal fun ImageViewerScreenRoot(
     imageUrl: String,
     paddingValues: PaddingValues,
 ) {
@@ -65,8 +71,25 @@ fun ImageViewerScreenRoot(
     val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    ImageViewerScreenContent(
+        paddingValues = paddingValues,
+        state = state,
+        actions = viewModel,
+        snackbarHostState = snackbarHostState,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ImageViewerScreenContent(
+    paddingValues: PaddingValues,
+    state: ImageViewerScreenState,
+    actions: ImageViewerActions,
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .padding(
                 start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
                 end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
@@ -76,7 +99,7 @@ fun ImageViewerScreenRoot(
             TopAppBar(
                 title = { },
                 navigationIcon = {
-                    IconButton(onClick = viewModel::onBackClicked) {
+                    IconButton(onClick = actions::onBackClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
@@ -85,7 +108,7 @@ fun ImageViewerScreenRoot(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.onDownloadClicked(state.imageUrl) }) {
+                    IconButton(onClick = { actions.onDownloadClicked(state.imageUrl) }) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_download),
@@ -131,7 +154,7 @@ private fun ZoomableImage(
             }
             .pointerInput(containerSize) {
                 detectTransformGestures { _, pan, zoom, _ ->
-                    val updatedScale = (scale * zoom).coerceIn(MinScale, MaxScale)
+                    val updatedScale = (scale * zoom).coerceIn(MIN_SCALE, MAX_SCALE)
 
                     scale = updatedScale
                     offset = clampOffsetForScale(
@@ -145,11 +168,11 @@ private fun ZoomableImage(
                 detectTapGestures(
                     onDoubleTap = { tapOffset ->
                         val currentScale = scale
-                        val shouldResetZoom = currentScale > ScaleResetThreshold
+                        val shouldResetZoom = currentScale > SCALE_RESET_THRESHOLD
                         val updatedScale = if (shouldResetZoom) {
-                            MinScale
+                            MIN_SCALE
                         } else {
-                            (currentScale * 2f).coerceIn(MinScale, MaxScale)
+                            (currentScale * 2f).coerceIn(MIN_SCALE, MAX_SCALE)
                         }
 
                         scale = updatedScale
@@ -194,7 +217,7 @@ private fun clampOffsetForScale(
     scale: Float,
     offset: Offset,
 ): Offset {
-    if (scale <= MinScale) {
+    if (scale <= MIN_SCALE) {
         return Offset.Zero
     }
 
@@ -227,4 +250,19 @@ private fun calculateOffsetForDoubleTap(
         x = -contentPoint.x * updatedScale,
         y = -contentPoint.y * updatedScale,
     )
+}
+
+@Preview
+@Composable
+private fun ImageViewerScreenContentPreview(
+    @PreviewParameter(ImageViewerScreenStateProvider::class) state: ImageViewerScreenState,
+) {
+    PodkopPreview(darkTheme = false) {
+        ImageViewerScreenContent(
+            paddingValues = PaddingValues(),
+            state = state,
+            actions = NoOpImageViewerActions,
+            snackbarHostState = remember { SnackbarHostState() },
+        )
+    }
 }

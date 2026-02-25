@@ -9,9 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.theme.colorsPalette
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.links_screen_label_adult_rating
@@ -36,5 +38,13 @@ fun AdultRating(
             text = stringResource(resource = Res.string.links_screen_label_adult_rating),
             style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
         )
+    }
+}
+
+@Preview
+@Composable
+private fun AdultRatingPreview() {
+    PodkopPreview(darkTheme = false) {
+        AdultRating()
     }
 }

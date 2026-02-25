@@ -1,7 +1,11 @@
 package pl.masslany.podkop.common.components.textflow
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -17,7 +21,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.PreviewFixtures
 
 /**
  * The composable to draw a text which flows around an "obstacle". Obstacle can be placed to the start top corner or to
@@ -194,4 +202,22 @@ public enum class TextFlowObstacleAlignment {
      * Obstacle is aligned in the top end corner.
      */
     TopEnd,
+}
+
+@Preview
+@Composable
+private fun TextFlowPreview() {
+    PodkopPreview(darkTheme = false) {
+        TextFlow(
+            text = PreviewFixtures.LONG_BODY,
+            obstacleAlignment = TextFlowObstacleAlignment.TopStart,
+            obstacleContent = {
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .background(MaterialTheme.colorScheme.error),
+                )
+            },
+        )
+    }
 }

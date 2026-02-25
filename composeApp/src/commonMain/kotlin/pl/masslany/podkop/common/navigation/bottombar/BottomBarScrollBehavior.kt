@@ -17,7 +17,7 @@ val LocalBottomBarScrollBehavior =
         BottomBarScrollBehavior()
     }
 
-private const val SnapFlingVelocityThreshold = 1000f
+private const val SNAP_FLING_VELOCITY_THRESHOLD = 1000f
 
 @Stable
 class BottomBarScrollBehavior {
@@ -52,9 +52,9 @@ class BottomBarScrollBehavior {
 
         offsetPx = when {
             // Strong fling → follow direction
-            velocity < -SnapFlingVelocityThreshold -> heightPx
+            velocity < -SNAP_FLING_VELOCITY_THRESHOLD -> heightPx
 
-            velocity > SnapFlingVelocityThreshold -> 0f
+            velocity > SNAP_FLING_VELOCITY_THRESHOLD -> 0f
 
             // Weak fling / drag release → use position
             offsetPx > halfway -> heightPx

@@ -27,7 +27,7 @@ private const val PredictiveBackTransitionDurationMs = 280
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavigationContent(
+internal fun NavigationContent(
     state: NavigationState,
     onBack: () -> Unit,
     entryProvider: (NavTarget) -> NavEntry<NavTarget>,

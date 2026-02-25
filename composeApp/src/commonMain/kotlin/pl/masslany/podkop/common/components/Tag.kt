@@ -6,8 +6,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.models.TagItem
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.TagItemProvider
 import pl.masslany.podkop.common.theme.colorsPalette
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.tag_label
@@ -26,4 +30,17 @@ fun Tag(
         modifier = modifier
             .clickable { onTagClick(state.tag) },
     )
+}
+
+@Preview
+@Composable
+private fun TagPreview(
+    @PreviewParameter(TagItemProvider::class) state: TagItem,
+) {
+    PodkopPreview(darkTheme = false) {
+        Tag(
+            state = state,
+            onTagClick = {},
+        )
+    }
 }

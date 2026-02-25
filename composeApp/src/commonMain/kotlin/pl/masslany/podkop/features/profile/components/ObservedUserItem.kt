@@ -12,11 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pl.masslany.podkop.common.components.Avatar
 import pl.masslany.podkop.common.components.toComposeColor
+import pl.masslany.podkop.common.models.NameColorType
 import pl.masslany.podkop.common.models.avatar.AvatarState
 import pl.masslany.podkop.common.models.avatar.AvatarType
+import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
 
 @Composable
@@ -66,5 +70,25 @@ fun ObservedUserItem(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ObservedUserItemPreview() {
+    PodkopPreview(darkTheme = false) {
+        ObservedUserItem(
+            user = ProfileObservedUserItemState(
+                username = "alice",
+                avatarUrl = "https://picsum.photos/seed/alice/96/96",
+                genderIndicatorType = GenderIndicatorType.Female,
+                nameColorType = NameColorType.Orange,
+                online = true,
+                company = false,
+                verified = true,
+                status = "Building things.",
+            ),
+            onClick = {},
+        )
     }
 }

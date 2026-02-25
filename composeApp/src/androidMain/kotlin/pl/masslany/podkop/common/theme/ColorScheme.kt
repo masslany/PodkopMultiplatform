@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 @Composable
-actual fun provideColorScheme(
+internal actual fun provideColorScheme(
     darkTheme: Boolean,
     dynamicColor: Boolean,
 ): ColorScheme {

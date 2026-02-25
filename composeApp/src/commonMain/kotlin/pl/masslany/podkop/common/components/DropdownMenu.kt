@@ -1,6 +1,7 @@
 package pl.masslany.podkop.common.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -12,10 +13,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import pl.masslany.podkop.common.models.DropdownMenuItemType
+import pl.masslany.podkop.common.preview.PodkopPreview
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.dropdown_menu_label_active
 import podkop.composeapp.generated.resources.dropdown_menu_label_all
@@ -64,7 +69,7 @@ fun DropdownMenu(
             },
             trailingIcon = {
                 Icon(
-                    modifier = Modifier.rotate(if (expanded) ExpandedRotation else DefaultRotation),
+                    modifier = Modifier.rotate(if (expanded) EXPANDED_ROTATION else DEFAULT_ROTATION),
                     imageVector = vectorResource(resource = Res.drawable.ic_arrow_dropdown),
                     contentDescription = null,
                 )
@@ -137,5 +142,25 @@ private fun DropdownMenuItemType.toText(): String = when (this) {
         stringResource(resource = Res.string.dropdown_menu_label_everything)
 }
 
-private const val ExpandedRotation = 180f
-private const val DefaultRotation = 0f
+private const val DEFAULT_ROTATION = 0f
+private const val EXPANDED_ROTATION = 180f
+
+@Preview
+@Composable
+private fun DropdownMenuPreview() {
+    PodkopPreview(darkTheme = false) {
+        DropdownMenu(
+            modifier = Modifier.padding(16.dp),
+            items = persistentListOf(
+                DropdownMenuItemType.Active,
+                DropdownMenuItemType.Newest,
+                DropdownMenuItemType.Digged,
+            ),
+            selected = DropdownMenuItemType.Active,
+            expanded = false,
+            onSelected = {},
+            onExpandedChange = {},
+            onDismissRequest = {},
+        )
+    }
+}

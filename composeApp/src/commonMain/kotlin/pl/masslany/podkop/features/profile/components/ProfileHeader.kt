@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -31,6 +32,9 @@ import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.components.GenderIndicator
 import pl.masslany.podkop.common.components.toComposeColor
+import pl.masslany.podkop.common.models.NameColorType
+import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.profile.models.MemberSinceState
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import podkop.composeapp.generated.resources.Res
@@ -196,5 +200,22 @@ private fun memberSinceLabel(memberSinceState: MemberSinceState): String? {
         }
 
         MemberSinceState.Unknown -> null
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileHeaderPreview() {
+    PodkopPreview(darkTheme = false) {
+        ProfileHeader(
+            state = ProfileHeaderState(
+                username = "patryk",
+                avatarUrl = "https://picsum.photos/seed/profile-avatar/160/160",
+                backgroundUrl = "https://picsum.photos/seed/profile-bg/1200/600",
+                genderIndicatorType = GenderIndicatorType.Male,
+                nameColorType = NameColorType.Orange,
+                memberSinceState = MemberSinceState.YearsAndMonths(years = 6, months = 2),
+            ),
+        )
     }
 }

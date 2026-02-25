@@ -10,7 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
 
 @Composable
@@ -36,5 +38,16 @@ fun ObservedTagItem(
                 style = MaterialTheme.typography.titleSmall,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ObservedTagItemPreview() {
+    PodkopPreview(darkTheme = false) {
+        ObservedTagItem(
+            tag = ProfileObservedTagItemState(name = "compose", pinned = true),
+            onClick = {},
+        )
     }
 }

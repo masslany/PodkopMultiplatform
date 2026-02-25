@@ -7,10 +7,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import pl.masslany.podkop.common.components.textflow.TextFlow
 import pl.masslany.podkop.common.components.textflow.TextFlowObstacleAlignment
 import pl.masslany.podkop.common.models.TitleState
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.TitleStateProvider
 
 @Composable
 fun Title(
@@ -35,5 +39,18 @@ fun Title(
                 modifier = Modifier.padding(end = 8.dp),
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun TitlePreview(
+    @PreviewParameter(TitleStateProvider::class) state: TitleState,
+) {
+    PodkopPreview(darkTheme = false) {
+        Title(
+            modifier = Modifier.padding(16.dp),
+            state = state,
+        )
     }
 }

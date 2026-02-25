@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.painterResource
@@ -27,6 +28,9 @@ import pl.masslany.podkop.common.components.Author
 import pl.masslany.podkop.common.components.Source
 import pl.masslany.podkop.common.components.Title
 import pl.masslany.podkop.common.components.vote.Vote
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.PreviewFixtures
+import pl.masslany.podkop.features.resources.models.ResourceType
 import pl.masslany.podkop.features.resources.models.related.RelatedItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.no_image
@@ -98,5 +102,30 @@ fun RelatedItem(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun RelatedItemPreview() {
+    val state = RelatedItemState(
+        id = 1,
+        contentType = ResourceType.RelatedItem,
+        imageUrl = "https://picsum.photos/seed/related-preview/400/300",
+        titleState = PreviewFixtures.titleState(maxLines = 2),
+        authorState = PreviewFixtures.authorState(),
+        source = PreviewFixtures.DOMAIN,
+        sourceUrl = PreviewFixtures.URL,
+        voteState = PreviewFixtures.voteState(),
+    )
+    PodkopPreview(darkTheme = false) {
+        RelatedItem(
+            modifier = Modifier.padding(16.dp),
+            state = state,
+            onItemClick = {},
+            onAuthorClick = {},
+            onSourceClick = {},
+            onVoteClick = {},
+        )
     }
 }

@@ -18,9 +18,13 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.preview.NoOpResourceItemActions
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.links.hits.HitItem
 import pl.masslany.podkop.features.links.hits.models.HitItemState
 import pl.masslany.podkop.features.resources.ResourceItemActions
@@ -30,6 +34,7 @@ import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
+import pl.masslany.podkop.features.resources.preview.ResourceItemStateProvider
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.comment_button_show_comments
 
@@ -241,4 +246,18 @@ private fun LinkCommentItemRenderer(
             )
         },
     )
+}
+
+@Preview
+@Composable
+private fun ResourceItemRendererPreview(
+    @PreviewParameter(ResourceItemStateProvider::class) state: ResourceItemState,
+) {
+    PodkopPreview(darkTheme = false) {
+        ResourceItemRenderer(
+            modifier = Modifier.padding(16.dp),
+            state = state,
+            actions = NoOpResourceItemActions,
+        )
+    }
 }

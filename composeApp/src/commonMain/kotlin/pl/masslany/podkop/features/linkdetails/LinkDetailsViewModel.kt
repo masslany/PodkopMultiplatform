@@ -94,7 +94,7 @@ class LinkDetailsViewModel(
         )
     }
 
-    private val _commentRepliesStateById = MutableStateFlow<Map<Int, CommentRepliesState>>(emptyMap())
+    private val commentRepliesStateById = MutableStateFlow<Map<Int, CommentRepliesState>>(emptyMap())
     private val _state = MutableStateFlow(
         LinkDetailsScreenState.initial.copy(
             commentsState = LinkDetailsCommentsState.Loading(
@@ -112,7 +112,7 @@ class LinkDetailsViewModel(
         _state,
         resourceItemStateHolder.items,
         paginator.state,
-        _commentRepliesStateById,
+        commentRepliesStateById,
     ) { state, comments, paginatorState, repliesStateById ->
         val mappedComments = comments
             .filterIsInstance<LinkCommentItemState>()
@@ -152,7 +152,7 @@ class LinkDetailsViewModel(
             commentId = commentId,
             voted = voted,
         )
-        _commentRepliesStateById.update { previousState ->
+        commentRepliesStateById.update { previousState ->
             previousState.mapValues { (_, itemState) ->
                 itemState.copy(
                     replies = itemState.replies.applyVoteById(
@@ -200,7 +200,7 @@ class LinkDetailsViewModel(
     }
 
     override fun onShowMoreRepliesClicked(commentId: Int, nextPage: Int) {
-        _commentRepliesStateById.update { previousState ->
+        commentRepliesStateById.update { previousState ->
             val current = previousState[commentId] ?: CommentRepliesState.empty
             previousState + (commentId to current.copy(isLoadingReplies = true))
         }
@@ -214,7 +214,7 @@ class LinkDetailsViewModel(
                 val loadedReplies = resources.data
                     .map { it.toLinkCommentItemState(linkIdOverride = id) }
 
-                _commentRepliesStateById.update { previousState ->
+                commentRepliesStateById.update { previousState ->
                     val current = previousState[commentId] ?: CommentRepliesState.empty
                     previousState + (
                         commentId to current.mergeReplies(
@@ -229,7 +229,7 @@ class LinkDetailsViewModel(
                     "Failed to load replies for link id=$id, commentId=$commentId, page=$nextPage",
                     it,
                 )
-                _commentRepliesStateById.update { previousState ->
+                commentRepliesStateById.update { previousState ->
                     val current = previousState[commentId] ?: return@update previousState
                     previousState + (commentId to current.copy(isLoadingReplies = false))
                 }
@@ -392,7 +392,7 @@ class LinkDetailsViewModel(
 
     private suspend fun onCommentsPageOneLoadFailed() {
         resourceItemStateHolder.updateData(emptyList())
-        _commentRepliesStateById.value = emptyMap()
+        commentRepliesStateById.value = emptyMap()
         _state.update { previousState ->
             previousState.copy(
                 commentsState = previousState.commentsState.toError(),
@@ -433,12 +433,12 @@ class LinkDetailsViewModel(
     }
 
     private fun replaceCommentsRepliesState(items: List<ResourceItem>) {
-        _commentRepliesStateById.value = buildInitialCommentRepliesState(items)
+        commentRepliesStateById.value = buildInitialCommentRepliesState(items)
     }
 
     private fun appendCommentsRepliesState(items: List<ResourceItem>) {
         val newState = buildInitialCommentRepliesState(items)
-        _commentRepliesStateById.update { previousState ->
+        commentRepliesStateById.update { previousState ->
             previousState + newState.filterKeys { key -> !previousState.containsKey(key) }
         }
     }

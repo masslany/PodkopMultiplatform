@@ -32,12 +32,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.settings.ThemeOverride
+import pl.masslany.podkop.features.settings.preview.NoOpSettingsActions
+import pl.masslany.podkop.features.settings.preview.SettingsScreenStateProvider
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.ic_arrow_back
@@ -57,14 +62,29 @@ import podkop.composeapp.generated.resources.topbar_label_settings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreenRoot(
+internal fun SettingsScreenRoot(
     paddingValues: PaddingValues,
 ) {
     val viewModel = koinViewModel<SettingsViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
 
+    SettingsScreenContent(
+        paddingValues = paddingValues,
+        state = state,
+        actions = viewModel,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingsScreenContent(
+    paddingValues: PaddingValues,
+    state: SettingsScreenState,
+    actions: SettingsActions,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(
                 start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
@@ -76,7 +96,7 @@ fun SettingsScreenRoot(
                     Text(text = stringResource(resource = Res.string.topbar_label_settings))
                 },
                 navigationIcon = {
-                    IconButton(onClick = viewModel::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
@@ -110,24 +130,24 @@ fun SettingsScreenRoot(
             ThemeOverrideOptionRow(
                 label = stringResource(resource = Res.string.settings_option_theme_auto),
                 selected = state.themeOverride == ThemeOverride.AUTO,
-                onClick = { viewModel.onThemeOverrideChanged(ThemeOverride.AUTO) },
+                onClick = { actions.onThemeOverrideChanged(ThemeOverride.AUTO) },
             )
             ThemeOverrideOptionRow(
                 label = stringResource(resource = Res.string.settings_option_theme_light),
                 selected = state.themeOverride == ThemeOverride.LIGHT,
-                onClick = { viewModel.onThemeOverrideChanged(ThemeOverride.LIGHT) },
+                onClick = { actions.onThemeOverrideChanged(ThemeOverride.LIGHT) },
             )
             ThemeOverrideOptionRow(
                 label = stringResource(resource = Res.string.settings_option_theme_dark),
                 selected = state.themeOverride == ThemeOverride.DARK,
-                onClick = { viewModel.onThemeOverrideChanged(ThemeOverride.DARK) },
+                onClick = { actions.onThemeOverrideChanged(ThemeOverride.DARK) },
             )
 
             if (state.supportsDynamicColorsToggle) {
                 SwitchSettingRow(
                     label = stringResource(resource = Res.string.settings_body_dynamic_colors),
                     checked = state.dynamicColorsEnabled,
-                    onCheckedChange = viewModel::onDynamicColorsChanged,
+                    onCheckedChange = actions::onDynamicColorsChanged,
                 )
             }
 
@@ -156,7 +176,7 @@ fun SettingsScreenRoot(
                 SwitchSettingRow(
                     label = stringResource(resource = Res.string.settings_body_gif_autoplay),
                     checked = autoplayGifs,
-                    onCheckedChange = viewModel::onAutoplayGifsChanged,
+                    onCheckedChange = actions::onAutoplayGifsChanged,
                 )
             }
 
@@ -176,7 +196,7 @@ fun SettingsScreenRoot(
                         style = MaterialTheme.typography.bodyLarge,
                     )
                     TextButton(
-                        onClick = viewModel::onDebugToolsClicked,
+                        onClick = actions::onDebugToolsClicked,
                     ) {
                         Text(text = stringResource(resource = Res.string.settings_button_open_debug))
                     }
@@ -194,7 +214,7 @@ fun SettingsScreenRoot(
                         .fillMaxWidth()
                         .widthIn(max = 600.dp)
                         .align(Alignment.CenterHorizontally),
-                    onClick = viewModel::onLogoutClicked,
+                    onClick = actions::onLogoutClicked,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError,
@@ -249,6 +269,20 @@ private fun SwitchSettingRow(
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SettingsScreenContentPreview(
+    @PreviewParameter(SettingsScreenStateProvider::class) state: SettingsScreenState,
+) {
+    PodkopPreview(darkTheme = false) {
+        SettingsScreenContent(
+            paddingValues = PaddingValues(),
+            state = state,
+            actions = NoOpSettingsActions,
         )
     }
 }

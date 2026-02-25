@@ -12,9 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.preview.PodkopPreview
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.profile_log_in_button
 import podkop.composeapp.generated.resources.profile_not_logged_in_message
@@ -41,5 +43,13 @@ fun ProfileLoggedOutContent(
         Button(onClick = onLoginClicked) {
             Text(text = stringResource(resource = Res.string.profile_log_in_button))
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileLoggedOutContentPreview() {
+    PodkopPreview(darkTheme = false) {
+        ProfileLoggedOutContent(onLoginClicked = {})
     }
 }

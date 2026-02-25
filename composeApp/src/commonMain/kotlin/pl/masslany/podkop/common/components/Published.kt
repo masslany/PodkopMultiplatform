@@ -4,9 +4,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.models.PublishedTimeType
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.PublishedTimeTypeProvider
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.published_at_days
 import podkop.composeapp.generated.resources.published_at_hours
@@ -49,4 +53,14 @@ private fun PublishedTimeType.toText(): String = when (this) {
 
     is PublishedTimeType.Now ->
         stringResource(resource = Res.string.published_at_now)
+}
+
+@Preview
+@Composable
+private fun PublishedPreview(
+    @PreviewParameter(PublishedTimeTypeProvider::class) type: PublishedTimeType,
+) {
+    PodkopPreview(darkTheme = false) {
+        Published(type = type)
+    }
 }

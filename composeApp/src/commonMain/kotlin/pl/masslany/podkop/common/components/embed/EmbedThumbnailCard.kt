@@ -20,11 +20,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import pl.masslany.podkop.common.preview.PodkopPreview
 
 @Composable
 fun EmbedThumbnailCard(
@@ -95,5 +97,19 @@ fun EmbedThumbnailCard(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun EmbedThumbnailCardPreview() {
+    PodkopPreview(darkTheme = false) {
+        EmbedThumbnailCard(
+            modifier = Modifier.padding(16.dp),
+            thumbnailUrl = "https://picsum.photos/seed/thumb/640/360",
+            sourceLabel = "podkop.app",
+            onClick = {},
+            centerOverlay = {},
+        )
     }
 }

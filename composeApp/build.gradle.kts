@@ -1,4 +1,7 @@
+
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jmailen.gradle.kotlinter.tasks.FormatTask
+import org.jmailen.gradle.kotlinter.tasks.LintTask
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -27,6 +30,7 @@ kotlin {
         androidMain.dependencies  {
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.browser)
+            implementation(libs.androidx.compose.ui.tooling)
         }
 
         commonMain.dependencies {
@@ -79,5 +83,17 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
             freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
         }
+    }
+}
+
+afterEvaluate {
+    tasks.withType<LintTask>().configureEach {
+        exclude("**/build/**")
+        exclude("**/generated/**")
+    }
+
+    tasks.withType<FormatTask>().configureEach {
+        exclude("**/build/**")
+        exclude("**/generated/**")
     }
 }

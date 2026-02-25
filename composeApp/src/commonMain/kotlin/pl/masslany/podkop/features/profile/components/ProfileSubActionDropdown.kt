@@ -1,6 +1,7 @@
 package pl.masslany.podkop.features.profile.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -18,12 +19,16 @@ import androidx.compose.ui.graphics.vector.DefaultRotation
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.profile.ProfileActions
 import pl.masslany.podkop.features.profile.models.ProfileSubActionState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionType
+import pl.masslany.podkop.features.profile.preview.NoOpProfileActions
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_arrow_dropdown
 import podkop.composeapp.generated.resources.profile_sub_action_added
@@ -38,7 +43,7 @@ import podkop.composeapp.generated.resources.profile_sub_action_related
 import podkop.composeapp.generated.resources.profile_sub_action_up
 import podkop.composeapp.generated.resources.profile_sub_action_voted
 
-private const val ExpandedRotation = 180f
+private const val EXPANDED_ROTATION = 180f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,7 +92,7 @@ fun ProfileSubActionDropdown(
                 Icon(
                     modifier = Modifier.rotate(
                         if (subActionState.expanded) {
-                            ExpandedRotation
+                            EXPANDED_ROTATION
                         } else {
                             DefaultRotation
                         },
@@ -142,3 +147,23 @@ private fun profileSubActionLabel(type: ProfileSubActionType): String =
         ProfileSubActionType.FollowingTags -> stringResource(resource = Res.string.profile_sub_action_following_tags)
         ProfileSubActionType.FollowingUsers -> stringResource(resource = Res.string.profile_sub_action_following_users)
     }
+
+@Preview
+@Composable
+private fun ProfileSubActionDropdownPreview() {
+    PodkopPreview(darkTheme = false) {
+        ProfileSubActionDropdown(
+            modifier = Modifier.padding(16.dp),
+            subActionState = ProfileSubActionState(
+                items = persistentListOf(
+                    ProfileSubActionType.LinksAdded,
+                    ProfileSubActionType.LinksPublished,
+                    ProfileSubActionType.LinksCommented,
+                ),
+                selected = ProfileSubActionType.LinksPublished,
+                expanded = false,
+            ),
+            actions = NoOpProfileActions,
+        )
+    }
+}

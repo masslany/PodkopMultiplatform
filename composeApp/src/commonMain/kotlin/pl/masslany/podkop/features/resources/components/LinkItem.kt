@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -48,9 +49,10 @@ import pl.masslany.podkop.common.models.PublishedTimeType
 import pl.masslany.podkop.common.models.TagItem
 import pl.masslany.podkop.common.models.TitleState
 import pl.masslany.podkop.common.models.embed.EmbedContentState
-import pl.masslany.podkop.common.theme.PodkopTheme
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.resources.models.ResourceType
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
+import pl.masslany.podkop.features.resources.preview.LinkItemStateProvider
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -228,51 +230,23 @@ fun LinkItem(
 
 @Preview
 @Composable
-private fun LinkItemPreview() {
-    PodkopTheme {
+private fun LinkItemPreview(
+    @PreviewParameter(LinkItemStateProvider::class) state: LinkItemState,
+) {
+    PodkopPreview(darkTheme = false) {
         LinkItem(
-            state = LinkItemState(
-                id = 0,
-                titleState = TitleState(
-                    title = "Title",
-                    maxLines = Int.MAX_VALUE,
-                    isAdult = false,
-                    displayAdultBadge = true,
-                ),
-                descriptionState = DescriptionState(
-                    "Description desc desc desc. ".repeat(5),
-                    3,
-                ),
-                countState = CountState(
-                    count = "300",
-                    isHot = false,
-                    isVoted = false,
-                    canVote = false,
-                ),
-                authorState = AuthorState("Username", NameColorType.Orange),
-                source = "test.website",
-                sourceUrl = "https://test.website",
-                imageUrl = "",
-                tags = persistentListOf(
-                    TagItem("#test", true),
-                    TagItem("#test2", true),
-                    TagItem("#test3", false),
-                ),
-                comments = persistentListOf(),
-                commentCount = 10,
-                publishedTimeType = PublishedTimeType.Now,
-                contentType = ResourceType.LinkItem,
-            ),
-            onTagClick = {},
-            onVoteClick = {},
+            modifier = Modifier.padding(16.dp),
+            state = state,
             onLinkClick = {},
+            onVoteClick = {},
             onAuthorClick = {},
+            onTagClick = {},
             onSourceClick = {},
             onProfileClicked = {},
             onUrlClicked = {},
             onImageClicked = {},
-            onLinkCommentVoteUpClick = { _, _, _ -> },
             onEmbedPreviewClick = {},
+            onLinkCommentVoteUpClick = { _, _, _ -> },
         )
     }
 }

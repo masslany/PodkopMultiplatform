@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
@@ -11,9 +12,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.preview.NoOpResourceItemActions
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.features.links.hits.preview.HitItemStateProvider
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemState
@@ -48,5 +54,20 @@ fun HitsList(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun HitsListPreview() {
+    val items = HitItemStateProvider().values.toList()
+    PodkopPreview(darkTheme = false) {
+        HitsList(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            state = persistentListOf(items[0], items[1], items[2]),
+            actions = NoOpResourceItemActions,
+        )
     }
 }

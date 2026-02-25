@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -46,6 +47,8 @@ import coil3.size.Scale
 import dev.chrisbanes.haze.hazeEffect
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.models.EmbedImageState
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.PreviewFixtures
 import pl.masslany.podkop.common.settings.LocalAppSettings
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.embed_adult_image
@@ -306,5 +309,26 @@ fun EmbedImage(
                 overflow = TextOverflow.Ellipsis,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun EmbedImagePreview() {
+    PodkopPreview(darkTheme = false) {
+        EmbedImage(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            state = EmbedImageState(
+                url = "https://picsum.photos/seed/embed-image/800/600",
+                source = PreviewFixtures.DOMAIN,
+                isAdult = false,
+                isGif = false,
+                width = 800,
+                height = 600,
+            ),
+            onImageClick = {},
+        )
     }
 }

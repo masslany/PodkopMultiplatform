@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -31,11 +32,9 @@ import org.jetbrains.compose.resources.painterResource
 import pl.masslany.podkop.common.components.AdultRating
 import pl.masslany.podkop.common.components.Count
 import pl.masslany.podkop.common.components.Title
-import pl.masslany.podkop.common.models.CountState
-import pl.masslany.podkop.common.models.TitleState
-import pl.masslany.podkop.common.theme.PodkopTheme
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.links.hits.models.HitItemState
-import pl.masslany.podkop.features.resources.models.ResourceType
+import pl.masslany.podkop.features.links.hits.preview.HitItemStateProvider
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.no_image
 
@@ -121,29 +120,15 @@ fun HitItem(
 
 @Preview
 @Composable
-private fun HitItemPreview() {
-    PodkopTheme {
+private fun HitItemPreview(
+    @PreviewParameter(HitItemStateProvider::class) state: HitItemState,
+) {
+    PodkopPreview(darkTheme = false) {
         HitItem(
-            state = HitItemState(
-                id = 0,
-                titleState = TitleState(
-                    title = "Title",
-                    maxLines = 3,
-                    isAdult = false,
-                    displayAdultBadge = false,
-                ),
-                countState = CountState(
-                    count = "300",
-                    isHot = false,
-                    isVoted = false,
-                    canVote = false,
-                ),
-                imageUrl = "",
-                isAdult = false,
-                contentType = ResourceType.HitItem,
-            ),
-            onItemClick = { },
-            onVoteClick = { },
+            modifier = Modifier.padding(16.dp),
+            state = state,
+            onItemClick = {},
+            onVoteClick = {},
         )
     }
 }

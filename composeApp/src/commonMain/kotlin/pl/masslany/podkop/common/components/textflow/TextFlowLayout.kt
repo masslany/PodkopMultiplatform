@@ -1,5 +1,10 @@
 package pl.masslany.podkop.common.components.textflow
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,9 +19,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.PreviewFixtures
 import kotlin.math.max
 
 /**
@@ -131,3 +140,23 @@ public fun TextFlowLayout(
 }
 
 private enum class TextFlowContent { Obstacle, Text }
+
+@Preview
+@Composable
+private fun TextFlowLayoutPreview() {
+    PodkopPreview(darkTheme = false) {
+        TextFlowLayout(
+            text = AnnotatedString(PreviewFixtures.LONG_BODY),
+            style = MaterialTheme.typography.bodySmall,
+            obstacleAlignment = TextFlowLayoutObstacleAlignment.TopStart,
+            obstacleContent = {
+                Box(
+                    modifier = Modifier
+                        .width(36.dp)
+                        .height(12.dp)
+                        .background(MaterialTheme.colorScheme.primary),
+                )
+            },
+        )
+    }
+}

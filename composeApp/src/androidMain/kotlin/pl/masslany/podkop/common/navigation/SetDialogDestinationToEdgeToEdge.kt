@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.window.DialogWindowProvider
 
 @Composable
-actual fun SetDialogDestinationToEdgeToEdge() {
+internal actual fun SetDialogDestinationToEdgeToEdge() {
     val activityWindow = LocalActivity.current?.window
     val dialogWindow = (LocalView.current.parent as? DialogWindowProvider)?.window
     val parentView = LocalView.current.parent as View

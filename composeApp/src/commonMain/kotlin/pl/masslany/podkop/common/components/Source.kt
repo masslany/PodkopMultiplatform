@@ -5,6 +5,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.preview.PreviewFixtures
 
 @Composable
 fun Source(
@@ -19,4 +22,15 @@ fun Source(
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
     )
+}
+
+@Preview
+@Composable
+private fun SourcePreview() {
+    PodkopPreview(darkTheme = false) {
+        Source(
+            source = PreviewFixtures.DOMAIN,
+            onSourceClick = {},
+        )
+    }
 }

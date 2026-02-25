@@ -13,11 +13,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -34,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -42,6 +45,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.extensions.rememberWindowSizeClass
@@ -50,36 +54,90 @@ import pl.masslany.podkop.common.navigation.HomeListDetailSceneStrategy
 import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.common.navigation.bottombar.BottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
+import pl.masslany.podkop.features.bottombar.BottomBarDestinationState
 import pl.masslany.podkop.features.bottombar.BottomBarRoot
 import pl.masslany.podkop.features.bottombar.SideBarRoot
 import pl.masslany.podkop.features.entries.EntriesScreen
+import pl.masslany.podkop.features.entries.EntriesScreenContent
 import pl.masslany.podkop.features.entries.EntriesScreenRoot
+import pl.masslany.podkop.features.entries.preview.EntriesScreenStateProvider
+import pl.masslany.podkop.features.entries.preview.NoOpEntriesActions
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreenRoot
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenRoot
 import pl.masslany.podkop.features.links.LinksScreen
+import pl.masslany.podkop.features.links.LinksScreenContent
 import pl.masslany.podkop.features.links.LinksScreenRoot
+import pl.masslany.podkop.features.links.preview.LinksScreenStateProvider
+import pl.masslany.podkop.features.links.preview.NoOpLinksActions
 import pl.masslany.podkop.features.upcoming.UpcomingScreen
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.home_link_details_placeholder_body
 import podkop.composeapp.generated.resources.home_link_details_placeholder_title
+import podkop.composeapp.generated.resources.ic_home
+import podkop.composeapp.generated.resources.ic_nav_letter_m
+import podkop.composeapp.generated.resources.ic_nav_shovel
+import podkop.composeapp.generated.resources.navigation_label_entries
+import podkop.composeapp.generated.resources.navigation_label_homepage
+import podkop.composeapp.generated.resources.navigation_label_upcoming
 
-private const val HomeKeyLinksList = "home:list:links"
-private const val HomeKeyUpcomingList = "home:list:upcoming"
-private const val HomeKeyEntriesList = "home:list:entries"
-private const val HomeKeyLinkDetailsPrefix = "home:details:link:"
-private const val HomeKeyEntryDetailsPrefix = "home:details:entry:"
+private const val HOME_KEY_LINKS_LIST = "home:list:links"
+private const val HOME_KEY_UPCOMING_LIST = "home:list:upcoming"
+private const val HOME_KEY_ENTRIES_LIST = "home:list:entries"
+private const val HOME_KEY_LINK_DETAILS_PREFIX = "home:details:link:"
+private const val HOME_KEY_ENTRY_DETAILS_PREFIX = "home:details:entry:"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenRoot(
+internal fun HomeScreenRoot(
     modifier: Modifier = Modifier,
 ) {
     val viewModel = koinViewModel<HomeViewModel>()
     val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
+    HomeScreenContent(
+        modifier = modifier,
+        state = state,
+        snackbarHostState = snackbarHostState,
+        onTabChanged = viewModel::onTabChanged,
+        onBack = viewModel::onBackPressedInHome,
+        onInlineDetailsModeChanged = viewModel::onInlineDetailsModeChanged,
+        onLinkClicked = viewModel::onLinkClicked,
+        onEntryClicked = viewModel::onEntryClicked,
+    )
+}
+
+@Composable
+fun HomeScreenContent(
+    modifier: Modifier = Modifier,
+    state: HomeScreenState,
+    snackbarHostState: SnackbarHostState,
+    onTabChanged: (NavTarget) -> Unit,
+    onBack: () -> Unit,
+    onInlineDetailsModeChanged: (Boolean) -> Unit,
+    onLinkClicked: (id: Int, useInlineDetails: Boolean) -> Unit,
+    onEntryClicked: (id: Int, useInlineDetails: Boolean) -> Unit,
+    navContent: @Composable (
+        backStack: ImmutableList<NavTarget>,
+        contentPadding: PaddingValues,
+        inlineSceneEnabled: Boolean,
+        onBack: () -> Unit,
+        onLinkClicked: (Int) -> Unit,
+        onEntryClicked: (Int) -> Unit,
+    ) -> Unit = { backStack, contentPadding, inlineSceneEnabled, navOnBack, navOnLinkClicked, navOnEntryClicked ->
+        HomeNavDisplay(
+            backStack = backStack,
+            contentPadding = contentPadding,
+            inlineSceneEnabled = inlineSceneEnabled,
+            onBack = navOnBack,
+            onLinkClicked = navOnLinkClicked,
+            onEntryClicked = navOnEntryClicked,
+        )
+    },
+) {
     val windowSizeClass = rememberWindowSizeClass()
     val useInlineDetails = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Medium
     val useBottomBar = windowSizeClass.widthSizeClass <= WindowWidthSizeClass.Medium
@@ -92,7 +150,7 @@ fun HomeScreenRoot(
     val inlineSceneEnabled = useInlineDetails || hasInlineDetailsInCurrentStack
 
     LaunchedEffect(useInlineDetails) {
-        viewModel.onInlineDetailsModeChanged(enabled = useInlineDetails)
+        onInlineDetailsModeChanged(useInlineDetails)
     }
 
     LaunchedEffect(useBottomBar) {
@@ -116,7 +174,7 @@ fun HomeScreenRoot(
                 if (useBottomBar && state.destinations.isNotEmpty()) {
                     BottomBarRoot(
                         destinations = state.destinations,
-                        onScreenChanged = viewModel::onTabChanged,
+                        onScreenChanged = onTabChanged,
                         modifier = Modifier
                             .onSizeChanged {
                                 bottomBarBehavior.heightPx = it.height.toFloat()
@@ -129,25 +187,19 @@ fun HomeScreenRoot(
             },
         ) { contentPadding ->
             val contentPaddingState = rememberUpdatedState(newValue = contentPadding)
-            val homeNavContent = remember(holder, viewModel) {
+            val homeNavContent = remember(holder) {
                 movableContentOf {
                     holder.SaveableStateProvider(currentTabKeyState.value) {
-                        HomeNavDisplay(
-                            backStack = currentStackState.value,
-                            contentPadding = contentPaddingState.value,
-                            inlineSceneEnabled = inlineSceneEnabledState.value,
-                            onBack = viewModel::onBackPressedInHome,
-                            onLinkClicked = { id ->
-                                viewModel.onLinkClicked(
-                                    id = id,
-                                    useInlineDetails = useInlineDetailsState.value,
-                                )
+                        navContent(
+                            currentStackState.value,
+                            contentPaddingState.value,
+                            inlineSceneEnabledState.value,
+                            onBack,
+                            { id ->
+                                onLinkClicked(id, useInlineDetailsState.value)
                             },
-                            onEntryClicked = { id ->
-                                viewModel.onEntryClicked(
-                                    id = id,
-                                    useInlineDetails = useInlineDetailsState.value,
-                                )
+                            { id ->
+                                onEntryClicked(id, useInlineDetailsState.value)
                             },
                         )
                     }
@@ -162,7 +214,7 @@ fun HomeScreenRoot(
                 ) {
                     SideBarRoot(
                         destinations = state.destinations,
-                        onScreenChanged = viewModel::onTabChanged,
+                        onScreenChanged = onTabChanged,
                         modifier = Modifier
                             .fillMaxHeight()
                             .padding(
@@ -198,13 +250,13 @@ private fun HomeNavDisplay(
         HomeListDetailSceneStrategy<NavTarget>(
             enabled = inlineSceneEnabled,
             isListTarget = { target ->
-                target == HomeKeyLinksList ||
-                    target == HomeKeyUpcomingList ||
-                    target == HomeKeyEntriesList
+                target == HOME_KEY_LINKS_LIST ||
+                    target == HOME_KEY_UPCOMING_LIST ||
+                    target == HOME_KEY_ENTRIES_LIST
             },
             isDetailTarget = { target ->
-                (target as? String)?.startsWith(HomeKeyLinkDetailsPrefix) == true ||
-                    (target as? String)?.startsWith(HomeKeyEntryDetailsPrefix) == true
+                (target as? String)?.startsWith(HOME_KEY_LINK_DETAILS_PREFIX) == true ||
+                    (target as? String)?.startsWith(HOME_KEY_ENTRY_DETAILS_PREFIX) == true
             },
             detailsPlaceholder = {
                 HomeLinkDetailsPlaceholder()
@@ -213,7 +265,7 @@ private fun HomeNavDisplay(
     }
     val provider = entryProvider {
         entry<LinksScreen>(
-            clazzContentKey = { HomeKeyLinksList },
+            clazzContentKey = { HOME_KEY_LINKS_LIST },
         ) {
             LinksScreenRoot(
                 isUpcoming = false,
@@ -223,7 +275,7 @@ private fun HomeNavDisplay(
         }
 
         entry<UpcomingScreen>(
-            clazzContentKey = { HomeKeyUpcomingList },
+            clazzContentKey = { HOME_KEY_UPCOMING_LIST },
         ) {
             LinksScreenRoot(
                 isUpcoming = true,
@@ -233,7 +285,7 @@ private fun HomeNavDisplay(
         }
 
         entry<EntriesScreen>(
-            clazzContentKey = { HomeKeyEntriesList },
+            clazzContentKey = { HOME_KEY_ENTRIES_LIST },
         ) {
             EntriesScreenRoot(
                 paddingValues = contentPadding,
@@ -243,7 +295,7 @@ private fun HomeNavDisplay(
 
         entry<LinkDetailsScreen>(
             clazzContentKey = { screen ->
-                "$HomeKeyLinkDetailsPrefix${screen.id}"
+                "$HOME_KEY_LINK_DETAILS_PREFIX${screen.id}"
             },
         ) {
             LinkDetailsScreenRoot(
@@ -255,7 +307,7 @@ private fun HomeNavDisplay(
 
         entry<EntryDetailsScreen>(
             clazzContentKey = { screen ->
-                "$HomeKeyEntryDetailsPrefix${screen.id}"
+                "$HOME_KEY_ENTRY_DETAILS_PREFIX${screen.id}"
             },
         ) {
             EntryDetailsScreenRoot(
@@ -332,5 +384,121 @@ private fun HomeLinkDetailsPlaceholder(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenContentPreviewLinksTab() {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val state = remember {
+        HomeScreenState(
+            destinations = persistentListOf(
+                BottomBarDestinationState(
+                    screen = LinksScreen,
+                    isSelected = true,
+                    isEnabled = true,
+                    iconRes = Res.drawable.ic_home,
+                    labelRes = Res.string.navigation_label_homepage,
+                ),
+                BottomBarDestinationState(
+                    screen = UpcomingScreen,
+                    isSelected = false,
+                    isEnabled = true,
+                    iconRes = Res.drawable.ic_nav_shovel,
+                    labelRes = Res.string.navigation_label_upcoming,
+                ),
+                BottomBarDestinationState(
+                    screen = EntriesScreen,
+                    isSelected = false,
+                    isEnabled = true,
+                    iconRes = Res.drawable.ic_nav_letter_m,
+                    labelRes = Res.string.navigation_label_entries,
+                ),
+            ),
+            currentTabKey = LinksScreen.toString(),
+            currentStack = persistentListOf(LinksScreen),
+        )
+    }
+    val linksState = remember {
+        LinksScreenStateProvider().values.first { !it.isLoading && !it.isError }
+    }
+
+    PodkopPreview(darkTheme = false) {
+        HomeScreenContent(
+            state = state,
+            snackbarHostState = snackbarHostState,
+            onTabChanged = {},
+            onBack = {},
+            onInlineDetailsModeChanged = {},
+            onLinkClicked = { _, _ -> },
+            onEntryClicked = { _, _ -> },
+            navContent = { _, contentPadding, _, _, _, _ ->
+                LinksScreenContent(
+                    paddingValues = contentPadding,
+                    state = linksState,
+                    actions = NoOpLinksActions,
+                    lazyListState = rememberLazyListState(),
+                )
+            },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HomeScreenContentPreviewEntriesTab() {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val state = remember {
+        HomeScreenState(
+            destinations = persistentListOf(
+                BottomBarDestinationState(
+                    screen = LinksScreen,
+                    isSelected = false,
+                    isEnabled = true,
+                    iconRes = Res.drawable.ic_home,
+                    labelRes = Res.string.navigation_label_homepage,
+                ),
+                BottomBarDestinationState(
+                    screen = UpcomingScreen,
+                    isSelected = false,
+                    isEnabled = true,
+                    iconRes = Res.drawable.ic_nav_shovel,
+                    labelRes = Res.string.navigation_label_upcoming,
+                ),
+                BottomBarDestinationState(
+                    screen = EntriesScreen,
+                    isSelected = true,
+                    isEnabled = true,
+                    iconRes = Res.drawable.ic_nav_letter_m,
+                    labelRes = Res.string.navigation_label_entries,
+                ),
+            ),
+            currentTabKey = EntriesScreen.toString(),
+            currentStack = persistentListOf(EntriesScreen),
+        )
+    }
+    val entriesState = remember {
+        EntriesScreenStateProvider().values.first { !it.isLoading && !it.isError }
+    }
+
+    PodkopPreview(darkTheme = false) {
+        HomeScreenContent(
+            state = state,
+            snackbarHostState = snackbarHostState,
+            onTabChanged = {},
+            onBack = {},
+            onInlineDetailsModeChanged = {},
+            onLinkClicked = { _, _ -> },
+            onEntryClicked = { _, _ -> },
+            navContent = { _, contentPadding, _, _, _, _ ->
+                EntriesScreenContent(
+                    paddingValues = contentPadding,
+                    state = entriesState,
+                    actions = NoOpEntriesActions,
+                    lazyListState = rememberLazyListState(),
+                )
+            },
+        )
     }
 }

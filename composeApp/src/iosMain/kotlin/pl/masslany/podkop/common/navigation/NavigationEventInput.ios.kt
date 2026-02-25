@@ -7,7 +7,7 @@ import androidx.navigationevent.DirectNavigationEventInput
 import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
 
 @Composable
-actual fun rememberPlatformBackNavigationInput(enabled: Boolean): DirectNavigationEventInput? {
+internal actual fun rememberPlatformBackNavigationInput(enabled: Boolean): DirectNavigationEventInput? {
     if (!enabled) return null
 
     val dispatcherOwner = LocalNavigationEventDispatcherOwner.current ?: return null

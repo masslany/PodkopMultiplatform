@@ -16,9 +16,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.profile.models.ProfileSummaryItem
 import pl.masslany.podkop.features.profile.models.ProfileSummaryType
 import podkop.composeapp.generated.resources.Res
@@ -88,3 +91,21 @@ private fun summaryItemLabel(item: ProfileSummaryItem): String =
         is ProfileSummaryItem.Following -> stringResource(resource = Res.string.profile_summary_following)
         is ProfileSummaryItem.Links -> stringResource(resource = Res.string.profile_summary_links)
     }
+
+@Preview
+@Composable
+private fun ProfileSummaryPreview() {
+    PodkopPreview(darkTheme = false) {
+        ProfileSummary(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            summary = persistentListOf(
+                ProfileSummaryItem.Links(128),
+                ProfileSummaryItem.Entries(42),
+                ProfileSummaryItem.Followers(900),
+                ProfileSummaryItem.Following(123),
+            ),
+            selectedType = ProfileSummaryType.Links,
+            onSelected = {},
+        )
+    }
+}

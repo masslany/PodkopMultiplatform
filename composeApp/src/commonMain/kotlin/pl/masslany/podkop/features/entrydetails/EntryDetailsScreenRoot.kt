@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -32,6 +33,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,6 +50,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -62,8 +66,11 @@ import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.common.theme.colorsPalette
+import pl.masslany.podkop.features.entrydetails.preview.EntryDetailsScreenStateProvider
+import pl.masslany.podkop.features.entrydetails.preview.NoOpEntryDetailsActions
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import podkop.composeapp.generated.resources.Res
@@ -76,11 +83,11 @@ import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_person
 import podkop.composeapp.generated.resources.topbar_label_entry
 
-private const val FabItemsOffset = 10
+private const val FAB_ITEMS_OFFSET = 10
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EntryDetailsScreenRoot(
+internal fun EntryDetailsScreenRoot(
     id: Int,
     paddingValues: PaddingValues,
     showTopBar: Boolean = true,
@@ -90,9 +97,6 @@ fun EntryDetailsScreenRoot(
     )
     val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
     val lazyListState = rememberLazyListPaginator(
         shouldPaginate = { lastVisibleIndex, totalItems ->
             viewModel.shouldPaginate(lastVisibleIndex, totalItems)
@@ -101,14 +105,37 @@ fun EntryDetailsScreenRoot(
             viewModel.paginate()
         },
     )
+    EntryDetailsScreenContent(
+        paddingValues = paddingValues,
+        showTopBar = showTopBar,
+        state = state,
+        actions = viewModel,
+        lazyListState = lazyListState,
+        snackbarHostState = snackbarHostState,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EntryDetailsScreenContent(
+    paddingValues: PaddingValues,
+    showTopBar: Boolean,
+    state: EntryDetailsScreenState,
+    actions: EntryDetailsActions,
+    lazyListState: LazyListState,
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
     val isScrollingUp = lazyListState.isScrollingUp()
     val showFab by remember(isScrollingUp) {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex > FabItemsOffset && isScrollingUp
+            lazyListState.firstVisibleItemIndex > FAB_ITEMS_OFFSET && isScrollingUp
         }
     }
     val coroutineScope = rememberCoroutineScope()
-    val scaffoldModifier = Modifier
+    val scaffoldModifier = modifier
         .padding(
             top = if (!showTopBar) paddingValues.calculateTopPadding() else 0.dp,
             start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
@@ -131,7 +158,7 @@ fun EntryDetailsScreenRoot(
                 TopAppBar(
                     title = { Text(text = stringResource(resource = Res.string.topbar_label_entry)) },
                     actions = {
-                        IconButton(onClick = viewModel::onTopBarProfileClicked) {
+                        IconButton(onClick = actions::onTopBarProfileClicked) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = vectorResource(resource = Res.drawable.ic_person),
@@ -142,7 +169,7 @@ fun EntryDetailsScreenRoot(
                         }
                     },
                     navigationIcon = {
-                        IconButton(onClick = viewModel::onTopBarBackClicked) {
+                        IconButton(onClick = actions::onTopBarBackClicked) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = vectorResource(resource = Res.drawable.ic_arrow_back),
@@ -190,7 +217,7 @@ fun EntryDetailsScreenRoot(
     ) { innerPaddingValues ->
         PullToRefreshBox(
             isRefreshing = state.isRefreshing,
-            onRefresh = { viewModel.onRefresh() },
+            onRefresh = actions::onRefresh,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = innerPaddingValues.calculateTopPadding()),
@@ -206,14 +233,14 @@ fun EntryDetailsScreenRoot(
                     modifier = Modifier
                         .fillMaxSize()
                         .align(Alignment.Center),
-                    onRefreshClicked = viewModel::onRefresh,
+                    onRefreshClicked = actions::onRefresh,
                 )
             } else {
-                EntryDetailsScreen(
+                EntryDetailsScreenList(
                     modifier = Modifier
                         .fillMaxSize(),
                     state = state,
-                    actions = viewModel,
+                    actions = actions,
                     lazyListState = lazyListState,
                 )
             }
@@ -223,7 +250,7 @@ fun EntryDetailsScreenRoot(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EntryDetailsScreen(
+private fun EntryDetailsScreenList(
     modifier: Modifier = Modifier,
     state: EntryDetailsScreenState,
     actions: EntryDetailsActions,
@@ -328,5 +355,22 @@ private fun EntryDetailsScreen(
                 PaginationLoadingIndicator()
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun EntryDetailsScreenContentPreview(
+    @PreviewParameter(EntryDetailsScreenStateProvider::class) state: EntryDetailsScreenState,
+) {
+    PodkopPreview(darkTheme = false) {
+        EntryDetailsScreenContent(
+            paddingValues = PaddingValues(),
+            showTopBar = true,
+            state = state,
+            actions = NoOpEntryDetailsActions,
+            lazyListState = rememberLazyListState(),
+            snackbarHostState = remember { SnackbarHostState() },
+        )
     }
 }

@@ -4,4 +4,4 @@ import androidx.compose.runtime.Composable
 import androidx.navigationevent.DirectNavigationEventInput
 
 @Composable
-actual fun rememberPlatformBackNavigationInput(enabled: Boolean): DirectNavigationEventInput? = null
+internal actual fun rememberPlatformBackNavigationInput(enabled: Boolean): DirectNavigationEventInput? = null

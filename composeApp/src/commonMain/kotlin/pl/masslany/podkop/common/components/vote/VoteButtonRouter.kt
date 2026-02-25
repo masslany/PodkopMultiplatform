@@ -15,10 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.vectorResource
 import pl.masslany.podkop.common.models.vote.VoteButtonState
 import pl.masslany.podkop.common.models.vote.VoteButtonType
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.theme.colorsPalette
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_add
@@ -135,4 +137,19 @@ private fun getNegativeBackgroundColor(isVoted: Boolean): Color = if (isVoted) {
     MaterialTheme.colorsPalette.voteNegative
 } else {
     Color.Transparent
+}
+
+@Preview
+@Composable
+private fun VoteButtonPreview() {
+    PodkopPreview(darkTheme = false) {
+        VoteButton(
+            state = VoteButtonState(
+                voteButtonType = VoteButtonType.Positive,
+                isVoted = false,
+            ),
+            onVoteUpClick = {},
+            onVoteDownClick = {},
+        )
+    }
 }

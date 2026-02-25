@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.DpSize
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
-fun rememberWindowSizeClass(): WindowSizeClass {
+internal fun rememberWindowSizeClass(): WindowSizeClass {
     val windowInfo = LocalWindowInfo.current
     val density = LocalDensity.current
     return remember(windowInfo.containerSize, density) {
