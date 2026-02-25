@@ -2,6 +2,7 @@ package pl.masslany.podkop.business.entries.domain.main
 
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.entries.domain.models.EntryVoters
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import kotlin.time.ExperimentalTime
@@ -29,6 +30,17 @@ interface EntriesRepository {
         entryId: Int,
         page: Any?,
     ): Result<Resources>
+
+    suspend fun getEntryVotes(
+        entryId: Int,
+        page: Any?,
+    ): Result<EntryVoters>
+
+    suspend fun getEntryCommentVotes(
+        entryId: Int,
+        commentId: Int,
+        page: Any?,
+    ): Result<EntryVoters>
 
     suspend fun voteUp(entryId: Int): Result<Unit>
 

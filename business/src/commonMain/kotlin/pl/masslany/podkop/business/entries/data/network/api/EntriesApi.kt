@@ -2,6 +2,7 @@ package pl.masslany.podkop.business.entries.data.network.api
 
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 
 interface EntriesApi {
     @Suppress("LongParameterList")
@@ -20,6 +21,17 @@ interface EntriesApi {
         entryId: Int,
         page: Any?,
     ): Result<ResourceResponseDto>
+
+    suspend fun getEntryVotes(
+        entryId: Int,
+        page: Any?,
+    ): Result<EntryVotersResponseDto>
+
+    suspend fun getEntryCommentVotes(
+        entryId: Int,
+        commentId: Int,
+        page: Any?,
+    ): Result<EntryVotersResponseDto>
 
     suspend fun voteUp(entryId: Int): Result<Unit>
 

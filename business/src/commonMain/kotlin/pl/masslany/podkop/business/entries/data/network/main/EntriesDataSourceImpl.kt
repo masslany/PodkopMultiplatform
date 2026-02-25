@@ -4,6 +4,7 @@ import pl.masslany.podkop.business.common.data.network.models.common.ResourceRes
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.entries.data.api.EntriesDataSource
 import pl.masslany.podkop.business.entries.data.network.api.EntriesApi
+import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 
 
 class EntriesDataSourceImpl(
@@ -29,6 +30,21 @@ class EntriesDataSourceImpl(
         page: Any?,
     ): Result<ResourceResponseDto> {
         return entriesApi.getEntryComments(entryId, page)
+    }
+
+    override suspend fun getEntryVotes(
+        entryId: Int,
+        page: Any?,
+    ): Result<EntryVotersResponseDto> {
+        return entriesApi.getEntryVotes(entryId, page)
+    }
+
+    override suspend fun getEntryCommentVotes(
+        entryId: Int,
+        commentId: Int,
+        page: Any?,
+    ): Result<EntryVotersResponseDto> {
+        return entriesApi.getEntryCommentVotes(entryId, commentId, page)
     }
 
     override suspend fun voteUp(entryId: Int): Result<Unit> {

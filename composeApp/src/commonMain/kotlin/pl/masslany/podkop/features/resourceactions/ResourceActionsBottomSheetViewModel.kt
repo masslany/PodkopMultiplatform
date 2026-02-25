@@ -9,19 +9,21 @@ import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.ic_add
 import podkop.composeapp.generated.resources.ic_copy
 import podkop.composeapp.generated.resources.resource_actions_copy_as_link
+import podkop.composeapp.generated.resources.resource_actions_show_voters
 import podkop.composeapp.generated.resources.snackbar_link_copied
 
 class ResourceActionsBottomSheetViewModel(
-    params: ResourceActionsParams,
+    private val params: ResourceActionsParams,
     private val appNavigator: AppNavigator,
     private val snackbarManager: SnackbarManager,
 ) : ViewModel(),
     ResourceActionsBottomSheetActions {
 
     private val _state = MutableStateFlow(
-        buildState(params),
+        buildState(this.params),
     )
     val state = _state.asStateFlow()
 
@@ -35,11 +37,34 @@ class ResourceActionsBottomSheetViewModel(
                 )
                 appNavigator.back()
             }
+
+            ResourceActionId.ShowVoters -> {
+                val target = when (params.resourceType) {
+                    ResourceActionsType.Entry -> ResourceVotesBottomSheetScreen.forEntry(
+                        entryId = params.rootId,
+                    )
+
+                    ResourceActionsType.EntryComment -> ResourceVotesBottomSheetScreen.forEntryComment(
+                        entryId = params.rootId,
+                        entryCommentId = requireNotNull(params.childId) { "Entry comment actions require childId" },
+                    )
+
+                    ResourceActionsType.LinkComment -> return
+                }
+
+                appNavigator.back()
+                appNavigator.navigateTo(target)
+            }
         }
     }
 }
 
 private fun buildState(params: ResourceActionsParams): ResourceActionsBottomSheetState {
+    val showVotersAction = ResourceActionItemState(
+        id = ResourceActionId.ShowVoters,
+        title = Res.string.resource_actions_show_voters,
+        icon = Res.drawable.ic_add,
+    )
     val copyLinkAction = ResourceActionItemState(
         id = ResourceActionId.CopyAsLink,
         title = Res.string.resource_actions_copy_as_link,
@@ -55,6 +80,11 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
         actions = when (params.resourceType) {
             ResourceActionsType.Entry,
             ResourceActionsType.EntryComment,
+            -> persistentListOf(
+                showVotersAction,
+                copyLinkAction,
+            )
+
             ResourceActionsType.LinkComment,
             -> persistentListOf(copyLinkAction)
         },

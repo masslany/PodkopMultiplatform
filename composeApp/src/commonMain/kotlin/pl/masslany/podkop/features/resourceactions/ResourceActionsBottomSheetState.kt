@@ -20,6 +20,7 @@ data class ResourceActionItemState(
 
 enum class ResourceActionId {
     CopyAsLink,
+    ShowVoters,
 }
 
 sealed interface ResourceActionLocalAction {

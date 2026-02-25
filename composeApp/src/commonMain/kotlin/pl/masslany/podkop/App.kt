@@ -47,6 +47,8 @@ import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.ProfileScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreenRoot
+import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetScreen
+import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetScreenRoot
 import pl.masslany.podkop.features.search.SearchScreen
 import pl.masslany.podkop.features.search.SearchScreenRoot
 import pl.masslany.podkop.features.settings.SettingsScreen
@@ -161,6 +163,14 @@ fun App() {
                         metadata = BottomSheetSceneStrategy.bottomSheet(),
                     ) {
                         ResourceActionsBottomSheetScreenRoot(
+                            screen = it,
+                        )
+                    }
+
+                    entry<ResourceVotesBottomSheetScreen>(
+                        metadata = BottomSheetSceneStrategy.bottomSheet(),
+                    ) {
+                        ResourceVotesBottomSheetScreenRoot(
                             screen = it,
                         )
                     }

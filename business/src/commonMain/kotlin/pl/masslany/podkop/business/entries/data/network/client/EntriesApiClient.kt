@@ -3,6 +3,7 @@ package pl.masslany.podkop.business.entries.data.network.client
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.entries.data.network.api.EntriesApi
+import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
@@ -65,6 +66,47 @@ class EntriesApiClient(
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/entries/$entryId/comments",
+                queryParameters = queryParams,
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun getEntryVotes(
+        entryId: Int,
+        page: Any?,
+    ): Result<EntryVotersResponseDto> {
+        val queryParams = mutableMapOf<String, String>()
+        page?.let { queryParams["page"] = it.toString() }
+
+        val request =
+            Request<EntryVotersResponseDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/entries/$entryId/votes",
+                queryParameters = queryParams,
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun getEntryCommentVotes(
+        entryId: Int,
+        commentId: Int,
+        page: Any?,
+    ): Result<EntryVotersResponseDto> {
+        val queryParams = mutableMapOf<String, String>()
+        page?.let { queryParams["page"] = it.toString() }
+
+        val request =
+            Request<EntryVotersResponseDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/entries/$entryId/comments/$commentId/votes",
                 queryParameters = queryParams,
             )
 

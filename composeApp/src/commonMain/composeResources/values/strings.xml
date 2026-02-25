@@ -178,7 +178,11 @@
 
     <!-- Resource actions -->
     <string name="resource_actions_copy_as_link">Kopiuj link</string>
+    <string name="resource_actions_show_voters">Pokaż plusujących</string>
     <string name="resource_actions_reply">Odpowiedz</string>
+
+    <!-- Resource votes -->
+    <string name="resource_votes_empty">Brak plusujących</string>
 
     <!-- Survey -->
     <string name="survey_answers_count">Odpowiedzi: %1$s</string>

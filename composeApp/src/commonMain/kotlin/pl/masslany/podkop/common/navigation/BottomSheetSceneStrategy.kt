@@ -4,6 +4,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.scene.OverlayScene
@@ -20,14 +21,19 @@ internal class BottomSheetScene<T : Any>(
     override val overlaidEntries: List<NavEntry<T>>,
     private val entry: NavEntry<T>,
     private val modalBottomSheetProperties: ModalBottomSheetProperties,
+    private val skipPartiallyExpanded: Boolean,
     private val onBack: () -> Unit,
 ) : OverlayScene<T> {
 
     override val entries: List<NavEntry<T>> = listOf(entry)
 
     override val content: @Composable (() -> Unit) = {
+        val sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = skipPartiallyExpanded,
+        )
         ModalBottomSheet(
             onDismissRequest = onBack,
+            sheetState = sheetState,
             properties = modalBottomSheetProperties,
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
@@ -48,6 +54,8 @@ class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
     override fun SceneStrategyScope<T>.calculateScene(entries: List<NavEntry<T>>): Scene<T>? {
         val lastEntry = entries.lastOrNull()
         val bottomSheetProperties = lastEntry?.metadata?.get(BOTTOM_SHEET_KEY) as? ModalBottomSheetProperties
+        val skipPartiallyExpanded =
+            lastEntry?.metadata?.get(SKIP_PARTIALLY_EXPANDED_KEY) as? Boolean ?: false
         return bottomSheetProperties?.let { properties ->
             @Suppress("UNCHECKED_CAST")
             BottomSheetScene(
@@ -56,6 +64,7 @@ class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
                 overlaidEntries = entries.dropLast(1),
                 entry = lastEntry,
                 modalBottomSheetProperties = properties,
+                skipPartiallyExpanded = skipPartiallyExpanded,
                 onBack = onBack,
             )
         }
@@ -72,8 +81,13 @@ class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
         @OptIn(ExperimentalMaterial3Api::class)
         fun bottomSheet(
             modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties(),
-        ): Map<String, Any> = mapOf(BOTTOM_SHEET_KEY to modalBottomSheetProperties)
+            skipPartiallyExpanded: Boolean = false,
+        ): Map<String, Any> = mapOf(
+            BOTTOM_SHEET_KEY to modalBottomSheetProperties,
+            SKIP_PARTIALLY_EXPANDED_KEY to skipPartiallyExpanded,
+        )
 
         internal const val BOTTOM_SHEET_KEY = "bottomsheet"
+        internal const val SKIP_PARTIALLY_EXPANDED_KEY = "bottomsheet_skip_partially_expanded"
     }
 }

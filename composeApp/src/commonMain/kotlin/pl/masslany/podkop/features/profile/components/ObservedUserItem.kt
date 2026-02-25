@@ -25,11 +25,12 @@ import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
 
 @Composable
 fun ObservedUserItem(
+    modifier: Modifier = Modifier,
     user: ProfileObservedUserItemState,
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier.padding(horizontal = 16.dp),
+        modifier = modifier.padding(horizontal = 16.dp),
         onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,

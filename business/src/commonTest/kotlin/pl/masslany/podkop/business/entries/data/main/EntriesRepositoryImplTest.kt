@@ -2,7 +2,12 @@ package pl.masslany.podkop.business.entries.data.main
 
 import kotlinx.coroutines.runBlocking
 import pl.masslany.podkop.business.common.domain.models.common.Resource
+import pl.masslany.podkop.business.common.domain.models.common.Gender
+import pl.masslany.podkop.business.common.domain.models.common.NameColor
 import pl.masslany.podkop.business.common.domain.models.common.Voted
+import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
+import pl.masslany.podkop.business.entries.domain.models.EntryVoter
+import pl.masslany.podkop.business.entries.domain.models.EntryVoters
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
@@ -115,6 +120,124 @@ class EntriesRepositoryImplTest {
             entriesDataSource.getEntryCommentsCalls,
         )
         assertEquals(Fixtures.resources(), actual.getOrThrow())
+    }
+
+    @Test
+    fun `get entry votes maps users and forwards page`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            getEntryVotesResult = Result.success(
+                EntryVotersResponseDto(
+                    data = listOf(
+                        Fixtures.userDto(
+                            username = "alice",
+                            avatar = "a1",
+                            gender = "m",
+                            color = "burgundy",
+                            online = true,
+                            company = false,
+                            verified = true,
+                            status = "active",
+                        ),
+                        Fixtures.userDto(
+                            username = "eve",
+                            avatar = "",
+                            gender = null,
+                            color = "black",
+                            online = false,
+                            company = true,
+                            verified = false,
+                            status = "banned",
+                        ),
+                    ),
+                    pagination = Fixtures.paginationDto(perPage = 100000, total = 19, next = null, prev = "1"),
+                ),
+            )
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.getEntryVotes(entryId = 85140119, page = "2")
+
+        assertEquals(
+            listOf(FakeEntriesDataSource.GetEntryVotesCall(entryId = 85140119, page = "2")),
+            entriesDataSource.getEntryVotesCalls,
+        )
+        assertEquals(
+            EntryVoters(
+                data = listOf(
+                    EntryVoter(
+                        username = "alice",
+                        avatar = "a1",
+                        gender = Gender.Male,
+                        color = NameColor.Burgundy,
+                        online = true,
+                        company = false,
+                        verified = true,
+                        status = "active",
+                    ),
+                    EntryVoter(
+                        username = "eve",
+                        avatar = "",
+                        gender = Gender.Unspecified,
+                        color = NameColor.Black,
+                        online = false,
+                        company = true,
+                        verified = false,
+                        status = "banned",
+                    ),
+                ),
+                pagination = Fixtures.pagination(perPage = 100000, total = 19, next = "", prev = "1"),
+            ),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `get entry comment votes maps users and forwards identifiers`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            getEntryCommentVotesResult = Result.success(
+                EntryVotersResponseDto(
+                    data = listOf(
+                        Fixtures.userDto(
+                            username = "comment-voter",
+                            gender = "f",
+                            color = "green",
+                            status = "inactive",
+                        ),
+                    ),
+                    pagination = null,
+                ),
+            )
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.getEntryCommentVotes(
+            entryId = 123,
+            commentId = 456,
+            page = 1,
+        )
+
+        assertEquals(
+            listOf(FakeEntriesDataSource.GetEntryCommentVotesCall(entryId = 123, commentId = 456, page = 1)),
+            entriesDataSource.getEntryCommentVotesCalls,
+        )
+        assertEquals(
+            EntryVoters(
+                data = listOf(
+                    EntryVoter(
+                        username = "comment-voter",
+                        avatar = "https://example.com/user.png",
+                        gender = Gender.Female,
+                        color = NameColor.Green,
+                        online = false,
+                        company = true,
+                        verified = false,
+                        status = "inactive",
+                    ),
+                ),
+                pagination = null,
+            ),
+            actual.getOrThrow(),
+        )
     }
 
     @Test
