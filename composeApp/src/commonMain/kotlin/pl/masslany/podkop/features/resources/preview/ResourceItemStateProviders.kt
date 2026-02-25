@@ -236,6 +236,7 @@ private fun linkCommentBase(
     id = id,
     contentType = ResourceType.LinkCommentItem,
     linkId = linkId,
+    linkSlug = "example-link-slug",
     parentId = parentId,
     avatarState = avatarNetwork(),
     authorState = PreviewFixtures.authorState(),

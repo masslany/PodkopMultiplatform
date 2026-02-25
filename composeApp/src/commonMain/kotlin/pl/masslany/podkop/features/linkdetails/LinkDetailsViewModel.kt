@@ -200,6 +200,12 @@ class LinkDetailsViewModel(
     }
 
     override fun onShowMoreRepliesClicked(commentId: Int, nextPage: Int) {
+        val parentLinkSlug = (state.value.commentsState as? LinkDetailsCommentsState.Content)
+            ?.comments
+            ?.firstOrNull { it.id == commentId }
+            ?.comment
+            ?.linkSlug
+
         commentRepliesStateById.update { previousState ->
             val current = previousState[commentId] ?: CommentRepliesState.empty
             previousState + (commentId to current.copy(isLoadingReplies = true))
@@ -212,7 +218,12 @@ class LinkDetailsViewModel(
                 page = nextPage,
             ).onSuccess { resources ->
                 val loadedReplies = resources.data
-                    .map { it.toLinkCommentItemState(linkIdOverride = id) }
+                    .map {
+                        it.toLinkCommentItemState(
+                            linkIdOverride = id,
+                            linkSlugOverride = parentLinkSlug ?: it.slug,
+                        )
+                    }
 
                 commentRepliesStateById.update { previousState ->
                     val current = previousState[commentId] ?: CommentRepliesState.empty
@@ -449,7 +460,7 @@ class LinkDetailsViewModel(
         val replies = item.comments
             ?.items
             .orEmpty()
-            .map { comment -> comment.toLinkCommentItemState(linkId = id) }
+            .map { comment -> comment.toLinkCommentItemState(linkId = id, linkSlug = item.slug) }
             .toImmutableList()
         val totalReplies = item.comments?.count ?: replies.size
 

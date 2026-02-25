@@ -32,6 +32,7 @@ fun EntryItem(
     onVoteUpClick: () -> Unit,
     onImageClick: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
+    onMoreClick: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -93,6 +94,8 @@ fun EntryItem(
                 onFetchedContentClick = { onUrlClick(state.embedContentState.url) },
             )
         }
+        Spacer(Modifier.size(2.dp))
+        ResourceInlineActionsRow(onMoreClick = onMoreClick)
     }
 }
 
@@ -111,6 +114,7 @@ private fun EntryItemPreview(
             onImageClick = {},
             onEmbedPreviewClick = {},
             onVoteUpClick = {},
+            onMoreClick = {},
         )
     }
 }

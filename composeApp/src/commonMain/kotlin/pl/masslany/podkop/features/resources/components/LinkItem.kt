@@ -69,6 +69,12 @@ fun LinkItem(
     onImageClicked: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
     onLinkCommentVoteUpClick: (linkId: Int, commentId: Int, voted: Boolean) -> Unit,
+    onLinkCommentMoreClick: (
+        linkId: Int,
+        commentId: Int,
+        linkSlug: String,
+        parentCommentId: Int?,
+    ) -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -201,9 +207,9 @@ fun LinkItem(
                             thickness = Dp.Hairline,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                         )
-                        Spacer(Modifier.size(12.dp))
+                        Spacer(Modifier.size(8.dp))
                         LinkCommentItem(
-                            modifier = Modifier.padding(start = 16.dp),
+                            modifier = Modifier.padding(start = 12.dp),
                             state = comment,
                             onProfileClick = { onProfileClicked(it) },
                             onTagClick = { onTagClick(it) },
@@ -217,9 +223,17 @@ fun LinkItem(
                                 )
                             },
                             onEmbedPreviewClick = { embed -> onEmbedPreviewClick(embed) },
+                            onMoreClick = {
+                                onLinkCommentMoreClick(
+                                    comment.linkId,
+                                    comment.id,
+                                    comment.linkSlug,
+                                    comment.parentCommentIdOrNull,
+                                )
+                            },
                         )
                         if (index != state.comments.lastIndex) {
-                            Spacer(Modifier.size(12.dp))
+                            Spacer(Modifier.size(8.dp))
                         }
                     }
                 }
@@ -247,6 +261,7 @@ private fun LinkItemPreview(
             onImageClicked = {},
             onEmbedPreviewClick = {},
             onLinkCommentVoteUpClick = { _, _, _ -> },
+            onLinkCommentMoreClick = { _, _, _, _ -> },
         )
     }
 }

@@ -26,6 +26,7 @@ import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
+import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryVoteAction
@@ -217,7 +218,36 @@ open class BaseResourceItemStateHolder(
         appNavigator.navigateTo(EntryDetailsScreen(id))
     }
 
+    override fun onEntryMoreClicked(entryId: Int) {
+        appNavigator.navigateTo(ResourceActionsBottomSheetScreen.forEntry(entryId))
+    }
+
     override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) {
+    }
+
+    override fun onEntryCommentMoreClicked(entryId: Int, entryCommentId: Int) {
+        appNavigator.navigateTo(
+            ResourceActionsBottomSheetScreen.forEntryComment(
+                entryId = entryId,
+                entryCommentId = entryCommentId,
+            ),
+        )
+    }
+
+    override fun onLinkCommentMoreClicked(
+        linkId: Int,
+        commentId: Int,
+        linkSlug: String,
+        parentCommentId: Int?,
+    ) {
+        appNavigator.navigateTo(
+            ResourceActionsBottomSheetScreen.forLinkComment(
+                linkId = linkId,
+                linkSlug = linkSlug,
+                linkCommentId = commentId,
+                parentCommentId = parentCommentId,
+            ),
+        )
     }
 
     override fun onLinkCommentVoteUpClick(linkId: Int, commentId: Int, voted: Boolean) {

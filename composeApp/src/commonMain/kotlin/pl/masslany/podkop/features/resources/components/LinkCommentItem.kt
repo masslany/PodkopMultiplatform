@@ -31,6 +31,7 @@ fun LinkCommentItem(
     onVoteUpClick: () -> Unit,
     onImageClick: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
+    onMoreClick: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -86,6 +87,8 @@ fun LinkCommentItem(
                 onFetchedContentClick = { onUrlClick(state.embedContentState.url) },
             )
         }
+        Spacer(Modifier.size(2.dp))
+        ResourceInlineActionsRow(onMoreClick = onMoreClick)
     }
 }
 
@@ -104,6 +107,7 @@ private fun LinkCommentItemPreview(
             onVoteUpClick = {},
             onImageClick = {},
             onEmbedPreviewClick = {},
+            onMoreClick = {},
         )
     }
 }

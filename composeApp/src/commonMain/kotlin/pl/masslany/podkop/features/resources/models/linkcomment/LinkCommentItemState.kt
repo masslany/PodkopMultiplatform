@@ -15,6 +15,7 @@ data class LinkCommentItemState(
     override val id: Int,
     override val contentType: ResourceType,
     val linkId: Int,
+    val linkSlug: String,
     val parentId: Int,
     val avatarState: AvatarState,
     val authorState: AuthorState?,
@@ -24,4 +25,7 @@ data class LinkCommentItemState(
     val embedImageState: EmbedImageState?,
     val replies: ImmutableList<LinkCommentItemState>,
     val embedContentState: EmbedContentState? = null,
-) : ResourceItemState
+) : ResourceItemState {
+    val parentCommentIdOrNull: Int?
+        get() = parentId.takeIf { it > 0 && it != id && it != linkId }
+}

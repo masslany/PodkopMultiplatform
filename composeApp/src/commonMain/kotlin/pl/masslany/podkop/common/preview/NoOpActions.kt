@@ -19,11 +19,19 @@ object NoOpPaginationActions : PaginationActions {
 object NoOpResourceItemActions : ResourceItemActions {
     override fun onEntryClicked(id: Int) = Unit
     override fun onEntryVoteUpClicked(entryId: Int, voted: Boolean) = Unit
+    override fun onEntryMoreClicked(entryId: Int) = Unit
     override fun onLinkClicked(id: Int) = Unit
     override fun onLinkUrlClicked(url: String) = Unit
     override fun onLinkVoteClicked(id: Int, voted: Boolean) = Unit
     override fun onLinkCommentVoteUpClick(linkId: Int, commentId: Int, voted: Boolean) = Unit
+    override fun onLinkCommentMoreClicked(
+        linkId: Int,
+        commentId: Int,
+        linkSlug: String,
+        parentCommentId: Int?,
+    ) = Unit
     override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) = Unit
+    override fun onEntryCommentMoreClicked(entryId: Int, entryCommentId: Int) = Unit
     override fun onProfileClicked(username: String) = Unit
     override fun onTagClicked(tag: String) = Unit
     override fun onImageClicked(url: String) = Unit

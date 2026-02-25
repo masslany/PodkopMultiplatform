@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -22,6 +23,7 @@ import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.components.dialog.DefaultGenericDialog
 import pl.masslany.podkop.common.navigation.AppNavigator
+import pl.masslany.podkop.common.navigation.BottomSheetSceneStrategy
 import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.navigation.HomeScreen
 import pl.masslany.podkop.common.navigation.NavigationContent
@@ -43,6 +45,8 @@ import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenRoot
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.ProfileScreenRoot
+import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
+import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreenRoot
 import pl.masslany.podkop.features.search.SearchScreen
 import pl.masslany.podkop.features.search.SearchScreenRoot
 import pl.masslany.podkop.features.settings.SettingsScreen
@@ -50,7 +54,7 @@ import pl.masslany.podkop.features.settings.SettingsScreenRoot
 import pl.masslany.podkop.features.tag.TagScreen
 import pl.masslany.podkop.features.tag.TagScreenRoot
 
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
     val startupManager = koinInject<StartupManager>()
@@ -150,6 +154,14 @@ fun App() {
                         TagScreenRoot(
                             tag = it.tag,
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<ResourceActionsBottomSheetScreen>(
+                        metadata = BottomSheetSceneStrategy.bottomSheet(),
+                    ) {
+                        ResourceActionsBottomSheetScreenRoot(
+                            screen = it,
                         )
                     }
 

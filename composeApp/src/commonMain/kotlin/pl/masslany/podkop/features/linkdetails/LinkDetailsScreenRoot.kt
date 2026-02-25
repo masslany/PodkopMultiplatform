@@ -554,17 +554,25 @@ private fun LinkDetailsCommentItem(
                     },
                     onImageClick = { actions.onImageClicked(it) },
                     onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.comment.id, embed) },
+                    onMoreClick = {
+                        actions.onLinkCommentMoreClicked(
+                            linkId = state.comment.linkId,
+                            commentId = state.comment.id,
+                            linkSlug = state.comment.linkSlug,
+                            parentCommentId = state.comment.parentCommentIdOrNull,
+                        )
+                    },
                 )
 
                 state.replies.forEach { reply ->
-                    Spacer(Modifier.size(12.dp))
+                    Spacer(Modifier.size(8.dp))
                     HorizontalDivider(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                     )
-                    Spacer(Modifier.size(12.dp))
+                    Spacer(Modifier.size(8.dp))
                     LinkCommentItem(
                         modifier = Modifier
-                            .padding(start = 16.dp)
+                            .padding(start = 12.dp)
                             .fillMaxWidth(),
                         state = reply,
                         onProfileClick = { actions.onProfileClicked(it) },
@@ -579,6 +587,14 @@ private fun LinkDetailsCommentItem(
                         },
                         onImageClick = { actions.onImageClicked(it) },
                         onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(reply.id, embed) },
+                        onMoreClick = {
+                            actions.onLinkCommentMoreClicked(
+                                linkId = reply.linkId,
+                                commentId = reply.id,
+                                linkSlug = reply.linkSlug,
+                                parentCommentId = reply.parentCommentIdOrNull,
+                            )
+                        },
                     )
                 }
 

@@ -82,7 +82,7 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
         totalCommentsCount = this.comments?.count ?: 0,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         comments = this.comments?.items
-            ?.map { it.toEntryCommentItemState() }
+            ?.map { it.toEntryCommentItemState(parentId = this.id) }
             .orEmpty()
             .toImmutableList(),
         voteState = this.toVoteState(),
@@ -93,7 +93,7 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
     )
 }
 
-private fun Comment.toEntryCommentItemState(): EntryCommentItemState {
+private fun Comment.toEntryCommentItemState(parentId: Int? = null): EntryCommentItemState {
     val authorState = AuthorState(
         name = author.username,
         color = author.color.toNameColorType(),
@@ -139,7 +139,7 @@ private fun Comment.toEntryCommentItemState(): EntryCommentItemState {
     return EntryCommentItemState(
         id = this.id,
         contentType = ResourceType.EntryCommentItem,
-        parentId = this.parentId,
+        parentId = parentId ?: this.parentId,
         authorState = authorState,
         avatarState = avatarState,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),

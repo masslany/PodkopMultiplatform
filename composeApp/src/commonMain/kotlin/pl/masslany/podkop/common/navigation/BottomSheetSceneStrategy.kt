@@ -1,10 +1,10 @@
 package pl.masslany.podkop.common.navigation
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.scene.OverlayScene
 import androidx.navigation3.scene.Scene
@@ -29,7 +29,7 @@ internal class BottomSheetScene<T : Any>(
         ModalBottomSheet(
             onDismissRequest = onBack,
             properties = modalBottomSheetProperties,
-            containerColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.surface,
         ) {
             entry.Content()
         }

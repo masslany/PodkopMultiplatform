@@ -87,6 +87,7 @@ private fun EntryItemRenderer(
                             voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
                         )
                     },
+                    onMoreClick = { actions.onEntryMoreClicked(state.id) },
                 )
                 state.comments.forEach { comment ->
                     Spacer(Modifier.size(12.dp))
@@ -111,6 +112,12 @@ private fun EntryItemRenderer(
                                 entryCommentId = comment.id,
                                 parentEntryId = comment.parentId,
                                 voted = comment.voteState.positiveVoteButtonState?.isVoted ?: false,
+                            )
+                        },
+                        onMoreClick = {
+                            actions.onEntryCommentMoreClicked(
+                                entryId = comment.parentId,
+                                entryCommentId = comment.id,
                             )
                         },
                     )
@@ -151,6 +158,7 @@ private fun EntryItemRenderer(
                     voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
                 )
             },
+            onMoreClick = { actions.onEntryMoreClicked(state.id) },
         )
     }
 }
@@ -182,6 +190,14 @@ private fun LinkItemRenderer(
                     voted = voted,
                 )
             },
+            onLinkCommentMoreClick = { linkId, commentId, linkSlug, parentCommentId ->
+                actions.onLinkCommentMoreClicked(
+                    linkId = linkId,
+                    commentId = commentId,
+                    linkSlug = linkSlug,
+                    parentCommentId = parentCommentId,
+                )
+            },
         )
     }
 }
@@ -205,6 +221,12 @@ private fun EntryCommentItemRenderer(
                 entryCommentId = state.id,
                 parentEntryId = state.parentId,
                 voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+            )
+        },
+        onMoreClick = {
+            actions.onEntryCommentMoreClicked(
+                entryId = state.parentId,
+                entryCommentId = state.id,
             )
         },
     )
@@ -243,6 +265,14 @@ private fun LinkCommentItemRenderer(
                 linkId = state.linkId,
                 commentId = state.id,
                 voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+            )
+        },
+        onMoreClick = {
+            actions.onLinkCommentMoreClicked(
+                linkId = state.linkId,
+                commentId = state.id,
+                linkSlug = state.linkSlug,
+                parentCommentId = state.parentCommentIdOrNull,
             )
         },
     )

@@ -1,5 +1,6 @@
 package pl.masslany.podkop.features.resources.models.linkcomment
 
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import pl.masslany.podkop.business.common.domain.models.common.Comment
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
@@ -19,7 +20,10 @@ import pl.masslany.podkop.common.models.toPublishedTimeType
 import pl.masslany.podkop.common.models.vote.toVoteState
 import pl.masslany.podkop.features.resources.models.ResourceType
 
-internal fun ResourceItem.toLinkCommentItemState(linkIdOverride: Int? = null): LinkCommentItemState {
+internal fun ResourceItem.toLinkCommentItemState(
+    linkIdOverride: Int? = null,
+    linkSlugOverride: String? = null,
+): LinkCommentItemState {
     val author = this.author
     val authorState = author?.let {
         AuthorState(
@@ -73,17 +77,19 @@ internal fun ResourceItem.toLinkCommentItemState(linkIdOverride: Int? = null): L
     }
 
     val resolvedLinkId = linkIdOverride ?: this.parent?.linkId ?: this.parent?.id ?: 0
+    val resolvedLinkSlug = linkSlugOverride ?: this.slug
     val resolvedParentId = this.parentId ?: -1
     val replies = this.comments
         ?.items
         .orEmpty()
-        .map { it.toLinkCommentItemState(linkId = resolvedLinkId) }
+        .map { it.toLinkCommentItemState(linkId = resolvedLinkId, linkSlug = resolvedLinkSlug) }
         .toImmutableList()
 
     return LinkCommentItemState(
         id = this.id,
         contentType = ResourceType.LinkCommentItem,
         linkId = resolvedLinkId,
+        linkSlug = resolvedLinkSlug,
         parentId = resolvedParentId,
         avatarState = avatarState,
         authorState = authorState,
@@ -96,7 +102,10 @@ internal fun ResourceItem.toLinkCommentItemState(linkIdOverride: Int? = null): L
     )
 }
 
-internal fun Comment.toLinkCommentItemState(linkId: Int): LinkCommentItemState {
+internal fun Comment.toLinkCommentItemState(
+    linkId: Int,
+    linkSlug: String,
+): LinkCommentItemState {
     val authorState = AuthorState(
         name = this.author.username,
         color = this.author.color.toNameColorType(),
@@ -138,16 +147,12 @@ internal fun Comment.toLinkCommentItemState(linkId: Int): LinkCommentItemState {
     } else {
         null
     }
-    val replies = this.comments
-        ?.items
-        .orEmpty()
-        .map { it.toLinkCommentItemState(linkId = linkId) }
-        .toImmutableList()
 
     return LinkCommentItemState(
         id = this.id,
         contentType = ResourceType.LinkCommentItem,
         linkId = linkId,
+        linkSlug = linkSlug,
         parentId = this.parentId,
         avatarState = avatarState,
         authorState = authorState,
@@ -155,7 +160,7 @@ internal fun Comment.toLinkCommentItemState(linkId: Int): LinkCommentItemState {
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
         embedImageState = embedImageState,
-        replies = replies,
+        replies = persistentListOf(),
         embedContentState = this.media.embed.toEmbedContentState(),
     )
 }

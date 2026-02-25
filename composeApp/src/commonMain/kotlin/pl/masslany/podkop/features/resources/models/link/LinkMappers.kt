@@ -72,7 +72,7 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
     val comments = this.comments
         ?.items
         .orEmpty()
-        .map { it.toLinkCommentItemState(linkId = this.id) }
+        .map { it.toLinkCommentItemState(linkId = this.id, linkSlug = this.slug) }
         .toImmutableList()
 
     val publishedTimeType = if (isUpcoming) {

@@ -53,6 +53,7 @@
     <string name="accessibility_lock_icon">Zablokuj</string>
     <string name="accessibility_unlock_icon">Odblokuj</string>
     <string name="accessibility_fab_scroll_to_top">Przewiń do góry</string>
+    <string name="accessibility_resource_more_actions">Więcej akcji</string>
 
     <!-- Profile -->
     <string name="profile_not_logged_in_message">Nie jesteś zalogowany</string>
@@ -173,6 +174,11 @@
     <!-- Snackbar -->
     <string name="snackbar_image_saved">Zapisano</string>
     <string name="snackbar_generic_error">Wystąpił problem</string>
+    <string name="snackbar_link_copied">Skopiowano link</string>
+
+    <!-- Resource actions -->
+    <string name="resource_actions_copy_as_link">Kopiuj link</string>
+    <string name="resource_actions_reply">Odpowiedz</string>
 
     <!-- Survey -->
     <string name="survey_answers_count">Odpowiedzi: %1$s</string>
