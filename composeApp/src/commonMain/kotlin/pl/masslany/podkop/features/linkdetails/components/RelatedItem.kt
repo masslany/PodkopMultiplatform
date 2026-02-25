@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -16,6 +17,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
@@ -52,12 +54,20 @@ fun RelatedItem(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
         ),
     ) {
-        Row {
+        Row(
+            modifier = Modifier
+                .fillMaxHeight(),
+        ) {
             if (state.imageUrl.isEmpty()) {
                 Image(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .aspectRatio(1f),
+                        .padding(
+                            start = 16.dp,
+                            end = 8.dp,
+                        )
+                        .size(48.dp)
+                        .aspectRatio(1f)
+                        .align(Alignment.CenterVertically),
                     painter = painterResource(resource = Res.drawable.no_image),
                     contentDescription = null,
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
@@ -111,7 +121,7 @@ private fun RelatedItemPreview() {
     val state = RelatedItemState(
         id = 1,
         contentType = ResourceType.RelatedItem,
-        imageUrl = "https://picsum.photos/seed/related-preview/400/300",
+        imageUrl = "",
         titleState = PreviewFixtures.titleState(maxLines = 2),
         authorState = PreviewFixtures.authorState(),
         source = PreviewFixtures.DOMAIN,
@@ -120,7 +130,9 @@ private fun RelatedItemPreview() {
     )
     PodkopPreview(darkTheme = false) {
         RelatedItem(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .height(100.dp),
             state = state,
             onItemClick = {},
             onAuthorClick = {},
