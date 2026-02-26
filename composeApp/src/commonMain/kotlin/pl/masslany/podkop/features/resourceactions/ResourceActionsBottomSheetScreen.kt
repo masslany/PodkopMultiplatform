@@ -17,6 +17,7 @@ data class ResourceActionsBottomSheetScreen(
     val rootSlug: String? = null,
     val parentId: Int? = null,
     val childId: Int? = null,
+    val screenshotDraftId: String? = null,
 ) : NavTarget {
     init {
         require(resourceType == ResourceActionsType.Entry || childId != null) {
@@ -28,18 +29,24 @@ data class ResourceActionsBottomSheetScreen(
     }
 
     companion object {
-        fun forEntry(entryId: Int): ResourceActionsBottomSheetScreen = ResourceActionsBottomSheetScreen(
+        fun forEntry(
+            entryId: Int,
+            screenshotDraftId: String? = null,
+        ): ResourceActionsBottomSheetScreen = ResourceActionsBottomSheetScreen(
             resourceType = ResourceActionsType.Entry,
             rootId = entryId,
+            screenshotDraftId = screenshotDraftId,
         )
 
         fun forEntryComment(
             entryId: Int,
             entryCommentId: Int,
+            screenshotDraftId: String? = null,
         ): ResourceActionsBottomSheetScreen = ResourceActionsBottomSheetScreen(
             resourceType = ResourceActionsType.EntryComment,
             rootId = entryId,
             childId = entryCommentId,
+            screenshotDraftId = screenshotDraftId,
         )
 
         fun forLinkComment(
@@ -47,12 +54,14 @@ data class ResourceActionsBottomSheetScreen(
             linkSlug: String,
             linkCommentId: Int,
             parentCommentId: Int?,
+            screenshotDraftId: String? = null,
         ): ResourceActionsBottomSheetScreen = ResourceActionsBottomSheetScreen(
             resourceType = ResourceActionsType.LinkComment,
             rootId = linkId,
             rootSlug = linkSlug,
             parentId = parentCommentId,
             childId = linkCommentId,
+            screenshotDraftId = screenshotDraftId,
         )
     }
 }

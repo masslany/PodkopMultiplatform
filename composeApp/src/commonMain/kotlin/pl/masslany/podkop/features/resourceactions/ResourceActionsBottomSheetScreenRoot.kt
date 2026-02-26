@@ -38,6 +38,7 @@ fun ResourceActionsBottomSheetScreenRoot(
                     rootSlug = screen.rootSlug,
                     parentId = screen.parentId,
                     childId = screen.childId,
+                    screenshotDraftId = screen.screenshotDraftId,
                 ),
             )
         },

@@ -47,6 +47,8 @@ import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.ProfileScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreenRoot
+import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogScreen
+import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetScreenRoot
 import pl.masslany.podkop.features.search.SearchScreen
@@ -171,6 +173,18 @@ fun App() {
                         metadata = BottomSheetSceneStrategy.bottomSheet(),
                     ) {
                         ResourceVotesBottomSheetScreenRoot(
+                            screen = it,
+                        )
+                    }
+
+                    entry<ResourceScreenshotPreviewDialogScreen>(
+                        metadata = DialogSceneStrategy.dialog(
+                            DialogProperties(
+                                usePlatformDefaultWidth = false,
+                            ),
+                        ),
+                    ) {
+                        ResourceScreenshotPreviewDialogScreenRoot(
                             screen = it,
                         )
                     }

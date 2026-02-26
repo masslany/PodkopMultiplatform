@@ -60,6 +60,7 @@ import pl.masslany.podkop.features.links.hits.HitsList
 import pl.masslany.podkop.features.links.preview.LinksScreenStateProvider
 import pl.masslany.podkop.features.links.preview.NoOpLinksActions
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
+import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_profile
@@ -304,6 +305,9 @@ private fun LinksScreenList(
                     .padding(horizontal = 16.dp),
                 state = it,
                 actions = actions,
+                config = ResourceItemConfig(
+                    showEntryInlineActions = false,
+                ),
             )
         }
 

@@ -20,6 +20,7 @@ data class ResourceActionItemState(
 
 enum class ResourceActionId {
     CopyAsLink,
+    ShareAsScreenshot,
     ShowVoters,
 }
 
@@ -33,4 +34,5 @@ data class ResourceActionsParams(
     val rootSlug: String? = null,
     val parentId: Int? = null,
     val childId: Int? = null,
+    val screenshotDraftId: String? = null,
 )

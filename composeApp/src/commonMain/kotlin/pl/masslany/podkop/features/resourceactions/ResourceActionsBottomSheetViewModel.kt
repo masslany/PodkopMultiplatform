@@ -1,7 +1,7 @@
 package pl.masslany.podkop.features.resourceactions
 
 import androidx.lifecycle.ViewModel
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import pl.masslany.podkop.common.navigation.AppNavigator
@@ -11,7 +11,9 @@ import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_add
 import podkop.composeapp.generated.resources.ic_copy
+import podkop.composeapp.generated.resources.ic_share
 import podkop.composeapp.generated.resources.resource_actions_copy_as_link
+import podkop.composeapp.generated.resources.resource_actions_share_as_screenshot
 import podkop.composeapp.generated.resources.resource_actions_show_voters
 import podkop.composeapp.generated.resources.snackbar_link_copied
 
@@ -19,6 +21,7 @@ class ResourceActionsBottomSheetViewModel(
     private val params: ResourceActionsParams,
     private val appNavigator: AppNavigator,
     private val snackbarManager: SnackbarManager,
+    private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
 ) : ViewModel(),
     ResourceActionsBottomSheetActions {
 
@@ -36,6 +39,15 @@ class ResourceActionsBottomSheetViewModel(
                     ),
                 )
                 appNavigator.back()
+            }
+
+            ResourceActionId.ShareAsScreenshot -> {
+                val draftId = params.screenshotDraftId ?: return
+                appNavigator.navigateTo(
+                    ResourceScreenshotPreviewDialogScreen(
+                        draftId = draftId,
+                    ),
+                )
             }
 
             ResourceActionId.ShowVoters -> {
@@ -57,6 +69,11 @@ class ResourceActionsBottomSheetViewModel(
             }
         }
     }
+
+    override fun onCleared() {
+        params.screenshotDraftId?.let(screenshotShareDraftStore::remove)
+        super.onCleared()
+    }
 }
 
 private fun buildState(params: ResourceActionsParams): ResourceActionsBottomSheetState {
@@ -75,23 +92,34 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
             ),
         ),
     )
+    val screenshotAction = params.screenshotDraftId?.let {
+        ResourceActionItemState(
+            id = ResourceActionId.ShareAsScreenshot,
+            title = Res.string.resource_actions_share_as_screenshot,
+            icon = Res.drawable.ic_share,
+        )
+    }
 
     return ResourceActionsBottomSheetState(
         actions = when (params.resourceType) {
             ResourceActionsType.Entry,
             ResourceActionsType.EntryComment,
-            -> persistentListOf(
+            -> listOfNotNull(
                 showVotersAction,
+                screenshotAction,
                 copyLinkAction,
-            )
+            ).toPersistentList()
 
             ResourceActionsType.LinkComment,
-            -> persistentListOf(copyLinkAction)
+            -> listOfNotNull(
+                screenshotAction,
+                copyLinkAction,
+            ).toPersistentList()
         },
     )
 }
 
-private fun buildResourceLink(params: ResourceActionsParams): String = when (params.resourceType) {
+internal fun buildResourceLink(params: ResourceActionsParams): String = when (params.resourceType) {
     ResourceActionsType.Entry -> "https://wykop.pl/wpis/${params.rootId}"
 
     ResourceActionsType.EntryComment -> {

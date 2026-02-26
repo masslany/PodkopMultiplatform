@@ -175,11 +175,21 @@
     <string name="snackbar_image_saved">Zapisano</string>
     <string name="snackbar_generic_error">Wystąpił problem</string>
     <string name="snackbar_link_copied">Skopiowano link</string>
+    <string name="snackbar_screenshot_copied">Skopiowano obraz</string>
 
     <!-- Resource actions -->
     <string name="resource_actions_copy_as_link">Kopiuj link</string>
+    <string name="resource_actions_share_as_screenshot">Udostępnij jako zrzut ekranu</string>
     <string name="resource_actions_show_voters">Pokaż plusujących</string>
     <string name="resource_actions_reply">Odpowiedz</string>
+
+    <!-- Screenshot preview -->
+    <string name="screenshot_preview_title">Podgląd zrzutu</string>
+    <string name="screenshot_preview_show_parent">Pokaż element nadrzędny</string>
+    <string name="screenshot_preview_action_copy">Kopiuj obraz</string>
+    <string name="screenshot_preview_action_share">Udostępnij obraz</string>
+    <string name="screenshot_preview_action_save">Zapisz</string>
+    <string name="screenshot_preview_action_cancel">Anuluj</string>
 
     <!-- Resource votes -->
     <string name="resource_votes_empty">Brak plusujących</string>

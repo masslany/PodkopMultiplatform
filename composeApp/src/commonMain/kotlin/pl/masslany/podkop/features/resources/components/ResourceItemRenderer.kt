@@ -76,6 +76,7 @@ private fun EntryItemRenderer(
             ) {
                 EntryItem(
                     state = state,
+                    showInlineActions = config.showEntryInlineActions,
                     onProfileClick = { actions.onProfileClicked(it) },
                     onTagClick = { actions.onTagClicked(it) },
                     onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -102,6 +103,7 @@ private fun EntryItemRenderer(
                                 start = 16.dp,
                             ),
                         state = comment,
+                        showInlineActions = config.showEntryInlineActions,
                         onProfileClick = { actions.onProfileClicked(it) },
                         onTagClick = { actions.onTagClicked(it) },
                         onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -147,6 +149,7 @@ private fun EntryItemRenderer(
             modifier = modifier
                 .clickable { actions.onEntryClicked(state.id) },
             state = state,
+            showInlineActions = config.showEntryInlineActions,
             onProfileClick = { actions.onProfileClicked(it) },
             onTagClick = { actions.onTagClicked(it) },
             onUrlClick = { actions.onLinkUrlClicked(it) },

@@ -152,9 +152,7 @@ fun ProfileScreenContent(
                     when (state.content) {
                         is ProfileContentState.Loaded -> {
                             if (showProfileName) {
-                                val profileLabel = stringResource(resource = Res.string.topbar_label_profile)
-                                val username = (state.content as? ProfileContentState.Loaded)?.header?.username
-                                Text(text = username ?: profileLabel)
+                                Text(text = state.content.header.username)
                             }
                         }
 

@@ -5,6 +5,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import pl.masslany.podkop.common.navigation.ExternalBrowser
 import pl.masslany.podkop.common.platform.ImageDownloader
+import pl.masslany.podkop.common.platform.ScreenshotExporter
 
 val mainModule = module {
     viewModelOf(::MainActivityViewModel)
@@ -20,6 +21,12 @@ val mainModule = module {
 
     single {
         ImageDownloader(
+            application = androidApplication(),
+        )
+    }
+
+    single {
+        ScreenshotExporter(
             application = androidApplication(),
         )
     }

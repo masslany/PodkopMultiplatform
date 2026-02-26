@@ -25,6 +25,7 @@ import pl.masslany.podkop.features.resources.preview.LinkCommentItemStateProvide
 fun LinkCommentItem(
     state: LinkCommentItemState,
     modifier: Modifier = Modifier,
+    showInlineActions: Boolean = true,
     onProfileClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
@@ -87,8 +88,10 @@ fun LinkCommentItem(
                 onFetchedContentClick = { onUrlClick(state.embedContentState.url) },
             )
         }
-        Spacer(Modifier.size(2.dp))
-        ResourceInlineActionsRow(onMoreClick = onMoreClick)
+        if (showInlineActions) {
+            Spacer(Modifier.size(2.dp))
+            ResourceInlineActionsRow(onMoreClick = onMoreClick)
+        }
     }
 }
 

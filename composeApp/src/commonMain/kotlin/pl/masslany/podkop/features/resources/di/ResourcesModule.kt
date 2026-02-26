@@ -13,6 +13,7 @@ val resourcesModule = module {
             dispatcherProvider = get(),
             logger = get(),
             twitterEmbedPreviewRepository = get(),
+            screenshotShareDraftStore = get(),
         )
     }
 }

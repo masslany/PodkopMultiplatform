@@ -15,6 +15,7 @@ import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.deeplink.AppDeepLinkHandler
 import pl.masslany.podkop.common.navigation.ExternalBrowser
 import pl.masslany.podkop.common.platform.ImageDownloader
+import pl.masslany.podkop.common.platform.ScreenshotExporter
 import pl.masslany.podkop.initKoin
 
 fun initKoinIos() {
@@ -32,6 +33,11 @@ val iOSModule = module {
         )
     }
     single { ImageDownloader() }
+    single {
+        ScreenshotExporter(
+            viewControllerProvider = get<IOSViewControllerHolder>().provider,
+        )
+    }
 }
 
 class IOSDependencyHelper : KoinComponent {

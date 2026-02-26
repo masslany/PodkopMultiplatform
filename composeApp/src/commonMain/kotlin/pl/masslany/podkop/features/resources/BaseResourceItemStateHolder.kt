@@ -27,6 +27,8 @@ import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
+import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraft
+import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryVoteAction
@@ -43,6 +45,7 @@ open class BaseResourceItemStateHolder(
     private val dispatcherProvider: DispatcherProvider,
     private val logger: AppLogger,
     private val twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
+    private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
 ) : ResourceItemStateHolder {
 
     private val _items = MutableStateFlow<ImmutableList<ResourceItemState>>(persistentListOf())
@@ -219,17 +222,28 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onEntryMoreClicked(entryId: Int) {
-        appNavigator.navigateTo(ResourceActionsBottomSheetScreen.forEntry(entryId))
+        val draftId = createEntryScreenshotDraftId(entryId)
+        appNavigator.navigateTo(
+            ResourceActionsBottomSheetScreen.forEntry(
+                entryId = entryId,
+                screenshotDraftId = draftId,
+            ),
+        )
     }
 
     override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) {
     }
 
     override fun onEntryCommentMoreClicked(entryId: Int, entryCommentId: Int) {
+        val draftId = createEntryCommentScreenshotDraftId(
+            entryId = entryId,
+            entryCommentId = entryCommentId,
+        )
         appNavigator.navigateTo(
             ResourceActionsBottomSheetScreen.forEntryComment(
                 entryId = entryId,
                 entryCommentId = entryCommentId,
+                screenshotDraftId = draftId,
             ),
         )
     }
@@ -240,12 +254,14 @@ open class BaseResourceItemStateHolder(
         linkSlug: String,
         parentCommentId: Int?,
     ) {
+        val draftId = createTopLevelLinkCommentScreenshotDraftId(commentId)
         appNavigator.navigateTo(
             ResourceActionsBottomSheetScreen.forLinkComment(
                 linkId = linkId,
                 linkSlug = linkSlug,
                 linkCommentId = commentId,
                 parentCommentId = parentCommentId,
+                screenshotDraftId = draftId,
             ),
         )
     }
@@ -294,6 +310,60 @@ open class BaseResourceItemStateHolder(
 
             entry.copy(voteState = newVoteState)
         }
+    }
+
+    protected fun putScreenshotDraft(draft: ResourceScreenshotShareDraft): String =
+        screenshotShareDraftStore.put(draft)
+
+    private fun createEntryScreenshotDraftId(entryId: Int): String? {
+        val entry = _items.value
+            .filterIsInstance<EntryItemState>()
+            .firstOrNull { it.id == entryId }
+            ?: return null
+
+        return putScreenshotDraft(
+            ResourceScreenshotShareDraft.Entry(
+                entry = entry,
+            ),
+        )
+    }
+
+    private fun createEntryCommentScreenshotDraftId(
+        entryId: Int,
+        entryCommentId: Int,
+    ): String? {
+        val directComment = _items.value
+            .filterIsInstance<EntryCommentItemState>()
+            .firstOrNull { it.id == entryCommentId }
+        val nestedComment = _items.value
+            .filterIsInstance<EntryItemState>()
+            .firstOrNull { it.id == entryId }
+            ?.comments
+            ?.firstOrNull { it.id == entryCommentId }
+        val comment = directComment ?: nestedComment ?: return null
+        val parentEntry = _items.value
+            .filterIsInstance<EntryItemState>()
+            .firstOrNull { it.id == entryId }
+
+        return putScreenshotDraft(
+            ResourceScreenshotShareDraft.EntryComment(
+                comment = comment,
+                parentEntry = parentEntry,
+            ),
+        )
+    }
+
+    private fun createTopLevelLinkCommentScreenshotDraftId(commentId: Int): String? {
+        val comment = _items.value
+            .filterIsInstance<LinkCommentItemState>()
+            .firstOrNull { it.id == commentId }
+            ?: return null
+
+        return putScreenshotDraft(
+            ResourceScreenshotShareDraft.LinkComment(
+                comment = comment,
+            ),
+        )
     }
 
     private fun updateLinkCommentVote(

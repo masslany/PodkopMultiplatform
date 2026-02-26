@@ -21,12 +21,16 @@ import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
+import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.linkdetails.models.LinkDetailsCommentItemState
+import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
+import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraft
+import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.resources.models.link.toLinkItemState
@@ -39,6 +43,8 @@ class LinkDetailsViewModel(
     private val id: Int,
     private val linksRepository: LinksRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
+    private val appNavigator: AppNavigator,
+    private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
@@ -162,6 +168,24 @@ class LinkDetailsViewModel(
                 )
             }
         }
+    }
+
+    override fun onLinkCommentMoreClicked(
+        linkId: Int,
+        commentId: Int,
+        linkSlug: String,
+        parentCommentId: Int?,
+    ) {
+        val draftId = buildLinkCommentScreenshotDraftId(commentId)
+        appNavigator.navigateTo(
+            ResourceActionsBottomSheetScreen.forLinkComment(
+                linkId = linkId,
+                linkSlug = linkSlug,
+                linkCommentId = commentId,
+                parentCommentId = parentCommentId,
+                screenshotDraftId = draftId,
+            ),
+        )
     }
 
     override fun onSortSelected(sortType: DropdownMenuItemType) {
@@ -452,6 +476,30 @@ class LinkDetailsViewModel(
         commentRepliesStateById.update { previousState ->
             previousState + newState.filterKeys { key -> !previousState.containsKey(key) }
         }
+    }
+
+    private fun buildLinkCommentScreenshotDraftId(commentId: Int): String? {
+        val commentsState = state.value.commentsState as? LinkDetailsCommentsState.Content ?: return null
+
+        commentsState.comments.firstOrNull { it.id == commentId }?.let { topLevel ->
+            return screenshotShareDraftStore.put(
+                ResourceScreenshotShareDraft.LinkComment(
+                    comment = topLevel.comment,
+                ),
+            )
+        }
+
+        commentsState.comments.forEach { item ->
+            val reply = item.replies.firstOrNull { it.id == commentId } ?: return@forEach
+            return screenshotShareDraftStore.put(
+                ResourceScreenshotShareDraft.LinkComment(
+                    comment = reply,
+                    parentComment = item.comment,
+                ),
+            )
+        }
+
+        return null
     }
 
     private fun buildInitialCommentRepliesState(
