@@ -22,6 +22,7 @@ val networkModule = module {
         TokenRefreshCoordinator(
             configStorage = get(),
             json = get(),
+            logger = get(),
         )
     }
 

@@ -2,7 +2,10 @@ package pl.masslany.podkop.common.network.infrastructure.main
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.statement.bodyAsText
 import io.ktor.client.request.request
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
 import io.ktor.util.reflect.TypeInfo
 import pl.masslany.podkop.common.network.models.request.Request
 import pl.masslany.podkop.common.network.models.response.ApiResponse
@@ -20,6 +23,13 @@ internal class ApiClientImpl(
         return try {
             val requestBuilder = request.toHttpRequestBuilder()
             val httpResponse = httpClient.request(requestBuilder)
+            if (!httpResponse.status.isSuccess()) {
+                val responseBody = runCatching { httpResponse.bodyAsText() }.getOrNull()
+                throw ApiHttpException(
+                    status = httpResponse.status,
+                    responseBody = responseBody,
+                )
+            }
 
             val responseBody =
                 httpResponse.body(
@@ -33,5 +43,27 @@ internal class ApiClientImpl(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+}
+
+internal class ApiHttpException(
+    val status: HttpStatusCode,
+    val responseBody: String?,
+) : IllegalStateException(
+    buildString {
+        append("HTTP ")
+        append(status.value)
+        append(' ')
+        append(status.description)
+        responseBody
+            ?.takeIf(String::isNotBlank)
+            ?.let {
+                append(": ")
+                append(it.take(MAX_ERROR_BODY_LENGTH))
+            }
+    },
+) {
+    private companion object {
+        const val MAX_ERROR_BODY_LENGTH = 500
     }
 }

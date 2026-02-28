@@ -46,17 +46,22 @@ internal class AuthDataSourceImpl(
 
     override suspend fun updateTokens(): Result<Unit> {
         val refreshToken = configStorage.getRefreshToken()
-        return if (refreshToken.isEmpty()) {
-            getAuthToken().mapCatching {
-                configStorage.storeBearerToken(it.data.token)
-                Result.success(Unit)
+        if (refreshToken.isNotEmpty()) {
+            val refreshResult =
+                authApi.refreshTokens(refreshToken).mapCatching {
+                    configStorage.storeBearerToken(it.data.token)
+                    configStorage.storeRefreshToken(
+                        it.data.refreshToken?.takeIf(String::isNotBlank) ?: refreshToken,
+                    )
+                }
+
+            if (refreshResult.isSuccess) {
+                return refreshResult
             }
-        } else {
-            authApi.refreshTokens(refreshToken).mapCatching {
-                configStorage.storeBearerToken(it.data.token)
-                configStorage.storeRefreshToken(it.data.refreshToken)
-                Result.success(Unit)
-            }
+        }
+
+        return getAuthToken().mapCatching {
+            configStorage.storeBearerToken(it.data.token)
         }
     }
 

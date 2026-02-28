@@ -15,10 +15,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import pl.masslany.podkop.common.configstorage.api.ConfigStorage
+import pl.masslany.podkop.common.logging.api.AppLogger
 
 internal class TokenRefreshCoordinator(
     private val configStorage: ConfigStorage,
     private val json: Json,
+    private val logger: AppLogger,
 ) {
     private val refreshMutex = Mutex()
     private val refreshHttpClient by lazy {
@@ -74,9 +76,15 @@ internal class TokenRefreshCoordinator(
                 }.body<RefreshDto>()
 
             configStorage.storeBearerToken(response.data.token)
-            configStorage.storeRefreshToken(response.data.refreshToken)
+            configStorage.storeRefreshToken(
+                response.data.refreshToken?.takeIf(String::isNotBlank) ?: refreshToken,
+            )
             true
-        }.getOrDefault(false)
+        }
+            .onFailure {
+                logger.warn("Failed to refresh API token with refresh token", it)
+            }
+            .getOrDefault(false)
     }
 
     private suspend fun refreshWithApiCredentials(): Boolean {
@@ -100,7 +108,11 @@ internal class TokenRefreshCoordinator(
 
             configStorage.storeBearerToken(response.data.token)
             true
-        }.getOrDefault(false)
+        }
+            .onFailure {
+                logger.warn("Failed to refresh API token with API credentials", it)
+            }
+            .getOrDefault(false)
     }
 
     private companion object {
@@ -158,7 +170,7 @@ private data class RefreshDto(
 @Serializable
 private data class RefreshDtoData(
     @SerialName("refresh_token")
-    val refreshToken: String,
+    val refreshToken: String? = null,
     @SerialName("token")
     val token: String,
 )

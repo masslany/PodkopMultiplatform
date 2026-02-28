@@ -1,7 +1,6 @@
 package pl.masslany.podkop.common.logging.infrastructure.main
 
 import pl.masslany.podkop.common.logging.api.AppLogger
-import platform.Foundation.NSLog
 
 actual class PlatformLogger actual constructor() : AppLogger {
     override fun debug(message: String) {
@@ -26,6 +25,7 @@ actual class PlatformLogger actual constructor() : AppLogger {
         throwable: Throwable? = null,
     ) {
         val errorPart = throwable?.let { "\n${it.stackTraceToString()}" }.orEmpty()
-        NSLog("[%@] %@%@", level, message, errorPart)
+        val text = "[$level] $message$errorPart"
+        println(text)
     }
 }
