@@ -1,5 +1,10 @@
 package pl.masslany.podkop.common.pagination
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -74,6 +79,34 @@ class Paginator<T>(
                     _state.value = PaginatorState.Error(it)
                     onError(it)
                 }
+        }
+    }
+}
+
+@Composable
+fun Paginator(
+    paginate: () -> Unit,
+    shouldPaginate: (lastVisibleIndex: Int?, totalItems: Int) -> Boolean,
+    lastVisibleIndexProvider: () -> Int?,
+    totalItemsCountProvider: () -> Int,
+) {
+    val currentPaginate by rememberUpdatedState(newValue = paginate)
+    val currentShouldPaginate by rememberUpdatedState(newValue = shouldPaginate)
+    val currentLastVisibleIndexProvider by rememberUpdatedState(newValue = lastVisibleIndexProvider)
+    val currentTotalItemsCountProvider by rememberUpdatedState(newValue = totalItemsCountProvider)
+
+    LaunchedEffect(Unit) {
+        launch {
+            snapshotFlow {
+                currentShouldPaginate(
+                    currentLastVisibleIndexProvider(),
+                    currentTotalItemsCountProvider(),
+                )
+            }.collect {
+                if (it) {
+                    currentPaginate()
+                }
+            }
         }
     }
 }

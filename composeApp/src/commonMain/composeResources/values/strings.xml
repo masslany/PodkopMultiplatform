@@ -50,10 +50,13 @@
     <string name="accessibility_topbar_settings">Ustawienia</string>
     <string name="accessibility_topbar_downloads">Pobierz</string>
     <string name="accessibility_topbar_search">Szukaj</string>
+    <string name="accessibility_topbar_gallery_view">Widok galerii</string>
+    <string name="accessibility_topbar_list_view">Widok listy</string>
     <string name="accessibility_lock_icon">Zablokuj</string>
     <string name="accessibility_unlock_icon">Odblokuj</string>
     <string name="accessibility_fab_scroll_to_top">Przewiń do góry</string>
     <string name="accessibility_resource_more_actions">Więcej akcji</string>
+    <string name="accessibility_tag_gallery_open_entry">Otwórz wpis</string>
 
     <!-- Profile -->
     <string name="profile_not_logged_in_message">Nie jesteś zalogowany</string>
@@ -153,6 +156,7 @@
     <string name="tag_details_screen_no_results_label">Brak wyników</string>
     <string name="tag_details_screen_error_label">Wystąpił problem podczas wczytywania danych</string>
     <string name="tag_details_screen_error_loading_tags">Wystąpił problem podczas wczytywania tagu</string>
+    <string name="tag_details_screen_gallery_no_images">Brak obrazów we wpisach dla tego tagu</string>
 
     <!-- Entry details -->
     <string name="entry_details_screen_error_loading_comments">Wystąpił problem podczas wczytywania komentarzy</string>

@@ -74,6 +74,7 @@ class TagViewModel(
     ) { state, resources, paginator ->
         state.copy(
             resources = resources,
+            galleryItems = resources.toTagGalleryItems(),
             isPaginating = paginator is PaginatorState.Loading,
         )
     }.stateIn(
@@ -152,6 +153,12 @@ class TagViewModel(
     override fun onTypeDismissed() {
         _state.update { previousState ->
             previousState.updateTypeMenuExpanded(false)
+        }
+    }
+
+    override fun onGalleryModeToggled() {
+        _state.update { previousState ->
+            previousState.updateGalleryMode(!previousState.isGalleryMode)
         }
     }
 

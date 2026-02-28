@@ -6,9 +6,11 @@ import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.features.resources.preview.ResourceItemStateProvider
 import pl.masslany.podkop.features.tag.TagScreenState
+import pl.masslany.podkop.features.tag.toTagGalleryItems
 
 class TagScreenStateProvider : PreviewParameterProvider<TagScreenState> {
     private val items = ResourceItemStateProvider().values.toList()
+    private val resources = persistentListOf(items[0], items[1], items[0])
 
     override val values: Sequence<TagScreenState> = sequenceOf(
         TagScreenState.initial.copy(tag = "#ompose"),
@@ -21,7 +23,8 @@ class TagScreenStateProvider : PreviewParameterProvider<TagScreenState> {
             isError = false,
             isRefreshing = false,
             isTagContentError = false,
-            resources = persistentListOf(items[0], items[1], items[0]),
+            resources = resources,
+            galleryItems = resources.toTagGalleryItems(),
             sortMenuState = DropdownMenuState(
                 items = persistentListOf(
                     DropdownMenuItemType.Active,
@@ -41,6 +44,35 @@ class TagScreenStateProvider : PreviewParameterProvider<TagScreenState> {
                 expanded = false,
             ),
             isPaginating = true,
+        ),
+        TagScreenState.initial.copy(
+            screenInstanceId = "preview-gallery",
+            tag = "compose",
+            bannerUrl = "https://picsum.photos/seed/taggallery/1200/400",
+            isGalleryMode = true,
+            isLoading = false,
+            isError = false,
+            resources = resources,
+            galleryItems = resources.toTagGalleryItems(),
+            sortMenuState = DropdownMenuState(
+                items = persistentListOf(
+                    DropdownMenuItemType.Active,
+                    DropdownMenuItemType.Newest,
+                    DropdownMenuItemType.Digged,
+                ),
+                selected = DropdownMenuItemType.Active,
+                expanded = false,
+            ),
+            typeMenuState = DropdownMenuState(
+                items = persistentListOf(
+                    DropdownMenuItemType.Links,
+                    DropdownMenuItemType.Entries,
+                    DropdownMenuItemType.Everything,
+                ),
+                selected = DropdownMenuItemType.Entries,
+                expanded = false,
+            ),
+            isPaginating = false,
         ),
     )
 }

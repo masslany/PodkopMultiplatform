@@ -1,0 +1,17 @@
+package pl.masslany.podkop.features.tag.components
+
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+
+@Composable
+fun TagName(
+    tag: String,
+) {
+    Text(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        text = "#$tag",
+        style = MaterialTheme.typography.headlineSmall,
+    )
+}

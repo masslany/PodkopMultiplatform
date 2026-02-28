@@ -24,5 +24,7 @@ interface TagActions :
 
     fun onTypeDismissed()
 
+    fun onGalleryModeToggled()
+
     fun onRefresh()
 }

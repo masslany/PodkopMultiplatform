@@ -10,11 +10,13 @@ data class TagScreenState(
     val screenInstanceId: String,
     val tag: String,
     val bannerUrl: String,
+    val isGalleryMode: Boolean,
     val isLoading: Boolean,
     val isError: Boolean,
     val isRefreshing: Boolean,
     val isTagContentError: Boolean,
     val resources: ImmutableList<ResourceItemState>,
+    val galleryItems: ImmutableList<TagGalleryItemState>,
     val sortMenuState: DropdownMenuState,
     val typeMenuState: DropdownMenuState,
     val isPaginating: Boolean,
@@ -24,15 +26,37 @@ data class TagScreenState(
             screenInstanceId = "",
             tag = "",
             bannerUrl = "",
+            isGalleryMode = false,
             isLoading = true,
             isError = false,
             isRefreshing = false,
             isTagContentError = false,
             resources = persistentListOf(),
+            galleryItems = persistentListOf(),
             sortMenuState = DropdownMenuState.initial,
             typeMenuState = DropdownMenuState.initial,
             isPaginating = false,
         )
+
+        private const val TAG_GALLERY_BASE_HEADER_ITEMS_COUNT = 3
+    }
+
+    val headerItemsCount: Int
+        get() = TAG_GALLERY_BASE_HEADER_ITEMS_COUNT + if (isTagContentError) {
+            1
+        } else {
+            0
+        }
+
+    fun findClosestGalleryIndex(
+        resourceIndex: Int,
+    ): Int? {
+        if (galleryItems.isEmpty()) {
+            return null
+        }
+        return galleryItems.indexOfFirst { it.resourceIndex >= resourceIndex }
+            .takeIf { it >= 0 }
+            ?: galleryItems.lastIndex
     }
 
     fun updateTag(tag: String) = this.copy(
@@ -41,6 +65,10 @@ data class TagScreenState(
 
     fun updateBannerUrl(bannerUrl: String) = this.copy(
         bannerUrl = bannerUrl,
+    )
+
+    fun updateGalleryMode(isGalleryMode: Boolean) = this.copy(
+        isGalleryMode = isGalleryMode,
     )
 
     fun updateSortMenuExpanded(expanded: Boolean) = this.copy(

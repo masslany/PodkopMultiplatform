@@ -21,5 +21,6 @@ object NoOpTagActions :
     override fun onTypeSelected(type: DropdownMenuItemType) = Unit
     override fun onTypeExpandedChanged(expanded: Boolean) = Unit
     override fun onTypeDismissed() = Unit
+    override fun onGalleryModeToggled() = Unit
     override fun onRefresh() = Unit
 }
