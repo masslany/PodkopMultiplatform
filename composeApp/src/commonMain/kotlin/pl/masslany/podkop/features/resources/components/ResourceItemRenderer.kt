@@ -47,9 +47,9 @@ fun ResourceItemRenderer(
 ) {
     when (state) {
         is EntryItemState -> EntryItemRenderer(modifier, state, actions, config)
-        is LinkItemState -> LinkItemRenderer(modifier, state, actions)
-        is EntryCommentItemState -> EntryCommentItemRenderer(modifier, state, actions)
-        is LinkCommentItemState -> LinkCommentItemRenderer(modifier, state, actions)
+        is LinkItemState -> LinkItemRenderer(modifier, state, actions, config)
+        is EntryCommentItemState -> EntryCommentItemRenderer(modifier, state, actions, config)
+        is LinkCommentItemState -> LinkCommentItemRenderer(modifier, state, actions, config)
         is HitItemState -> HitItemRenderer(modifier, state, actions)
     }
 }
@@ -77,6 +77,7 @@ private fun EntryItemRenderer(
                 EntryItem(
                     state = state,
                     showInlineActions = config.showEntryInlineActions,
+                    isReplyEnabled = config.isReplyActionEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
                     onTagClick = { actions.onTagClicked(it) },
                     onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -87,6 +88,16 @@ private fun EntryItemRenderer(
                             entryId = state.id,
                             voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
                         )
+                    },
+                    onReplyClick = if (config.showReplyAction) {
+                        {
+                            actions.onEntryReplyClicked(
+                                entryId = state.id,
+                                author = state.authorState?.name,
+                            )
+                        }
+                    } else {
+                        null
                     },
                     onMoreClick = { actions.onEntryMoreClicked(state.id) },
                 )
@@ -104,6 +115,7 @@ private fun EntryItemRenderer(
                             ),
                         state = comment,
                         showInlineActions = config.showEntryInlineActions,
+                        isReplyEnabled = config.isReplyActionEnabled,
                         onProfileClick = { actions.onProfileClicked(it) },
                         onTagClick = { actions.onTagClicked(it) },
                         onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -115,6 +127,17 @@ private fun EntryItemRenderer(
                                 parentEntryId = comment.parentId,
                                 voted = comment.voteState.positiveVoteButtonState?.isVoted ?: false,
                             )
+                        },
+                        onReplyClick = if (config.showReplyAction) {
+                            {
+                                actions.onEntryCommentReplyClicked(
+                                    entryId = comment.parentId,
+                                    entryCommentId = comment.id,
+                                    author = comment.authorState?.name,
+                                )
+                            }
+                        } else {
+                            null
                         },
                         onMoreClick = {
                             actions.onEntryCommentMoreClicked(
@@ -150,6 +173,7 @@ private fun EntryItemRenderer(
                 .clickable { actions.onEntryClicked(state.id) },
             state = state,
             showInlineActions = config.showEntryInlineActions,
+            isReplyEnabled = config.isReplyActionEnabled,
             onProfileClick = { actions.onProfileClicked(it) },
             onTagClick = { actions.onTagClicked(it) },
             onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -161,6 +185,16 @@ private fun EntryItemRenderer(
                     voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
                 )
             },
+            onReplyClick = if (config.showReplyAction) {
+                {
+                    actions.onEntryReplyClicked(
+                        entryId = state.id,
+                        author = state.authorState?.name,
+                    )
+                }
+            } else {
+                null
+            },
             onMoreClick = { actions.onEntryMoreClicked(state.id) },
         )
     }
@@ -171,6 +205,7 @@ private fun LinkItemRenderer(
     modifier: Modifier,
     state: LinkItemState,
     actions: ResourceItemActions,
+    config: ResourceItemConfig,
 ) {
     Column(
         modifier = modifier,
@@ -201,6 +236,18 @@ private fun LinkItemRenderer(
                     parentCommentId = parentCommentId,
                 )
             },
+            onLinkCommentReplyClick = if (config.showReplyAction) {
+                { linkId, commentId, author ->
+                    actions.onLinkCommentReplyClicked(
+                        linkId = linkId,
+                        commentId = commentId,
+                        author = author,
+                    )
+                }
+            } else {
+                null
+            },
+            isReplyEnabled = config.isReplyActionEnabled,
         )
     }
 }
@@ -210,10 +257,12 @@ private fun EntryCommentItemRenderer(
     modifier: Modifier,
     state: EntryCommentItemState,
     actions: ResourceItemActions,
+    config: ResourceItemConfig,
 ) {
     EntryCommentItem(
         modifier = modifier,
         state = state,
+        isReplyEnabled = config.isReplyActionEnabled,
         onProfileClick = { actions.onProfileClicked(it) },
         onTagClick = { actions.onTagClicked(it) },
         onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -225,6 +274,17 @@ private fun EntryCommentItemRenderer(
                 parentEntryId = state.parentId,
                 voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
             )
+        },
+        onReplyClick = if (config.showReplyAction) {
+            {
+                actions.onEntryCommentReplyClicked(
+                    entryId = state.parentId,
+                    entryCommentId = state.id,
+                    author = state.authorState?.name,
+                )
+            }
+        } else {
+            null
         },
         onMoreClick = {
             actions.onEntryCommentMoreClicked(
@@ -254,10 +314,12 @@ private fun LinkCommentItemRenderer(
     modifier: Modifier,
     state: LinkCommentItemState,
     actions: ResourceItemActions,
+    config: ResourceItemConfig,
 ) {
     LinkCommentItem(
         modifier = modifier,
         state = state,
+        isReplyEnabled = config.isReplyActionEnabled,
         onProfileClick = { actions.onProfileClicked(it) },
         onTagClick = { actions.onTagClicked(it) },
         onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -277,6 +339,17 @@ private fun LinkCommentItemRenderer(
                 linkSlug = state.linkSlug,
                 parentCommentId = state.parentCommentIdOrNull,
             )
+        },
+        onReplyClick = if (config.showReplyAction) {
+            {
+                actions.onLinkCommentReplyClicked(
+                    linkId = state.linkId,
+                    commentId = state.id,
+                    author = state.authorState?.name,
+                )
+            }
+        } else {
+            null
         },
     )
 }

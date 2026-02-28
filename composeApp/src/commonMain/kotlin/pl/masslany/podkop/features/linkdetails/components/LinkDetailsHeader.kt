@@ -31,6 +31,7 @@ import pl.masslany.podkop.common.components.Source
 import pl.masslany.podkop.common.components.Tag
 import pl.masslany.podkop.common.components.Title
 import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.features.resources.components.ResourceInlineActionsRow
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.preview.LinkItemStateProvider
 
@@ -39,11 +40,13 @@ import pl.masslany.podkop.features.resources.preview.LinkItemStateProvider
 fun LinkDetailsHeader(
     modifier: Modifier = Modifier,
     state: LinkItemState,
+    isReplyEnabled: Boolean,
     onLinkClick: () -> Unit,
     onVoteClick: () -> Unit,
     onAuthorClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
-
+    onReplyClick: () -> Unit,
+    onMoreClick: () -> Unit,
 ) {
     Column(
         modifier = modifier,
@@ -119,6 +122,14 @@ fun LinkDetailsHeader(
             }
         }
         Spacer(modifier = Modifier.size(8.dp))
+        ResourceInlineActionsRow(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            isReplyEnabled = isReplyEnabled,
+
+            onReplyClick = onReplyClick,
+            onMoreClick = onMoreClick,
+        )
+        Spacer(modifier = Modifier.size(8.dp))
     }
 }
 
@@ -131,10 +142,13 @@ private fun LinkDetailsHeaderPreview(
         LinkDetailsHeader(
             modifier = Modifier.padding(bottom = 16.dp),
             state = state,
+            isReplyEnabled = true,
             onLinkClick = {},
             onVoteClick = {},
             onAuthorClick = {},
             onTagClick = {},
+            onReplyClick = {},
+            onMoreClick = {},
         )
     }
 }

@@ -144,6 +144,7 @@
     <string name="links_details_screen_error_loading_related">Wystąpił problem podczas wczytywania powiązanych</string>
     <string name="links_details_screen_related_label">Powiązane</string>
     <string name="links_details_screen_no_related">Brak powiązanych</string>
+    <string name="links_details_screen_new_comment">Nowy komentarz</string>
 
     <!-- Generic error -->
     <string name="generic_error_title">Wystąpił błąd podczas próby pobrania danych</string>
@@ -160,6 +161,10 @@
 
     <!-- Entry details -->
     <string name="entry_details_screen_error_loading_comments">Wystąpił problem podczas wczytywania komentarzy</string>
+    <string name="entry_details_reply_composer_hint">Napisz odpowiedź</string>
+    <string name="entry_details_reply_composer_send">Wyślij</string>
+    <string name="entry_details_reply_composer_target">Odpowiadasz do %1$s</string>
+    <string name="accessibility_resource_reply_close">Zamknij kreator odpowiedzi</string>
 
     <!-- Search -->
     <string name="search_screen_text_field_placeholder">Wyszukaj użytkownika, tag...</string>

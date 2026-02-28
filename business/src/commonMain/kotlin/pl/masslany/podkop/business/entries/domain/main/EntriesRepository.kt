@@ -42,6 +42,12 @@ interface EntriesRepository {
         page: Any?,
     ): Result<EntryVoters>
 
+    suspend fun createEntryComment(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<ResourceItem>
+
     suspend fun voteUp(entryId: Int): Result<Unit>
 
     suspend fun removeVoteUp(entryId: Int): Result<Unit>

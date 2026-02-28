@@ -75,6 +75,8 @@ fun LinkItem(
         linkSlug: String,
         parentCommentId: Int?,
     ) -> Unit,
+    onLinkCommentReplyClick: ((linkId: Int, commentId: Int, author: String?) -> Unit)? = null,
+    isReplyEnabled: Boolean = false,
 ) {
     Card(
         modifier = modifier
@@ -211,6 +213,7 @@ fun LinkItem(
                         LinkCommentItem(
                             modifier = Modifier.padding(start = 12.dp),
                             state = comment,
+                            isReplyEnabled = isReplyEnabled,
                             onProfileClick = { onProfileClicked(it) },
                             onTagClick = { onTagClick(it) },
                             onUrlClick = { onUrlClicked(it) },
@@ -230,6 +233,17 @@ fun LinkItem(
                                     comment.linkSlug,
                                     comment.parentCommentIdOrNull,
                                 )
+                            },
+                            onReplyClick = if (onLinkCommentReplyClick != null) {
+                                {
+                                    onLinkCommentReplyClick(
+                                        comment.linkId,
+                                        comment.id,
+                                        comment.authorState?.name,
+                                    )
+                                }
+                            } else {
+                                null
                             },
                         )
                         if (index != state.comments.lastIndex) {

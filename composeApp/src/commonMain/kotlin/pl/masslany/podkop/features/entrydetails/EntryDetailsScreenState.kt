@@ -9,9 +9,15 @@ data class EntryDetailsScreenState(
     val isError: Boolean,
     val isRefreshing: Boolean,
     val isCommentsError: Boolean,
+    val isLoggedIn: Boolean,
+    val currentUsername: String?,
     val entry: ResourceItemState?,
     val comments: ImmutableList<ResourceItemState>,
     val isPaginating: Boolean,
+    val isComposerVisible: Boolean,
+    val composerContent: String,
+    val composerReplyTarget: String?,
+    val isComposerSubmitting: Boolean,
 ) {
     companion object Companion {
         val initial = EntryDetailsScreenState(
@@ -19,9 +25,15 @@ data class EntryDetailsScreenState(
             isError = false,
             isRefreshing = false,
             isCommentsError = false,
+            isLoggedIn = false,
+            currentUsername = null,
             entry = null,
             comments = persistentListOf(),
             isPaginating = false,
+            isComposerVisible = false,
+            composerContent = "",
+            composerReplyTarget = null,
+            isComposerSubmitting = false,
         )
     }
 

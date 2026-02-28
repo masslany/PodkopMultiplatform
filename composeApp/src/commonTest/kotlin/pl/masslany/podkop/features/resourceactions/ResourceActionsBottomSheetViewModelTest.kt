@@ -31,6 +31,19 @@ class ResourceActionsBottomSheetViewModelTest {
     }
 
     @Test
+    fun `buildResourceLink builds link url`() {
+        val result = buildResourceLink(
+            ResourceActionsParams(
+                resourceType = ResourceActionsType.Link,
+                rootId = 42,
+                rootSlug = "slug",
+            ),
+        )
+
+        assertEquals("https://wykop.pl/link/42/slug", result)
+    }
+
+    @Test
     fun `buildResourceLink builds top level link comment url when parent is missing or same comment`() {
         val params = ResourceActionsParams(
             resourceType = ResourceActionsType.LinkComment,

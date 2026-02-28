@@ -14,4 +14,7 @@ object NoOpEntryDetailsActions :
     PaginationActions by NoOpPaginationActions,
     TopBarActions by NoOpTopBarActions {
     override fun onRefresh() = Unit
+    override fun onComposerTextChanged(content: String) = Unit
+    override fun onComposerDismissed() = Unit
+    override fun onComposerSubmit() = Unit
 }

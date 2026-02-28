@@ -45,6 +45,32 @@ class LinksDataSourceImpl(
         return linksApi.getRelatedLinks(linkId)
     }
 
+    override suspend fun createLinkComment(
+        linkId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto> {
+        return linksApi.createLinkComment(
+            linkId = linkId,
+            content = content,
+            adult = adult,
+        )
+    }
+
+    override suspend fun createLinkCommentReply(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto> {
+        return linksApi.createLinkCommentReply(
+            linkId = linkId,
+            commentId = commentId,
+            content = content,
+            adult = adult,
+        )
+    }
+
     override suspend fun voteOnLink(linkId: Int): Result<Unit> {
         return linksApi.voteOnLink(linkId)
     }

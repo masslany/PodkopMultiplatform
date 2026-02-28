@@ -4,4 +4,6 @@ interface LinkActions {
     fun onLinkClicked(id: Int)
     fun onLinkUrlClicked(url: String)
     fun onLinkVoteClicked(id: Int, voted: Boolean)
+    fun onLinkReplyClicked(linkId: Int, author: String?)
+    fun onLinkMoreClicked(linkId: Int, linkSlug: String)
 }

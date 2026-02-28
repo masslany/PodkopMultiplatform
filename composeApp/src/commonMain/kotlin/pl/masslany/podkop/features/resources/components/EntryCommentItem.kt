@@ -26,12 +26,14 @@ fun EntryCommentItem(
     state: EntryCommentItemState,
     modifier: Modifier = Modifier,
     showInlineActions: Boolean = true,
+    isReplyEnabled: Boolean = false,
     onProfileClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
     onVoteUpClick: () -> Unit,
     onImageClick: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
+    onReplyClick: (() -> Unit)? = null,
     onMoreClick: () -> Unit,
 ) {
     Column(
@@ -90,7 +92,11 @@ fun EntryCommentItem(
         }
         if (showInlineActions) {
             Spacer(Modifier.size(2.dp))
-            ResourceInlineActionsRow(onMoreClick = onMoreClick)
+            ResourceInlineActionsRow(
+                onMoreClick = onMoreClick,
+                onReplyClick = onReplyClick,
+                isReplyEnabled = isReplyEnabled,
+            )
         }
     }
 }
@@ -110,6 +116,8 @@ private fun EntryCommentItemPreview(
             onImageClick = {},
             onEmbedPreviewClick = {},
             onVoteUpClick = {},
+            onReplyClick = {},
+            isReplyEnabled = true,
             onMoreClick = {},
         )
     }

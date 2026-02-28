@@ -31,12 +31,20 @@ class FakeEntriesDataSource : EntriesDataSource {
         val page: Any?,
     )
 
+    data class CreateEntryCommentCall(
+        val entryId: Int,
+        val content: String,
+        val adult: Boolean,
+    )
+
     var getEntriesResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntries")
     var getEntryResult: Result<SingleResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntry")
     var getEntryCommentsResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntryComments")
     var getEntryVotesResult: Result<EntryVotersResponseDto> = unstubbedResult("EntriesDataSource.getEntryVotes")
     var getEntryCommentVotesResult: Result<EntryVotersResponseDto> =
         unstubbedResult("EntriesDataSource.getEntryCommentVotes")
+    var createEntryCommentResult: Result<SingleResourceResponseDto> =
+        unstubbedResult("EntriesDataSource.createEntryComment")
     var voteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.voteUp")
     var removeVoteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.removeVoteUp")
 
@@ -45,6 +53,7 @@ class FakeEntriesDataSource : EntriesDataSource {
     val getEntryCommentsCalls = mutableListOf<GetEntryCommentsCall>()
     val getEntryVotesCalls = mutableListOf<GetEntryVotesCall>()
     val getEntryCommentVotesCalls = mutableListOf<GetEntryCommentVotesCall>()
+    val createEntryCommentCalls = mutableListOf<CreateEntryCommentCall>()
     val voteUpCalls = mutableListOf<Int>()
     val removeVoteUpCalls = mutableListOf<Int>()
 
@@ -88,6 +97,19 @@ class FakeEntriesDataSource : EntriesDataSource {
     ): Result<EntryVotersResponseDto> {
         getEntryCommentVotesCalls += GetEntryCommentVotesCall(entryId, commentId, page)
         return getEntryCommentVotesResult
+    }
+
+    override suspend fun createEntryComment(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto> {
+        createEntryCommentCalls += CreateEntryCommentCall(
+            entryId = entryId,
+            content = content,
+            adult = adult,
+        )
+        return createEntryCommentResult
     }
 
     override suspend fun voteUp(entryId: Int): Result<Unit> {

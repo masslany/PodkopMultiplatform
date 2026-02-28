@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -52,6 +53,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -61,7 +63,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
-import pl.masslany.podkop.common.extensions.isAuthorReply
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
@@ -71,8 +72,10 @@ import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.common.theme.colorsPalette
 import pl.masslany.podkop.features.entrydetails.preview.EntryDetailsScreenStateProvider
 import pl.masslany.podkop.features.entrydetails.preview.NoOpEntryDetailsActions
+import pl.masslany.podkop.features.resources.components.ReplyComposer
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
+import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
@@ -189,7 +192,7 @@ fun EntryDetailsScreenContent(
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = showFab,
+                visible = showFab && !state.isComposerVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
@@ -215,35 +218,52 @@ fun EntryDetailsScreenContent(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPaddingValues ->
-        PullToRefreshBox(
-            isRefreshing = state.isRefreshing,
-            onRefresh = actions::onRefresh,
+        val composerBottomPadding = if (state.isComposerVisible) 176.dp else 0.dp
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = innerPaddingValues.calculateTopPadding()),
         ) {
-            if (state.isLoading) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = actions::onRefresh,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                if (state.isLoading) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    }
+                } else if (state.isError) {
+                    GenericErrorScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center),
+                        onRefreshClicked = actions::onRefresh,
+                    )
+                } else {
+                    EntryDetailsScreenList(
+                        modifier = Modifier.fillMaxSize(),
+                        state = state,
+                        actions = actions,
+                        lazyListState = lazyListState,
+                        composerBottomPadding = composerBottomPadding,
                     )
                 }
-            } else if (state.isError) {
-                GenericErrorScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.Center),
-                    onRefreshClicked = actions::onRefresh,
-                )
-            } else {
-                EntryDetailsScreenList(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    state = state,
-                    actions = actions,
-                    lazyListState = lazyListState,
-                )
             }
+
+            ReplyComposer(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                isVisible = state.isComposerVisible,
+                content = state.composerContent,
+                replyTarget = state.composerReplyTarget,
+                isSubmitting = state.isComposerSubmitting,
+                onContentChanged = actions::onComposerTextChanged,
+                onDismiss = actions::onComposerDismissed,
+                onSubmit = actions::onComposerSubmit,
+            )
         }
     }
 }
@@ -255,6 +275,7 @@ private fun EntryDetailsScreenList(
     state: EntryDetailsScreenState,
     actions: EntryDetailsActions,
     lazyListState: LazyListState,
+    composerBottomPadding: Dp,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -263,9 +284,15 @@ private fun EntryDetailsScreenList(
             bottom = WindowInsets
                 .systemBars
                 .asPaddingValues()
-                .calculateBottomPadding() + 16.dp,
+                .calculateBottomPadding() + 16.dp + composerBottomPadding,
         ),
     ) {
+        val replyActionsConfig = ResourceItemConfig(
+            showReplyAction = true,
+            isReplyActionEnabled = state.isLoggedIn,
+            renderEntryAsCard = true,
+        )
+
         if (state.entry != null) {
             item(
                 key = "Entry",
@@ -276,9 +303,7 @@ private fun EntryDetailsScreenList(
                             .padding(horizontal = 16.dp),
                         state = state.entry,
                         actions = actions,
-                        config = ResourceItemConfig(
-                            renderEntryAsCard = true,
-                        ),
+                        config = replyActionsConfig,
                     )
                     Spacer(modifier = Modifier.height(32.dp))
                 }
@@ -303,7 +328,10 @@ private fun EntryDetailsScreenList(
             contentType = { _, item -> item.contentType },
         ) { index, item ->
             val lineColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-            val authorColor = MaterialTheme.colorsPalette.authorComment
+            val authorColor = MaterialTheme.colorsPalette.nameGreen
+            val isCurrentUserComment = (item as? EntryCommentItemState)
+                ?.authorState
+                ?.name == state.currentUsername
 
             Column(
                 modifier = Modifier
@@ -315,7 +343,7 @@ private fun EntryDetailsScreenList(
                     .drawBehind {
                         val lineWidth = 2.dp.toPx()
                         drawRect(
-                            color = if (item.isAuthorReply(state.entry)) {
+                            color = if (isCurrentUserComment && !state.currentUsername.isNullOrBlank()) {
                                 authorColor
                             } else {
                                 lineColor
@@ -334,6 +362,7 @@ private fun EntryDetailsScreenList(
                     ResourceItemRenderer(
                         state = item,
                         actions = actions,
+                        config = replyActionsConfig,
                     )
                 }
 

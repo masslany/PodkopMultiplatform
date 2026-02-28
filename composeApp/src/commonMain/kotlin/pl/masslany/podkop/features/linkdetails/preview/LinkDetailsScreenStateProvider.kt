@@ -23,6 +23,8 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
             isLoading = false,
             isError = false,
             isRefreshing = false,
+            isLoggedIn = true,
+            currentUsername = "patryk",
             link = link,
             commentsState = LinkDetailsCommentsState.Content(
                 sortMenuState = DropdownMenuState(
@@ -60,16 +62,28 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
                     ),
                 ),
             ),
+            isComposerVisible = false,
+            composerContent = "",
+            composerReplyTarget = null,
+            composerParentCommentId = null,
+            isComposerSubmitting = false,
         ),
         LinkDetailsScreenState(
             isLoading = false,
             isError = false,
             isRefreshing = true,
+            isLoggedIn = false,
+            currentUsername = null,
             link = link,
             commentsState = LinkDetailsCommentsState.Empty(
                 sortMenuState = DropdownMenuState.initial,
             ),
             relatedState = LinkDetailsRelatedState.Empty,
+            isComposerVisible = false,
+            composerContent = "",
+            composerReplyTarget = null,
+            composerParentCommentId = null,
+            isComposerSubmitting = false,
         ),
     )
 }

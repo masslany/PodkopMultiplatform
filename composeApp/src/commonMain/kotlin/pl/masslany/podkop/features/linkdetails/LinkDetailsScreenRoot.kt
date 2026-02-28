@@ -55,6 +55,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -76,6 +77,7 @@ import pl.masslany.podkop.features.linkdetails.models.LinkDetailsCommentItemStat
 import pl.masslany.podkop.features.linkdetails.preview.LinkDetailsScreenStateProvider
 import pl.masslany.podkop.features.linkdetails.preview.NoOpLinkDetailsActions
 import pl.masslany.podkop.features.resources.components.LinkCommentItem
+import pl.masslany.podkop.features.resources.components.ReplyComposer
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
@@ -210,7 +212,7 @@ fun LinkDetailsScreenContent(
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = showFab,
+                visible = showFab && !state.isComposerVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
@@ -235,34 +237,52 @@ fun LinkDetailsScreenContent(
         },
         containerColor = MaterialTheme.colorScheme.surface,
     ) { innerPaddingValues ->
-        PullToRefreshBox(
-            isRefreshing = state.isRefreshing,
-            onRefresh = actions::onRefresh,
+        val composerBottomPadding = if (state.isComposerVisible) 176.dp else 0.dp
+
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = innerPaddingValues.calculateTopPadding()),
         ) {
-            if (state.isLoading) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = actions::onRefresh,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                if (state.isLoading) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    }
+                } else if (state.isError) {
+                    GenericErrorScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center),
+                        onRefreshClicked = actions::onRefresh,
+                    )
+                } else {
+                    LinkDetailsScreenList(
+                        modifier = Modifier.fillMaxSize(),
+                        state = state,
+                        actions = actions,
+                        lazyListState = lazyListState,
+                        composerBottomPadding = composerBottomPadding,
                     )
                 }
-            } else if (state.isError) {
-                GenericErrorScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.Center),
-                    onRefreshClicked = actions::onRefresh,
-                )
-            } else {
-                LinkDetailsScreenList(
-                    modifier = Modifier.fillMaxSize(),
-                    state = state,
-                    actions = actions,
-                    lazyListState = lazyListState,
-                )
             }
+
+            ReplyComposer(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                isVisible = state.isComposerVisible,
+                content = state.composerContent,
+                replyTarget = state.composerReplyTarget,
+                isSubmitting = state.isComposerSubmitting,
+                onContentChanged = actions::onComposerTextChanged,
+                onDismiss = actions::onComposerDismissed,
+                onSubmit = actions::onComposerSubmit,
+            )
         }
     }
 }
@@ -274,6 +294,7 @@ private fun LinkDetailsScreenList(
     state: LinkDetailsScreenState,
     actions: LinkDetailsActions,
     lazyListState: LazyListState,
+    composerBottomPadding: Dp,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -283,7 +304,7 @@ private fun LinkDetailsScreenList(
             bottom = WindowInsets
                 .systemBars
                 .asPaddingValues()
-                .calculateBottomPadding() + 16.dp,
+                .calculateBottomPadding() + 16.dp + composerBottomPadding,
         ),
     ) {
         state.link?.let { link ->
@@ -292,10 +313,23 @@ private fun LinkDetailsScreenList(
             ) {
                 LinkDetailsHeader(
                     state = link,
+                    isReplyEnabled = state.isLoggedIn,
                     onLinkClick = { actions.onLinkUrlClicked(link.sourceUrl) },
                     onVoteClick = { actions.onLinkVoteClicked(link.id, link.countState.isVoted) },
                     onAuthorClick = { actions.onProfileClicked(it) },
                     onTagClick = { actions.onTagClicked(it) },
+                    onReplyClick = {
+                        actions.onLinkReplyClicked(
+                            linkId = link.id,
+                            author = null,
+                        )
+                    },
+                    onMoreClick = {
+                        actions.onLinkMoreClicked(
+                            linkId = link.id,
+                            linkSlug = link.slug,
+                        )
+                    },
                 )
             }
         }
@@ -499,6 +533,7 @@ private fun LinkDetailsScreenList(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         state = comment,
                         actions = actions,
+                        isReplyEnabled = state.isLoggedIn,
                     )
                 }
 
@@ -527,6 +562,7 @@ private fun LinkDetailsCommentItem(
     modifier: Modifier = Modifier,
     state: LinkDetailsCommentItemState,
     actions: LinkDetailsActions,
+    isReplyEnabled: Boolean,
 ) {
     Card(
         modifier = modifier
@@ -542,6 +578,7 @@ private fun LinkDetailsCommentItem(
                 LinkCommentItem(
                     modifier = Modifier.fillMaxWidth(),
                     state = state.comment,
+                    isReplyEnabled = isReplyEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
                     onTagClick = { actions.onTagClicked(it) },
                     onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -562,6 +599,13 @@ private fun LinkDetailsCommentItem(
                             parentCommentId = state.comment.parentCommentIdOrNull,
                         )
                     },
+                    onReplyClick = {
+                        actions.onLinkCommentReplyClicked(
+                            linkId = state.comment.linkId,
+                            commentId = state.comment.id,
+                            author = state.comment.authorState?.name,
+                        )
+                    },
                 )
 
                 state.replies.forEach { reply ->
@@ -575,6 +619,7 @@ private fun LinkDetailsCommentItem(
                             .padding(start = 12.dp)
                             .fillMaxWidth(),
                         state = reply,
+                        isReplyEnabled = isReplyEnabled,
                         onProfileClick = { actions.onProfileClicked(it) },
                         onTagClick = { actions.onTagClicked(it) },
                         onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -593,6 +638,13 @@ private fun LinkDetailsCommentItem(
                                 commentId = reply.id,
                                 linkSlug = reply.linkSlug,
                                 parentCommentId = reply.parentCommentIdOrNull,
+                            )
+                        },
+                        onReplyClick = {
+                            actions.onLinkCommentReplyClicked(
+                                linkId = reply.linkId,
+                                commentId = reply.id,
+                                author = reply.authorState?.name,
                             )
                         },
                     )

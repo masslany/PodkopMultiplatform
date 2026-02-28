@@ -84,6 +84,7 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
     return LinkItemState(
         id = this.id,
         contentType = ResourceType.LinkItem,
+        slug = this.slug,
         titleState = titleState,
         descriptionState = descriptionState,
         countState = countState,

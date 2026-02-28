@@ -82,6 +82,7 @@ class LinkItemStateProvider : PreviewParameterProvider<LinkItemState> {
         LinkItemState(
             id = 42,
             contentType = ResourceType.LinkItem,
+            slug = "slug-preview-42",
             titleState = PreviewFixtures.titleState(maxLines = 3),
             descriptionState = PreviewFixtures.descriptionState(
                 description = PreviewFixtures.LONG_BODY,
@@ -101,6 +102,7 @@ class LinkItemStateProvider : PreviewParameterProvider<LinkItemState> {
         LinkItemState(
             id = 43,
             contentType = ResourceType.LinkItem,
+            slug = "slug-preview-43",
             titleState = PreviewFixtures.titleState(title = PreviewFixtures.LONG_TITLE, maxLines = 2),
             descriptionState = null,
             countState = PreviewFixtures.countState(count = "12"),

@@ -33,6 +33,12 @@ interface EntriesApi {
         page: Any?,
     ): Result<EntryVotersResponseDto>
 
+    suspend fun createEntryComment(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto>
+
     suspend fun voteUp(entryId: Int): Result<Unit>
 
     suspend fun removeVoteUp(entryId: Int): Result<Unit>

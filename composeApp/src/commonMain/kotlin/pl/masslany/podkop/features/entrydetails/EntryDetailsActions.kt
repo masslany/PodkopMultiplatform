@@ -12,4 +12,10 @@ interface EntryDetailsActions :
     TopBarActions {
 
     fun onRefresh()
+
+    fun onComposerTextChanged(content: String)
+
+    fun onComposerDismissed()
+
+    fun onComposerSubmit()
 }

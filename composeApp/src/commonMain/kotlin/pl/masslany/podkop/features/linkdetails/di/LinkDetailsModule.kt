@@ -10,6 +10,8 @@ val linkDetailsModule = module {
         LinkDetailsViewModel(
             id = params.get<Int>(),
             linksRepository = get(),
+            authRepository = get(),
+            profileRepository = get(),
             resourceItemStateHolder = get<ResourceItemStateHolder>(),
             appNavigator = get(),
             screenshotShareDraftStore = get(),

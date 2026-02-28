@@ -9,6 +9,8 @@ val entryDetailsModule = module {
         EntryDetailsViewModel(
             id = params.get<Int>(),
             entriesRepository = get(),
+            authRepository = get(),
+            profileRepository = get(),
             resourceItemStateHolder = get(),
             logger = get(),
             topBarActions = get(),

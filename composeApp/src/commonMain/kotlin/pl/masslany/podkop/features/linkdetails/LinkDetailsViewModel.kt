@@ -13,11 +13,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
+import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
@@ -42,6 +44,8 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 class LinkDetailsViewModel(
     private val id: Int,
     private val linksRepository: LinksRepository,
+    private val authRepository: AuthRepository,
+    private val profileRepository: ProfileRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val appNavigator: AppNavigator,
     private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
@@ -152,6 +156,96 @@ class LinkDetailsViewModel(
         loadContent(isRefreshing = true)
     }
 
+    override fun onComposerTextChanged(content: String) {
+        _state.update { previousState ->
+            previousState.copy(composerContent = content)
+        }
+    }
+
+    override fun onComposerDismissed() {
+        _state.update { previousState ->
+            previousState.copy(
+                isComposerVisible = false,
+                composerContent = "",
+                composerReplyTarget = null,
+                composerParentCommentId = null,
+                isComposerSubmitting = false,
+            )
+        }
+    }
+
+    override fun onComposerSubmit() {
+        val currentState = state.value
+        if (!currentState.isLoggedIn || !currentState.isComposerVisible || currentState.isComposerSubmitting) {
+            return
+        }
+
+        val content = currentState.composerContent.trim()
+        if (content.isBlank()) {
+            return
+        }
+
+        _state.update { previousState ->
+            previousState.copy(isComposerSubmitting = true)
+        }
+
+        viewModelScope.launch {
+            val submitResult = if (currentState.composerParentCommentId == null) {
+                linksRepository.createLinkComment(
+                    linkId = id,
+                    content = content,
+                    adult = false,
+                )
+            } else {
+                linksRepository.createLinkCommentReply(
+                    linkId = id,
+                    commentId = currentState.composerParentCommentId,
+                    content = content,
+                    adult = false,
+                )
+            }
+
+            submitResult.onSuccess { createdComment ->
+                appendCreatedComment(
+                    createdComment = createdComment,
+                    repliedCommentId = currentState.composerParentCommentId,
+                )
+                _state.update { previousState ->
+                    previousState.copy(
+                        isComposerVisible = false,
+                        composerContent = "",
+                        composerReplyTarget = null,
+                        composerParentCommentId = null,
+                        isComposerSubmitting = false,
+                    )
+                }
+            }.onFailure {
+                logger.error("Failed to create link comment for id=$id", it)
+                _state.update { previousState ->
+                    previousState.copy(isComposerSubmitting = false)
+                }
+                snackbarManager.tryEmitGenericError()
+            }
+        }
+    }
+
+    override fun onLinkReplyClicked(linkId: Int, author: String?) {
+        if (linkId != id) return
+        showComposerForAuthor(
+            author = author,
+            parentCommentId = null,
+        )
+    }
+
+    override fun onLinkCommentReplyClicked(linkId: Int, commentId: Int, author: String?) {
+        if (linkId != id) return
+        val replyParentCommentId = resolveReplyParentCommentId(commentId) ?: return
+        showComposerForAuthor(
+            author = author,
+            parentCommentId = replyParentCommentId,
+        )
+    }
+
     override fun onLinkCommentVoteUpClick(linkId: Int, commentId: Int, voted: Boolean) {
         resourceItemStateHolder.onLinkCommentVoteUpClick(
             linkId = linkId,
@@ -184,6 +278,16 @@ class LinkDetailsViewModel(
                 linkCommentId = commentId,
                 parentCommentId = parentCommentId,
                 screenshotDraftId = draftId,
+            ),
+        )
+    }
+
+    override fun onLinkMoreClicked(linkId: Int, linkSlug: String) {
+        if (linkId != id) return
+        appNavigator.navigateTo(
+            ResourceActionsBottomSheetScreen.forLink(
+                linkId = linkId,
+                linkSlug = linkSlug,
             ),
         )
     }
@@ -314,6 +418,9 @@ class LinkDetailsViewModel(
 
         viewModelScope.launch {
             coroutineScope {
+                val viewerContextDeferred = async {
+                    resolveViewerContext()
+                }
                 val linkDeferred = async {
                     linksRepository.getLink(id)
                 }
@@ -342,6 +449,40 @@ class LinkDetailsViewModel(
                         logger.error("Failed to load link details for id=$id", it)
                     }
                     .isSuccess
+
+                viewerContextDeferred.await().let { viewerContext ->
+                    _state.update { previousState ->
+                        previousState.copy(
+                            isLoggedIn = viewerContext.isLoggedIn,
+                            currentUsername = viewerContext.username,
+                            isComposerVisible = if (viewerContext.isLoggedIn) {
+                                previousState.isComposerVisible
+                            } else {
+                                false
+                            },
+                            composerContent = if (viewerContext.isLoggedIn) {
+                                previousState.composerContent
+                            } else {
+                                ""
+                            },
+                            composerReplyTarget = if (viewerContext.isLoggedIn) {
+                                previousState.composerReplyTarget
+                            } else {
+                                null
+                            },
+                            composerParentCommentId = if (viewerContext.isLoggedIn) {
+                                previousState.composerParentCommentId
+                            } else {
+                                null
+                            },
+                            isComposerSubmitting = if (viewerContext.isLoggedIn) {
+                                previousState.isComposerSubmitting
+                            } else {
+                                false
+                            },
+                        )
+                    }
+                }
 
                 commentsDeferred.await().onSuccess { comments ->
                     onCommentsPageOneLoaded(comments)
@@ -478,6 +619,115 @@ class LinkDetailsViewModel(
         }
     }
 
+    private suspend fun appendCreatedComment(
+        createdComment: ResourceItem,
+        repliedCommentId: Int?,
+    ) {
+        val targetTopLevelCommentId = createdComment.parentId ?: repliedCommentId
+        val hasTargetTopLevelComment = targetTopLevelCommentId != null &&
+            (
+                (state.value.commentsState as? LinkDetailsCommentsState.Content)
+                    ?.comments
+                    ?.any { it.id == targetTopLevelCommentId } == true
+                )
+
+        if (!hasTargetTopLevelComment) {
+            resourceItemStateHolder.appendData(listOf(createdComment))
+            appendCommentsRepliesState(listOf(createdComment))
+            return
+        }
+
+        val parentLinkSlug = findTopLevelCommentById(targetTopLevelCommentId)?.comment?.linkSlug
+        val mappedReply = createdComment.toLinkCommentItemState(
+            linkIdOverride = id,
+            linkSlugOverride = parentLinkSlug ?: createdComment.slug,
+        )
+
+        commentRepliesStateById.update { previousState ->
+            val current = previousState[targetTopLevelCommentId] ?: CommentRepliesState.empty
+            previousState + (
+                targetTopLevelCommentId to current.copy(
+                    replies = (current.replies + mappedReply).distinctBy { it.id }.toImmutableList(),
+                    remainingRepliesCount = (current.remainingRepliesCount - 1).coerceAtLeast(0),
+                    nextRepliesPage = if (current.remainingRepliesCount <= 1) {
+                        null
+                    } else {
+                        current.nextRepliesPage
+                    },
+                    isLoadingReplies = false,
+                )
+                )
+        }
+    }
+
+    private fun showComposerForAuthor(
+        author: String?,
+        parentCommentId: Int?,
+    ) {
+        if (!state.value.isLoggedIn) {
+            return
+        }
+
+        val normalizedAuthor = author?.trim().orEmpty()
+        val prefill = if (normalizedAuthor.isEmpty()) {
+            ""
+        } else {
+            "@$normalizedAuthor: "
+        }
+
+        _state.update { previousState ->
+            previousState.copy(
+                isComposerVisible = true,
+                composerReplyTarget = if (normalizedAuthor.isEmpty()) null else "@$normalizedAuthor",
+                composerContent = prefill,
+                composerParentCommentId = parentCommentId,
+                isComposerSubmitting = false,
+            )
+        }
+    }
+
+    private fun resolveReplyParentCommentId(commentId: Int): Int? {
+        val topLevel = findTopLevelCommentById(commentId)
+        if (topLevel != null) {
+            return topLevel.id
+        }
+
+        val contentState = state.value.commentsState as? LinkDetailsCommentsState.Content ?: return null
+        contentState.comments.forEach { item ->
+            val matchingReply = item.replies.firstOrNull { it.id == commentId } ?: return@forEach
+            return matchingReply.parentCommentIdOrNull ?: matchingReply.id
+        }
+
+        return commentId
+    }
+
+    private fun findTopLevelCommentById(commentId: Int): LinkDetailsCommentItemState? {
+        val contentState = state.value.commentsState as? LinkDetailsCommentsState.Content ?: return null
+        return contentState.comments.firstOrNull { it.id == commentId }
+    }
+
+    private suspend fun resolveViewerContext(): ViewerContext {
+        val isLoggedIn = authRepository.isLoggedIn()
+        if (!isLoggedIn) {
+            return ViewerContext(
+                isLoggedIn = false,
+                username = null,
+            )
+        }
+
+        val username = profileRepository.getProfileShort()
+            .onFailure {
+                logger.error("Failed to resolve current profile short", it)
+            }
+            .getOrNull()
+            ?.name
+
+        return ViewerContext(
+            isLoggedIn = true,
+            username = username,
+        )
+    }
+
     private fun buildLinkCommentScreenshotDraftId(commentId: Int): String? {
         val commentsState = state.value.commentsState as? LinkDetailsCommentsState.Content ?: return null
 
@@ -544,6 +794,8 @@ class LinkDetailsViewModel(
             isLoadingReplies = false,
         )
     }
+
+    private data class ViewerContext(val isLoggedIn: Boolean, val username: String?)
 }
 
 private fun LinkDetailsCommentsState.resolve(

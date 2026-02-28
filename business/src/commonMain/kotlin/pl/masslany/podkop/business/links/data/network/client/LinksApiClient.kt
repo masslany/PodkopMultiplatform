@@ -3,6 +3,8 @@ package pl.masslany.podkop.business.links.data.network.client
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.links.data.network.api.LinksApi
+ import pl.masslany.podkop.business.links.data.network.models.LinkCommentCreateDataDto
+import pl.masslany.podkop.business.links.data.network.models.LinkCommentCreateRequestDto
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
@@ -106,6 +108,55 @@ class LinksApiClient(
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/links/$linkId/related",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun createLinkComment(
+        linkId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto> {
+        val body = LinkCommentCreateRequestDto(
+            data = LinkCommentCreateDataDto(
+                content = content,
+                adult = adult,
+            ),
+        )
+        val request =
+            Request<SingleResourceResponseDto>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/links/$linkId/comments",
+                body = body,
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun createLinkCommentReply(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto> {
+        val body = LinkCommentCreateRequestDto(
+            data = LinkCommentCreateDataDto(
+                content = content,
+                adult = adult,
+            ),
+        )
+        val request =
+            Request<SingleResourceResponseDto>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/links/$linkId/comments/$commentId/comments",
+                body = body,
             )
 
         return apiClient.request(request).fold(

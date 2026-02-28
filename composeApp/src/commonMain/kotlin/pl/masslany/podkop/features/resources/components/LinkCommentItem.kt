@@ -26,6 +26,8 @@ fun LinkCommentItem(
     state: LinkCommentItemState,
     modifier: Modifier = Modifier,
     showInlineActions: Boolean = true,
+    onReplyClick: (() -> Unit)? = null,
+    isReplyEnabled: Boolean = false,
     onProfileClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
@@ -90,7 +92,11 @@ fun LinkCommentItem(
         }
         if (showInlineActions) {
             Spacer(Modifier.size(2.dp))
-            ResourceInlineActionsRow(onMoreClick = onMoreClick)
+            ResourceInlineActionsRow(
+                onMoreClick = onMoreClick,
+                onReplyClick = onReplyClick,
+                isReplyEnabled = isReplyEnabled,
+            )
         }
     }
 }

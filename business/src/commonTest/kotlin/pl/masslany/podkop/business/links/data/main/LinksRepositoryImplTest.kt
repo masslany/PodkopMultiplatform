@@ -169,6 +169,90 @@ class LinksRepositoryImplTest {
     }
 
     @Test
+    fun `create link comment forwards payload and maps single resource item`() = runBlocking {
+        val linksDataSource = FakeLinksDataSource().apply {
+            createLinkCommentResult = Result.success(
+                Fixtures.singleResourceResponseDto(
+                    data = Fixtures.resourceItemDto(
+                        id = 808,
+                        resource = "link_comment",
+                        parentId = 404,
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(linksDataSource)
+
+        val actual = sut.createLinkComment(
+            linkId = 404,
+            content = "@user: hello",
+            adult = false,
+        )
+
+        assertEquals(
+            listOf(
+                FakeLinksDataSource.CreateLinkCommentCall(
+                    linkId = 404,
+                    content = "@user: hello",
+                    adult = false,
+                ),
+            ),
+            linksDataSource.createLinkCommentCalls,
+        )
+        assertEquals(
+            Fixtures.resourceItem(
+                id = 808,
+                resource = Resource.LinkComment,
+                parentId = 404,
+            ),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `create link comment reply forwards payload and maps single resource item`() = runBlocking {
+        val linksDataSource = FakeLinksDataSource().apply {
+            createLinkCommentReplyResult = Result.success(
+                Fixtures.singleResourceResponseDto(
+                    data = Fixtures.resourceItemDto(
+                        id = 909,
+                        resource = "link_comment",
+                        parentId = 505,
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(linksDataSource)
+
+        val actual = sut.createLinkCommentReply(
+            linkId = 404,
+            commentId = 505,
+            content = "@author: reply",
+            adult = false,
+        )
+
+        assertEquals(
+            listOf(
+                FakeLinksDataSource.CreateLinkCommentReplyCall(
+                    linkId = 404,
+                    commentId = 505,
+                    content = "@author: reply",
+                    adult = false,
+                ),
+            ),
+            linksDataSource.createLinkCommentReplyCalls,
+        )
+        assertEquals(
+            Fixtures.resourceItem(
+                id = 909,
+                resource = Resource.LinkComment,
+                parentId = 505,
+            ),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
     fun `vote operations delegate to data source`() = runBlocking {
         val linksDataSource = FakeLinksDataSource().apply {
             voteOnLinkResult = Result.success(Unit)
@@ -214,6 +298,24 @@ class LinksRepositoryImplTest {
             linksType = LinksType.HOMEPAGE,
             category = null,
             bucket = null,
+        )
+
+        assertTrue(actual.isFailure)
+        assertSame(expected, actual.exceptionOrNull())
+    }
+
+    @Test
+    fun `create link comment propagates failure`() = runBlocking {
+        val expected = IllegalStateException("create failed")
+        val linksDataSource = FakeLinksDataSource().apply {
+            createLinkCommentResult = Result.failure(expected)
+        }
+        val sut = createSut(linksDataSource)
+
+        val actual = sut.createLinkComment(
+            linkId = 12,
+            content = "payload",
+            adult = false,
         )
 
         assertTrue(actual.isFailure)

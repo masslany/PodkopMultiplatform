@@ -1,8 +1,10 @@
 package pl.masslany.podkop.business.links.data.main
 
 import kotlinx.coroutines.withContext
+import pl.masslany.podkop.business.common.data.main.mapper.common.toResourceItemList
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
 import pl.masslany.podkop.business.common.data.main.mapper.links.toLink
+import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.common.domain.models.links.Link
 import pl.masslany.podkop.business.links.data.api.LinksDataSource
@@ -93,6 +95,40 @@ class LinksRepositoryImpl(
         return withContext(dispatcherProvider.io) {
             linksDataSource.getRelatedLinks(linkId).mapCatching {
                 it.toResources()
+            }
+        }
+    }
+
+    override suspend fun createLinkComment(
+        linkId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<ResourceItem> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.createLinkComment(
+                linkId = linkId,
+                content = content,
+                adult = adult,
+            ).mapCatching {
+                listOf(it.data).toResourceItemList().first()
+            }
+        }
+    }
+
+    override suspend fun createLinkCommentReply(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<ResourceItem> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.createLinkCommentReply(
+                linkId = linkId,
+                commentId = commentId,
+                content = content,
+                adult = adult,
+            ).mapCatching {
+                listOf(it.data).toResourceItemList().first()
             }
         }
     }

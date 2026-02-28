@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
+import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
@@ -27,6 +29,8 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 class EntryDetailsViewModel(
     private val id: Int,
     private val entriesRepository: EntriesRepository,
+    private val authRepository: AuthRepository,
+    private val profileRepository: ProfileRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
@@ -86,6 +90,73 @@ class EntryDetailsViewModel(
         loadContent(isRefreshing = true)
     }
 
+    override fun onComposerTextChanged(content: String) {
+        _state.update { previousState ->
+            previousState.copy(composerContent = content)
+        }
+    }
+
+    override fun onComposerDismissed() {
+        _state.update { previousState ->
+            previousState.copy(
+                isComposerVisible = false,
+                composerContent = "",
+                composerReplyTarget = null,
+                isComposerSubmitting = false,
+            )
+        }
+    }
+
+    override fun onComposerSubmit() {
+        val currentState = state.value
+        if (!currentState.isLoggedIn || !currentState.isComposerVisible || currentState.isComposerSubmitting) {
+            return
+        }
+
+        val content = currentState.composerContent.trim()
+        if (content.isBlank()) {
+            return
+        }
+
+        _state.update { previousState ->
+            previousState.copy(isComposerSubmitting = true)
+        }
+
+        viewModelScope.launch {
+            entriesRepository.createEntryComment(
+                entryId = id,
+                content = content,
+                adult = false,
+            ).onSuccess { comment ->
+                resourceItemStateHolder.appendData(listOf(comment))
+                _state.update { previousState ->
+                    previousState.copy(
+                        isComposerVisible = false,
+                        composerContent = "",
+                        composerReplyTarget = null,
+                        isComposerSubmitting = false,
+                    )
+                }
+            }.onFailure {
+                logger.error("Failed to create entry comment for id=$id", it)
+                _state.update { previousState ->
+                    previousState.copy(isComposerSubmitting = false)
+                }
+                snackbarManager.tryEmitGenericError()
+            }
+        }
+    }
+
+    override fun onEntryReplyClicked(entryId: Int, author: String?) {
+        if (entryId != id) return
+        showComposerForAuthor(author)
+    }
+
+    override fun onEntryCommentReplyClicked(entryId: Int, entryCommentId: Int, author: String?) {
+        if (entryId != id) return
+        showComposerForAuthor(author)
+    }
+
     private fun loadContent(isRefreshing: Boolean) {
         _state.update { previousState ->
             previousState
@@ -97,6 +168,9 @@ class EntryDetailsViewModel(
 
         viewModelScope.launch {
             coroutineScope {
+                val viewerContextDeferred = async {
+                    resolveViewerContext()
+                }
                 val entryDeferred = async {
                     entriesRepository.getEntry(entryId = id)
                 }
@@ -119,6 +193,35 @@ class EntryDetailsViewModel(
                         logger.error("Failed to load entry details for id=$id", it)
                     }
                     .isSuccess
+
+                viewerContextDeferred.await().let { viewerContext ->
+                    _state.update { previousState ->
+                        previousState.copy(
+                            isLoggedIn = viewerContext.isLoggedIn,
+                            currentUsername = viewerContext.username,
+                            isComposerVisible = if (viewerContext.isLoggedIn) {
+                                previousState.isComposerVisible
+                            } else {
+                                false
+                            },
+                            composerContent = if (viewerContext.isLoggedIn) {
+                                previousState.composerContent
+                            } else {
+                                ""
+                            },
+                            composerReplyTarget = if (viewerContext.isLoggedIn) {
+                                previousState.composerReplyTarget
+                            } else {
+                                null
+                            },
+                            isComposerSubmitting = if (viewerContext.isLoggedIn) {
+                                previousState.isComposerSubmitting
+                            } else {
+                                false
+                            },
+                        )
+                    }
+                }
 
                 commentsDeferred.await()
                     .onSuccess { comments ->
@@ -159,6 +262,50 @@ class EntryDetailsViewModel(
         paginator.paginate()
     }
 
+    private fun showComposerForAuthor(author: String?) {
+        if (!state.value.isLoggedIn) {
+            return
+        }
+
+        val normalizedAuthor = author?.trim().orEmpty()
+        val prefill = if (normalizedAuthor.isEmpty()) {
+            ""
+        } else {
+            "@$normalizedAuthor: "
+        }
+
+        _state.update { previousState ->
+            previousState.copy(
+                isComposerVisible = true,
+                composerReplyTarget = if (normalizedAuthor.isEmpty()) null else "@$normalizedAuthor",
+                composerContent = prefill,
+                isComposerSubmitting = false,
+            )
+        }
+    }
+
+    private suspend fun resolveViewerContext(): ViewerContext {
+        val isLoggedIn = authRepository.isLoggedIn()
+        if (!isLoggedIn) {
+            return ViewerContext(
+                isLoggedIn = false,
+                username = null,
+            )
+        }
+
+        val username = profileRepository.getProfileShort()
+            .onFailure {
+                logger.error("Failed to resolve current profile short", it)
+            }
+            .getOrNull()
+            ?.name
+
+        return ViewerContext(
+            isLoggedIn = true,
+            username = username,
+        )
+    }
+
     private fun topLevelEntryAndComments(
         comments: List<ResourceItem>,
     ): List<ResourceItem> {
@@ -172,4 +319,6 @@ class EntryDetailsViewModel(
             }
         }
     }
+
+    private data class ViewerContext(val isLoggedIn: Boolean, val username: String?)
 }

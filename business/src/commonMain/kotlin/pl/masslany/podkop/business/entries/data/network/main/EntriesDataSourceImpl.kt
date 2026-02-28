@@ -47,6 +47,18 @@ class EntriesDataSourceImpl(
         return entriesApi.getEntryCommentVotes(entryId, commentId, page)
     }
 
+    override suspend fun createEntryComment(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto> {
+        return entriesApi.createEntryComment(
+            entryId = entryId,
+            content = content,
+            adult = adult,
+        )
+    }
+
     override suspend fun voteUp(entryId: Int): Result<Unit> {
         return entriesApi.voteUp(entryId)
     }

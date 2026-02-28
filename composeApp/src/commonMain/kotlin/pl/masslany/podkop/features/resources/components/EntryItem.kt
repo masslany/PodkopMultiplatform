@@ -27,12 +27,14 @@ fun EntryItem(
     state: EntryItemState,
     modifier: Modifier = Modifier,
     showInlineActions: Boolean = true,
+    isReplyEnabled: Boolean = false,
     onProfileClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
     onVoteUpClick: () -> Unit,
     onImageClick: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
+    onReplyClick: (() -> Unit)? = null,
     onMoreClick: () -> Unit,
 ) {
     Column(
@@ -97,7 +99,11 @@ fun EntryItem(
         }
         if (showInlineActions) {
             Spacer(Modifier.size(2.dp))
-            ResourceInlineActionsRow(onMoreClick = onMoreClick)
+            ResourceInlineActionsRow(
+                onMoreClick = onMoreClick,
+                onReplyClick = onReplyClick,
+                isReplyEnabled = isReplyEnabled,
+            )
         }
     }
 }
@@ -117,6 +123,8 @@ private fun EntryItemPreview(
             onImageClick = {},
             onEmbedPreviewClick = {},
             onVoteUpClick = {},
+            onReplyClick = {},
+            isReplyEnabled = true,
             onMoreClick = {},
         )
     }

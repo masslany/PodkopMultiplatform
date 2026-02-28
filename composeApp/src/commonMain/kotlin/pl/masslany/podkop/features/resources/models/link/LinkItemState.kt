@@ -15,6 +15,7 @@ import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemS
 data class LinkItemState(
     override val id: Int,
     override val contentType: ResourceType,
+    val slug: String,
     val titleState: TitleState?,
     val descriptionState: DescriptionState?,
     val countState: CountState,

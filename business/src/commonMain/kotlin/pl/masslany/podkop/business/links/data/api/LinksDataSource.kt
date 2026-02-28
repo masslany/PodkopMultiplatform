@@ -33,6 +33,19 @@ interface LinksDataSource {
 
     suspend fun getRelatedLinks(linkId: Int): Result<ResourceResponseDto>
 
+    suspend fun createLinkComment(
+        linkId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto>
+
+    suspend fun createLinkCommentReply(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto>
+
     suspend fun voteOnLink(linkId: Int): Result<Unit>
 
     suspend fun removeVoteOnLink(linkId: Int): Result<Unit>

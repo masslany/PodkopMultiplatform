@@ -1,5 +1,6 @@
 package pl.masslany.podkop.features.resources.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
@@ -29,9 +32,13 @@ import podkop.composeapp.generated.resources.resource_actions_reply
 @Composable
 internal fun ResourceInlineActionsRow(
     onMoreClick: () -> Unit,
+    onReplyClick: (() -> Unit)? = null,
+    isReplyEnabled: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val disabledTint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.55f)
+    val enabledTint = MaterialTheme.colorScheme.primary
+    val isReplyActionEnabled = onReplyClick != null && isReplyEnabled
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -42,20 +49,26 @@ internal fun ResourceInlineActionsRow(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
-                modifier = Modifier.height(32.dp),
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .height(32.dp)
+                    .clickable(
+                        enabled = isReplyActionEnabled,
+                        onClick = { onReplyClick?.invoke() },
+                    ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     modifier = Modifier.size(18.dp),
                     imageVector = vectorResource(resource = Res.drawable.ic_reply),
                     contentDescription = null,
-                    tint = disabledTint,
+                    tint = if (isReplyActionEnabled) enabledTint else disabledTint,
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = stringResource(resource = Res.string.resource_actions_reply),
                     style = MaterialTheme.typography.labelLarge,
-                    color = disabledTint,
+                    color = if (isReplyActionEnabled) enabledTint else disabledTint,
                 )
             }
 
@@ -96,6 +109,8 @@ private fun ResourceInlineActionsRowPreview() {
     PodkopPreview(darkTheme = false) {
         ResourceInlineActionsRow(
             onMoreClick = {},
+            onReplyClick = {},
+            isReplyEnabled = true,
         )
     }
 }

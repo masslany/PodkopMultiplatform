@@ -52,6 +52,8 @@ class ResourceActionsBottomSheetViewModel(
 
             ResourceActionId.ShowVoters -> {
                 val target = when (params.resourceType) {
+                    ResourceActionsType.Link -> return
+
                     ResourceActionsType.Entry -> ResourceVotesBottomSheetScreen.forEntry(
                         entryId = params.rootId,
                     )
@@ -102,6 +104,10 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
 
     return ResourceActionsBottomSheetState(
         actions = when (params.resourceType) {
+            ResourceActionsType.Link -> listOfNotNull(
+                copyLinkAction,
+            ).toPersistentList()
+
             ResourceActionsType.Entry,
             ResourceActionsType.EntryComment,
             -> listOfNotNull(
@@ -120,6 +126,11 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
 }
 
 internal fun buildResourceLink(params: ResourceActionsParams): String = when (params.resourceType) {
+    ResourceActionsType.Link -> {
+        val slug = requireNotNull(params.rootSlug) { "Link actions require rootSlug" }
+        "https://wykop.pl/link/${params.rootId}/$slug"
+    }
+
     ResourceActionsType.Entry -> "https://wykop.pl/wpis/${params.rootId}"
 
     ResourceActionsType.EntryComment -> {

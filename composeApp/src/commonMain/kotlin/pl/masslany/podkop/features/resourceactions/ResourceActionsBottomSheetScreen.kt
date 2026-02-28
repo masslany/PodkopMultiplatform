@@ -5,6 +5,7 @@ import pl.masslany.podkop.common.navigation.NavTarget
 
 @Serializable
 enum class ResourceActionsType {
+    Link,
     Entry,
     EntryComment,
     LinkComment,
@@ -20,8 +21,11 @@ data class ResourceActionsBottomSheetScreen(
     val screenshotDraftId: String? = null,
 ) : NavTarget {
     init {
-        require(resourceType == ResourceActionsType.Entry || childId != null) {
+        require(resourceType == ResourceActionsType.Entry || resourceType == ResourceActionsType.Link || childId != null) {
             "Comment actions require childId"
+        }
+        require(resourceType != ResourceActionsType.Link || !rootSlug.isNullOrBlank()) {
+            "Link actions require rootSlug"
         }
         require(resourceType != ResourceActionsType.LinkComment || !rootSlug.isNullOrBlank()) {
             "Link comment actions require rootSlug"
@@ -36,6 +40,15 @@ data class ResourceActionsBottomSheetScreen(
             resourceType = ResourceActionsType.Entry,
             rootId = entryId,
             screenshotDraftId = screenshotDraftId,
+        )
+
+        fun forLink(
+            linkId: Int,
+            linkSlug: String,
+        ): ResourceActionsBottomSheetScreen = ResourceActionsBottomSheetScreen(
+            resourceType = ResourceActionsType.Link,
+            rootId = linkId,
+            rootSlug = linkSlug,
         )
 
         fun forEntryComment(

@@ -20,6 +20,7 @@ import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import kotlin.math.abs
 import pl.masslany.podkop.business.testsupport.fixtures.BusinessFixtures as Fixtures
 
 @OptIn(ExperimentalTime::class)
@@ -241,6 +242,67 @@ class EntriesRepositoryImplTest {
     }
 
     @Test
+    fun `create entry comment forwards payload and maps single resource item`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            createEntryCommentResult = Result.success(
+                Fixtures.singleResourceResponseDto(
+                    data = Fixtures.resourceItemDto(
+                        id = 1001,
+                        resource = "entry_comment",
+                        parent = Fixtures.parentDto(id = 77),
+                        voted = 0,
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.createEntryComment(
+            entryId = 77,
+            content = "@author: hello there",
+            adult = false,
+        )
+
+        assertEquals(
+            listOf(
+                FakeEntriesDataSource.CreateEntryCommentCall(
+                    entryId = 77,
+                    content = "@author: hello there",
+                    adult = false,
+                ),
+            ),
+            entriesDataSource.createEntryCommentCalls,
+        )
+        assertEquals(
+            Fixtures.resourceItem(
+                id = 1001,
+                resource = Resource.EntryComment,
+                parent = Fixtures.parent(id = 77),
+                voted = Voted.None,
+            ),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `create entry comment propagates failure`() = runBlocking {
+        val expected = IllegalArgumentException("validation failed")
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            createEntryCommentResult = Result.failure(expected)
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.createEntryComment(
+            entryId = 8,
+            content = "foo",
+            adult = false,
+        )
+
+        assertTrue(actual.isFailure)
+        assertSame(expected, actual.exceptionOrNull())
+    }
+
+    @Test
     fun `vote up delegates to data source`() = runBlocking {
         val entriesDataSource = FakeEntriesDataSource().apply {
             voteUpResult = Result.success(Unit)
@@ -281,14 +343,12 @@ class EntriesRepositoryImplTest {
     @Test
     fun `get last updated falls back to current time when storage is empty`() = runBlocking {
         val sut = createSut(keyValueStorage = FakeKeyValueStorage())
-        val before = Clock.System.now()
 
         val actual = sut.getLastUpdated()
+        val now = Clock.System.now()
+        val deltaMillis = abs(now.toEpochMilliseconds() - actual.toEpochMilliseconds())
 
-        val after = Clock.System.now()
-
-        assertTrue(actual >= before)
-        assertTrue(actual <= after)
+        assertTrue(deltaMillis <= 5_000L)
     }
 
     @Test

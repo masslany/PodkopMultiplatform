@@ -1,6 +1,7 @@
 package pl.masslany.podkop.business.links.domain.main
 
 import pl.masslany.podkop.business.common.domain.models.links.Link
+import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
@@ -40,6 +41,19 @@ interface LinksRepository {
     ): Result<Resources>
 
     suspend fun getRelatedLinks(linkId: Int): Result<Resources>
+
+    suspend fun createLinkComment(
+        linkId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<ResourceItem>
+
+    suspend fun createLinkCommentReply(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+    ): Result<ResourceItem>
 
     suspend fun voteOnLink(linkId: Int): Result<Unit>
 

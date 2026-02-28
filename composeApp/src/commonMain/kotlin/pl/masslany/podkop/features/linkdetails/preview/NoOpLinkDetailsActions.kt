@@ -20,4 +20,7 @@ object NoOpLinkDetailsActions :
     override fun onSortExpandedChanged(expanded: Boolean) = Unit
     override fun onSortDismissed() = Unit
     override fun onShowMoreRepliesClicked(commentId: Int, nextPage: Int) = Unit
+    override fun onComposerTextChanged(content: String) = Unit
+    override fun onComposerDismissed() = Unit
+    override fun onComposerSubmit() = Unit
 }

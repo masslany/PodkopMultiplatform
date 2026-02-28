@@ -21,4 +21,10 @@ interface LinkDetailsActions :
     fun onSortDismissed()
 
     fun onShowMoreRepliesClicked(commentId: Int, nextPage: Int)
+
+    fun onComposerTextChanged(content: String)
+
+    fun onComposerDismissed()
+
+    fun onComposerSubmit()
 }

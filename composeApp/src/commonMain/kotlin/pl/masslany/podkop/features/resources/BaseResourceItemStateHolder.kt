@@ -112,6 +112,10 @@ open class BaseResourceItemStateHolder(
         }
     }
 
+    override fun onLinkReplyClicked(linkId: Int, author: String?) = Unit
+
+    override fun onLinkMoreClicked(linkId: Int, linkSlug: String) = Unit
+
     override fun onLinkClicked(id: Int) {
         appNavigator.navigateTo(LinkDetailsScreen(id))
     }
@@ -221,6 +225,8 @@ open class BaseResourceItemStateHolder(
         appNavigator.navigateTo(EntryDetailsScreen(id))
     }
 
+    override fun onEntryReplyClicked(entryId: Int, author: String?) = Unit
+
     override fun onEntryMoreClicked(entryId: Int) {
         val draftId = createEntryScreenshotDraftId(entryId)
         appNavigator.navigateTo(
@@ -233,6 +239,8 @@ open class BaseResourceItemStateHolder(
 
     override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) {
     }
+
+    override fun onEntryCommentReplyClicked(entryId: Int, entryCommentId: Int, author: String?) = Unit
 
     override fun onEntryCommentMoreClicked(entryId: Int, entryCommentId: Int) {
         val draftId = createEntryCommentScreenshotDraftId(
@@ -265,6 +273,8 @@ open class BaseResourceItemStateHolder(
             ),
         )
     }
+
+    override fun onLinkCommentReplyClicked(linkId: Int, commentId: Int, author: String?) = Unit
 
     override fun onLinkCommentVoteUpClick(linkId: Int, commentId: Int, voted: Boolean) {
         scope?.launch {
