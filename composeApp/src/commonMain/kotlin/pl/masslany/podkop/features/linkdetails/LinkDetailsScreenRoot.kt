@@ -237,7 +237,8 @@ fun LinkDetailsScreenContent(
         },
         containerColor = MaterialTheme.colorScheme.surface,
     ) { innerPaddingValues ->
-        val composerBottomPadding = if (state.isComposerVisible) 176.dp else 0.dp
+        // TODO: Rethink this with imePadding() and what now
+        val composerBottomPadding = if (state.isComposerVisible) 232.dp else 0.dp
 
         Box(
             modifier = Modifier
@@ -277,9 +278,11 @@ fun LinkDetailsScreenContent(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 isVisible = state.isComposerVisible,
                 content = state.composerContent,
+                isAdult = state.composerAdult,
                 replyTarget = state.composerReplyTarget,
                 isSubmitting = state.isComposerSubmitting,
                 onContentChanged = actions::onComposerTextChanged,
+                onAdultChanged = actions::onComposerAdultChanged,
                 onDismiss = actions::onComposerDismissed,
                 onSubmit = actions::onComposerSubmit,
             )

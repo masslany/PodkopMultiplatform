@@ -219,4 +219,12 @@
     <!-- Tag -->
     <string name="tag_label">#%1$s</string>
 
+    <!-- Composer -->
+    <string name="composer_button_send">Wyślij</string>
+    <string name="composer_bold_placeholder">treść progrubiona</string>
+    <string name="composer_italic_placeholder">treść pochylona</string>
+    <string name="composer_link_description_placeholder">opis odnośnika</string>
+    <string name="composer_link_url_placeholder">url</string>
+    <string name="composer_quote_placeholder">cytowana treść</string>
+    <string name="composer_code_placeholder">kod</string>
 </resources>

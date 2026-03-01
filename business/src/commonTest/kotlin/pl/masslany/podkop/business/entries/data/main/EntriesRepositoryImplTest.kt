@@ -329,6 +329,23 @@ class EntriesRepositoryImplTest {
     }
 
     @Test
+    fun `entry comment vote operations delegate to data source`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            voteUpCommentResult = Result.success(Unit)
+            removeVoteUpCommentResult = Result.success(Unit)
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val vote = sut.voteUpComment(entryId = 11, commentId = 22)
+        val remove = sut.removeVoteUpComment(entryId = 33, commentId = 44)
+
+        assertTrue(vote.isSuccess)
+        assertTrue(remove.isSuccess)
+        assertEquals(listOf(11 to 22), entriesDataSource.voteUpCommentCalls)
+        assertEquals(listOf(33 to 44), entriesDataSource.removeVoteUpCommentCalls)
+    }
+
+    @Test
     fun `get last updated returns stored instant`() = runBlocking {
         val keyValueStorage = FakeKeyValueStorage().apply {
             putLong(EntriesRepositoryImpl.ENTRIES_LAST_UPDATED_KEY, 1234L)

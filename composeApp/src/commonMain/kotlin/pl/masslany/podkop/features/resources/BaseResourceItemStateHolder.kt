@@ -238,6 +238,30 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) {
+        scope?.launch {
+            val result = if (voted) {
+                entriesRepository.removeVoteUpComment(
+                    entryId = parentEntryId,
+                    commentId = entryCommentId,
+                )
+            } else {
+                entriesRepository.voteUpComment(
+                    entryId = parentEntryId,
+                    commentId = entryCommentId,
+                )
+            }
+
+            result.onSuccess {
+                updateEntryCommentVote(
+                    commentId = entryCommentId,
+                    action = if (voted) {
+                        EntryCommentVoteAction.RemoveVoteUp
+                    } else {
+                        EntryCommentVoteAction.VoteUp
+                    },
+                )
+            }
+        }
     }
 
     override fun onEntryCommentReplyClicked(entryId: Int, entryCommentId: Int, author: String?) = Unit
@@ -395,6 +419,25 @@ open class BaseResourceItemStateHolder(
         }
     }
 
+    private fun updateEntryCommentVote(
+        commentId: Int,
+        action: EntryCommentVoteAction,
+    ) {
+        updateItem(commentId) { item ->
+            val comment = item as? EntryCommentItemState ?: return@updateItem item
+
+            val newVoteState = when (action) {
+                EntryCommentVoteAction.VoteUp ->
+                    comment.voteState.increaseVoteUp()
+
+                EntryCommentVoteAction.RemoveVoteUp ->
+                    comment.voteState.removeVoteUp()
+            }
+
+            comment.copy(voteState = newVoteState)
+        }
+    }
+
     protected fun updateItem(
         id: Int,
         updater: (ResourceItemState) -> ResourceItemState,
@@ -504,6 +547,11 @@ open class BaseResourceItemStateHolder(
     }
 
     private enum class LinkCommentVoteAction {
+        VoteUp,
+        RemoveVoteUp,
+    }
+
+    private enum class EntryCommentVoteAction {
         VoteUp,
         RemoveVoteUp,
     }

@@ -1,5 +1,6 @@
 package pl.masslany.podkop.features.entrydetails
 
+import androidx.compose.ui.text.input.TextFieldValue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import pl.masslany.podkop.features.resources.models.ResourceItemState
@@ -15,8 +16,9 @@ data class EntryDetailsScreenState(
     val comments: ImmutableList<ResourceItemState>,
     val isPaginating: Boolean,
     val isComposerVisible: Boolean,
-    val composerContent: String,
+    val composerContent: TextFieldValue,
     val composerReplyTarget: String?,
+    val composerAdult: Boolean,
     val isComposerSubmitting: Boolean,
 ) {
     companion object Companion {
@@ -31,8 +33,9 @@ data class EntryDetailsScreenState(
             comments = persistentListOf(),
             isPaginating = false,
             isComposerVisible = false,
-            composerContent = "",
+            composerContent = TextFieldValue(),
             composerReplyTarget = null,
+            composerAdult = false,
             isComposerSubmitting = false,
         )
     }

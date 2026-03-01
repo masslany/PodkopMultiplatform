@@ -1,5 +1,6 @@
 package pl.masslany.podkop.features.linkdetails
 
+import androidx.compose.ui.text.input.TextFieldValue
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 
@@ -13,9 +14,10 @@ data class LinkDetailsScreenState(
     val commentsState: LinkDetailsCommentsState,
     val relatedState: LinkDetailsRelatedState,
     val isComposerVisible: Boolean,
-    val composerContent: String,
+    val composerContent: TextFieldValue,
     val composerReplyTarget: String?,
     val composerParentCommentId: Int?,
+    val composerAdult: Boolean,
     val isComposerSubmitting: Boolean,
 ) {
     companion object Companion {
@@ -31,9 +33,10 @@ data class LinkDetailsScreenState(
             ),
             relatedState = LinkDetailsRelatedState.Loading,
             isComposerVisible = false,
-            composerContent = "",
+            composerContent = TextFieldValue(),
             composerReplyTarget = null,
             composerParentCommentId = null,
+            composerAdult = false,
             isComposerSubmitting = false,
         )
     }

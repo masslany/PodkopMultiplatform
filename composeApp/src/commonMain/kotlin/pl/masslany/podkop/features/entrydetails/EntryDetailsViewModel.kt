@@ -1,5 +1,7 @@
 package pl.masslany.podkop.features.entrydetails
 
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList
@@ -90,9 +92,15 @@ class EntryDetailsViewModel(
         loadContent(isRefreshing = true)
     }
 
-    override fun onComposerTextChanged(content: String) {
+    override fun onComposerTextChanged(content: TextFieldValue) {
         _state.update { previousState ->
             previousState.copy(composerContent = content)
+        }
+    }
+
+    override fun onComposerAdultChanged(adult: Boolean) {
+        _state.update { previousState ->
+            previousState.copy(composerAdult = adult)
         }
     }
 
@@ -100,8 +108,9 @@ class EntryDetailsViewModel(
         _state.update { previousState ->
             previousState.copy(
                 isComposerVisible = false,
-                composerContent = "",
+                composerContent = TextFieldValue(),
                 composerReplyTarget = null,
+                composerAdult = false,
                 isComposerSubmitting = false,
             )
         }
@@ -113,7 +122,7 @@ class EntryDetailsViewModel(
             return
         }
 
-        val content = currentState.composerContent.trim()
+        val content = currentState.composerContent.text.trim()
         if (content.isBlank()) {
             return
         }
@@ -126,14 +135,15 @@ class EntryDetailsViewModel(
             entriesRepository.createEntryComment(
                 entryId = id,
                 content = content,
-                adult = false,
+                adult = currentState.composerAdult,
             ).onSuccess { comment ->
                 resourceItemStateHolder.appendData(listOf(comment))
                 _state.update { previousState ->
                     previousState.copy(
                         isComposerVisible = false,
-                        composerContent = "",
+                        composerContent = TextFieldValue(),
                         composerReplyTarget = null,
+                        composerAdult = false,
                         isComposerSubmitting = false,
                     )
                 }
@@ -207,12 +217,17 @@ class EntryDetailsViewModel(
                             composerContent = if (viewerContext.isLoggedIn) {
                                 previousState.composerContent
                             } else {
-                                ""
+                                TextFieldValue()
                             },
                             composerReplyTarget = if (viewerContext.isLoggedIn) {
                                 previousState.composerReplyTarget
                             } else {
                                 null
+                            },
+                            composerAdult = if (viewerContext.isLoggedIn) {
+                                previousState.composerAdult
+                            } else {
+                                false
                             },
                             isComposerSubmitting = if (viewerContext.isLoggedIn) {
                                 previousState.isComposerSubmitting
@@ -278,7 +293,8 @@ class EntryDetailsViewModel(
             previousState.copy(
                 isComposerVisible = true,
                 composerReplyTarget = if (normalizedAuthor.isEmpty()) null else "@$normalizedAuthor",
-                composerContent = prefill,
+                composerContent = TextFieldValue(text = prefill, selection = TextRange(prefill.length)),
+                composerAdult = false,
                 isComposerSubmitting = false,
             )
         }

@@ -218,7 +218,7 @@ fun EntryDetailsScreenContent(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPaddingValues ->
-        val composerBottomPadding = if (state.isComposerVisible) 176.dp else 0.dp
+        val composerBottomPadding = if (state.isComposerVisible) 232.dp else 0.dp
 
         Box(
             modifier = Modifier
@@ -258,9 +258,11 @@ fun EntryDetailsScreenContent(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 isVisible = state.isComposerVisible,
                 content = state.composerContent,
+                isAdult = state.composerAdult,
                 replyTarget = state.composerReplyTarget,
                 isSubmitting = state.isComposerSubmitting,
                 onContentChanged = actions::onComposerTextChanged,
+                onAdultChanged = actions::onComposerAdultChanged,
                 onDismiss = actions::onComposerDismissed,
                 onSubmit = actions::onComposerSubmit,
             )

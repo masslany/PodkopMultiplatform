@@ -42,4 +42,8 @@ interface EntriesApi {
     suspend fun voteUp(entryId: Int): Result<Unit>
 
     suspend fun removeVoteUp(entryId: Int): Result<Unit>
+
+    suspend fun voteUpComment(entryId: Int, commentId: Int): Result<Unit>
+
+    suspend fun removeVoteUpComment(entryId: Int, commentId: Int): Result<Unit>
 }

@@ -123,6 +123,24 @@ class EntriesRepositoryImpl(
         }
     }
 
+    override suspend fun voteUpComment(
+        entryId: Int,
+        commentId: Int,
+    ): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.voteUpComment(entryId, commentId)
+        }
+    }
+
+    override suspend fun removeVoteUpComment(
+        entryId: Int,
+        commentId: Int,
+    ): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.removeVoteUpComment(entryId, commentId)
+        }
+    }
+
     override suspend fun getLastUpdated(): Instant {
         return withContext(dispatcherProvider.io) {
             val long = keyValueStorage.getLong(ENTRIES_LAST_UPDATED_KEY) ?: Clock.System.now().toEpochMilliseconds()

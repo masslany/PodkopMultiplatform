@@ -66,4 +66,12 @@ class EntriesDataSourceImpl(
     override suspend fun removeVoteUp(entryId: Int): Result<Unit> {
         return entriesApi.removeVoteUp(entryId)
     }
+
+    override suspend fun voteUpComment(entryId: Int, commentId: Int): Result<Unit> {
+        return entriesApi.voteUpComment(entryId, commentId)
+    }
+
+    override suspend fun removeVoteUpComment(entryId: Int, commentId: Int): Result<Unit> {
+        return entriesApi.removeVoteUpComment(entryId, commentId)
+    }
 }

@@ -52,6 +52,16 @@ interface EntriesRepository {
 
     suspend fun removeVoteUp(entryId: Int): Result<Unit>
 
+    suspend fun voteUpComment(
+        entryId: Int,
+        commentId: Int,
+    ): Result<Unit>
+
+    suspend fun removeVoteUpComment(
+        entryId: Int,
+        commentId: Int,
+    ): Result<Unit>
+
     suspend fun getLastUpdated(): Instant
 
     suspend fun setLastUpdated(lastUpdated: Instant)

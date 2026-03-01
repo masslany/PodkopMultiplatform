@@ -3,9 +3,9 @@ package pl.masslany.podkop.business.entries.data.network.client
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.entries.data.network.api.EntriesApi
-import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryCommentCreateDataDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryCommentCreateRequestDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
@@ -160,6 +160,32 @@ class EntriesApiClient(
             Request<Unit>(
                 method = Request.HttpMethod.DELETE,
                 path = "api/v3/entries/$entryId/votes",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun voteUpComment(entryId: Int, commentId: Int): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/entries/$entryId/comments/$commentId/votes",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun removeVoteUpComment(entryId: Int, commentId: Int): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.DELETE,
+                path = "api/v3/entries/$entryId/comments/$commentId/votes",
             )
 
         return apiClient.request(request).fold(
