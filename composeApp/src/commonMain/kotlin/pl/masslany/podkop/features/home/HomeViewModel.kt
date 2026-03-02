@@ -55,7 +55,6 @@ class HomeViewModel(
     }
 
     fun onEntryClicked(id: Int, useInlineDetails: Boolean) {
-        logger.debug("[ReplyTrace] HomeViewModel.onEntryClicked entryId=$id inline=$useInlineDetails")
         onEntryDetailsRequested(
             screen = EntryDetailsScreen.forEntry(id),
             useInlineDetails = useInlineDetails,
@@ -63,10 +62,6 @@ class HomeViewModel(
     }
 
     fun onEntryReplyClicked(entryId: Int, author: String?, useInlineDetails: Boolean) {
-        logger.debug(
-            "[ReplyTrace] HomeViewModel.onEntryReplyClicked entryId=$entryId author=${author.orEmpty()} " +
-                "inline=$useInlineDetails",
-        )
         onEntryDetailsRequested(
             screen = EntryDetailsScreen.forEntryReply(
                 entryId = entryId,
@@ -82,10 +77,6 @@ class HomeViewModel(
         author: String?,
         useInlineDetails: Boolean,
     ) {
-        logger.debug(
-            "[ReplyTrace] HomeViewModel.onEntryCommentReplyClicked entryId=$entryId " +
-                "entryCommentId=$entryCommentId author=${author.orEmpty()} inline=$useInlineDetails",
-        )
         onEntryDetailsRequested(
             screen = EntryDetailsScreen.forEntryCommentReply(
                 entryId = entryId,
@@ -97,10 +88,6 @@ class HomeViewModel(
     }
 
     fun onEntryDetailsRequested(screen: EntryDetailsScreen, useInlineDetails: Boolean) {
-        logger.debug(
-            "[ReplyTrace] HomeViewModel.onEntryDetailsRequested entryId=${screen.id} " +
-                "intent=${screen.pendingComposerIntent}",
-        )
         if (useInlineDetails) {
             homeNavigator.navigateToEntryDetails(screen)
         } else {

@@ -211,7 +211,7 @@ class TagViewModel(
         viewModelScope.launch {
             tagsRepository.getTagStream(
                 tagName = tag,
-                page = 1,
+                page = resolveFirstPageParam(),
                 limit = null,
                 sort = currentSort,
                 type = currentType,
@@ -238,5 +238,11 @@ class TagViewModel(
                     snackbarManager.tryEmitGenericError()
                 }
         }
+    }
+
+    private suspend fun resolveFirstPageParam(): Any? = if (authRepository.isLoggedIn()) {
+        null
+    } else {
+        1
     }
 }

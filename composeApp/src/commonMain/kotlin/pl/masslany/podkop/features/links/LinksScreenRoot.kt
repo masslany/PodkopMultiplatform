@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -266,6 +268,12 @@ private fun LinksScreenList(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
+        contentPadding = PaddingValues(
+            bottom = WindowInsets
+                .navigationBars
+                .asPaddingValues()
+                .calculateBottomPadding() + 16.dp,
+        ),
     ) {
         if (!state.isUpcoming) {
             item {

@@ -31,9 +31,17 @@ class Paginator<T>(
     fun setup(pagination: Pagination?, initialItemCount: Int) {
         nextPage = 2
         nextCursor = pagination?.next
-        total = pagination?.total
+        total = pagination?.total?.takeIf { it > 0 }
         emittedCount = initialItemCount
-        _state.value = PaginatorState.Idle
+        val noMoreItems =
+            initialItemCount == 0 &&
+                pagination != null &&
+                pagination.next.isBlank()
+        _state.value = if (noMoreItems) {
+            PaginatorState.Exhausted
+        } else {
+            PaginatorState.Idle
+        }
     }
 
     fun shouldPaginate(
@@ -43,7 +51,7 @@ class Paginator<T>(
     ): Boolean {
         if (_state.value != PaginatorState.Idle) return false
         if (lastVisibleIndex == null) return false
-        if (totalItemsCount >= (total ?: Int.MAX_VALUE)) return false
+        if (total != null && emittedCount >= (total ?: Int.MAX_VALUE)) return false
 
         return lastVisibleIndex + prefetchDistance >= totalItemsCount
     }
@@ -62,14 +70,16 @@ class Paginator<T>(
             loader(request)
                 .onSuccess { resources ->
                     nextCursor = resources.pagination?.next
-                    total = resources.pagination?.total
+                    total = resources.pagination?.total?.takeIf { it > 0 }
                     nextPage++
 
                     emittedCount += resources.data.size
                     onNewItems(resources.data)
 
+                    val hasNoNextCursor = resources.pagination?.next.isNullOrBlank()
+                    val noMoreItems = resources.data.isEmpty() && hasNoNextCursor
                     _state.value =
-                        if (total != null && emittedCount >= (total ?: Int.MAX_VALUE)) {
+                        if (noMoreItems || (total != null && emittedCount >= (total ?: Int.MAX_VALUE))) {
                             PaginatorState.Exhausted
                         } else {
                             PaginatorState.Idle

@@ -111,12 +111,26 @@ class CommonValueMappersTest {
         val dto = Fixtures.paginationDto(
             perPage = null,
             total = null,
+            totalItems = null,
             next = null,
             prev = null,
         )
 
         assertEquals(
             Fixtures.pagination(perPage = 0, total = 0, next = "", prev = ""),
+            dto.toPagination(),
+        )
+    }
+
+    @Test
+    fun `pagination mapper falls back to total items when total is missing`() {
+        val dto = Fixtures.paginationDto(
+            total = null,
+            totalItems = 123,
+        )
+
+        assertEquals(
+            Fixtures.pagination(total = 123),
             dto.toPagination(),
         )
     }

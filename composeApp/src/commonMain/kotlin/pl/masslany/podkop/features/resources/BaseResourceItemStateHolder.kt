@@ -222,14 +222,10 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onEntryClicked(id: Int) {
-        logger.debug("[ReplyTrace] BaseResourceItemStateHolder.onEntryClicked entryId=$id")
         appNavigator.navigateTo(EntryDetailsScreen.forEntry(id))
     }
 
     override fun onEntryReplyClicked(entryId: Int, author: String?) {
-        logger.debug(
-            "[ReplyTrace] BaseResourceItemStateHolder.onEntryReplyClicked entryId=$entryId author=${author.orEmpty()}",
-        )
         appNavigator.navigateTo(
             EntryDetailsScreen.forEntryReply(
                 entryId = entryId,
@@ -276,10 +272,6 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onEntryCommentReplyClicked(entryId: Int, entryCommentId: Int, author: String?) {
-        logger.debug(
-            "[ReplyTrace] BaseResourceItemStateHolder.onEntryCommentReplyClicked entryId=$entryId " +
-                "entryCommentId=$entryCommentId author=${author.orEmpty()}",
-        )
         appNavigator.navigateTo(
             EntryDetailsScreen.forEntryCommentReply(
                 entryId = entryId,

@@ -90,10 +90,6 @@ class EntryDetailsViewModel(
     }.stateIn(viewModelScope, WhileSubscribed(5000), initialState())
 
     init {
-        logger.debug(
-            "[ReplyTrace] EntryDetailsViewModel.init entryId=$entryId pendingIntent=${screen.pendingComposerIntent} " +
-                "restoredDraft=${restoredComposerDraft != null} consumed=$isPendingComposerIntentConsumed",
-        )
         resourceItemStateHolder.init(viewModelScope)
         loadContent(isRefreshing = false)
     }
@@ -152,19 +148,11 @@ class EntryDetailsViewModel(
     }
 
     override fun onEntryReplyClicked(entryId: Int, author: String?) {
-        logger.debug(
-            "[ReplyTrace] EntryDetailsViewModel.onEntryReplyClicked entryId=$entryId " +
-                "currentEntryId=${this.entryId} author=${author.orEmpty()}",
-        )
         if (entryId != this.entryId) return
         showComposerForAuthor(author = author)
     }
 
     override fun onEntryCommentReplyClicked(entryId: Int, entryCommentId: Int, author: String?) {
-        logger.debug(
-            "[ReplyTrace] EntryDetailsViewModel.onEntryCommentReplyClicked entryId=$entryId " +
-                "entryCommentId=$entryCommentId currentEntryId=${this.entryId} author=${author.orEmpty()}",
-        )
         if (entryId != this.entryId) return
         showComposerForAuthor(author = author)
     }
@@ -249,10 +237,6 @@ class EntryDetailsViewModel(
 
     private fun showComposerForAuthor(author: String?, canShowComposer: Boolean = _state.value.isLoggedIn) {
         if (!canShowComposer) {
-            logger.debug(
-                "[ReplyTrace] EntryDetailsViewModel.showComposerForAuthor skipped (not logged in) " +
-                    "entryId=$entryId author=${author.orEmpty()}",
-            )
             return
         }
 
@@ -272,18 +256,9 @@ class EntryDetailsViewModel(
                 isComposerSubmitting = false,
             )
         }
-        logger.debug(
-            "[ReplyTrace] EntryDetailsViewModel.showComposerForAuthor applied entryId=$entryId " +
-                "replyTarget=${if (normalizedAuthor.isEmpty()) "<none>" else "@$normalizedAuthor"} " +
-                "prefillLength=${prefill.length}",
-        )
     }
 
     private fun applyViewerContext(viewerContext: ViewerContext) {
-        logger.debug(
-            "[ReplyTrace] EntryDetailsViewModel.applyViewerContext entryId=$entryId " +
-                "isLoggedIn=${viewerContext.isLoggedIn} username=${viewerContext.username.orEmpty()}",
-        )
         updateState { previousState ->
             if (!viewerContext.isLoggedIn) {
                 clearComposerState(
@@ -303,11 +278,6 @@ class EntryDetailsViewModel(
     }
 
     private fun maybeApplyPendingComposerIntent(canShowComposer: Boolean) {
-        logger.debug(
-            "[ReplyTrace] EntryDetailsViewModel.maybeApplyPendingComposerIntent entryId=$entryId " +
-                "consumed=$isPendingComposerIntentConsumed canShowComposer=$canShowComposer " +
-                "pendingIntent=${screen.pendingComposerIntent}",
-        )
         if (isPendingComposerIntentConsumed) {
             return
         }
@@ -322,6 +292,7 @@ class EntryDetailsViewModel(
                 author = screen.pendingComposerIntent.author,
                 canShowComposer = canShowComposer,
             )
+
             null -> Unit
         }
     }
