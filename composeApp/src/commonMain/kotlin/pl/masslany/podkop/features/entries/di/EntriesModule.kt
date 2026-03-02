@@ -13,6 +13,7 @@ val entriesModule = module {
             logger = get(),
             topBarActions = get(),
             snackbarManager = get(),
+            savedStateHandle = get(),
         )
     }
 }

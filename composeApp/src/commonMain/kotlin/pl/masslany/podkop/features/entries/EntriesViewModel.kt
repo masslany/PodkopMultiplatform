@@ -1,6 +1,8 @@
 package pl.masslany.podkop.features.entries
 
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlin.uuid.ExperimentalUuidApi
@@ -40,6 +42,7 @@ class EntriesViewModel(
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
+    private val savedStateHandle: SavedStateHandle,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     EntriesActions,
@@ -49,6 +52,7 @@ class EntriesViewModel(
     private var currentEntriesSortType: EntriesSortType = EntriesSortType.Hot
     private var currentHotSortType: HotSortType = HotSortType.TwelveHours
     private val screenInstanceId = Uuid.random().toString()
+    private val restoredComposerDraft = restoreComposerDraft()
 
     private val paginator = Paginator(
         scope = viewModelScope,
@@ -73,9 +77,7 @@ class EntriesViewModel(
         )
     }
 
-    private val _state = MutableStateFlow(
-        EntriesScreenState.initial.copy(screenInstanceId = screenInstanceId),
-    )
+    private val _state = MutableStateFlow(initialState())
 
     // TODO: Think of better UI events system
     private val _entryCreatedNavigation = MutableSharedFlow<Int>(extraBufferCapacity = 1)
@@ -93,7 +95,7 @@ class EntriesViewModel(
     }.stateIn(
         viewModelScope,
         WhileSubscribed(5000),
-        EntriesScreenState.initial.copy(screenInstanceId = screenInstanceId),
+        initialState(),
     )
 
     private val entriesSortTypes = entriesRepository.getEntriesSortTypes()
@@ -107,7 +109,7 @@ class EntriesViewModel(
     init {
         resourceItemStateHolder.init(viewModelScope)
 
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(
                 sortMenuState = DropdownMenuState(
                     items = entriesSortTypes,
@@ -123,7 +125,7 @@ class EntriesViewModel(
         }
 
         viewModelScope.launch {
-            _state.update { previousState ->
+            updateState { previousState ->
                 previousState.copy(
                     isLoggedIn = authRepository.isLoggedIn(),
                 )
@@ -139,7 +141,7 @@ class EntriesViewModel(
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
                     paginator.setup(it.pagination, it.data.size)
-                    _state.update { previousState ->
+                    updateState { previousState ->
                         previousState
                             .updateLoading(false)
                             .updateError(false)
@@ -148,7 +150,7 @@ class EntriesViewModel(
                 }
                 .onFailure {
                     logger.error("Failed to load entries", it)
-                    _state.update { previousState ->
+                    updateState { previousState ->
                         previousState
                             .updateLoading(false)
                             .updateError(true)
@@ -162,7 +164,7 @@ class EntriesViewModel(
         currentEntriesSortType = sortType.toEntriesSortType()
         currentHotSortType = HotSortType.TwelveHours
 
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState
                 .updateSortMenuSelected(sortType, hotSortTypes)
                 .updateError(false)
@@ -180,7 +182,7 @@ class EntriesViewModel(
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
                     paginator.setup(it.pagination, it.data.size)
-                    _state.update { previousState ->
+                    updateState { previousState ->
                         previousState
                             .updateLoading(false)
                             .updateError(false)
@@ -190,7 +192,7 @@ class EntriesViewModel(
                 .onFailure {
                     logger.error("Failed to load entries for sort type $sortType", it)
                     val shouldShowErrorScreen = state.value.entries.isEmpty()
-                    _state.update { previousState ->
+                    updateState { previousState ->
                         previousState
                             .updateLoading(false)
                             .updateRefreshing(false)
@@ -202,13 +204,13 @@ class EntriesViewModel(
     }
 
     override fun onSortExpandedChanged(expanded: Boolean) {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.updateSortMenuExpanded(expanded)
         }
     }
 
     override fun onSortDismissed() {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.updateSortMenuExpanded(false)
         }
     }
@@ -217,7 +219,7 @@ class EntriesViewModel(
         currentEntriesSortType = EntriesSortType.Hot
         currentHotSortType = sortType.toHotSortType()
 
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState
                 .updateHotSortMenuSelected(sortType)
                 .updateError(false)
@@ -235,7 +237,7 @@ class EntriesViewModel(
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
                     paginator.setup(it.pagination, it.data.size)
-                    _state.update { previousState ->
+                    updateState { previousState ->
                         previousState
                             .updateLoading(false)
                             .updateError(false)
@@ -245,7 +247,7 @@ class EntriesViewModel(
                 .onFailure {
                     logger.error("Failed to load hot entries for sort type $sortType", it)
                     val shouldShowErrorScreen = state.value.entries.isEmpty()
-                    _state.update { previousState ->
+                    updateState { previousState ->
                         previousState
                             .updateLoading(false)
                             .updateRefreshing(false)
@@ -257,19 +259,19 @@ class EntriesViewModel(
     }
 
     override fun onHotSortExpandedChanged(expanded: Boolean) {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.updateHotSortMenuExpanded(expanded)
         }
     }
 
     override fun onHotSortDismissed() {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.updateHotSortMenuExpanded(false)
         }
     }
 
     override fun onRefresh(sortType: DropdownMenuItemType) {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState
                 .updateError(false)
                 .updateRefreshing(true)
@@ -286,7 +288,7 @@ class EntriesViewModel(
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
                     paginator.setup(it.pagination, it.data.size)
-                    _state.update { previousState ->
+                    updateState { previousState ->
                         previousState
                             .updateLoading(false)
                             .updateError(false)
@@ -296,7 +298,7 @@ class EntriesViewModel(
                 .onFailure {
                     logger.error("Failed to refresh entries for sort type $sortType", it)
                     val shouldShowErrorScreen = state.value.entries.isEmpty()
-                    _state.update { previousState ->
+                    updateState { previousState ->
                         previousState
                             .updateLoading(false)
                             .updateRefreshing(false)
@@ -312,7 +314,7 @@ class EntriesViewModel(
             if (!authRepository.isLoggedIn()) {
                 return@launch
             }
-            _state.update { previousState ->
+            updateState { previousState ->
                 previousState.copy(
                     isComposerVisible = true,
                     composerContent = TextFieldValue(),
@@ -324,26 +326,19 @@ class EntriesViewModel(
     }
 
     override fun onComposerTextChanged(content: TextFieldValue) {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(composerContent = content)
         }
     }
 
     override fun onComposerAdultChanged(adult: Boolean) {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(composerAdult = adult)
         }
     }
 
     override fun onComposerDismissed() {
-        _state.update { previousState ->
-            previousState.copy(
-                isComposerVisible = false,
-                composerContent = TextFieldValue(),
-                composerAdult = false,
-                isComposerSubmitting = false,
-            )
-        }
+        updateState(::clearComposerState)
     }
 
     override fun onComposerSubmit() {
@@ -357,13 +352,13 @@ class EntriesViewModel(
             return
         }
 
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(isComposerSubmitting = true)
         }
 
         viewModelScope.launch {
             if (!authRepository.isLoggedIn()) {
-                _state.update { previousState ->
+                updateState { previousState ->
                     previousState.copy(isComposerSubmitting = false)
                 }
                 return@launch
@@ -373,18 +368,11 @@ class EntriesViewModel(
                 content = content,
                 adult = currentState.composerAdult,
             ).onSuccess { createdEntry ->
-                _state.update { previousState ->
-                    previousState.copy(
-                        isComposerVisible = false,
-                        composerContent = TextFieldValue(),
-                        composerAdult = false,
-                        isComposerSubmitting = false,
-                    )
-                }
+                updateState(::clearComposerState)
                 _entryCreatedNavigation.tryEmit(createdEntry.id)
             }.onFailure {
                 logger.error("Failed to create entry from entries composer", it)
-                _state.update { previousState ->
+                updateState { previousState ->
                     previousState.copy(isComposerSubmitting = false)
                 }
                 snackbarManager.tryEmitGenericError()
@@ -401,9 +389,88 @@ class EntriesViewModel(
         paginator.paginate()
     }
 
+    private fun clearComposerState(
+        previousState: EntriesScreenState,
+    ): EntriesScreenState = previousState.copy(
+        isComposerVisible = false,
+        composerContent = TextFieldValue(),
+        composerAdult = false,
+        isComposerSubmitting = false,
+    )
+
     private suspend fun resolveFirstPageParam(): Any? = if (authRepository.isLoggedIn()) {
         null
     } else {
         1
+    }
+
+    private inline fun updateState(transform: (EntriesScreenState) -> EntriesScreenState) {
+        _state.update { previousState ->
+            transform(previousState).also(::persistComposerDraft)
+        }
+    }
+
+    private fun initialState(): EntriesScreenState {
+        val draft = restoredComposerDraft
+        return EntriesScreenState.initial.copy(
+            screenInstanceId = screenInstanceId,
+            isComposerVisible = draft?.isVisible ?: false,
+            composerContent = draft?.content ?: TextFieldValue(),
+            composerAdult = draft?.adult ?: false,
+        )
+    }
+
+    private fun restoreComposerDraft(): RestoredComposerDraft? {
+        val visible = savedStateHandle.get<Boolean>(STATE_COMPOSER_VISIBLE) ?: false
+        val text = savedStateHandle.get<String>(STATE_COMPOSER_CONTENT).orEmpty()
+        val selectionStart = savedStateHandle.get<Int>(STATE_COMPOSER_SELECTION_START) ?: text.length
+        val selectionEnd = savedStateHandle.get<Int>(STATE_COMPOSER_SELECTION_END) ?: text.length
+        val adult = savedStateHandle.get<Boolean>(STATE_COMPOSER_ADULT) ?: false
+
+        val hasPersistedDraft = visible || text.isNotEmpty() || adult
+        if (!hasPersistedDraft) {
+            return null
+        }
+
+        val clampedSelectionStart = selectionStart.coerceIn(0, text.length)
+        val clampedSelectionEnd = selectionEnd.coerceIn(0, text.length)
+
+        return RestoredComposerDraft(
+            isVisible = visible || text.isNotEmpty(),
+            content = TextFieldValue(
+                text = text,
+                selection = TextRange(clampedSelectionStart, clampedSelectionEnd),
+            ),
+            adult = adult,
+        )
+    }
+
+    private fun persistComposerDraft(state: EntriesScreenState) {
+        val hasPersistedDraft =
+            state.isComposerVisible || state.composerContent.text.isNotEmpty() || state.composerAdult
+        if (!hasPersistedDraft) {
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_VISIBLE)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_CONTENT)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_SELECTION_START)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_SELECTION_END)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_ADULT)
+            return
+        }
+
+        savedStateHandle[STATE_COMPOSER_VISIBLE] = state.isComposerVisible
+        savedStateHandle[STATE_COMPOSER_CONTENT] = state.composerContent.text
+        savedStateHandle[STATE_COMPOSER_SELECTION_START] = state.composerContent.selection.start
+        savedStateHandle[STATE_COMPOSER_SELECTION_END] = state.composerContent.selection.end
+        savedStateHandle[STATE_COMPOSER_ADULT] = state.composerAdult
+    }
+
+    private data class RestoredComposerDraft(val isVisible: Boolean, val content: TextFieldValue, val adult: Boolean)
+
+    private companion object {
+        const val STATE_COMPOSER_VISIBLE = "entries_composer_visible"
+        const val STATE_COMPOSER_CONTENT = "entries_composer_content"
+        const val STATE_COMPOSER_SELECTION_START = "entries_composer_selection_start"
+        const val STATE_COMPOSER_SELECTION_END = "entries_composer_selection_end"
+        const val STATE_COMPOSER_ADULT = "entries_composer_adult"
     }
 }

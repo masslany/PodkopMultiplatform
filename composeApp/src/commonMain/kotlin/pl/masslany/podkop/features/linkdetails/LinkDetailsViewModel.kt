@@ -1,6 +1,8 @@
 package pl.masslany.podkop.features.linkdetails
 
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.ImmutableList
@@ -52,6 +54,7 @@ class LinkDetailsViewModel(
     private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
+    private val savedStateHandle: SavedStateHandle,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     LinkDetailsActions,
@@ -81,6 +84,7 @@ class LinkDetailsViewModel(
     private var selectedCommentsSortType = availableCommentsSortTypes
         .firstOrNull { it == CommentsSortType.Best }
         ?: availableCommentsSortTypes.first()
+    private val restoredComposerDraft = restoreComposerDraft()
 
     private val paginator = Paginator(
         scope = viewModelScope,
@@ -106,19 +110,7 @@ class LinkDetailsViewModel(
     }
 
     private val commentRepliesStateById = MutableStateFlow<Map<Int, CommentRepliesState>>(emptyMap())
-    private val _state = MutableStateFlow(
-        LinkDetailsScreenState.initial.copy(
-            commentsState = LinkDetailsCommentsState.Loading(
-                sortMenuState = DropdownMenuState(
-                    items = availableCommentsSortTypes
-                        .map { it.toDropdownMenuItemType() }
-                        .toImmutableList(),
-                    selected = selectedCommentsSortType.toDropdownMenuItemType(),
-                    expanded = false,
-                ),
-            ),
-        ),
-    )
+    private val _state = MutableStateFlow(initialState())
     val state = combine(
         _state,
         resourceItemStateHolder.items,
@@ -158,28 +150,19 @@ class LinkDetailsViewModel(
     }
 
     override fun onComposerTextChanged(content: TextFieldValue) {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(composerContent = content)
         }
     }
 
     override fun onComposerAdultChanged(adult: Boolean) {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(composerAdult = adult)
         }
     }
 
     override fun onComposerDismissed() {
-        _state.update { previousState ->
-            previousState.copy(
-                isComposerVisible = false,
-                composerContent = TextFieldValue(),
-                composerReplyTarget = null,
-                composerParentCommentId = null,
-                composerAdult = false,
-                isComposerSubmitting = false,
-            )
-        }
+        updateState(::clearComposerState)
     }
 
     override fun onComposerSubmit() {
@@ -193,7 +176,7 @@ class LinkDetailsViewModel(
             return
         }
 
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(isComposerSubmitting = true)
         }
 
@@ -218,19 +201,10 @@ class LinkDetailsViewModel(
                     createdComment = createdComment,
                     repliedCommentId = currentState.composerParentCommentId,
                 )
-                _state.update { previousState ->
-                    previousState.copy(
-                        isComposerVisible = false,
-                        composerContent = TextFieldValue(),
-                        composerReplyTarget = null,
-                        composerParentCommentId = null,
-                        composerAdult = false,
-                        isComposerSubmitting = false,
-                    )
-                }
+                updateState(::clearComposerState)
             }.onFailure {
                 logger.error("Failed to create link comment for id=$id", it)
-                _state.update { previousState ->
+                updateState { previousState ->
                     previousState.copy(isComposerSubmitting = false)
                 }
                 snackbarManager.tryEmitGenericError()
@@ -303,7 +277,7 @@ class LinkDetailsViewModel(
 
     override fun onSortSelected(sortType: DropdownMenuItemType) {
         selectedCommentsSortType = sortType.toCommentsSortType()
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(
                 commentsState = previousState.commentsState.updateSortMenuState { menu ->
                     menu.copy(
@@ -317,7 +291,7 @@ class LinkDetailsViewModel(
     }
 
     override fun onSortExpandedChanged(expanded: Boolean) {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(
                 commentsState = previousState.commentsState.updateSortMenuState { menu ->
                     menu.copy(expanded = expanded)
@@ -327,7 +301,7 @@ class LinkDetailsViewModel(
     }
 
     override fun onSortDismissed() {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(
                 commentsState = previousState.commentsState.updateSortMenuState { menu ->
                     menu.copy(expanded = false)
@@ -415,7 +389,7 @@ class LinkDetailsViewModel(
     }
 
     private fun loadContent(isRefreshing: Boolean) {
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(
                 isLoading = !isRefreshing,
                 isError = false,
@@ -448,7 +422,7 @@ class LinkDetailsViewModel(
 
                 val isLinkLoaded = linkDeferred.await()
                     .onSuccess { link ->
-                        _state.update { previousState ->
+                        updateState { previousState ->
                             previousState.copy(
                                 link = link.data.toLinkItemState(isUpcoming = false),
                             )
@@ -460,7 +434,7 @@ class LinkDetailsViewModel(
                     .isSuccess
 
                 viewerContextDeferred.await().let { viewerContext ->
-                    _state.update { previousState ->
+                    updateState { previousState ->
                         previousState.copy(
                             isLoggedIn = viewerContext.isLoggedIn,
                             currentUsername = viewerContext.username,
@@ -508,7 +482,7 @@ class LinkDetailsViewModel(
 
                 relatedDeferred.await()
                     .onSuccess { related ->
-                        _state.update { previousState ->
+                        updateState { previousState ->
                             previousState.copy(
                                 relatedState = if (related.data.isEmpty()) {
                                     LinkDetailsRelatedState.Empty
@@ -524,7 +498,7 @@ class LinkDetailsViewModel(
                     }
                     .onFailure {
                         logger.error("Failed to load related links for link id=$id", it)
-                        _state.update { previousState ->
+                        updateState { previousState ->
                             previousState.copy(
                                 relatedState = LinkDetailsRelatedState.Error,
                             )
@@ -532,14 +506,14 @@ class LinkDetailsViewModel(
                         snackbarManager.tryEmitGenericError()
                     }
 
-                _state.update { previousState ->
+                updateState { previousState ->
                     previousState.copy(
                         isError = !isLinkLoaded,
                     )
                 }
             }
 
-            _state.update { previousState ->
+            updateState { previousState ->
                 previousState.copy(
                     isLoading = false,
                     isRefreshing = false,
@@ -573,7 +547,7 @@ class LinkDetailsViewModel(
             pagination = comments.pagination,
             initialItemCount = comments.data.size,
         )
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(
                 commentsState = previousState.commentsState.toLoaded(),
             )
@@ -583,7 +557,7 @@ class LinkDetailsViewModel(
     private suspend fun onCommentsPageOneLoadFailed() {
         resourceItemStateHolder.updateData(emptyList())
         commentRepliesStateById.value = emptyMap()
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(
                 commentsState = previousState.commentsState.toError(),
             )
@@ -595,7 +569,7 @@ class LinkDetailsViewModel(
             .onSuccess { link ->
                 val updatedState = link.data.toLinkItemState(isUpcoming = false)
                 val updatedRelatedState = link.data.toRelatedItemState()
-                _state.update { previousState ->
+                updateState { previousState ->
                     previousState.copy(
                         link = if (previousState.link?.id == linkId) {
                             updatedState
@@ -689,11 +663,14 @@ class LinkDetailsViewModel(
             "@$normalizedAuthor: "
         }
 
-        _state.update { previousState ->
+        updateState { previousState ->
             previousState.copy(
                 isComposerVisible = true,
                 composerReplyTarget = if (normalizedAuthor.isEmpty()) null else "@$normalizedAuthor",
-                composerContent = TextFieldValue(text = prefill),
+                composerContent = TextFieldValue(
+                    text = prefill,
+                    selection = TextRange(prefill.length),
+                ),
                 composerParentCommentId = parentCommentId,
                 composerAdult = false,
                 isComposerSubmitting = false,
@@ -785,6 +762,99 @@ class LinkDetailsViewModel(
         )
     }
 
+    private fun clearComposerState(
+        previousState: LinkDetailsScreenState,
+    ): LinkDetailsScreenState = previousState.copy(
+        isComposerVisible = false,
+        composerContent = TextFieldValue(),
+        composerReplyTarget = null,
+        composerParentCommentId = null,
+        composerAdult = false,
+        isComposerSubmitting = false,
+    )
+
+    private inline fun updateState(transform: (LinkDetailsScreenState) -> LinkDetailsScreenState) {
+        _state.update { previousState ->
+            transform(previousState).also(::persistComposerDraft)
+        }
+    }
+
+    private fun initialState(): LinkDetailsScreenState {
+        val draft = restoredComposerDraft
+        return LinkDetailsScreenState.initial.copy(
+            commentsState = LinkDetailsCommentsState.Loading(
+                sortMenuState = DropdownMenuState(
+                    items = availableCommentsSortTypes
+                        .map { it.toDropdownMenuItemType() }
+                        .toImmutableList(),
+                    selected = selectedCommentsSortType.toDropdownMenuItemType(),
+                    expanded = false,
+                ),
+            ),
+            isComposerVisible = draft?.isVisible ?: false,
+            composerContent = draft?.content ?: TextFieldValue(),
+            composerReplyTarget = draft?.replyTarget,
+            composerParentCommentId = draft?.parentCommentId,
+            composerAdult = draft?.adult ?: false,
+        )
+    }
+
+    private fun restoreComposerDraft(): RestoredComposerDraft? {
+        val visible = savedStateHandle.get<Boolean>(STATE_COMPOSER_VISIBLE) ?: false
+        val text = savedStateHandle.get<String>(STATE_COMPOSER_CONTENT).orEmpty()
+        val selectionStart = savedStateHandle.get<Int>(STATE_COMPOSER_SELECTION_START) ?: text.length
+        val selectionEnd = savedStateHandle.get<Int>(STATE_COMPOSER_SELECTION_END) ?: text.length
+        val replyTarget = savedStateHandle.get<String>(STATE_COMPOSER_REPLY_TARGET)
+        val parentCommentId = savedStateHandle.get<Int>(STATE_COMPOSER_PARENT_COMMENT_ID)
+        val adult = savedStateHandle.get<Boolean>(STATE_COMPOSER_ADULT) ?: false
+
+        val hasPersistedDraft = visible || text.isNotEmpty() || replyTarget != null || parentCommentId != null || adult
+        if (!hasPersistedDraft) {
+            return null
+        }
+
+        val clampedSelectionStart = selectionStart.coerceIn(0, text.length)
+        val clampedSelectionEnd = selectionEnd.coerceIn(0, text.length)
+
+        return RestoredComposerDraft(
+            isVisible = visible || text.isNotEmpty(),
+            content = TextFieldValue(
+                text = text,
+                selection = TextRange(clampedSelectionStart, clampedSelectionEnd),
+            ),
+            replyTarget = replyTarget,
+            parentCommentId = parentCommentId,
+            adult = adult,
+        )
+    }
+
+    private fun persistComposerDraft(state: LinkDetailsScreenState) {
+        val hasPersistedDraft = state.isComposerVisible ||
+            state.composerContent.text.isNotEmpty() ||
+            state.composerReplyTarget != null ||
+            state.composerParentCommentId != null ||
+            state.composerAdult
+
+        if (!hasPersistedDraft) {
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_VISIBLE)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_CONTENT)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_SELECTION_START)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_SELECTION_END)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_REPLY_TARGET)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_PARENT_COMMENT_ID)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_ADULT)
+            return
+        }
+
+        savedStateHandle[STATE_COMPOSER_VISIBLE] = state.isComposerVisible
+        savedStateHandle[STATE_COMPOSER_CONTENT] = state.composerContent.text
+        savedStateHandle[STATE_COMPOSER_SELECTION_START] = state.composerContent.selection.start
+        savedStateHandle[STATE_COMPOSER_SELECTION_END] = state.composerContent.selection.end
+        savedStateHandle[STATE_COMPOSER_REPLY_TARGET] = state.composerReplyTarget
+        savedStateHandle[STATE_COMPOSER_PARENT_COMMENT_ID] = state.composerParentCommentId
+        savedStateHandle[STATE_COMPOSER_ADULT] = state.composerAdult
+    }
+
     private fun CommentRepliesState.mergeReplies(
         replies: List<LinkCommentItemState>,
         pagination: Pagination?,
@@ -810,7 +880,25 @@ class LinkDetailsViewModel(
         )
     }
 
+    private data class RestoredComposerDraft(
+        val isVisible: Boolean,
+        val content: TextFieldValue,
+        val replyTarget: String?,
+        val parentCommentId: Int?,
+        val adult: Boolean,
+    )
+
     private data class ViewerContext(val isLoggedIn: Boolean, val username: String?)
+
+    private companion object {
+        const val STATE_COMPOSER_VISIBLE = "link_details_composer_visible"
+        const val STATE_COMPOSER_CONTENT = "link_details_composer_content"
+        const val STATE_COMPOSER_SELECTION_START = "link_details_composer_selection_start"
+        const val STATE_COMPOSER_SELECTION_END = "link_details_composer_selection_end"
+        const val STATE_COMPOSER_REPLY_TARGET = "link_details_composer_reply_target"
+        const val STATE_COMPOSER_PARENT_COMMENT_ID = "link_details_composer_parent_comment_id"
+        const val STATE_COMPOSER_ADULT = "link_details_composer_adult"
+    }
 }
 
 private fun LinkDetailsCommentsState.resolve(

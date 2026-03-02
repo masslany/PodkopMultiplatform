@@ -18,6 +18,7 @@ val linkDetailsModule = module {
             topBarActions = get(),
             logger = get(),
             snackbarManager = get(),
+            savedStateHandle = get(),
         )
     }
 }
