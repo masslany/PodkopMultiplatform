@@ -96,5 +96,7 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
         comments = comments,
         commentCount = commentCount,
         publishedTimeType = publishedTimeType,
+        isFavourite = this.favourite,
+        isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
     )
 }

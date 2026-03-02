@@ -31,6 +31,7 @@ fun EntryCommentItem(
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
     onVoteUpClick: () -> Unit,
+    onFavouriteClick: () -> Unit,
     onImageClick: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
     onReplyClick: (() -> Unit)? = null,
@@ -96,6 +97,9 @@ fun EntryCommentItem(
                 onMoreClick = onMoreClick,
                 onReplyClick = onReplyClick,
                 isReplyEnabled = isReplyEnabled,
+                onFavouriteClick = onFavouriteClick,
+                isFavourite = state.isFavourite,
+                isFavouriteEnabled = state.isFavouriteEnabled,
             )
         }
     }
@@ -116,6 +120,7 @@ private fun EntryCommentItemPreview(
             onImageClick = {},
             onEmbedPreviewClick = {},
             onVoteUpClick = {},
+            onFavouriteClick = {},
             onReplyClick = {},
             isReplyEnabled = true,
             onMoreClick = {},

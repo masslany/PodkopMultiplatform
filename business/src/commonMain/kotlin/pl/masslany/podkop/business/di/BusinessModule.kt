@@ -6,6 +6,8 @@ import pl.masslany.podkop.business.embeds.data.di.twitterEmbedPreviewDataModule
 import pl.masslany.podkop.business.embeds.data.network.di.twitterEmbedPreviewNetworkModule
 import pl.masslany.podkop.business.entries.data.di.entriesDataModule
 import pl.masslany.podkop.business.entries.data.network.di.entriesNetworkModule
+import pl.masslany.podkop.business.favourites.data.di.favouritesDataModule
+import pl.masslany.podkop.business.favourites.data.network.di.favouritesNetworkModule
 import pl.masslany.podkop.business.hits.data.di.hitsDataModule
 import pl.masslany.podkop.business.hits.data.network.di.hitsNetworkModule
 import pl.masslany.podkop.business.links.data.di.linksDataModule
@@ -29,6 +31,8 @@ val businessModule = module {
         hitsNetworkModule,
         entriesDataModule,
         entriesNetworkModule,
+        favouritesDataModule,
+        favouritesNetworkModule,
         profileDataModule,
         profileNetworkModule,
         tagsDataModule,

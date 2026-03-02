@@ -22,6 +22,8 @@ data class LinkCommentItemState(
     val entryContentState: EntryContentState,
     val publishedTimeType: PublishedTimeType?,
     val voteState: VoteState,
+    val isFavourite: Boolean = false,
+    val isFavouriteEnabled: Boolean = false,
     val embedImageState: EmbedImageState?,
     val replies: ImmutableList<LinkCommentItemState>,
     val embedContentState: EmbedContentState? = null,

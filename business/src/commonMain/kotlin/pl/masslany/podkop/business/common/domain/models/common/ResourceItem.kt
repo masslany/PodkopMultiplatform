@@ -29,4 +29,5 @@ data class ResourceItem(
     val title: String,
     val voted: Voted,
     val votes: Votes?,
+    val favourite: Boolean,
 )

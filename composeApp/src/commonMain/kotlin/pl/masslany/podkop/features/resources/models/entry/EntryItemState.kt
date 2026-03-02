@@ -23,12 +23,11 @@ data class EntryItemState(
     val entryContentState: EntryContentState,
     val publishedTimeType: PublishedTimeType?,
     val voteState: VoteState,
+    val isFavourite: Boolean = false,
+    val isFavouriteEnabled: Boolean = false,
     val surveyState: SurveyState? = null,
     val embedImageState: EmbedImageState?,
     val embedContentState: EmbedContentState? = null,
-//    val replies: ImmutableList<CommentItemState>,
-//    val repliesPaginationState: CommentPaginationState,
-//    val showMoreCommentsButtonState: ShowMoreCommentsButtonState,
 ) : ResourceItemState {
     val isShowCommentsButtonVisible: Boolean
         get() = comments.isNotEmpty() && totalCommentsCount > comments.size

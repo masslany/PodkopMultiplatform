@@ -321,6 +321,12 @@ private fun LinkDetailsScreenList(
                     isReplyEnabled = state.isLoggedIn,
                     onLinkClick = { actions.onLinkUrlClicked(link.sourceUrl) },
                     onVoteClick = { actions.onLinkVoteClicked(link.id, link.countState.isVoted) },
+                    onFavouriteClick = {
+                        actions.onLinkFavouriteClicked(
+                            linkId = link.id,
+                            favourited = link.isFavourite,
+                        )
+                    },
                     onAuthorClick = { actions.onProfileClicked(it) },
                     onTagClick = { actions.onTagClicked(it) },
                     onReplyClick = {
@@ -594,6 +600,13 @@ private fun LinkDetailsCommentItem(
                             voted = state.comment.voteState.positiveVoteButtonState?.isVoted ?: false,
                         )
                     },
+                    onFavouriteClick = {
+                        actions.onLinkCommentFavouriteClicked(
+                            linkId = state.comment.linkId,
+                            commentId = state.comment.id,
+                            favourited = state.comment.isFavourite,
+                        )
+                    },
                     onImageClick = { actions.onImageClicked(it) },
                     onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.comment.id, embed) },
                     onMoreClick = {
@@ -633,6 +646,13 @@ private fun LinkDetailsCommentItem(
                                 linkId = reply.linkId,
                                 commentId = reply.id,
                                 voted = reply.voteState.positiveVoteButtonState?.isVoted ?: false,
+                            )
+                        },
+                        onFavouriteClick = {
+                            actions.onLinkCommentFavouriteClicked(
+                                linkId = reply.linkId,
+                                commentId = reply.id,
+                                favourited = reply.isFavourite,
                             )
                         },
                         onImageClick = { actions.onImageClicked(it) },

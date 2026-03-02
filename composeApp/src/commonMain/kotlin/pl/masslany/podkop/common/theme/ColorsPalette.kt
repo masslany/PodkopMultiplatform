@@ -19,6 +19,7 @@ data class ColorsPalette(
     val tagBlue: Color = Color.Unspecified,
     val hotOrange: Color = Color.Unspecified,
     val adultRed: Color = Color.Unspecified,
+    val favouriteGold: Color = Color.Unspecified,
     val votePositive: Color = Color.Unspecified,
     val voteNegative: Color = Color.Unspecified,
     val authorComment: Color = Color.Unspecified,
@@ -34,6 +35,7 @@ val LightGenderGray = Color(color = 0xFFE5E5E5)
 val LightTagBlue = Color(color = 0xFF3D83CC)
 val LightHotOrange = Color(color = 0xFFEF713F)
 val LightAdultRed = Color(color = 0xFFE86064)
+val LightFavouriteGold = Color(color = 0xFFFFC107)
 val LightVotePositive = Color(color = 0xFF74BD74)
 val LightVoteNegative = Color(color = 0xFFE7625A)
 val LightAuthorComment = Color(color = 0xFF3A3A3A)
@@ -48,6 +50,7 @@ val DarkGenderGray = Color(color = 0xFFE5E5E5)
 val DarkTagBlue = Color(color = 0xFF3D83CC)
 val DarkHotOrange = Color(color = 0xFFEF713F)
 val DarkAdultRed = Color(color = 0xFFE86064)
+val DarkFavouriteGold = Color(color = 0xFFFFC107)
 val DarkVotePositive = Color(color = 0xFF74BD74)
 val DarkVoteNegative = Color(color = 0xFFE7625A)
 val DarkAuthorComment = Color(color = 0xFFE5E5E5)
@@ -63,6 +66,7 @@ val LightColorsPalette = ColorsPalette(
     tagBlue = LightTagBlue,
     hotOrange = LightHotOrange,
     adultRed = LightAdultRed,
+    favouriteGold = LightFavouriteGold,
     votePositive = LightVotePositive,
     voteNegative = LightVoteNegative,
     authorComment = LightAuthorComment,
@@ -79,6 +83,7 @@ val DarkColorsPalette = ColorsPalette(
     tagBlue = DarkTagBlue,
     hotOrange = DarkHotOrange,
     adultRed = DarkAdultRed,
+    favouriteGold = DarkFavouriteGold,
     votePositive = DarkVotePositive,
     voteNegative = DarkVoteNegative,
     authorComment = DarkAuthorComment,

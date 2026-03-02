@@ -32,6 +32,7 @@ fun LinkCommentItem(
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
     onVoteUpClick: () -> Unit,
+    onFavouriteClick: () -> Unit,
     onImageClick: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
     onMoreClick: () -> Unit,
@@ -96,6 +97,9 @@ fun LinkCommentItem(
                 onMoreClick = onMoreClick,
                 onReplyClick = onReplyClick,
                 isReplyEnabled = isReplyEnabled,
+                onFavouriteClick = onFavouriteClick,
+                isFavourite = state.isFavourite,
+                isFavouriteEnabled = state.isFavouriteEnabled,
             )
         }
     }
@@ -114,6 +118,7 @@ private fun LinkCommentItemPreview(
             onTagClick = {},
             onUrlClick = {},
             onVoteUpClick = {},
+            onFavouriteClick = {},
             onImageClick = {},
             onEmbedPreviewClick = {},
             onMoreClick = {},

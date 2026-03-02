@@ -89,6 +89,12 @@ private fun EntryItemRenderer(
                             voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
                         )
                     },
+                    onFavouriteClick = {
+                        actions.onEntryFavouriteClicked(
+                            entryId = state.id,
+                            favourited = state.isFavourite,
+                        )
+                    },
                     onReplyClick = if (config.showReplyAction) {
                         {
                             actions.onEntryReplyClicked(
@@ -126,6 +132,12 @@ private fun EntryItemRenderer(
                                 entryCommentId = comment.id,
                                 parentEntryId = comment.parentId,
                                 voted = comment.voteState.positiveVoteButtonState?.isVoted ?: false,
+                            )
+                        },
+                        onFavouriteClick = {
+                            actions.onEntryCommentFavouriteClicked(
+                                entryCommentId = comment.id,
+                                favourited = comment.isFavourite,
                             )
                         },
                         onReplyClick = if (config.showReplyAction) {
@@ -185,6 +197,12 @@ private fun EntryItemRenderer(
                     voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
                 )
             },
+            onFavouriteClick = {
+                actions.onEntryFavouriteClicked(
+                    entryId = state.id,
+                    favourited = state.isFavourite,
+                )
+            },
             onReplyClick = if (config.showReplyAction) {
                 {
                     actions.onEntryReplyClicked(
@@ -226,6 +244,13 @@ private fun LinkItemRenderer(
                     linkId = linkId,
                     commentId = commentId,
                     voted = voted,
+                )
+            },
+            onLinkCommentFavouriteClick = { linkId, commentId, favourited ->
+                actions.onLinkCommentFavouriteClicked(
+                    linkId = linkId,
+                    commentId = commentId,
+                    favourited = favourited,
                 )
             },
             onLinkCommentMoreClick = { linkId, commentId, linkSlug, parentCommentId ->
@@ -273,6 +298,12 @@ private fun EntryCommentItemRenderer(
                 entryCommentId = state.id,
                 parentEntryId = state.parentId,
                 voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+            )
+        },
+        onFavouriteClick = {
+            actions.onEntryCommentFavouriteClicked(
+                entryCommentId = state.id,
+                favourited = state.isFavourite,
             )
         },
         onReplyClick = if (config.showReplyAction) {
@@ -330,6 +361,13 @@ private fun LinkCommentItemRenderer(
                 linkId = state.linkId,
                 commentId = state.id,
                 voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+            )
+        },
+        onFavouriteClick = {
+            actions.onLinkCommentFavouriteClicked(
+                linkId = state.linkId,
+                commentId = state.id,
+                favourited = state.isFavourite,
             )
         },
         onMoreClick = {

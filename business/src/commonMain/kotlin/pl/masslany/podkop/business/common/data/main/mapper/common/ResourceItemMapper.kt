@@ -33,6 +33,7 @@ fun List<ResourceItemDto>.toResourceItemList(): List<ResourceItem> {
             title = it.title.orEmpty(),
             voted = it.voted.toVoted(),
             votes = it.votes?.toVotes(),
+            favourite = it.favourite ?: false,
         )
     }
 }

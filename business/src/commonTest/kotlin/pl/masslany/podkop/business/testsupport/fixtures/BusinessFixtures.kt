@@ -730,6 +730,7 @@ object BusinessFixtures {
         title: String = "Resource title",
         voted: Voted = Voted.Positive,
         votes: Votes? = votes(),
+        favourite: Boolean = true,
     ): ResourceItem = ResourceItem(
         actions = actions,
         adult = adult,
@@ -757,6 +758,7 @@ object BusinessFixtures {
         title = title,
         voted = voted,
         votes = votes,
+        favourite = favourite,
     )
 
     fun resources(

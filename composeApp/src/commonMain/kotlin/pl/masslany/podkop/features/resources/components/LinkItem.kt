@@ -30,7 +30,6 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import kotlinx.collections.immutable.persistentListOf
 import pl.masslany.podkop.common.components.Author
 import pl.masslany.podkop.common.components.CommentCount
 import pl.masslany.podkop.common.components.Count
@@ -41,16 +40,8 @@ import pl.masslany.podkop.common.components.Source
 import pl.masslany.podkop.common.components.Tag
 import pl.masslany.podkop.common.components.Title
 import pl.masslany.podkop.common.components.embed.EmbedContent
-import pl.masslany.podkop.common.models.AuthorState
-import pl.masslany.podkop.common.models.CountState
-import pl.masslany.podkop.common.models.DescriptionState
-import pl.masslany.podkop.common.models.NameColorType
-import pl.masslany.podkop.common.models.PublishedTimeType
-import pl.masslany.podkop.common.models.TagItem
-import pl.masslany.podkop.common.models.TitleState
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.preview.PodkopPreview
-import pl.masslany.podkop.features.resources.models.ResourceType
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.preview.LinkItemStateProvider
 
@@ -69,6 +60,7 @@ fun LinkItem(
     onImageClicked: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
     onLinkCommentVoteUpClick: (linkId: Int, commentId: Int, voted: Boolean) -> Unit,
+    onLinkCommentFavouriteClick: (linkId: Int, commentId: Int, favourited: Boolean) -> Unit,
     onLinkCommentMoreClick: (
         linkId: Int,
         commentId: Int,
@@ -225,6 +217,13 @@ fun LinkItem(
                                     comment.voteState.positiveVoteButtonState?.isVoted ?: false,
                                 )
                             },
+                            onFavouriteClick = {
+                                onLinkCommentFavouriteClick(
+                                    comment.linkId,
+                                    comment.id,
+                                    comment.isFavourite,
+                                )
+                            },
                             onEmbedPreviewClick = { embed -> onEmbedPreviewClick(embed) },
                             onMoreClick = {
                                 onLinkCommentMoreClick(
@@ -275,6 +274,7 @@ private fun LinkItemPreview(
             onImageClicked = {},
             onEmbedPreviewClick = {},
             onLinkCommentVoteUpClick = { _, _, _ -> },
+            onLinkCommentFavouriteClick = { _, _, _ -> },
             onLinkCommentMoreClick = { _, _, _, _ -> },
         )
     }

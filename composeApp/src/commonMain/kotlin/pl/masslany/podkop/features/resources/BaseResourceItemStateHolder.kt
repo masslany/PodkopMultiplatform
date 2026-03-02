@@ -14,6 +14,8 @@ import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
+import pl.masslany.podkop.business.favourites.domain.main.FavouritesRepository
+import pl.masslany.podkop.business.favourites.domain.models.FavouriteType
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.logging.api.AppLogger
@@ -41,6 +43,7 @@ import pl.masslany.podkop.features.tag.TagScreen
 open class BaseResourceItemStateHolder(
     private val linksRepository: LinksRepository,
     private val entriesRepository: EntriesRepository,
+    private val favouritesRepository: FavouritesRepository,
     private val appNavigator: AppNavigator,
     private val dispatcherProvider: DispatcherProvider,
     private val logger: AppLogger,
@@ -109,6 +112,16 @@ open class BaseResourceItemStateHolder(
                         logger.error("Link update fetch failed for id=$id", it)
                     }
             }
+        }
+    }
+
+    override fun onLinkFavouriteClicked(linkId: Int, favourited: Boolean) {
+        scope?.launch {
+            toggleFavourite(
+                itemId = linkId,
+                type = FavouriteType.Link,
+                favourited = favourited,
+            )
         }
     }
 
@@ -221,6 +234,16 @@ open class BaseResourceItemStateHolder(
         }
     }
 
+    override fun onEntryFavouriteClicked(entryId: Int, favourited: Boolean) {
+        scope?.launch {
+            toggleFavourite(
+                itemId = entryId,
+                type = FavouriteType.Entry,
+                favourited = favourited,
+            )
+        }
+    }
+
     override fun onEntryClicked(id: Int) {
         appNavigator.navigateTo(EntryDetailsScreen.forEntry(id))
     }
@@ -268,6 +291,16 @@ open class BaseResourceItemStateHolder(
                     },
                 )
             }
+        }
+    }
+
+    override fun onEntryCommentFavouriteClicked(entryCommentId: Int, favourited: Boolean) {
+        scope?.launch {
+            toggleFavourite(
+                itemId = entryCommentId,
+                type = FavouriteType.EntryComment,
+                favourited = favourited,
+            )
         }
     }
 
@@ -339,6 +372,37 @@ open class BaseResourceItemStateHolder(
                     },
                 )
             }
+        }
+    }
+
+    override fun onLinkCommentFavouriteClicked(linkId: Int, commentId: Int, favourited: Boolean) {
+        scope?.launch {
+            toggleFavourite(
+                itemId = commentId,
+                type = FavouriteType.LinkComment,
+                favourited = favourited,
+            )
+        }
+    }
+
+    private suspend fun toggleFavourite(
+        itemId: Int,
+        type: FavouriteType,
+        favourited: Boolean,
+    ) {
+        val result = if (favourited) {
+            favouritesRepository.deleteFavourite(type = type, sourceId = itemId)
+        } else {
+            favouritesRepository.createFavourite(type = type, sourceId = itemId)
+        }
+
+        result.onSuccess {
+            updateItemFavourite(
+                itemId = itemId,
+                isFavourite = !favourited,
+            )
+        }.onFailure {
+            logger.error("Failed to toggle favourite for itemId=$itemId type=$type", it)
         }
     }
 
@@ -450,6 +514,21 @@ open class BaseResourceItemStateHolder(
             }
 
             comment.copy(voteState = newVoteState)
+        }
+    }
+
+    private fun updateItemFavourite(
+        itemId: Int,
+        isFavourite: Boolean,
+    ) {
+        updateItem(itemId) { item ->
+            when (item) {
+                is EntryItemState -> item.copy(isFavourite = isFavourite)
+                is EntryCommentItemState -> item.copy(isFavourite = isFavourite)
+                is LinkItemState -> item.copy(isFavourite = isFavourite)
+                is LinkCommentItemState -> item.copy(isFavourite = isFavourite)
+                else -> item
+            }
         }
     }
 

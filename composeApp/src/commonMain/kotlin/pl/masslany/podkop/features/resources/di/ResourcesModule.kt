@@ -9,6 +9,7 @@ val resourcesModule = module {
         BaseResourceItemStateHolder(
             linksRepository = get(),
             entriesRepository = get(),
+            favouritesRepository = get(),
             appNavigator = get(),
             dispatcherProvider = get(),
             logger = get(),

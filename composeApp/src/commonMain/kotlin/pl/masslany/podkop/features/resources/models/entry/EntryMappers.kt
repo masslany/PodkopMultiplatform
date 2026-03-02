@@ -86,6 +86,8 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
             .orEmpty()
             .toImmutableList(),
         voteState = this.toVoteState(),
+        isFavourite = this.favourite,
+        isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
         entryContentState = entryContentState,
         surveyState = this.media?.survey.toSurveyState(),
         embedImageState = embedImageState,
@@ -144,6 +146,8 @@ private fun Comment.toEntryCommentItemState(parentId: Int? = null): EntryComment
         avatarState = avatarState,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
+        isFavourite = this.favourite,
+        isFavouriteEnabled = this.actions.createFavourite || this.actions.deleteFavourite,
         entryContentState = entryContentState,
         embedImageState = embedImageState,
         embedContentState = this.media.embed.toEmbedContentState(),

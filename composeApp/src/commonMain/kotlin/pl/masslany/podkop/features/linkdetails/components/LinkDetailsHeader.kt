@@ -43,6 +43,7 @@ fun LinkDetailsHeader(
     isReplyEnabled: Boolean,
     onLinkClick: () -> Unit,
     onVoteClick: () -> Unit,
+    onFavouriteClick: () -> Unit,
     onAuthorClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onReplyClick: () -> Unit,
@@ -125,7 +126,9 @@ fun LinkDetailsHeader(
         ResourceInlineActionsRow(
             modifier = Modifier.padding(horizontal = 16.dp),
             isReplyEnabled = isReplyEnabled,
-
+            onFavouriteClick = onFavouriteClick,
+            isFavourite = state.isFavourite,
+            isFavouriteEnabled = state.isFavouriteEnabled,
             onReplyClick = onReplyClick,
             onMoreClick = onMoreClick,
         )
@@ -145,6 +148,7 @@ private fun LinkDetailsHeaderPreview(
             isReplyEnabled = true,
             onLinkClick = {},
             onVoteClick = {},
+            onFavouriteClick = {},
             onAuthorClick = {},
             onTagClick = {},
             onReplyClick = {},

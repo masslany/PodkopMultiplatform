@@ -38,6 +38,7 @@ import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraft
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
+import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.models.link.toLinkItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.toLinkCommentItemState
@@ -86,6 +87,8 @@ class LinkDetailsViewModel(
         ?: availableCommentsSortTypes.first()
     private val restoredComposerDraft = restoreComposerDraft()
 
+    private var linkResource: ResourceItem? = null
+
     private val paginator = Paginator(
         scope = viewModelScope,
         onNewItems = { data ->
@@ -116,8 +119,11 @@ class LinkDetailsViewModel(
         resourceItemStateHolder.items,
         paginator.state,
         commentRepliesStateById,
-    ) { state, comments, paginatorState, repliesStateById ->
-        val mappedComments = comments
+    ) { state, items, paginatorState, repliesStateById ->
+        val holderLink = items
+            .filterIsInstance<LinkItemState>()
+            .firstOrNull { it.id == id }
+        val mappedComments = items
             .filterIsInstance<LinkCommentItemState>()
             .map { comment ->
                 val repliesState = repliesStateById[comment.id] ?: CommentRepliesState.empty
@@ -133,6 +139,7 @@ class LinkDetailsViewModel(
             .toImmutableList()
 
         state.copy(
+            link = holderLink ?: state.link,
             commentsState = state.commentsState.resolve(
                 comments = mappedComments,
                 isPaginating = paginatorState is PaginatorState.Loading,
@@ -241,6 +248,24 @@ class LinkDetailsViewModel(
                     replies = itemState.replies.applyVoteById(
                         commentId = commentId,
                         voted = voted,
+                    ),
+                )
+            }
+        }
+    }
+
+    override fun onLinkCommentFavouriteClicked(linkId: Int, commentId: Int, favourited: Boolean) {
+        resourceItemStateHolder.onLinkCommentFavouriteClicked(
+            linkId = linkId,
+            commentId = commentId,
+            favourited = favourited,
+        )
+        commentRepliesStateById.update { previousState ->
+            previousState.mapValues { (_, itemState) ->
+                itemState.copy(
+                    replies = itemState.replies.applyFavouriteById(
+                        commentId = commentId,
+                        favourited = favourited,
                     ),
                 )
             }
@@ -422,6 +447,7 @@ class LinkDetailsViewModel(
 
                 val isLinkLoaded = linkDeferred.await()
                     .onSuccess { link ->
+                        linkResource = link.data
                         updateState { previousState ->
                             previousState.copy(
                                 link = link.data.toLinkItemState(isUpcoming = false),
@@ -541,7 +567,7 @@ class LinkDetailsViewModel(
     }
 
     private suspend fun onCommentsPageOneLoaded(comments: Resources) {
-        resourceItemStateHolder.updateData(comments.data)
+        resourceItemStateHolder.updateData(topLevelLinkAndComments(comments.data))
         replaceCommentsRepliesState(comments.data)
         paginator.setup(
             pagination = comments.pagination,
@@ -555,7 +581,7 @@ class LinkDetailsViewModel(
     }
 
     private suspend fun onCommentsPageOneLoadFailed() {
-        resourceItemStateHolder.updateData(emptyList())
+        resourceItemStateHolder.updateData(topLevelLinkAndComments(emptyList()))
         commentRepliesStateById.value = emptyMap()
         updateState { previousState ->
             previousState.copy(
@@ -604,6 +630,20 @@ class LinkDetailsViewModel(
         val newState = buildInitialCommentRepliesState(items)
         commentRepliesStateById.update { previousState ->
             previousState + newState.filterKeys { key -> !previousState.containsKey(key) }
+        }
+    }
+
+    private fun topLevelLinkAndComments(
+        comments: List<ResourceItem>,
+    ): List<ResourceItem> {
+        val topLevel = linkResource
+        return if (topLevel == null) {
+            comments
+        } else {
+            buildList(comments.size + 1) {
+                add(topLevel)
+                addAll(comments)
+            }
         }
     }
 
@@ -953,6 +993,10 @@ private fun LinkCommentItemState.applyVoteUp(voted: Boolean): LinkCommentItemSta
     },
 )
 
+private fun LinkCommentItemState.applyFavourite(favourited: Boolean): LinkCommentItemState = copy(
+    isFavourite = !favourited,
+)
+
 private fun ImmutableList<LinkCommentItemState>.applyVoteById(
     commentId: Int,
     voted: Boolean,
@@ -971,6 +1015,34 @@ private fun LinkCommentItemState.applyVoteById(commentId: Int, voted: Boolean): 
         replies = updated.replies.applyVoteById(
             commentId = commentId,
             voted = voted,
+        ),
+    )
+}
+
+private fun ImmutableList<LinkCommentItemState>.applyFavouriteById(
+    commentId: Int,
+    favourited: Boolean,
+): ImmutableList<LinkCommentItemState> = this.map { comment ->
+    comment.applyFavouriteById(
+        commentId = commentId,
+        favourited = favourited,
+    )
+}.toImmutableList()
+
+private fun LinkCommentItemState.applyFavouriteById(
+    commentId: Int,
+    favourited: Boolean,
+): LinkCommentItemState {
+    val updated = if (this.id == commentId) {
+        this.applyFavourite(favourited)
+    } else {
+        this
+    }
+
+    return updated.copy(
+        replies = updated.replies.applyFavouriteById(
+            commentId = commentId,
+            favourited = favourited,
         ),
     )
 }

@@ -27,5 +27,7 @@ data class LinkItemState(
     val imageUrl: String,
     val tags: ImmutableList<TagItem>,
     val comments: ImmutableList<LinkCommentItemState>,
+    val isFavourite: Boolean = false,
+    val isFavouriteEnabled: Boolean = false,
     val embedContentState: EmbedContentState? = null,
 ) : ResourceItemState

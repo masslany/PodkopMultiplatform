@@ -19,14 +19,17 @@ object NoOpPaginationActions : PaginationActions {
 object NoOpResourceItemActions : ResourceItemActions {
     override fun onEntryClicked(id: Int) = Unit
     override fun onEntryVoteUpClicked(entryId: Int, voted: Boolean) = Unit
+    override fun onEntryFavouriteClicked(entryId: Int, favourited: Boolean) = Unit
     override fun onEntryReplyClicked(entryId: Int, author: String?) = Unit
     override fun onEntryMoreClicked(entryId: Int) = Unit
     override fun onLinkClicked(id: Int) = Unit
     override fun onLinkUrlClicked(url: String) = Unit
     override fun onLinkVoteClicked(id: Int, voted: Boolean) = Unit
+    override fun onLinkFavouriteClicked(linkId: Int, favourited: Boolean) = Unit
     override fun onLinkReplyClicked(linkId: Int, author: String?) = Unit
     override fun onLinkMoreClicked(linkId: Int, linkSlug: String) = Unit
     override fun onLinkCommentVoteUpClick(linkId: Int, commentId: Int, voted: Boolean) = Unit
+    override fun onLinkCommentFavouriteClicked(linkId: Int, commentId: Int, favourited: Boolean) = Unit
     override fun onLinkCommentReplyClicked(linkId: Int, commentId: Int, author: String?) = Unit
     override fun onLinkCommentMoreClicked(
         linkId: Int,
@@ -35,6 +38,7 @@ object NoOpResourceItemActions : ResourceItemActions {
         parentCommentId: Int?,
     ) = Unit
     override fun onEntryCommentVoteUpClick(entryCommentId: Int, parentEntryId: Int, voted: Boolean) = Unit
+    override fun onEntryCommentFavouriteClicked(entryCommentId: Int, favourited: Boolean) = Unit
     override fun onEntryCommentReplyClicked(entryId: Int, entryCommentId: Int, author: String?) = Unit
     override fun onEntryCommentMoreClicked(entryId: Int, entryCommentId: Int) = Unit
     override fun onProfileClicked(username: String) = Unit

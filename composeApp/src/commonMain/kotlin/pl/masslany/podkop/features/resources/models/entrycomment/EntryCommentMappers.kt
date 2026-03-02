@@ -79,6 +79,8 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
         avatarState = avatarState,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
+        isFavourite = this.favourite,
+        isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
         entryContentState = entryContentState,
         embedImageState = embedImageState,
         embedContentState = this.media?.embed.toEmbedContentState(),
