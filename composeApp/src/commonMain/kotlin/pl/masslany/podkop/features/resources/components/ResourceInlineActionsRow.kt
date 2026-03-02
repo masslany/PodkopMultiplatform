@@ -126,7 +126,7 @@ internal fun ResourceInlineActionsRow(
 @Composable
 private fun ResourceInlineActionsRowPreviewEnabled() {
     PodkopPreview(darkTheme = false) {
-        Column{
+        Column {
             ResourceInlineActionsRow(
                 onMoreClick = {},
                 onReplyClick = {},

@@ -34,6 +34,7 @@ import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.theme.PodkopTheme
+import pl.masslany.podkop.common.theme.SystemAppearance
 import pl.masslany.podkop.features.debug.DebugScreen
 import pl.masslany.podkop.features.debug.DebugScreenRoot
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
@@ -72,6 +73,8 @@ fun App() {
         ThemeOverride.LIGHT -> false
         ThemeOverride.DARK -> true
     }
+
+    SystemAppearance(isDark = darkTheme)
 
     PodkopTheme(
         darkTheme = darkTheme,
