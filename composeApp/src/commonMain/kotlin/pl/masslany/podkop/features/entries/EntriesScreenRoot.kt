@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -30,6 +32,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -41,6 +44,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -58,10 +62,15 @@ import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.entries.preview.EntriesScreenStateProvider
 import pl.masslany.podkop.features.entries.preview.NoOpEntriesActions
+import pl.masslany.podkop.features.resources.components.ReplyComposer
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
+import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
+import podkop.composeapp.generated.resources.accessibility_topbar_add
 import podkop.composeapp.generated.resources.accessibility_topbar_profile
+import podkop.composeapp.generated.resources.entries_composer_hint
+import podkop.composeapp.generated.resources.ic_add
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_person
 import podkop.composeapp.generated.resources.topbar_label_entries
@@ -73,10 +82,27 @@ private const val FAB_ITEMS_OFFSET = 10
 internal fun EntriesScreenRoot(
     paddingValues: PaddingValues,
     onEntryClicked: ((Int) -> Unit)? = null,
+    onEntryReplyClicked: ((entryId: Int, author: String?) -> Unit)? = null,
+    onEntryCommentReplyClicked: ((entryId: Int, entryCommentId: Int, author: String?) -> Unit)? = null,
 ) {
     val viewModel = koinViewModel<EntriesViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val actions = remember(viewModel, onEntryClicked) {
+    LaunchedEffect(viewModel, onEntryClicked) {
+        viewModel.entryCreatedNavigation.collect { entryId ->
+            val navigationOverride = onEntryClicked
+            if (navigationOverride != null) {
+                navigationOverride(entryId)
+            } else {
+                viewModel.onEntryClicked(entryId)
+            }
+        }
+    }
+    val actions = remember(
+        viewModel,
+        onEntryClicked,
+        onEntryReplyClicked,
+        onEntryCommentReplyClicked,
+    ) {
         object : EntriesActions by viewModel {
             override fun onEntryClicked(id: Int) {
                 val navigationOverride = onEntryClicked
@@ -84,6 +110,24 @@ internal fun EntriesScreenRoot(
                     navigationOverride(id)
                 } else {
                     viewModel.onEntryClicked(id)
+                }
+            }
+
+            override fun onEntryReplyClicked(entryId: Int, author: String?) {
+                val navigationOverride = onEntryReplyClicked
+                if (navigationOverride != null) {
+                    navigationOverride(entryId, author)
+                } else {
+                    viewModel.onEntryReplyClicked(entryId, author)
+                }
+            }
+
+            override fun onEntryCommentReplyClicked(entryId: Int, entryCommentId: Int, author: String?) {
+                val navigationOverride = onEntryCommentReplyClicked
+                if (navigationOverride != null) {
+                    navigationOverride(entryId, entryCommentId, author)
+                } else {
+                    viewModel.onEntryCommentReplyClicked(entryId, entryCommentId, author)
                 }
             }
         }
@@ -134,6 +178,7 @@ fun EntriesScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val composerBottomPadding = if (state.isComposerVisible) 232.dp else 0.dp
 
     Box(
         modifier = modifier
@@ -151,6 +196,15 @@ fun EntriesScreenContent(
             TopAppBar(
                 title = { Text(text = stringResource(resource = Res.string.topbar_label_entries)) },
                 actions = {
+                    IconButton(onClick = actions::onTopBarAddEntryClicked) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = vectorResource(resource = Res.drawable.ic_add),
+                            contentDescription = stringResource(
+                                resource = Res.string.accessibility_topbar_add,
+                            ),
+                        )
+                    }
                     IconButton(onClick = actions::onTopBarProfileClicked) {
                         Icon(
                             modifier = Modifier.size(24.dp),
@@ -192,6 +246,7 @@ fun EntriesScreenContent(
                         state = state,
                         actions = actions,
                         lazyListState = lazyListState,
+                        composerBottomPadding = composerBottomPadding,
                     )
                 }
             }
@@ -204,7 +259,7 @@ fun EntriesScreenContent(
                     end = 16.dp,
                     bottom = 16.dp + bottomPadding,
                 ),
-            visible = showFab,
+            visible = showFab && !state.isComposerVisible,
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
@@ -227,6 +282,20 @@ fun EntriesScreenContent(
             }
         }
 
+        ReplyComposer(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            isVisible = state.isComposerVisible,
+            content = state.composerContent,
+            isAdult = state.composerAdult,
+            hintText = stringResource(resource = Res.string.entries_composer_hint),
+            replyTarget = null,
+            isSubmitting = state.isComposerSubmitting,
+            onContentChanged = actions::onComposerTextChanged,
+            onAdultChanged = actions::onComposerAdultChanged,
+            onDismiss = actions::onComposerDismissed,
+            onSubmit = actions::onComposerSubmit,
+        )
+
         Box(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -243,11 +312,20 @@ private fun EntriesScreenList(
     state: EntriesScreenState,
     actions: EntriesActions,
     lazyListState: LazyListState,
+    composerBottomPadding: Dp,
 ) {
+    val systemBottomPadding = WindowInsets
+        .systemBars
+        .asPaddingValues()
+        .calculateBottomPadding()
+
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
+        contentPadding = PaddingValues(
+            bottom = systemBottomPadding + composerBottomPadding,
+        ),
     ) {
         item(
             key = "DropdownMenuRow",
@@ -294,6 +372,10 @@ private fun EntriesScreenList(
                     .padding(horizontal = 16.dp),
                 state = it,
                 actions = actions,
+                config = ResourceItemConfig(
+                    showReplyAction = true,
+                    isReplyActionEnabled = state.isLoggedIn,
+                ),
             )
         }
 

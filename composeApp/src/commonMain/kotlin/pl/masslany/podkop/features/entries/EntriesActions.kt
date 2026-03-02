@@ -1,6 +1,7 @@
 package pl.masslany.podkop.features.entries
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.text.input.TextFieldValue
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.pagination.PaginationActions
 import pl.masslany.podkop.features.resources.ResourceItemActions
@@ -25,4 +26,12 @@ interface EntriesActions :
     fun onHotSortDismissed()
 
     fun onRefresh(sortType: DropdownMenuItemType)
+
+    fun onComposerTextChanged(content: TextFieldValue)
+
+    fun onComposerAdultChanged(adult: Boolean)
+
+    fun onComposerDismissed()
+
+    fun onComposerSubmit()
 }

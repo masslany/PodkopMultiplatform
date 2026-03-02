@@ -65,6 +65,7 @@ fun ReplyComposer(
     // TODO: Consider TextFieldState & removing Compose class from the state
     content: TextFieldValue,
     isAdult: Boolean,
+    hintText: String,
     replyTarget: String?,
     isSubmitting: Boolean,
     onContentChanged: (TextFieldValue) -> Unit,
@@ -227,7 +228,7 @@ fun ReplyComposer(
                     enabled = !isSubmitting,
                     minLines = 3,
                     placeholder = {
-                        Text(text = stringResource(resource = Res.string.entry_details_reply_composer_hint))
+                        Text(text = hintText)
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
                 )
@@ -346,6 +347,7 @@ private fun ReplyComposerPreview() {
             isVisible = true,
             content = TextFieldValue("test"),
             isAdult = false,
+            hintText = stringResource(resource = Res.string.entry_details_reply_composer_hint),
             replyTarget = null,
             isSubmitting = false,
             onContentChanged = {},

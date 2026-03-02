@@ -48,6 +48,11 @@ interface EntriesRepository {
         adult: Boolean,
     ): Result<ResourceItem>
 
+    suspend fun createEntry(
+        content: String,
+        adult: Boolean,
+    ): Result<ResourceItem>
+
     suspend fun voteUp(entryId: Int): Result<Unit>
 
     suspend fun removeVoteUp(entryId: Int): Result<Unit>

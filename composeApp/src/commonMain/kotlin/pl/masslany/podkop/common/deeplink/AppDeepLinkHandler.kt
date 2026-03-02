@@ -54,7 +54,7 @@ class AppDeepLinkHandler internal constructor(
             }
 
             is AppDeepLink.EntryDetails -> {
-                navigateWhenReady(EntryDetailsScreen(id = deepLink.id))
+                navigateWhenReady(EntryDetailsScreen.forEntry(id = deepLink.id))
             }
         }
     }

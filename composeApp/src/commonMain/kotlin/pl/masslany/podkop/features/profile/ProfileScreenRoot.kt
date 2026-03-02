@@ -71,6 +71,7 @@ import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
 import pl.masslany.podkop.features.profile.preview.NoOpProfileActions
 import pl.masslany.podkop.features.profile.preview.ProfileScreenStateProvider
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
+import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
@@ -345,6 +346,7 @@ private fun ProfileLoadedContent(
         renderListContent(
             listContent = state.listContent,
             actions = actions,
+            isLoggedIn = state.isLoggedIn,
         )
 
         if (state.isPaginating) {
@@ -360,6 +362,7 @@ private fun ProfileLoadedContent(
 private fun LazyListScope.renderListContent(
     listContent: ProfileListContentState,
     actions: ProfileActions,
+    isLoggedIn: Boolean,
 ) {
     when (listContent) {
         ProfileListContentState.Empty -> Unit
@@ -368,6 +371,7 @@ private fun LazyListScope.renderListContent(
             renderResources(
                 resources = listContent.items,
                 actions = actions,
+                isLoggedIn = isLoggedIn,
             )
         }
 
@@ -390,6 +394,7 @@ private fun LazyListScope.renderListContent(
 private fun LazyListScope.renderResources(
     resources: ImmutableList<ResourceItemState>,
     actions: ProfileActions,
+    isLoggedIn: Boolean,
 ) {
     if (resources.isEmpty()) return
 
@@ -403,6 +408,10 @@ private fun LazyListScope.renderResources(
                     .padding(horizontal = 16.dp),
                 state = resource,
                 actions = actions,
+                config = ResourceItemConfig(
+                    showReplyAction = true,
+                    isReplyActionEnabled = isLoggedIn,
+                ),
             )
         }
     }

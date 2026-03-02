@@ -57,7 +57,11 @@ class HomeNavigator(private val configProvider: NavigationConfigProvider) : Auto
     }
 
     fun navigateToEntryDetails(id: Int) {
-        navigateToCurrentTab(EntryDetailsScreen(id))
+        navigateToEntryDetails(EntryDetailsScreen.forEntry(id))
+    }
+
+    fun navigateToEntryDetails(screen: EntryDetailsScreen) {
+        navigateToCurrentTab(screen)
     }
 
     fun clearInlineDetailsDestinations() {

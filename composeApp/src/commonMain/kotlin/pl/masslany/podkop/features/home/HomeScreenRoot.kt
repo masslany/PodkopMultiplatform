@@ -107,6 +107,8 @@ internal fun HomeScreenRoot(
         onInlineDetailsModeChanged = viewModel::onInlineDetailsModeChanged,
         onLinkClicked = viewModel::onLinkClicked,
         onEntryClicked = viewModel::onEntryClicked,
+        onEntryReplyClicked = viewModel::onEntryReplyClicked,
+        onEntryCommentReplyClicked = viewModel::onEntryCommentReplyClicked,
     )
 }
 
@@ -120,6 +122,8 @@ fun HomeScreenContent(
     onInlineDetailsModeChanged: (Boolean) -> Unit,
     onLinkClicked: (id: Int, useInlineDetails: Boolean) -> Unit,
     onEntryClicked: (id: Int, useInlineDetails: Boolean) -> Unit,
+    onEntryReplyClicked: (entryId: Int, author: String?, useInlineDetails: Boolean) -> Unit,
+    onEntryCommentReplyClicked: (entryId: Int, entryCommentId: Int, author: String?, useInlineDetails: Boolean) -> Unit,
     navContent: @Composable (
         backStack: ImmutableList<NavTarget>,
         contentPadding: PaddingValues,
@@ -127,7 +131,18 @@ fun HomeScreenContent(
         onBack: () -> Unit,
         onLinkClicked: (Int) -> Unit,
         onEntryClicked: (Int) -> Unit,
-    ) -> Unit = { backStack, contentPadding, inlineSceneEnabled, navOnBack, navOnLinkClicked, navOnEntryClicked ->
+        onEntryReplyClicked: (entryId: Int, author: String?) -> Unit,
+        onEntryCommentReplyClicked: (entryId: Int, entryCommentId: Int, author: String?) -> Unit,
+    ) -> Unit = {
+            backStack,
+            contentPadding,
+            inlineSceneEnabled,
+            navOnBack,
+            navOnLinkClicked,
+            navOnEntryClicked,
+            navOnEntryReplyClicked,
+            navOnEntryCommentReplyClicked,
+        ->
         HomeNavDisplay(
             backStack = backStack,
             contentPadding = contentPadding,
@@ -135,6 +150,8 @@ fun HomeScreenContent(
             onBack = navOnBack,
             onLinkClicked = navOnLinkClicked,
             onEntryClicked = navOnEntryClicked,
+            onEntryReplyClicked = navOnEntryReplyClicked,
+            onEntryCommentReplyClicked = navOnEntryCommentReplyClicked,
         )
     },
 ) {
@@ -201,6 +218,17 @@ fun HomeScreenContent(
                             { id ->
                                 onEntryClicked(id, useInlineDetailsState.value)
                             },
+                            { entryId, author ->
+                                onEntryReplyClicked(entryId, author, useInlineDetailsState.value)
+                            },
+                            { entryId, entryCommentId, author ->
+                                onEntryCommentReplyClicked(
+                                    entryId,
+                                    entryCommentId,
+                                    author,
+                                    useInlineDetailsState.value,
+                                )
+                            },
                         )
                     }
                 }
@@ -243,6 +271,8 @@ private fun HomeNavDisplay(
     onBack: () -> Unit,
     onLinkClicked: (Int) -> Unit,
     onEntryClicked: (Int) -> Unit,
+    onEntryReplyClicked: (entryId: Int, author: String?) -> Unit,
+    onEntryCommentReplyClicked: (entryId: Int, entryCommentId: Int, author: String?) -> Unit,
 ) {
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavTarget>() }
     val dialogSceneStrategy = remember { DialogSceneStrategy<NavTarget>() }
@@ -290,6 +320,8 @@ private fun HomeNavDisplay(
             EntriesScreenRoot(
                 paddingValues = contentPadding,
                 onEntryClicked = onEntryClicked,
+                onEntryReplyClicked = onEntryReplyClicked,
+                onEntryCommentReplyClicked = onEntryCommentReplyClicked,
             )
         }
 
@@ -305,13 +337,9 @@ private fun HomeNavDisplay(
             )
         }
 
-        entry<EntryDetailsScreen>(
-            clazzContentKey = { screen ->
-                "$HOME_KEY_ENTRY_DETAILS_PREFIX${screen.id}"
-            },
-        ) {
+        entry<EntryDetailsScreen> {
             EntryDetailsScreenRoot(
-                id = it.id,
+                screen = it,
                 paddingValues = contentPadding,
                 showTopBar = !inlineSceneEnabled,
             )
@@ -433,7 +461,9 @@ private fun HomeScreenContentPreviewLinksTab() {
             onInlineDetailsModeChanged = {},
             onLinkClicked = { _, _ -> },
             onEntryClicked = { _, _ -> },
-            navContent = { _, contentPadding, _, _, _, _ ->
+            onEntryReplyClicked = { _, _, _ -> },
+            onEntryCommentReplyClicked = { _, _, _, _ -> },
+            navContent = { _, contentPadding, _, _, _, _, _, _ ->
                 LinksScreenContent(
                     paddingValues = contentPadding,
                     state = linksState,
@@ -491,7 +521,9 @@ private fun HomeScreenContentPreviewEntriesTab() {
             onInlineDetailsModeChanged = {},
             onLinkClicked = { _, _ -> },
             onEntryClicked = { _, _ -> },
-            navContent = { _, contentPadding, _, _, _, _ ->
+            onEntryReplyClicked = { _, _, _ -> },
+            onEntryCommentReplyClicked = { _, _, _, _ -> },
+            navContent = { _, contentPadding, _, _, _, _, _, _ ->
                 EntriesScreenContent(
                     paddingValues = contentPadding,
                     state = entriesState,

@@ -26,6 +26,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             isLoading = false,
             isResourcesLoading = false,
             isPaginating = false,
+            isLoggedIn = false,
             content = ProfileContentState.LoggedOut,
             listContent = ProfileListContentState.Empty,
         ),
@@ -33,6 +34,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             isLoading = false,
             isResourcesLoading = false,
             isPaginating = true,
+            isLoggedIn = true,
             content = ProfileContentState.Loaded(
                 isCurrentUser = false,
                 header = ProfileHeaderState(
@@ -68,6 +70,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             isLoading = false,
             isResourcesLoading = false,
             isPaginating = false,
+            isLoggedIn = true,
             content = ProfileContentState.Loaded(
                 isCurrentUser = true,
                 header = ProfileHeaderState(
@@ -118,6 +121,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             isLoading = false,
             isResourcesLoading = false,
             isPaginating = false,
+            isLoggedIn = true,
             content = ProfileContentState.Loaded(
                 isCurrentUser = true,
                 header = ProfileHeaderState(

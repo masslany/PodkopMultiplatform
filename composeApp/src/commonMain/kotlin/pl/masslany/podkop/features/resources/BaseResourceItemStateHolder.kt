@@ -222,10 +222,21 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onEntryClicked(id: Int) {
-        appNavigator.navigateTo(EntryDetailsScreen(id))
+        logger.debug("[ReplyTrace] BaseResourceItemStateHolder.onEntryClicked entryId=$id")
+        appNavigator.navigateTo(EntryDetailsScreen.forEntry(id))
     }
 
-    override fun onEntryReplyClicked(entryId: Int, author: String?) = Unit
+    override fun onEntryReplyClicked(entryId: Int, author: String?) {
+        logger.debug(
+            "[ReplyTrace] BaseResourceItemStateHolder.onEntryReplyClicked entryId=$entryId author=${author.orEmpty()}",
+        )
+        appNavigator.navigateTo(
+            EntryDetailsScreen.forEntryReply(
+                entryId = entryId,
+                author = author,
+            ),
+        )
+    }
 
     override fun onEntryMoreClicked(entryId: Int) {
         val draftId = createEntryScreenshotDraftId(entryId)
@@ -264,7 +275,19 @@ open class BaseResourceItemStateHolder(
         }
     }
 
-    override fun onEntryCommentReplyClicked(entryId: Int, entryCommentId: Int, author: String?) = Unit
+    override fun onEntryCommentReplyClicked(entryId: Int, entryCommentId: Int, author: String?) {
+        logger.debug(
+            "[ReplyTrace] BaseResourceItemStateHolder.onEntryCommentReplyClicked entryId=$entryId " +
+                "entryCommentId=$entryCommentId author=${author.orEmpty()}",
+        )
+        appNavigator.navigateTo(
+            EntryDetailsScreen.forEntryCommentReply(
+                entryId = entryId,
+                entryCommentId = entryCommentId,
+                author = author,
+            ),
+        )
+    }
 
     override fun onEntryCommentMoreClicked(entryId: Int, entryCommentId: Int) {
         val draftId = createEntryCommentScreenshotDraftId(

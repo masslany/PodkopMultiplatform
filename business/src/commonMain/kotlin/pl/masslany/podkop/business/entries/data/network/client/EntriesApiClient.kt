@@ -5,6 +5,8 @@ import pl.masslany.podkop.business.common.data.network.models.common.SingleResou
 import pl.masslany.podkop.business.entries.data.network.api.EntriesApi
 import pl.masslany.podkop.business.entries.data.network.models.EntryCommentCreateDataDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryCommentCreateRequestDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryCreateDataDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryCreateRequestDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
@@ -133,6 +135,29 @@ class EntriesApiClient(
             Request<SingleResourceResponseDto>(
                 method = Request.HttpMethod.POST,
                 path = "api/v3/entries/$entryId/comments",
+                body = body,
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun createEntry(
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto> {
+        val body = EntryCreateRequestDto(
+            data = EntryCreateDataDto(
+                content = content,
+                adult = adult,
+            ),
+        )
+        val request =
+            Request<SingleResourceResponseDto>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/entries",
                 body = body,
             )
 

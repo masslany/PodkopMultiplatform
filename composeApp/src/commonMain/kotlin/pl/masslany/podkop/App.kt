@@ -110,7 +110,7 @@ fun App() {
 
                     entry<EntryDetailsScreen> {
                         EntryDetailsScreenRoot(
-                            id = it.id,
+                            screen = it,
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )
                     }

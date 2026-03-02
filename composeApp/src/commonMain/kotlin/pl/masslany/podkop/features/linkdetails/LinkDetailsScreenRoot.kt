@@ -83,6 +83,7 @@ import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.accessibility_topbar_profile
 import podkop.composeapp.generated.resources.comment_button_load_all_comments
+import podkop.composeapp.generated.resources.entry_details_reply_composer_hint
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_person
@@ -279,6 +280,7 @@ fun LinkDetailsScreenContent(
                 isVisible = state.isComposerVisible,
                 content = state.composerContent,
                 isAdult = state.composerAdult,
+                hintText = stringResource(resource = Res.string.entry_details_reply_composer_hint),
                 replyTarget = state.composerReplyTarget,
                 isSubmitting = state.isComposerSubmitting,
                 onContentChanged = actions::onComposerTextChanged,

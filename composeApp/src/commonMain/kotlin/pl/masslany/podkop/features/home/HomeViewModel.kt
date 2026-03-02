@@ -6,6 +6,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.HomeScreen
 import pl.masslany.podkop.common.navigation.NavTarget
@@ -13,7 +14,11 @@ import pl.masslany.podkop.features.bottombar.BottomBarDestinationState
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 
-class HomeViewModel(private val appNavigator: AppNavigator, private val homeNavigator: HomeNavigator) : ViewModel() {
+class HomeViewModel(
+    private val appNavigator: AppNavigator,
+    private val homeNavigator: HomeNavigator,
+    private val logger: AppLogger,
+) : ViewModel() {
 
     val state = homeNavigator.state
         .map { navigatorState ->
@@ -50,10 +55,56 @@ class HomeViewModel(private val appNavigator: AppNavigator, private val homeNavi
     }
 
     fun onEntryClicked(id: Int, useInlineDetails: Boolean) {
+        logger.debug("[ReplyTrace] HomeViewModel.onEntryClicked entryId=$id inline=$useInlineDetails")
+        onEntryDetailsRequested(
+            screen = EntryDetailsScreen.forEntry(id),
+            useInlineDetails = useInlineDetails,
+        )
+    }
+
+    fun onEntryReplyClicked(entryId: Int, author: String?, useInlineDetails: Boolean) {
+        logger.debug(
+            "[ReplyTrace] HomeViewModel.onEntryReplyClicked entryId=$entryId author=${author.orEmpty()} " +
+                "inline=$useInlineDetails",
+        )
+        onEntryDetailsRequested(
+            screen = EntryDetailsScreen.forEntryReply(
+                entryId = entryId,
+                author = author,
+            ),
+            useInlineDetails = useInlineDetails,
+        )
+    }
+
+    fun onEntryCommentReplyClicked(
+        entryId: Int,
+        entryCommentId: Int,
+        author: String?,
+        useInlineDetails: Boolean,
+    ) {
+        logger.debug(
+            "[ReplyTrace] HomeViewModel.onEntryCommentReplyClicked entryId=$entryId " +
+                "entryCommentId=$entryCommentId author=${author.orEmpty()} inline=$useInlineDetails",
+        )
+        onEntryDetailsRequested(
+            screen = EntryDetailsScreen.forEntryCommentReply(
+                entryId = entryId,
+                entryCommentId = entryCommentId,
+                author = author,
+            ),
+            useInlineDetails = useInlineDetails,
+        )
+    }
+
+    fun onEntryDetailsRequested(screen: EntryDetailsScreen, useInlineDetails: Boolean) {
+        logger.debug(
+            "[ReplyTrace] HomeViewModel.onEntryDetailsRequested entryId=${screen.id} " +
+                "intent=${screen.pendingComposerIntent}",
+        )
         if (useInlineDetails) {
-            homeNavigator.navigateToEntryDetails(id)
+            homeNavigator.navigateToEntryDetails(screen)
         } else {
-            appNavigator.navigateTo(EntryDetailsScreen(id))
+            appNavigator.navigateTo(screen)
         }
     }
 

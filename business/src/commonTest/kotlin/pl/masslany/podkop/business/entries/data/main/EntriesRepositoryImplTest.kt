@@ -303,6 +303,62 @@ class EntriesRepositoryImplTest {
     }
 
     @Test
+    fun `create entry forwards payload and maps single resource item`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            createEntryResult = Result.success(
+                Fixtures.singleResourceResponseDto(
+                    data = Fixtures.resourceItemDto(
+                        id = 222,
+                        resource = "entry",
+                        voted = 0,
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.createEntry(
+            content = "new entry content",
+            adult = true,
+        )
+
+        assertEquals(
+            listOf(
+                FakeEntriesDataSource.CreateEntryCall(
+                    content = "new entry content",
+                    adult = true,
+                ),
+            ),
+            entriesDataSource.createEntryCalls,
+        )
+        assertEquals(
+            Fixtures.resourceItem(
+                id = 222,
+                resource = Resource.Entry,
+                voted = Voted.None,
+            ),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `create entry propagates failure`() = runBlocking {
+        val expected = IllegalStateException("entry creation failed")
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            createEntryResult = Result.failure(expected)
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.createEntry(
+            content = "foo",
+            adult = false,
+        )
+
+        assertTrue(actual.isFailure)
+        assertSame(expected, actual.exceptionOrNull())
+    }
+
+    @Test
     fun `vote up delegates to data source`() = runBlocking {
         val entriesDataSource = FakeEntriesDataSource().apply {
             voteUpResult = Result.success(Unit)

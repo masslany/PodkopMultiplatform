@@ -1,12 +1,14 @@
 package pl.masslany.podkop.features.entries
 
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -28,6 +30,8 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class EntriesViewModel(
@@ -72,6 +76,11 @@ class EntriesViewModel(
     private val _state = MutableStateFlow(
         EntriesScreenState.initial.copy(screenInstanceId = screenInstanceId),
     )
+
+    // TODO: Think of better UI events system
+    private val _entryCreatedNavigation = MutableSharedFlow<Int>(extraBufferCapacity = 1)
+    val entryCreatedNavigation: SharedFlow<Int> = _entryCreatedNavigation.asSharedFlow()
+
     val state = combine(
         _state,
         resourceItemStateHolder.items,
@@ -114,6 +123,11 @@ class EntriesViewModel(
         }
 
         viewModelScope.launch {
+            _state.update { previousState ->
+                previousState.copy(
+                    isLoggedIn = authRepository.isLoggedIn(),
+                )
+            }
             entriesRepository.getEntries(
                 page = resolveFirstPageParam(),
                 limit = null,
@@ -290,6 +304,91 @@ class EntriesViewModel(
                     }
                     snackbarManager.tryEmitGenericError()
                 }
+        }
+    }
+
+    override fun onTopBarAddEntryClicked() {
+        viewModelScope.launch {
+            if (!authRepository.isLoggedIn()) {
+                return@launch
+            }
+            _state.update { previousState ->
+                previousState.copy(
+                    isComposerVisible = true,
+                    composerContent = TextFieldValue(),
+                    composerAdult = false,
+                    isComposerSubmitting = false,
+                )
+            }
+        }
+    }
+
+    override fun onComposerTextChanged(content: TextFieldValue) {
+        _state.update { previousState ->
+            previousState.copy(composerContent = content)
+        }
+    }
+
+    override fun onComposerAdultChanged(adult: Boolean) {
+        _state.update { previousState ->
+            previousState.copy(composerAdult = adult)
+        }
+    }
+
+    override fun onComposerDismissed() {
+        _state.update { previousState ->
+            previousState.copy(
+                isComposerVisible = false,
+                composerContent = TextFieldValue(),
+                composerAdult = false,
+                isComposerSubmitting = false,
+            )
+        }
+    }
+
+    override fun onComposerSubmit() {
+        val currentState = state.value
+        if (!currentState.isComposerVisible || currentState.isComposerSubmitting) {
+            return
+        }
+
+        val content = currentState.composerContent.text.trim()
+        if (content.isBlank()) {
+            return
+        }
+
+        _state.update { previousState ->
+            previousState.copy(isComposerSubmitting = true)
+        }
+
+        viewModelScope.launch {
+            if (!authRepository.isLoggedIn()) {
+                _state.update { previousState ->
+                    previousState.copy(isComposerSubmitting = false)
+                }
+                return@launch
+            }
+
+            entriesRepository.createEntry(
+                content = content,
+                adult = currentState.composerAdult,
+            ).onSuccess { createdEntry ->
+                _state.update { previousState ->
+                    previousState.copy(
+                        isComposerVisible = false,
+                        composerContent = TextFieldValue(),
+                        composerAdult = false,
+                        isComposerSubmitting = false,
+                    )
+                }
+                _entryCreatedNavigation.tryEmit(createdEntry.id)
+            }.onFailure {
+                logger.error("Failed to create entry from entries composer", it)
+                _state.update { previousState ->
+                    previousState.copy(isComposerSubmitting = false)
+                }
+                snackbarManager.tryEmitGenericError()
+            }
         }
     }
 

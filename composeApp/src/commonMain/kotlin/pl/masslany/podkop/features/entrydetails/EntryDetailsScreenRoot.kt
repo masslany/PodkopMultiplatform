@@ -5,7 +5,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -80,6 +79,7 @@ import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.accessibility_topbar_profile
+import podkop.composeapp.generated.resources.entry_details_reply_composer_hint
 import podkop.composeapp.generated.resources.entry_details_screen_error_loading_comments
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
@@ -91,12 +91,12 @@ private const val FAB_ITEMS_OFFSET = 10
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun EntryDetailsScreenRoot(
-    id: Int,
+    screen: EntryDetailsScreen,
     paddingValues: PaddingValues,
     showTopBar: Boolean = true,
 ) {
     val viewModel = koinViewModel<EntryDetailsViewModel>(
-        parameters = { parametersOf(id) },
+        parameters = { parametersOf(screen) },
     )
     val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -159,7 +159,13 @@ fun EntryDetailsScreenContent(
         topBar = {
             if (showTopBar) {
                 TopAppBar(
-                    title = { Text(text = stringResource(resource = Res.string.topbar_label_entry)) },
+                    title = {
+                        Text(
+                            text = stringResource(
+                                resource = Res.string.topbar_label_entry,
+                            ),
+                        )
+                    },
                     actions = {
                         IconButton(onClick = actions::onTopBarProfileClicked) {
                             Icon(
@@ -259,6 +265,7 @@ fun EntryDetailsScreenContent(
                 isVisible = state.isComposerVisible,
                 content = state.composerContent,
                 isAdult = state.composerAdult,
+                hintText = stringResource(resource = Res.string.entry_details_reply_composer_hint),
                 replyTarget = state.composerReplyTarget,
                 isSubmitting = state.isComposerSubmitting,
                 onContentChanged = actions::onComposerTextChanged,

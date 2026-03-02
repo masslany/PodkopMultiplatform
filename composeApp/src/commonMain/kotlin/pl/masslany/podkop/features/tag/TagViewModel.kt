@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.tags.domain.main.TagsRepository
 import pl.masslany.podkop.business.tags.domain.models.request.TagsSort
 import pl.masslany.podkop.business.tags.domain.models.request.TagsType
@@ -28,6 +29,7 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 @OptIn(ExperimentalUuidApi::class)
 class TagViewModel(
     private val tag: String,
+    private val authRepository: AuthRepository,
     private val tagsRepository: TagsRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
@@ -86,28 +88,30 @@ class TagViewModel(
     init {
         resourceItemStateHolder.init(viewModelScope)
 
-        _state.update { previousState ->
-            previousState.copy(
-                tag = tag,
-                sortMenuState = DropdownMenuState(
-                    items = tagsRepository.getTagsSorts()
-                        .map { it.toDropdownMenuItemType() }
-                        .toImmutableList(),
-                    selected = currentSort.toDropdownMenuItemType(),
-                    expanded = false,
-                ),
-                typeMenuState = DropdownMenuState(
-                    items = tagsRepository.getTagsTypes()
-                        .map { it.toDropdownMenuItemType() }
-                        .toImmutableList(),
-                    selected = currentType.toDropdownMenuItemType(),
-                    expanded = false,
-                ),
-            )
+        viewModelScope.launch {
+            _state.update { previousState ->
+                previousState.copy(
+                    tag = tag,
+                    isLoggedIn = authRepository.isLoggedIn(),
+                    sortMenuState = DropdownMenuState(
+                        items = tagsRepository.getTagsSorts()
+                            .map { it.toDropdownMenuItemType() }
+                            .toImmutableList(),
+                        selected = currentSort.toDropdownMenuItemType(),
+                        expanded = false,
+                    ),
+                    typeMenuState = DropdownMenuState(
+                        items = tagsRepository.getTagsTypes()
+                            .map { it.toDropdownMenuItemType() }
+                            .toImmutableList(),
+                        selected = currentType.toDropdownMenuItemType(),
+                        expanded = false,
+                    ),
+                )
+            }
+            loadTagDetails()
+            loadTagStream()
         }
-
-        loadTagDetails()
-        loadTagStream()
     }
 
     override fun onSortSelected(sortType: DropdownMenuItemType) {

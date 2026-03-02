@@ -9,4 +9,6 @@ interface TopBarActions {
     fun onTopBarProfileClicked()
 
     fun onTopBarSearchClicked()
+
+    fun onTopBarAddEntryClicked() = Unit
 }

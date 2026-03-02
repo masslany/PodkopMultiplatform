@@ -4,5 +4,6 @@ data class ResourceItemConfig(
     val renderEntryAsCard: Boolean = true,
     val showEntryInlineActions: Boolean = true,
     val showReplyAction: Boolean = false,
+    val showLinkCommentReplyAction: Boolean = false,
     val isReplyActionEnabled: Boolean = false,
 )

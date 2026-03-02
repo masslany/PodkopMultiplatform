@@ -37,6 +37,11 @@ class FakeEntriesDataSource : EntriesDataSource {
         val adult: Boolean,
     )
 
+    data class CreateEntryCall(
+        val content: String,
+        val adult: Boolean,
+    )
+
     var getEntriesResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntries")
     var getEntryResult: Result<SingleResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntry")
     var getEntryCommentsResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntryComments")
@@ -45,6 +50,8 @@ class FakeEntriesDataSource : EntriesDataSource {
         unstubbedResult("EntriesDataSource.getEntryCommentVotes")
     var createEntryCommentResult: Result<SingleResourceResponseDto> =
         unstubbedResult("EntriesDataSource.createEntryComment")
+    var createEntryResult: Result<SingleResourceResponseDto> =
+        unstubbedResult("EntriesDataSource.createEntry")
     var voteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.voteUp")
     var removeVoteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.removeVoteUp")
     var voteUpCommentResult: Result<Unit> = unstubbedResult("EntriesDataSource.voteUpComment")
@@ -56,6 +63,7 @@ class FakeEntriesDataSource : EntriesDataSource {
     val getEntryVotesCalls = mutableListOf<GetEntryVotesCall>()
     val getEntryCommentVotesCalls = mutableListOf<GetEntryCommentVotesCall>()
     val createEntryCommentCalls = mutableListOf<CreateEntryCommentCall>()
+    val createEntryCalls = mutableListOf<CreateEntryCall>()
     val voteUpCalls = mutableListOf<Int>()
     val removeVoteUpCalls = mutableListOf<Int>()
     val voteUpCommentCalls = mutableListOf<Pair<Int, Int>>()
@@ -114,6 +122,17 @@ class FakeEntriesDataSource : EntriesDataSource {
             adult = adult,
         )
         return createEntryCommentResult
+    }
+
+    override suspend fun createEntry(
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto> {
+        createEntryCalls += CreateEntryCall(
+            content = content,
+            adult = adult,
+        )
+        return createEntryResult
     }
 
     override suspend fun voteUp(entryId: Int): Result<Unit> {

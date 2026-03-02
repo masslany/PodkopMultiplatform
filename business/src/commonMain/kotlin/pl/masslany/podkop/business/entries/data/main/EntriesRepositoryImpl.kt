@@ -111,6 +111,20 @@ class EntriesRepositoryImpl(
         }
     }
 
+    override suspend fun createEntry(
+        content: String,
+        adult: Boolean,
+    ): Result<ResourceItem> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.createEntry(
+                content = content,
+                adult = adult,
+            ).mapCatching {
+                listOf(it.data).toResourceItemList().first()
+            }
+        }
+    }
+
     override suspend fun voteUp(entryId: Int): Result<Unit> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.voteUp(entryId)

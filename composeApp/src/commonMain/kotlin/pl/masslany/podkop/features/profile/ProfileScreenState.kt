@@ -7,6 +7,7 @@ data class ProfileScreenState(
     val isLoading: Boolean,
     val isResourcesLoading: Boolean,
     val isPaginating: Boolean,
+    val isLoggedIn: Boolean,
     val content: ProfileContentState,
     val listContent: ProfileListContentState,
 ) {
@@ -15,6 +16,7 @@ data class ProfileScreenState(
             isLoading = true,
             isResourcesLoading = false,
             isPaginating = false,
+            isLoggedIn = false,
             content = ProfileContentState.Empty,
             listContent = ProfileListContentState.Empty,
         )

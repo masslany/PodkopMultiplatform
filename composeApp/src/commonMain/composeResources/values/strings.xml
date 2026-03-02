@@ -162,6 +162,7 @@
     <!-- Entry details -->
     <string name="entry_details_screen_error_loading_comments">Wystąpił problem podczas wczytywania komentarzy</string>
     <string name="entry_details_reply_composer_hint">Napisz odpowiedź</string>
+    <string name="entries_composer_hint">Napisz wpis</string>
     <string name="entry_details_reply_composer_send">Wyślij</string>
     <string name="entry_details_reply_composer_target">Odpowiadasz do %1$s</string>
     <string name="accessibility_resource_reply_close">Zamknij kreator odpowiedzi</string>

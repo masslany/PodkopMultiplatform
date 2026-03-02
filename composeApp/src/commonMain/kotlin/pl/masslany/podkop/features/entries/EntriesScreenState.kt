@@ -1,5 +1,6 @@
 package pl.masslany.podkop.features.entries
 
+import androidx.compose.ui.text.input.TextFieldValue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import pl.masslany.podkop.common.models.DropdownMenuItemType
@@ -15,6 +16,11 @@ data class EntriesScreenState(
     val sortMenuState: DropdownMenuState,
     val hotSortMenuState: DropdownMenuState?,
     val isPaginating: Boolean,
+    val isLoggedIn: Boolean,
+    val isComposerVisible: Boolean,
+    val composerContent: TextFieldValue,
+    val composerAdult: Boolean,
+    val isComposerSubmitting: Boolean,
 ) {
     companion object Companion {
         val initial = EntriesScreenState(
@@ -26,6 +32,11 @@ data class EntriesScreenState(
             sortMenuState = DropdownMenuState.initial,
             hotSortMenuState = null,
             isPaginating = false,
+            isLoggedIn = false,
+            isComposerVisible = false,
+            composerContent = TextFieldValue(),
+            composerAdult = false,
+            isComposerSubmitting = false,
         )
     }
 

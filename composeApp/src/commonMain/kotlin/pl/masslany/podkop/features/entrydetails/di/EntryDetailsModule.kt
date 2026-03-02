@@ -7,7 +7,7 @@ import pl.masslany.podkop.features.entrydetails.EntryDetailsViewModel
 val entryDetailsModule = module {
     viewModel { params ->
         EntryDetailsViewModel(
-            id = params.get<Int>(),
+            screen = params.get(),
             entriesRepository = get(),
             authRepository = get(),
             profileRepository = get(),
@@ -15,6 +15,7 @@ val entryDetailsModule = module {
             logger = get(),
             topBarActions = get(),
             snackbarManager = get(),
+            savedStateHandle = get(),
         )
     }
 }

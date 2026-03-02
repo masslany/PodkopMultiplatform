@@ -39,6 +39,6 @@ class DebugViewModel(private val appNavigator: AppNavigator, topBarActions: TopB
             return
         }
 
-        appNavigator.navigateTo(EntryDetailsScreen(id = entryId))
+        appNavigator.navigateTo(EntryDetailsScreen.forEntry(id = entryId))
     }
 }

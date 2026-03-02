@@ -59,6 +59,16 @@ class EntriesDataSourceImpl(
         )
     }
 
+    override suspend fun createEntry(
+        content: String,
+        adult: Boolean,
+    ): Result<SingleResourceResponseDto> {
+        return entriesApi.createEntry(
+            content = content,
+            adult = adult,
+        )
+    }
+
     override suspend fun voteUp(entryId: Int): Result<Unit> {
         return entriesApi.voteUp(entryId)
     }

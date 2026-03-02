@@ -274,6 +274,7 @@ class ProfileViewModel(
     }
 
     private suspend fun loadData() {
+        val isLoggedIn = authRepository.isLoggedIn()
         listCache.clear()
         resourcesLoadRequestId = 0
         profileUsername = null
@@ -287,13 +288,14 @@ class ProfileViewModel(
             previousState.copy(
                 isLoading = true,
                 isResourcesLoading = false,
+                isLoggedIn = isLoggedIn,
             )
         }
 
         val requestedUsername = username?.trim()?.takeIf { it.isNotEmpty() }
         val isCurrentUserProfile = requestedUsername == null
 
-        if (isCurrentUserProfile && !authRepository.isLoggedIn()) {
+        if (isCurrentUserProfile && !isLoggedIn) {
             listOwner.value = null
             observedListContent.value = ProfileListContentState.Empty
             resourceItemStateHolder.updateData(emptyList())
@@ -301,6 +303,7 @@ class ProfileViewModel(
                 previousState.copy(
                     isLoading = false,
                     isResourcesLoading = false,
+                    isLoggedIn = false,
                     content = ProfileContentState.LoggedOut,
                 )
             }

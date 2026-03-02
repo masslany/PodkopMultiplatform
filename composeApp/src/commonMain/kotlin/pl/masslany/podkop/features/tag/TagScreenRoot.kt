@@ -71,6 +71,7 @@ import pl.masslany.podkop.common.pagination.rememberLazyStaggeredGridPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
+import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import pl.masslany.podkop.features.tag.components.TagBanner
 import pl.masslany.podkop.features.tag.components.TagContentError
 import pl.masslany.podkop.features.tag.components.TagGalleryImageItem
@@ -384,6 +385,10 @@ private fun TagScreenList(
                     .padding(horizontal = 16.dp),
                 state = it,
                 actions = actions,
+                config = ResourceItemConfig(
+                    showReplyAction = true,
+                    isReplyActionEnabled = state.isLoggedIn,
+                ),
             )
         }
 

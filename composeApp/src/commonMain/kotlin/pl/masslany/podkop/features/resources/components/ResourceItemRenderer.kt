@@ -236,7 +236,7 @@ private fun LinkItemRenderer(
                     parentCommentId = parentCommentId,
                 )
             },
-            onLinkCommentReplyClick = if (config.showReplyAction) {
+            onLinkCommentReplyClick = if (config.showLinkCommentReplyAction) {
                 { linkId, commentId, author ->
                     actions.onLinkCommentReplyClicked(
                         linkId = linkId,
@@ -340,7 +340,7 @@ private fun LinkCommentItemRenderer(
                 parentCommentId = state.parentCommentIdOrNull,
             )
         },
-        onReplyClick = if (config.showReplyAction) {
+        onReplyClick = if (config.showLinkCommentReplyAction) {
             {
                 actions.onLinkCommentReplyClicked(
                     linkId = state.linkId,

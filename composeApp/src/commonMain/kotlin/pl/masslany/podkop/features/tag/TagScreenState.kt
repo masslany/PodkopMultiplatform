@@ -20,6 +20,7 @@ data class TagScreenState(
     val sortMenuState: DropdownMenuState,
     val typeMenuState: DropdownMenuState,
     val isPaginating: Boolean,
+    val isLoggedIn: Boolean,
 ) {
     companion object {
         val initial = TagScreenState(
@@ -36,6 +37,7 @@ data class TagScreenState(
             sortMenuState = DropdownMenuState.initial,
             typeMenuState = DropdownMenuState.initial,
             isPaginating = false,
+            isLoggedIn = false,
         )
 
         private const val TAG_GALLERY_BASE_HEADER_ITEMS_COUNT = 3
