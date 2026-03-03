@@ -17,6 +17,7 @@ import pl.masslany.podkop.common.models.isGifImage
 import pl.masslany.podkop.common.models.toEntryContentState
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.models.toPublishedTimeType
+import pl.masslany.podkop.common.models.vote.VoteValueType
 import pl.masslany.podkop.common.models.vote.toVoteState
 import pl.masslany.podkop.features.resources.models.ResourceType
 
@@ -48,10 +49,13 @@ internal fun ResourceItem.toLinkCommentItemState(
         )
     }
 
+    val voteState = this.toVoteState()
+    val isDownVoted = voteState.voteValueType is VoteValueType.Negative
+
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
         Deleted.Moderator -> EntryContentState.DeletedByModerator
-        Deleted.None -> this.content.toEntryContentState()
+        Deleted.None -> this.content.toEntryContentState(isDownVoted = isDownVoted)
     }
 
     val embedUrl = this.media?.photo?.url
@@ -95,7 +99,7 @@ internal fun ResourceItem.toLinkCommentItemState(
         authorState = authorState,
         entryContentState = entryContentState,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
-        voteState = this.toVoteState(),
+        voteState = voteState,
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
         embedImageState = embedImageState,
@@ -122,10 +126,13 @@ internal fun Comment.toLinkCommentItemState(
         genderIndicatorType = this.author.gender.toGenderIndicatorType(),
     )
 
+    val voteState = this.toVoteState()
+    val isDownVoted = voteState.voteValueType is VoteValueType.Negative
+
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
         Deleted.Moderator -> EntryContentState.DeletedByModerator
-        Deleted.None -> this.content.toEntryContentState()
+        Deleted.None -> this.content.toEntryContentState(isDownVoted = isDownVoted)
     }
 
     val embedUrl = this.media.photo?.url
@@ -160,7 +167,7 @@ internal fun Comment.toLinkCommentItemState(
         authorState = authorState,
         entryContentState = entryContentState,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
-        voteState = this.toVoteState(),
+        voteState = voteState,
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions.createFavourite || this.actions.deleteFavourite,
         embedImageState = embedImageState,

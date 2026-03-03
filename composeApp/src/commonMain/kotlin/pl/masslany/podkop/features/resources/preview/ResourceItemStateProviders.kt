@@ -138,7 +138,7 @@ class EntryItemStateProvider : PreviewParameterProvider<EntryItemState> {
                 entryCommentBase(id = 202, parentId = 77, content = "First!"),
                 entryCommentBase(id = 203, parentId = 77, content = "Great post, thanks."),
             ),
-            entryContentState = PreviewFixtures.LONG_BODY.toEntryContentState(),
+            entryContentState = PreviewFixtures.LONG_BODY.toEntryContentState(isDownVoted = false),
             publishedTimeType = PublishedTimeType.Hours(6),
             voteState = PreviewFixtures.voteState(
                 value = VoteValueType.Positive("31"),
@@ -162,7 +162,7 @@ class EntryItemStateProvider : PreviewParameterProvider<EntryItemState> {
             authorState = PreviewFixtures.authorState(name = "anonymous"),
             totalCommentsCount = 0,
             comments = persistentListOf(),
-            entryContentState = "Short note with #tag and @mention".toEntryContentState(),
+            entryContentState = "Short note with #tag and @mention".toEntryContentState(isDownVoted = false),
             publishedTimeType = PublishedTimeType.Now,
             voteState = PreviewFixtures.voteState(value = VoteValueType.Zero),
             surveyState = SurveyState(
@@ -242,7 +242,7 @@ private fun linkCommentBase(
     parentId = parentId,
     avatarState = avatarNetwork(),
     authorState = PreviewFixtures.authorState(),
-    entryContentState = content.toEntryContentState(),
+    entryContentState = content.toEntryContentState(isDownVoted = false),
     publishedTimeType = publishedTimeType,
     voteState = vote,
     embedImageState = embedImageState,
@@ -254,7 +254,7 @@ private fun entryCommentBase(
     id: Int,
     parentId: Int,
     content: String,
-    entryContentState: EntryContentState = content.toEntryContentState(),
+    entryContentState: EntryContentState = content.toEntryContentState(isDownVoted = false),
     publishedTimeType: PublishedTimeType? = PublishedTimeType.Minutes(8),
 ) = EntryCommentItemState(
     id = id,

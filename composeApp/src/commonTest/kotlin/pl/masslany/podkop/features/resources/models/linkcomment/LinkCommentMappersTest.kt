@@ -2,6 +2,7 @@ package pl.masslany.podkop.features.resources.models.linkcomment
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNull
 import pl.masslany.podkop.business.common.domain.models.common.Actions
 import pl.masslany.podkop.business.common.domain.models.common.Author
@@ -17,6 +18,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Voted
 import pl.masslany.podkop.business.common.domain.models.common.Votes
+import pl.masslany.podkop.common.models.EntryContentState
 
 class LinkCommentMappersTest {
 
@@ -150,6 +152,38 @@ class LinkCommentMappersTest {
     }
 
     @Test
+    fun `resource mapper marks content as downvoted when vote is negative`() {
+        val state = resourceLinkComment(
+            id = 135740393,
+            slug = "comment-slug",
+            parent = Parent(id = 7896627),
+            parentId = 7896627,
+            voted = Voted.Negative,
+            votes = Votes(count = 2, down = 2, up = 0),
+        ).toLinkCommentItemState()
+
+        val contentState = assertIs<EntryContentState.Content>(state.entryContentState)
+        assertEquals(true, contentState.isDownVoted)
+    }
+
+    @Test
+    fun `comment mapper marks content as downvoted when vote is negative`() {
+        val state = commentLinkReply(
+            id = 135740683,
+            parentId = 135740393,
+            slug = "komentarz",
+            voted = Voted.Negative,
+            votes = Votes(count = 2, down = 2, up = 0),
+        ).toLinkCommentItemState(
+            linkId = 7896627,
+            linkSlug = "emulator-x86-css-bez-javascriptu",
+        )
+
+        val contentState = assertIs<EntryContentState.Content>(state.entryContentState)
+        assertEquals(true, contentState.isDownVoted)
+    }
+
+    @Test
     fun `parentCommentIdOrNull returns null when parent id equals comment id`() {
         val state = commentLinkReply(
             id = 135740393,
@@ -186,6 +220,8 @@ private fun resourceLinkComment(
     parent: Parent?,
     parentId: Int?,
     comments: Comments? = null,
+    voted: Voted = Voted.None,
+    votes: Votes = votes(),
 ): ResourceItem = ResourceItem(
     actions = actions(),
     adult = false,
@@ -211,8 +247,8 @@ private fun resourceLinkComment(
     source = null,
     tags = emptyList(),
     title = "",
-    voted = Voted.None,
-    votes = votes(),
+    voted = voted,
+    votes = votes,
     favourite = false,
 )
 
@@ -220,6 +256,8 @@ private fun commentLinkReply(
     id: Int,
     parentId: Int,
     slug: String,
+    voted: Voted = Voted.None,
+    votes: Votes = votes(),
 ): Comment = Comment(
     actions = actions(),
     adult = false,
@@ -240,8 +278,8 @@ private fun commentLinkReply(
     resource = Resource.LinkComment,
     slug = slug,
     tags = emptyList(),
-    voted = Voted.None,
-    votes = votes(),
+    voted = voted,
+    votes = votes,
 )
 
 private fun comments(vararg items: Comment): Comments = Comments(

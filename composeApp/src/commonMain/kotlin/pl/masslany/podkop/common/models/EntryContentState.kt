@@ -7,7 +7,8 @@ import org.intellij.markdown.parser.MarkdownParser
 
 sealed class EntryContentState {
 
-    data class Content(val content: String, val markdownState: State.Success) : EntryContentState()
+    data class Content(val content: String, val markdownState: State.Success, val isDownVoted: Boolean) :
+        EntryContentState()
 
     data object DeletedByModerator : EntryContentState()
 
@@ -22,11 +23,12 @@ fun String.toHighlightedTagProfileMarkdown(): String = this
         "[${it.value}](${it.value})"
     }
 
-fun String.toEntryContentState(): EntryContentState.Content {
+fun String.toEntryContentState(isDownVoted: Boolean): EntryContentState.Content {
     val highlightedContent = toHighlightedTagProfileMarkdown()
     return EntryContentState.Content(
         content = highlightedContent,
         markdownState = highlightedContent.toMarkdownStateSuccess(),
+        isDownVoted = isDownVoted,
     )
 }
 

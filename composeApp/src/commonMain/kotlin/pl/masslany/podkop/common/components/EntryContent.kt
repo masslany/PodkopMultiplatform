@@ -1,5 +1,6 @@
 package pl.masslany.podkop.common.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -84,7 +85,11 @@ fun EntryContent(
                         modifier = Modifier.fillMaxWidth(),
                         components = spoilerComponents,
                         colors = markdownColor(
-                            text = MaterialTheme.colorScheme.onSurface,
+                            text = if (state.isDownVoted) {
+                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
                         ),
                         typography = markdownTypography(
                             text = MaterialTheme.typography.bodySmall,
@@ -195,12 +200,20 @@ private val spoilerComponents = markdownComponents(
 @Composable
 private fun EntryContentPreviewContent() {
     PodkopPreview(darkTheme = false) {
-        EntryContent(
-            state = PreviewFixtures.LONG_BODY.toEntryContentState(),
-            onProfileClick = {},
-            onTagClick = {},
-            onUrlClick = {},
-        )
+        Column {
+            EntryContent(
+                state = PreviewFixtures.LONG_BODY.toEntryContentState(isDownVoted = false),
+                onProfileClick = {},
+                onTagClick = {},
+                onUrlClick = {},
+            )
+            EntryContent(
+                state = PreviewFixtures.LONG_BODY.toEntryContentState(isDownVoted = true),
+                onProfileClick = {},
+                onTagClick = {},
+                onUrlClick = {},
+            )
+        }
     }
 }
 
