@@ -16,6 +16,7 @@ import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.links.hits.models.toHitItemState
+import pl.masslany.podkop.features.resourceactions.ResourceActionUpdatesStore
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
 import pl.masslany.podkop.features.resources.BaseResourceItemStateHolder
 import pl.masslany.podkop.features.resources.models.ResourceItemState
@@ -29,6 +30,7 @@ class LinksResourceItemStateHolderImpl(
     logger: AppLogger,
     twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
     screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
+    resourceActionUpdatesStore: ResourceActionUpdatesStore,
 ) : BaseResourceItemStateHolder(
     entriesRepository = entriesRepository,
     linksRepository = linksRepository,
@@ -38,6 +40,7 @@ class LinksResourceItemStateHolderImpl(
     logger = logger,
     twitterEmbedPreviewRepository = twitterEmbedPreviewRepository,
     screenshotShareDraftStore = screenshotShareDraftStore,
+    resourceActionUpdatesStore = resourceActionUpdatesStore,
 ),
     LinksResourceItemStateHolder {
 

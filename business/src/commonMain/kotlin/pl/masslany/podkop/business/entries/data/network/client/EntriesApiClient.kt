@@ -193,6 +193,32 @@ class EntriesApiClient(
         )
     }
 
+    override suspend fun deleteEntry(entryId: Int): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.DELETE,
+                path = "api/v3/entries/$entryId",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun deleteEntryComment(entryId: Int, commentId: Int): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.DELETE,
+                path = "api/v3/entries/$entryId/comments/$commentId",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
     override suspend fun voteUpComment(entryId: Int, commentId: Int): Result<Unit> {
         val request =
             Request<Unit>(

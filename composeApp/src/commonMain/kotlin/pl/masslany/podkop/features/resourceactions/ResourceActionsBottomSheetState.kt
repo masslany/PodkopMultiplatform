@@ -16,6 +16,7 @@ data class ResourceActionItemState(
     val title: StringResource,
     val icon: DrawableResource,
     val localAction: ResourceActionLocalAction? = null,
+    val isDestructive: Boolean = false,
 )
 
 enum class ResourceActionId {
@@ -24,6 +25,8 @@ enum class ResourceActionId {
     ShowVoters,
     ShowLinkUpvoters,
     ShowLinkDownvoters,
+    DeleteEntry,
+    DeleteEntryComment,
 }
 
 sealed interface ResourceActionLocalAction {
@@ -37,4 +40,5 @@ data class ResourceActionsParams(
     val parentId: Int? = null,
     val childId: Int? = null,
     val screenshotDraftId: String? = null,
+    val canDelete: Boolean = false,
 )

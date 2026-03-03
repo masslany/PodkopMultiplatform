@@ -21,6 +21,7 @@ data class EntryCommentItemState(
     val voteState: VoteState,
     val isFavourite: Boolean = false,
     val isFavouriteEnabled: Boolean = false,
+    val isDeleteEnabled: Boolean = false,
     val embedImageState: EmbedImageState?,
     val embedContentState: EmbedContentState? = null,
 ) : ResourceItemState

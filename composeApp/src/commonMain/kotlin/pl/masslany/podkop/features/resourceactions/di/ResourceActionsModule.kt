@@ -2,6 +2,7 @@ package pl.masslany.podkop.features.resourceactions.di
 
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import pl.masslany.podkop.features.resourceactions.ResourceActionUpdatesStore
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetViewModel
 import pl.masslany.podkop.features.resourceactions.ResourceActionsParams
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogViewModel
@@ -11,6 +12,7 @@ import pl.masslany.podkop.features.resourceactions.ResourceVotesParams
 
 val resourceActionsModule = module {
     single { ResourceScreenshotShareDraftStore() }
+    single { ResourceActionUpdatesStore() }
 
     viewModel { params ->
         ResourceScreenshotPreviewDialogViewModel(
@@ -26,9 +28,11 @@ val resourceActionsModule = module {
         ResourceActionsBottomSheetViewModel(
             params = params.get<ResourceActionsParams>(),
             authRepository = get(),
+            entriesRepository = get(),
             appNavigator = get(),
             snackbarManager = get(),
             screenshotShareDraftStore = get(),
+            resourceActionUpdatesStore = get(),
         )
     }
 

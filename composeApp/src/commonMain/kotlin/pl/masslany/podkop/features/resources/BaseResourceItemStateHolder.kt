@@ -28,6 +28,8 @@ import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
+import pl.masslany.podkop.features.resourceactions.ResourceActionUpdate
+import pl.masslany.podkop.features.resourceactions.ResourceActionUpdatesStore
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraft
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
@@ -37,6 +39,7 @@ import pl.masslany.podkop.features.resources.models.entry.EntryVoteAction
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
+import pl.masslany.podkop.features.resources.models.toDeletedByAuthor
 import pl.masslany.podkop.features.resources.models.toResourceItemState
 import pl.masslany.podkop.features.tag.TagScreen
 
@@ -49,6 +52,7 @@ open class BaseResourceItemStateHolder(
     private val logger: AppLogger,
     private val twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
     private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
+    private val resourceActionUpdatesStore: ResourceActionUpdatesStore,
 ) : ResourceItemStateHolder {
 
     private val _items = MutableStateFlow<ImmutableList<ResourceItemState>>(persistentListOf())
@@ -65,6 +69,21 @@ open class BaseResourceItemStateHolder(
     ) {
         this.scope = scope
         this.isUpcoming = isUpcoming
+        observeResourceActionUpdates(scope)
+    }
+
+    private fun observeResourceActionUpdates(scope: CoroutineScope) {
+        scope.launch {
+            resourceActionUpdatesStore.updates.collect { update ->
+                when (update) {
+                    is ResourceActionUpdate.EntryCommentDeleted -> {
+                        updateItem(update.commentId) { current ->
+                            current.toDeletedByAuthor()
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override suspend fun updateData(data: List<ResourceItem>) {
@@ -259,10 +278,15 @@ open class BaseResourceItemStateHolder(
 
     override fun onEntryMoreClicked(entryId: Int) {
         val draftId = createEntryScreenshotDraftId(entryId)
+        val canDelete = _items.value
+            .filterIsInstance<EntryItemState>()
+            .firstOrNull { it.id == entryId }
+            ?.isDeleteEnabled == true
         appNavigator.navigateTo(
             ResourceActionsBottomSheetScreen.forEntry(
                 entryId = entryId,
                 screenshotDraftId = draftId,
+                canDelete = canDelete,
             ),
         )
     }
@@ -315,6 +339,19 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onEntryCommentMoreClicked(entryId: Int, entryCommentId: Int) {
+        val canDelete = _items.value
+            .asSequence()
+            .filterIsInstance<EntryCommentItemState>()
+            .firstOrNull { it.id == entryCommentId }
+            ?.isDeleteEnabled
+            ?: _items.value
+                .asSequence()
+                .filterIsInstance<EntryItemState>()
+                .firstOrNull { it.id == entryId }
+                ?.comments
+                ?.firstOrNull { it.id == entryCommentId }
+                ?.isDeleteEnabled
+            ?: false
         val draftId = createEntryCommentScreenshotDraftId(
             entryId = entryId,
             entryCommentId = entryCommentId,
@@ -324,6 +361,7 @@ open class BaseResourceItemStateHolder(
                 entryId = entryId,
                 entryCommentId = entryCommentId,
                 screenshotDraftId = draftId,
+                canDelete = canDelete,
             ),
         )
     }

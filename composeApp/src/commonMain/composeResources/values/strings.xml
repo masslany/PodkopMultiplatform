@@ -186,6 +186,8 @@
     <string name="snackbar_generic_error">Wystąpił problem</string>
     <string name="snackbar_link_copied">Skopiowano link</string>
     <string name="snackbar_screenshot_copied">Skopiowano obraz</string>
+    <string name="snackbar_entry_deleted">Usunięto wpis</string>
+    <string name="snackbar_entry_comment_deleted">Usunięto komentarz</string>
 
     <!-- Resource actions -->
     <string name="resource_actions_copy_as_link">Kopiuj link</string>
@@ -193,6 +195,8 @@
     <string name="resource_actions_show_voters">Pokaż plusujących</string>
     <string name="resource_actions_show_link_upvoters">Pokaż wykopujących</string>
     <string name="resource_actions_show_link_downvoters">Pokaż zakopujących</string>
+    <string name="resource_actions_delete_entry">Usuń wpis</string>
+    <string name="resource_actions_delete_entry_comment">Usuń komentarz</string>
     <string name="resource_actions_reply">Odpowiedz</string>
 
     <!-- Screenshot preview -->
@@ -222,6 +226,9 @@
 
     <!-- Dialog -->
     <string name="dialog_title_logout">Czy na pewno chcesz się wylogować?</string>
+    <string name="dialog_title_delete_entry">Czy na pewno chcesz usunąć wpis?</string>
+    <string name="dialog_title_delete_entry_comment">Czy na pewno chcesz usunąć komentarz?</string>
+    <string name="dialog_button_delete">Usuń</string>
     <string name="dialog_button_confirm">Potwierdź</string>
     <string name="dialog_button_dismiss">Anuluj</string>
 

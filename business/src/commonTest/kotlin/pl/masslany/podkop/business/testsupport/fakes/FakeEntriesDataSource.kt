@@ -54,6 +54,8 @@ class FakeEntriesDataSource : EntriesDataSource {
         unstubbedResult("EntriesDataSource.createEntry")
     var voteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.voteUp")
     var removeVoteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.removeVoteUp")
+    var deleteEntryResult: Result<Unit> = unstubbedResult("EntriesDataSource.deleteEntry")
+    var deleteEntryCommentResult: Result<Unit> = unstubbedResult("EntriesDataSource.deleteEntryComment")
     var voteUpCommentResult: Result<Unit> = unstubbedResult("EntriesDataSource.voteUpComment")
     var removeVoteUpCommentResult: Result<Unit> = unstubbedResult("EntriesDataSource.removeVoteUpComment")
 
@@ -66,6 +68,8 @@ class FakeEntriesDataSource : EntriesDataSource {
     val createEntryCalls = mutableListOf<CreateEntryCall>()
     val voteUpCalls = mutableListOf<Int>()
     val removeVoteUpCalls = mutableListOf<Int>()
+    val deleteEntryCalls = mutableListOf<Int>()
+    val deleteEntryCommentCalls = mutableListOf<Pair<Int, Int>>()
     val voteUpCommentCalls = mutableListOf<Pair<Int, Int>>()
     val removeVoteUpCommentCalls = mutableListOf<Pair<Int, Int>>()
 
@@ -143,6 +147,16 @@ class FakeEntriesDataSource : EntriesDataSource {
     override suspend fun removeVoteUp(entryId: Int): Result<Unit> {
         removeVoteUpCalls += entryId
         return removeVoteUpResult
+    }
+
+    override suspend fun deleteEntry(entryId: Int): Result<Unit> {
+        deleteEntryCalls += entryId
+        return deleteEntryResult
+    }
+
+    override suspend fun deleteEntryComment(entryId: Int, commentId: Int): Result<Unit> {
+        deleteEntryCommentCalls += entryId to commentId
+        return deleteEntryCommentResult
     }
 
     override suspend fun voteUpComment(entryId: Int, commentId: Int): Result<Unit> {

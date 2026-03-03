@@ -25,6 +25,7 @@ data class EntryItemState(
     val voteState: VoteState,
     val isFavourite: Boolean = false,
     val isFavouriteEnabled: Boolean = false,
+    val isDeleteEnabled: Boolean = false,
     val surveyState: SurveyState? = null,
     val embedImageState: EmbedImageState?,
     val embedContentState: EmbedContentState? = null,

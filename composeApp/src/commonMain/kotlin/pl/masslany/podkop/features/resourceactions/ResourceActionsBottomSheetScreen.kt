@@ -19,6 +19,7 @@ data class ResourceActionsBottomSheetScreen(
     val parentId: Int? = null,
     val childId: Int? = null,
     val screenshotDraftId: String? = null,
+    val canDelete: Boolean = false,
 ) : NavTarget {
     init {
         require(resourceType == ResourceActionsType.Entry || resourceType == ResourceActionsType.Link || childId != null) {
@@ -36,10 +37,12 @@ data class ResourceActionsBottomSheetScreen(
         fun forEntry(
             entryId: Int,
             screenshotDraftId: String? = null,
+            canDelete: Boolean = false,
         ): ResourceActionsBottomSheetScreen = ResourceActionsBottomSheetScreen(
             resourceType = ResourceActionsType.Entry,
             rootId = entryId,
             screenshotDraftId = screenshotDraftId,
+            canDelete = canDelete,
         )
 
         fun forLink(
@@ -55,11 +58,13 @@ data class ResourceActionsBottomSheetScreen(
             entryId: Int,
             entryCommentId: Int,
             screenshotDraftId: String? = null,
+            canDelete: Boolean = false,
         ): ResourceActionsBottomSheetScreen = ResourceActionsBottomSheetScreen(
             resourceType = ResourceActionsType.EntryComment,
             rootId = entryId,
             childId = entryCommentId,
             screenshotDraftId = screenshotDraftId,
+            canDelete = canDelete,
         )
 
         fun forLinkComment(

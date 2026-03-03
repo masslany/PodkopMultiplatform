@@ -15,6 +15,7 @@ val resourcesModule = module {
             logger = get(),
             twitterEmbedPreviewRepository = get(),
             screenshotShareDraftStore = get(),
+            resourceActionUpdatesStore = get(),
         )
     }
 }

@@ -385,6 +385,32 @@ class EntriesRepositoryImplTest {
     }
 
     @Test
+    fun `delete entry delegates to data source`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            deleteEntryResult = Result.success(Unit)
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.deleteEntry(9)
+
+        assertTrue(actual.isSuccess)
+        assertEquals(listOf(9), entriesDataSource.deleteEntryCalls)
+    }
+
+    @Test
+    fun `delete entry comment delegates to data source`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            deleteEntryCommentResult = Result.success(Unit)
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.deleteEntryComment(entryId = 9, commentId = 99)
+
+        assertTrue(actual.isSuccess)
+        assertEquals(listOf(9 to 99), entriesDataSource.deleteEntryCommentCalls)
+    }
+
+    @Test
     fun `entry comment vote operations delegate to data source`() = runBlocking {
         val entriesDataSource = FakeEntriesDataSource().apply {
             voteUpCommentResult = Result.success(Unit)

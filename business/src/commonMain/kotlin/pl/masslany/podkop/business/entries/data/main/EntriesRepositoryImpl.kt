@@ -137,6 +137,21 @@ class EntriesRepositoryImpl(
         }
     }
 
+    override suspend fun deleteEntry(entryId: Int): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.deleteEntry(entryId)
+        }
+    }
+
+    override suspend fun deleteEntryComment(
+        entryId: Int,
+        commentId: Int,
+    ): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.deleteEntryComment(entryId, commentId)
+        }
+    }
+
     override suspend fun voteUpComment(
         entryId: Int,
         commentId: Int,

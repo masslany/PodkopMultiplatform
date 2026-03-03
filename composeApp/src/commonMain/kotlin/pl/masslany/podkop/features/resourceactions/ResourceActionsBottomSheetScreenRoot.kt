@@ -39,6 +39,7 @@ fun ResourceActionsBottomSheetScreenRoot(
                     parentId = screen.parentId,
                     childId = screen.childId,
                     screenshotDraftId = screen.screenshotDraftId,
+                    canDelete = screen.canDelete,
                 ),
             )
         },
@@ -96,6 +97,11 @@ internal fun ResourceActionsBottomSheetContent(
                         Icon(
                             painter = painterResource(item.icon),
                             contentDescription = null,
+                            tint = if (item.isDestructive) {
+                                MaterialTheme.colorScheme.error
+                            } else {
+                                Color.Unspecified
+                            },
                         )
                     },
                 )
