@@ -14,6 +14,7 @@ class SettingsScreenStateProvider : PreviewParameterProvider<SettingsScreenState
             supportsDynamicColorsToggle = true,
             showDebugTools = true,
             showLogoutButton = true,
+            appVersion = "2.0.0-debug",
         ),
         SettingsScreenState(
             autoplayGifs = false,
@@ -22,6 +23,7 @@ class SettingsScreenStateProvider : PreviewParameterProvider<SettingsScreenState
             supportsDynamicColorsToggle = true,
             showDebugTools = false,
             showLogoutButton = true,
+            appVersion = "2.0.0",
         ),
     )
 }

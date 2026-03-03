@@ -9,6 +9,7 @@ data class SettingsScreenState(
     val supportsDynamicColorsToggle: Boolean,
     val showDebugTools: Boolean,
     val showLogoutButton: Boolean,
+    val appVersion: String,
 ) {
     companion object {
         val initial = SettingsScreenState(
@@ -18,6 +19,7 @@ data class SettingsScreenState(
             supportsDynamicColorsToggle = false,
             showDebugTools = false,
             showLogoutButton = false,
+            appVersion = "",
         )
     }
 }

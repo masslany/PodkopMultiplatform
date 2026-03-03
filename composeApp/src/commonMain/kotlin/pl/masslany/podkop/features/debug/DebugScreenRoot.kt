@@ -40,6 +40,10 @@ import podkop.composeapp.generated.resources.debug_entry_button_open
 import podkop.composeapp.generated.resources.debug_entry_hint
 import podkop.composeapp.generated.resources.debug_entry_title
 import podkop.composeapp.generated.resources.debug_entry_validation_error
+import podkop.composeapp.generated.resources.debug_link_button_open
+import podkop.composeapp.generated.resources.debug_link_hint
+import podkop.composeapp.generated.resources.debug_link_title
+import podkop.composeapp.generated.resources.debug_link_validation_error
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.topbar_label_debug
 
@@ -131,6 +135,34 @@ fun DebugScreenContent(
                 enabled = state.entryIdInput.isNotBlank(),
             ) {
                 Text(text = stringResource(resource = Res.string.debug_entry_button_open))
+            }
+
+            Text(
+                text = stringResource(resource = Res.string.debug_link_title),
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = state.linkIdInput,
+                onValueChange = actions::onLinkIdChanged,
+                singleLine = true,
+                label = {
+                    Text(text = stringResource(resource = Res.string.debug_link_hint))
+                },
+                isError = state.isLinkIdInvalid,
+                supportingText = {
+                    if (state.isLinkIdInvalid) {
+                        Text(text = stringResource(resource = Res.string.debug_link_validation_error))
+                    }
+                },
+            )
+
+            Button(
+                onClick = actions::onOpenLinkClicked,
+                enabled = state.linkIdInput.isNotBlank(),
+            ) {
+                Text(text = stringResource(resource = Res.string.debug_link_button_open))
             }
         }
     }

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.update
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.platform.isDebugBuild
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
+import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 class DebugViewModel(private val appNavigator: AppNavigator, topBarActions: TopBarActions) :
@@ -40,5 +41,24 @@ class DebugViewModel(private val appNavigator: AppNavigator, topBarActions: TopB
         }
 
         appNavigator.navigateTo(EntryDetailsScreen.forEntry(id = entryId))
+    }
+
+    override fun onLinkIdChanged(value: String) {
+        _state.update {
+            it.copy(
+                linkIdInput = value,
+                isLinkIdInvalid = false,
+            )
+        }
+    }
+
+    override fun onOpenLinkClicked() {
+        val linkId = state.value.linkIdInput.toIntOrNull()
+        if (linkId == null || linkId <= 0) {
+            _state.update { it.copy(isLinkIdInvalid = true) }
+            return
+        }
+
+        appNavigator.navigateTo(LinkDetailsScreen(id = linkId))
     }
 }

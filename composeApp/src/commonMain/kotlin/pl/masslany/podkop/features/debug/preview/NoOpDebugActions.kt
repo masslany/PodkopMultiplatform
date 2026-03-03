@@ -7,4 +7,6 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 object NoOpDebugActions : DebugActions, TopBarActions by NoOpTopBarActions {
     override fun onEntryIdChanged(value: String) = Unit
     override fun onOpenEntryClicked() = Unit
+    override fun onLinkIdChanged(value: String) = Unit
+    override fun onOpenLinkClicked() = Unit
 }

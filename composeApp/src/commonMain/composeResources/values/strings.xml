@@ -36,12 +36,17 @@
     <string name="settings_headline_debug">Debug</string>
     <string name="settings_body_open_debug">Narzędzia debug</string>
     <string name="settings_button_open_debug">Otwórz</string>
+    <string name="settings_body_version">Wersja aplikacji: %1$s</string>
 
     <!-- Debug -->
     <string name="debug_entry_title">Przejdź do wpisu</string>
     <string name="debug_entry_hint">ID wpisu</string>
     <string name="debug_entry_button_open">Przejdź</string>
     <string name="debug_entry_validation_error">Niepoprawne ID wpisu</string>
+    <string name="debug_link_title">Przejdź do znaleziska</string>
+    <string name="debug_link_hint">ID znaleziska</string>
+    <string name="debug_link_button_open">Przejdź</string>
+    <string name="debug_link_validation_error">Niepoprawne ID znaleziska</string>
 
     <!-- Accessibility -->
     <string name="accessibility_topbar_add">Dodaj</string>

@@ -8,4 +8,8 @@ interface DebugActions : TopBarActions {
     fun onEntryIdChanged(value: String)
 
     fun onOpenEntryClicked()
+
+    fun onLinkIdChanged(value: String)
+
+    fun onOpenLinkClicked()
 }

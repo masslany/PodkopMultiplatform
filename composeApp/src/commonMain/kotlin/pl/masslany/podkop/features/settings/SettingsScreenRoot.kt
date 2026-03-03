@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -49,6 +50,7 @@ import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.profile_log_out_button
 import podkop.composeapp.generated.resources.settings_body_dynamic_colors
 import podkop.composeapp.generated.resources.settings_body_gif_autoplay
+import podkop.composeapp.generated.resources.settings_body_version
 import podkop.composeapp.generated.resources.settings_body_open_debug
 import podkop.composeapp.generated.resources.settings_button_open_debug
 import podkop.composeapp.generated.resources.settings_headline_account
@@ -223,6 +225,18 @@ fun SettingsScreenContent(
                     Text(text = stringResource(resource = Res.string.profile_log_out_button))
                 }
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = stringResource(
+                    resource = Res.string.settings_body_version,
+                    state.appVersion,
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
