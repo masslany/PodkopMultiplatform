@@ -1,22 +1,22 @@
 package pl.masslany.podkop.business.entries.data.main.mapper
 
+import pl.masslany.podkop.business.common.data.main.mapper.common.toPagination
 import pl.masslany.podkop.business.common.data.main.mapper.toGender
 import pl.masslany.podkop.business.common.data.main.mapper.toNameColor
-import pl.masslany.podkop.business.common.data.main.mapper.common.toPagination
 import pl.masslany.podkop.business.common.data.network.models.common.UserDto
+import pl.masslany.podkop.business.common.domain.models.common.Voter
+import pl.masslany.podkop.business.common.domain.models.common.Voters
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
-import pl.masslany.podkop.business.entries.domain.models.EntryVoter
-import pl.masslany.podkop.business.entries.domain.models.EntryVoters
 
-fun EntryVotersResponseDto.toEntryVoters(): EntryVoters {
-    return EntryVoters(
-        data = data.map { it.toEntryVoter() },
+fun EntryVotersResponseDto.toVoters(): Voters {
+    return Voters(
+        data = data.map { it.toVoter() },
         pagination = pagination?.toPagination(),
     )
 }
 
-private fun UserDto.toEntryVoter(): EntryVoter {
-    return EntryVoter(
+private fun UserDto.toVoter(): Voter {
+    return Voter(
         username = username,
         avatar = avatar,
         gender = gender.toGender(),

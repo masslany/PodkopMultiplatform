@@ -7,16 +7,24 @@ import pl.masslany.podkop.common.navigation.NavTarget
 enum class ResourceVotesType {
     Entry,
     EntryComment,
+    LinkUp,
+    LinkDown,
 }
 
 @Serializable
 data class ResourceVotesBottomSheetScreen(
     val resourceType: ResourceVotesType,
-    val entryId: Int,
+    val entryId: Int = 0,
     val entryCommentId: Int? = null,
+    val linkId: Int = 0,
 ) : NavTarget {
     init {
-        require(resourceType == ResourceVotesType.Entry || entryCommentId != null) {
+        require(
+            resourceType == ResourceVotesType.Entry ||
+                resourceType == ResourceVotesType.LinkUp ||
+                resourceType == ResourceVotesType.LinkDown ||
+                entryCommentId != null,
+        ) {
             "Entry comment votes require entryCommentId"
         }
     }
@@ -34,6 +42,16 @@ data class ResourceVotesBottomSheetScreen(
             resourceType = ResourceVotesType.EntryComment,
             entryId = entryId,
             entryCommentId = entryCommentId,
+        )
+
+        fun forLinkUpvotes(linkId: Int): ResourceVotesBottomSheetScreen = ResourceVotesBottomSheetScreen(
+            resourceType = ResourceVotesType.LinkUp,
+            linkId = linkId,
+        )
+
+        fun forLinkDownvotes(linkId: Int): ResourceVotesBottomSheetScreen = ResourceVotesBottomSheetScreen(
+            resourceType = ResourceVotesType.LinkDown,
+            linkId = linkId,
         )
     }
 }

@@ -5,8 +5,8 @@ import kotlin.test.assertEquals
 import pl.masslany.podkop.business.common.domain.models.common.Gender
 import pl.masslany.podkop.business.common.domain.models.common.NameColor
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
-import pl.masslany.podkop.business.entries.domain.models.EntryVoter
-import pl.masslany.podkop.business.entries.domain.models.EntryVoters
+import pl.masslany.podkop.business.common.domain.models.common.Voter
+import pl.masslany.podkop.business.common.domain.models.common.Voters
 import pl.masslany.podkop.business.testsupport.fixtures.BusinessFixtures as Fixtures
 
 class EntryVotersMapperTest {
@@ -40,9 +40,9 @@ class EntryVotersMapperTest {
         )
 
         assertEquals(
-            EntryVoters(
+            Voters(
                 data = listOf(
-                    EntryVoter(
+                    Voter(
                         username = "u1",
                         avatar = "avatar-1",
                         gender = Gender.Male,
@@ -52,7 +52,7 @@ class EntryVotersMapperTest {
                         verified = true,
                         status = "active",
                     ),
-                    EntryVoter(
+                    Voter(
                         username = "u2",
                         avatar = "",
                         gender = Gender.Unspecified,
@@ -65,7 +65,7 @@ class EntryVotersMapperTest {
                 ),
                 pagination = Fixtures.pagination(perPage = 50, total = 51, next = "2", prev = ""),
             ),
-            dto.toEntryVoters(),
+            dto.toVoters(),
         )
     }
 
@@ -77,9 +77,9 @@ class EntryVotersMapperTest {
         )
 
         assertEquals(
-            EntryVoters(
+            Voters(
                 data = listOf(
-                    EntryVoter(
+                    Voter(
                         username = "solo",
                         avatar = "https://example.com/user.png",
                         gender = Gender.Female,
@@ -92,7 +92,7 @@ class EntryVotersMapperTest {
                 ),
                 pagination = null,
             ),
-            dto.toEntryVoters(),
+            dto.toVoters(),
         )
     }
 }

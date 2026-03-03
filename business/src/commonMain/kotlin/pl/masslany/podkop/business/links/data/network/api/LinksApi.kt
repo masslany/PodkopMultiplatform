@@ -2,6 +2,7 @@ package pl.masslany.podkop.business.links.data.network.api
 
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkUpvotesResponseDto
 
 interface LinksApi {
     @Suppress("LongParameterList")
@@ -44,6 +45,8 @@ interface LinksApi {
         content: String,
         adult: Boolean,
     ): Result<SingleResourceResponseDto>
+
+    suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto>
 
     suspend fun voteOnLink(linkId: Int): Result<Unit>
 

@@ -25,6 +25,7 @@ val resourceActionsModule = module {
     viewModel { params ->
         ResourceActionsBottomSheetViewModel(
             params = params.get<ResourceActionsParams>(),
+            authRepository = get(),
             appNavigator = get(),
             snackbarManager = get(),
             screenshotShareDraftStore = get(),
@@ -35,6 +36,7 @@ val resourceActionsModule = module {
         ResourceVotesBottomSheetViewModel(
             params = params.get<ResourceVotesParams>(),
             entriesRepository = get(),
+            linksRepository = get(),
             appNavigator = get(),
             logger = get(),
             snackbarManager = get(),

@@ -6,8 +6,8 @@ import pl.masslany.podkop.business.common.domain.models.common.Gender
 import pl.masslany.podkop.business.common.domain.models.common.NameColor
 import pl.masslany.podkop.business.common.domain.models.common.Voted
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
-import pl.masslany.podkop.business.entries.domain.models.EntryVoter
-import pl.masslany.podkop.business.entries.domain.models.EntryVoters
+import pl.masslany.podkop.business.common.domain.models.common.Voter
+import pl.masslany.podkop.business.common.domain.models.common.Voters
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
@@ -163,9 +163,9 @@ class EntriesRepositoryImplTest {
             entriesDataSource.getEntryVotesCalls,
         )
         assertEquals(
-            EntryVoters(
+            Voters(
                 data = listOf(
-                    EntryVoter(
+                    Voter(
                         username = "alice",
                         avatar = "a1",
                         gender = Gender.Male,
@@ -175,7 +175,7 @@ class EntriesRepositoryImplTest {
                         verified = true,
                         status = "active",
                     ),
-                    EntryVoter(
+                    Voter(
                         username = "eve",
                         avatar = "",
                         gender = Gender.Unspecified,
@@ -222,9 +222,9 @@ class EntriesRepositoryImplTest {
             entriesDataSource.getEntryCommentVotesCalls,
         )
         assertEquals(
-            EntryVoters(
+            Voters(
                 data = listOf(
-                    EntryVoter(
+                    Voter(
                         username = "comment-voter",
                         avatar = "https://example.com/user.png",
                         gender = Gender.Female,

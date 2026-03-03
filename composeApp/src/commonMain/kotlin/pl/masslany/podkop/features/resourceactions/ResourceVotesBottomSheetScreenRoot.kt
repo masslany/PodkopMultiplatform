@@ -37,6 +37,8 @@ import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicato
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.features.profile.components.ObservedUserItem
 import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.resource_link_downvotes_empty
+import podkop.composeapp.generated.resources.resource_link_upvotes_empty
 import podkop.composeapp.generated.resources.resource_votes_empty
 
 @Composable
@@ -51,6 +53,7 @@ fun ResourceVotesBottomSheetScreenRoot(
                     resourceType = screen.resourceType,
                     entryId = screen.entryId,
                     entryCommentId = screen.entryCommentId,
+                    linkId = screen.linkId,
                 ),
             )
         },
@@ -69,6 +72,7 @@ fun ResourceVotesBottomSheetScreenRoot(
         state = state,
         actions = viewModel,
         lazyListState = lazyListState,
+        resourceType = screen.resourceType,
         modifier = modifier,
     )
 }
@@ -78,6 +82,7 @@ internal fun ResourceVotesBottomSheetContent(
     state: ResourceVotesBottomSheetState,
     actions: ResourceVotesBottomSheetActions,
     lazyListState: LazyListState,
+    resourceType: ResourceVotesType,
     modifier: Modifier = Modifier,
 ) {
     val nestedScrollConnection = remember(lazyListState) {
@@ -154,6 +159,11 @@ internal fun ResourceVotesBottomSheetContent(
                 }
 
                 state.items.isEmpty() -> {
+                    val emptyText = when (resourceType) {
+                        ResourceVotesType.LinkUp -> stringResource(Res.string.resource_link_upvotes_empty)
+                        ResourceVotesType.LinkDown -> stringResource(Res.string.resource_link_downvotes_empty)
+                        else -> stringResource(Res.string.resource_votes_empty)
+                    }
                     Box(
                         modifier = contentModifier,
                         contentAlignment = Alignment.Center,
@@ -164,9 +174,7 @@ internal fun ResourceVotesBottomSheetContent(
                                 .padding(horizontal = 12.dp, vertical = 10.dp),
                             horizontalArrangement = Arrangement.Center,
                         ) {
-                            Text(
-                                text = stringResource(resource = Res.string.resource_votes_empty),
-                            )
+                            Text(text = emptyText)
                         }
                     }
                 }

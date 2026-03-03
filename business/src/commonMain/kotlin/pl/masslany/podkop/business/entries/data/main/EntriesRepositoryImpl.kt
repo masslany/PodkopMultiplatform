@@ -5,10 +5,10 @@ import pl.masslany.podkop.business.common.data.main.mapper.common.toResourceItem
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.common.domain.models.common.Voters
 import pl.masslany.podkop.business.entries.data.api.EntriesDataSource
-import pl.masslany.podkop.business.entries.data.main.mapper.toEntryVoters
+import pl.masslany.podkop.business.entries.data.main.mapper.toVoters
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
-import pl.masslany.podkop.business.entries.domain.models.EntryVoters
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
@@ -75,10 +75,10 @@ class EntriesRepositoryImpl(
     override suspend fun getEntryVotes(
         entryId: Int,
         page: Any?,
-    ): Result<EntryVoters> {
+    ): Result<Voters> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.getEntryVotes(entryId, page).mapCatching {
-                it.toEntryVoters()
+                it.toVoters()
             }
         }
     }
@@ -87,10 +87,10 @@ class EntriesRepositoryImpl(
         entryId: Int,
         commentId: Int,
         page: Any?,
-    ): Result<EntryVoters> {
+    ): Result<Voters> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.getEntryCommentVotes(entryId, commentId, page).mapCatching {
-                it.toEntryVoters()
+                it.toVoters()
             }
         }
     }

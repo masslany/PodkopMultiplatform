@@ -15,4 +15,9 @@ data class ResourceVotesBottomSheetState(
     }
 }
 
-data class ResourceVotesParams(val resourceType: ResourceVotesType, val entryId: Int, val entryCommentId: Int? = null)
+data class ResourceVotesParams(
+    val resourceType: ResourceVotesType,
+    val entryId: Int = 0,
+    val entryCommentId: Int? = null,
+    val linkId: Int = 0,
+)

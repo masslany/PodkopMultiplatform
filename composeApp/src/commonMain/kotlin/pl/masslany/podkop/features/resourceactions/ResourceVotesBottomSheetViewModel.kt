@@ -9,8 +9,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.StringResource
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
+import pl.masslany.podkop.business.common.domain.models.common.Voter
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
-import pl.masslany.podkop.business.entries.domain.models.EntryVoter
+import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
 import pl.masslany.podkop.common.models.toNameColorType
@@ -22,10 +25,17 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
+import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.vote_reason_duplicate
+import podkop.composeapp.generated.resources.vote_reason_fake
+import podkop.composeapp.generated.resources.vote_reason_invalid
+import podkop.composeapp.generated.resources.vote_reason_spam
+import podkop.composeapp.generated.resources.vote_reason_wrong
 
 class ResourceVotesBottomSheetViewModel(
     private val params: ResourceVotesParams,
     private val entriesRepository: EntriesRepository,
+    private val linksRepository: LinksRepository,
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
@@ -141,10 +151,22 @@ class ResourceVotesBottomSheetViewModel(
             commentId = requireNotNull(params.entryCommentId) { "Entry comment votes require entryCommentId" },
             page = page,
         )
+
+        ResourceVotesType.LinkUp -> linksRepository.getLinkUpvotes(
+            linkId = params.linkId,
+            type = "up",
+            page = page,
+        )
+
+        ResourceVotesType.LinkDown -> linksRepository.getLinkUpvotes(
+            linkId = params.linkId,
+            type = "down",
+            page = page,
+        )
     }
 }
 
-private fun EntryVoter.toItemState(): ProfileObservedUserItemState = ProfileObservedUserItemState(
+private fun Voter.toItemState(): ProfileObservedUserItemState = ProfileObservedUserItemState(
     username = username,
     avatarUrl = avatar,
     genderIndicatorType = gender.toGenderIndicatorType(),
@@ -153,7 +175,16 @@ private fun EntryVoter.toItemState(): ProfileObservedUserItemState = ProfileObse
     company = company,
     verified = verified,
     status = status,
+    voteReason = reason?.toStringResource(),
 )
+
+private fun VoteReason.toStringResource(): StringResource = when (this) {
+    VoteReason.Duplicate -> Res.string.vote_reason_duplicate
+    VoteReason.Spam -> Res.string.vote_reason_spam
+    VoteReason.Fake -> Res.string.vote_reason_fake
+    VoteReason.Wrong -> Res.string.vote_reason_wrong
+    VoteReason.Invalid -> Res.string.vote_reason_invalid
+}
 
 private fun List<ProfileObservedUserItemState>.appendDistinctByUsername(
     incoming: List<ProfileObservedUserItemState>,

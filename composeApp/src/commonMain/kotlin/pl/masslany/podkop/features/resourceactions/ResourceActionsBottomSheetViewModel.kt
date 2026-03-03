@@ -10,10 +10,14 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_add
+import podkop.composeapp.generated.resources.ic_arrow_down
+import podkop.composeapp.generated.resources.ic_arrow_up
 import podkop.composeapp.generated.resources.ic_copy
 import podkop.composeapp.generated.resources.ic_share
 import podkop.composeapp.generated.resources.resource_actions_copy_as_link
 import podkop.composeapp.generated.resources.resource_actions_share_as_screenshot
+import podkop.composeapp.generated.resources.resource_actions_show_link_downvoters
+import podkop.composeapp.generated.resources.resource_actions_show_link_upvoters
 import podkop.composeapp.generated.resources.resource_actions_show_voters
 import podkop.composeapp.generated.resources.snackbar_link_copied
 
@@ -26,7 +30,7 @@ class ResourceActionsBottomSheetViewModel(
     ResourceActionsBottomSheetActions {
 
     private val _state = MutableStateFlow(
-        buildState(this.params),
+        buildState(params = this.params),
     )
     val state = _state.asStateFlow()
 
@@ -69,6 +73,16 @@ class ResourceActionsBottomSheetViewModel(
                 appNavigator.back()
                 appNavigator.navigateTo(target)
             }
+
+            ResourceActionId.ShowLinkUpvoters -> {
+                appNavigator.back()
+                appNavigator.navigateTo(ResourceVotesBottomSheetScreen.forLinkUpvotes(linkId = params.rootId))
+            }
+
+            ResourceActionId.ShowLinkDownvoters -> {
+                appNavigator.back()
+                appNavigator.navigateTo(ResourceVotesBottomSheetScreen.forLinkDownvotes(linkId = params.rootId))
+            }
         }
     }
 
@@ -83,6 +97,16 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
         id = ResourceActionId.ShowVoters,
         title = Res.string.resource_actions_show_voters,
         icon = Res.drawable.ic_add,
+    )
+    val showLinkUpvotersAction = ResourceActionItemState(
+        id = ResourceActionId.ShowLinkUpvoters,
+        title = Res.string.resource_actions_show_link_upvoters,
+        icon = Res.drawable.ic_arrow_up,
+    )
+    val showLinkDownvotersAction = ResourceActionItemState(
+        id = ResourceActionId.ShowLinkDownvoters,
+        title = Res.string.resource_actions_show_link_downvoters,
+        icon = Res.drawable.ic_arrow_down,
     )
     val copyLinkAction = ResourceActionItemState(
         id = ResourceActionId.CopyAsLink,
@@ -105,6 +129,8 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
     return ResourceActionsBottomSheetState(
         actions = when (params.resourceType) {
             ResourceActionsType.Link -> listOfNotNull(
+                showLinkUpvotersAction,
+                showLinkDownvotersAction,
                 copyLinkAction,
             ).toPersistentList()
 

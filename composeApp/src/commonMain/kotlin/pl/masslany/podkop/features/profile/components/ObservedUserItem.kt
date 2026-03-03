@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.components.Avatar
 import pl.masslany.podkop.common.components.toComposeColor
 import pl.masslany.podkop.common.models.NameColorType
@@ -62,7 +63,14 @@ fun ObservedUserItem(
                     style = MaterialTheme.typography.titleSmall,
                     color = user.nameColorType.toComposeColor(),
                 )
-                if (user.status != "active") { // TODO
+                val voteReasonLabel = user.voteReason?.let { stringResource(it) }
+                if (voteReasonLabel != null) {
+                    Text(
+                        text = voteReasonLabel,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else if (user.status != "active") { // TODO
                     Text(
                         text = user.status,
                         style = MaterialTheme.typography.bodySmall,

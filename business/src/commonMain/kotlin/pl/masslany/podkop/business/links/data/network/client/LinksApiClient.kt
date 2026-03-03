@@ -3,7 +3,8 @@ package pl.masslany.podkop.business.links.data.network.client
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.links.data.network.api.LinksApi
- import pl.masslany.podkop.business.links.data.network.models.LinkCommentCreateDataDto
+import pl.masslany.podkop.business.links.data.network.models.LinkCommentCreateDataDto
+import pl.masslany.podkop.business.links.data.network.models.LinkUpvotesResponseDto
 import pl.masslany.podkop.business.links.data.network.models.LinkCommentCreateRequestDto
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
@@ -157,6 +158,23 @@ class LinksApiClient(
                 method = Request.HttpMethod.POST,
                 path = "api/v3/links/$linkId/comments/$commentId/comments",
                 body = body,
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto> {
+        val queryParams = mutableMapOf<String, String>()
+        page?.let { queryParams["page"] = it.toString() }
+
+        val request =
+            Request<LinkUpvotesResponseDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/links/$linkId/upvotes/$type",
+                queryParameters = queryParams,
             )
 
         return apiClient.request(request).fold(

@@ -4,6 +4,7 @@ import pl.masslany.podkop.business.common.data.network.models.common.ResourceRes
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.links.data.api.LinksDataSource
 import pl.masslany.podkop.business.links.data.network.api.LinksApi
+import pl.masslany.podkop.business.links.data.network.models.LinkUpvotesResponseDto
 
 class LinksDataSourceImpl(
     private val linksApi: LinksApi,
@@ -69,6 +70,10 @@ class LinksDataSourceImpl(
             content = content,
             adult = adult,
         )
+    }
+
+    override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto> {
+        return linksApi.getLinkUpvotes(linkId, type, page)
     }
 
     override suspend fun voteOnLink(linkId: Int): Result<Unit> {

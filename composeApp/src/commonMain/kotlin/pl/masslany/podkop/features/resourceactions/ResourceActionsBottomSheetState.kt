@@ -22,6 +22,8 @@ enum class ResourceActionId {
     CopyAsLink,
     ShareAsScreenshot,
     ShowVoters,
+    ShowLinkUpvoters,
+    ShowLinkDownvoters,
 }
 
 sealed interface ResourceActionLocalAction {

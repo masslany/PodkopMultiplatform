@@ -7,6 +7,8 @@ import pl.masslany.podkop.business.common.data.main.mapper.links.toLink
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.common.domain.models.links.Link
+import pl.masslany.podkop.business.common.domain.models.common.Voters
+import pl.masslany.podkop.business.links.data.main.mapper.toVoters
 import pl.masslany.podkop.business.links.data.api.LinksDataSource
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
@@ -129,6 +131,14 @@ class LinksRepositoryImpl(
                 adult = adult,
             ).mapCatching {
                 listOf(it.data).toResourceItemList().first()
+            }
+        }
+    }
+
+    override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<Voters> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.getLinkUpvotes(linkId, type, page).mapCatching {
+                it.toVoters()
             }
         }
     }
