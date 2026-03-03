@@ -9,6 +9,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.profile.data.main.ProfileRepositoryImpl
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeProfileDataSource
+import pl.masslany.podkop.business.testsupport.fakes.FakeProfileLocalDataSource
 import pl.masslany.podkop.business.testsupport.fixtures.BusinessFixtures as Fixtures
 
 class ProfileRepositoryImplTest {
@@ -34,6 +35,61 @@ class ProfileRepositoryImplTest {
     }
 
     @Test
+    fun `get profile short returns cached profile when available`() = runBlocking {
+        val profileDataSource = FakeProfileDataSource()
+        val profileLocalDataSource = FakeProfileLocalDataSource().apply {
+            cachedProfileShort = Fixtures.profileShort(name = "cached-short")
+        }
+        val sut = createSut(profileDataSource, profileLocalDataSource)
+
+        val actual = sut.getProfileShort()
+
+        assertEquals(0, profileDataSource.getProfileShortCalls)
+        assertEquals(1, profileLocalDataSource.getProfileShortCalls)
+        assertTrue(profileLocalDataSource.setProfileShortCalls.isEmpty())
+        assertEquals("cached-short", actual.getOrThrow().name)
+    }
+
+    @Test
+    fun `get profile short caches successful network response`() = runBlocking {
+        val profileDataSource = FakeProfileDataSource().apply {
+            getProfileShortResult = Result.success(
+                Fixtures.profileShortDto(
+                    data = Fixtures.profileShortDataDto(username = "short-john"),
+                ),
+            )
+        }
+        val profileLocalDataSource = FakeProfileLocalDataSource()
+        val sut = createSut(profileDataSource, profileLocalDataSource)
+
+        val first = sut.getProfileShort()
+        val second = sut.getProfileShort()
+
+        assertEquals(1, profileDataSource.getProfileShortCalls)
+        assertEquals(2, profileLocalDataSource.getProfileShortCalls)
+        assertEquals(listOf(first.getOrThrow()), profileLocalDataSource.setProfileShortCalls)
+        assertEquals(first.getOrThrow(), second.getOrThrow())
+    }
+
+    @Test
+    fun `get profile short does not cache failed network response`() = runBlocking {
+        val expected = IllegalStateException("failure")
+        val profileDataSource = FakeProfileDataSource().apply {
+            getProfileShortResult = Result.failure(expected)
+        }
+        val profileLocalDataSource = FakeProfileLocalDataSource()
+        val sut = createSut(profileDataSource, profileLocalDataSource)
+
+        val actual = sut.getProfileShort()
+
+        assertEquals(1, profileDataSource.getProfileShortCalls)
+        assertEquals(1, profileLocalDataSource.getProfileShortCalls)
+        assertTrue(profileLocalDataSource.setProfileShortCalls.isEmpty())
+        assertTrue(actual.isFailure)
+        assertSame(expected, actual.exceptionOrNull())
+    }
+
+    @Test
     fun `get profile without name delegates to no arg endpoint and maps dto`() = runBlocking {
         val profileDataSource = FakeProfileDataSource().apply {
             getProfileResult = Result.success(
@@ -48,6 +104,61 @@ class ProfileRepositoryImplTest {
 
         assertEquals(1, profileDataSource.getProfileCalls)
         assertEquals("john", actual.getOrThrow().name)
+    }
+
+    @Test
+    fun `get profile without name returns cached profile when available`() = runBlocking {
+        val profileDataSource = FakeProfileDataSource()
+        val profileLocalDataSource = FakeProfileLocalDataSource().apply {
+            cachedProfile = Fixtures.profile(name = "cached-user")
+        }
+        val sut = createSut(profileDataSource, profileLocalDataSource)
+
+        val actual = sut.getProfile()
+
+        assertEquals(0, profileDataSource.getProfileCalls)
+        assertEquals(1, profileLocalDataSource.getProfileCalls)
+        assertTrue(profileLocalDataSource.setProfileCalls.isEmpty())
+        assertEquals("cached-user", actual.getOrThrow().name)
+    }
+
+    @Test
+    fun `get profile without name caches successful network response`() = runBlocking {
+        val profileDataSource = FakeProfileDataSource().apply {
+            getProfileResult = Result.success(
+                Fixtures.profileDto(
+                    data = Fixtures.profileDataDto(username = "john"),
+                ),
+            )
+        }
+        val profileLocalDataSource = FakeProfileLocalDataSource()
+        val sut = createSut(profileDataSource, profileLocalDataSource)
+
+        val first = sut.getProfile()
+        val second = sut.getProfile()
+
+        assertEquals(1, profileDataSource.getProfileCalls)
+        assertEquals(2, profileLocalDataSource.getProfileCalls)
+        assertEquals(listOf(first.getOrThrow()), profileLocalDataSource.setProfileCalls)
+        assertEquals(first.getOrThrow(), second.getOrThrow())
+    }
+
+    @Test
+    fun `get profile without name does not cache failed network response`() = runBlocking {
+        val expected = IllegalStateException("failure")
+        val profileDataSource = FakeProfileDataSource().apply {
+            getProfileResult = Result.failure(expected)
+        }
+        val profileLocalDataSource = FakeProfileLocalDataSource()
+        val sut = createSut(profileDataSource, profileLocalDataSource)
+
+        val actual = sut.getProfile()
+
+        assertEquals(1, profileDataSource.getProfileCalls)
+        assertEquals(1, profileLocalDataSource.getProfileCalls)
+        assertTrue(profileLocalDataSource.setProfileCalls.isEmpty())
+        assertTrue(actual.isFailure)
+        assertSame(expected, actual.exceptionOrNull())
     }
 
     @Test
@@ -210,9 +321,11 @@ class ProfileRepositoryImplTest {
 
     private fun createSut(
         profileDataSource: FakeProfileDataSource = FakeProfileDataSource(),
+        profileLocalDataSource: FakeProfileLocalDataSource = FakeProfileLocalDataSource(),
     ): ProfileRepositoryImpl {
         return ProfileRepositoryImpl(
             profileDataSource = profileDataSource,
+            profileLocalDataSource = profileLocalDataSource,
             dispatcherProvider = FakeDispatcherProvider(),
         )
     }

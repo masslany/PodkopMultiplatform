@@ -15,6 +15,7 @@ import pl.masslany.podkop.business.links.data.network.di.linksNetworkModule
 import pl.masslany.podkop.business.media.data.di.mediaDataModule
 import pl.masslany.podkop.business.media.data.network.di.mediaNetworkModule
 import pl.masslany.podkop.business.profile.data.di.profileDataModule
+import pl.masslany.podkop.business.profile.data.local.di.profileLocalModule
 import pl.masslany.podkop.business.profile.data.network.di.profileNetworkModule
 import pl.masslany.podkop.business.startup.infrastructure.di.startupModule
 import pl.masslany.podkop.business.tags.data.di.tagsDataModule
@@ -37,6 +38,7 @@ val businessModule = module {
         favouritesNetworkModule,
         profileDataModule,
         profileNetworkModule,
+        profileLocalModule,
         mediaDataModule,
         mediaNetworkModule,
         tagsDataModule,

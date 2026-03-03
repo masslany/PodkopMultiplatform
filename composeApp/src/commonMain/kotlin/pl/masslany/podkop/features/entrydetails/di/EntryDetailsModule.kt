@@ -17,7 +17,6 @@ val entryDetailsModule = module {
             topBarActions = get(),
             snackbarManager = get(),
             savedStateHandle = get(),
-            appScope = get(),
             appNavigator = get(),
         )
     }

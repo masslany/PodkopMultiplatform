@@ -4,9 +4,10 @@ import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.profile.data.api.ProfileDataSource
+import pl.masslany.podkop.business.profile.data.local.api.ProfileLocalDataSource
 import pl.masslany.podkop.business.profile.data.main.mapper.toObservedTags
 import pl.masslany.podkop.business.profile.data.main.mapper.toObservedUsers
-import pl.masslany.podkop.business.profile.data.api.ProfileDataSource
 import pl.masslany.podkop.business.profile.data.main.mapper.toProfile
 import pl.masslany.podkop.business.profile.data.main.mapper.toProfileShort
 import pl.masslany.podkop.business.profile.data.main.mapper.toUsersAutoComplete
@@ -20,21 +21,30 @@ import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 
 class ProfileRepositoryImpl(
     private val profileDataSource: ProfileDataSource,
+    private val profileLocalDataSource: ProfileLocalDataSource,
     private val dispatcherProvider: DispatcherProvider,
 ) : ProfileRepository {
     override suspend fun getProfileShort(): Result<ProfileShort> {
         return withContext(dispatcherProvider.io) {
-            profileDataSource.getProfileShort().mapCatching {
-                it.toProfileShort()
+            profileLocalDataSource.getProfileShort()?.let { cachedProfileShort ->
+                return@withContext Result.success(cachedProfileShort)
             }
+
+            profileDataSource.getProfileShort()
+                .mapCatching { it.toProfileShort() }
+                .onSuccess { profileLocalDataSource.setProfileShort(it) }
         }
     }
 
     override suspend fun getProfile(): Result<Profile> {
         return withContext(dispatcherProvider.io) {
-            profileDataSource.getProfile().mapCatching {
-                it.toProfile()
+            profileLocalDataSource.getProfile()?.let { cachedProfile ->
+                return@withContext Result.success(cachedProfile)
             }
+
+            profileDataSource.getProfile()
+                .mapCatching { it.toProfile() }
+                .onSuccess { profileLocalDataSource.setProfile(it) }
         }
     }
 
