@@ -47,6 +47,7 @@ interface LinksRepository {
         linkId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<ResourceItem>
 
     suspend fun createLinkCommentReply(
@@ -54,6 +55,7 @@ interface LinksRepository {
         commentId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<ResourceItem>
 
     suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<Voters>

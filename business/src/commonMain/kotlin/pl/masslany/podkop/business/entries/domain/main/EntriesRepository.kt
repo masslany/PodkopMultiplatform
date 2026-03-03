@@ -46,11 +46,13 @@ interface EntriesRepository {
         entryId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<ResourceItem>
 
     suspend fun createEntry(
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<ResourceItem>
 
     suspend fun voteUp(entryId: Int): Result<Unit>

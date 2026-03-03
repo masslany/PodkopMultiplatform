@@ -246,4 +246,15 @@
     <string name="composer_link_url_placeholder">url</string>
     <string name="composer_quote_placeholder">cytowana treść</string>
     <string name="composer_code_placeholder">kod</string>
+    <string name="composer_photo_attach_title">Dodaj obraz</string>
+    <string name="composer_photo_attach_url">Wklej adres URL</string>
+    <string name="composer_photo_attach_device">Wybierz z urządzenia</string>
+    <string name="composer_photo_url_dialog_title">Adres obrazu</string>
+    <string name="composer_photo_url_dialog_hint">https://example.com/image.jpg</string>
+    <string name="composer_photo_url_dialog_invalid">Podaj poprawny adres http:// lub https://</string>
+    <string name="composer_photo_url_dialog_confirm">Dodaj</string>
+    <string name="composer_photo_preview">Podgląd obrazu</string>
+    <string name="composer_photo_uploading">Wysyłanie obrazu...</string>
+    <string name="accessibility_reply_composer_attach_photo">Dodaj obraz</string>
+    <string name="accessibility_reply_composer_remove_photo">Usuń obraz</string>
 </resources>

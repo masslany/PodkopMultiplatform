@@ -105,12 +105,14 @@ class LinksRepositoryImpl(
         linkId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<ResourceItem> {
         return withContext(dispatcherProvider.io) {
             linksDataSource.createLinkComment(
                 linkId = linkId,
                 content = content,
                 adult = adult,
+                photoKey = photoKey,
             ).mapCatching {
                 listOf(it.data).toResourceItemList().first()
             }
@@ -122,6 +124,7 @@ class LinksRepositoryImpl(
         commentId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<ResourceItem> {
         return withContext(dispatcherProvider.io) {
             linksDataSource.createLinkCommentReply(
@@ -129,6 +132,7 @@ class LinksRepositoryImpl(
                 commentId = commentId,
                 content = content,
                 adult = adult,
+                photoKey = photoKey,
             ).mapCatching {
                 listOf(it.data).toResourceItemList().first()
             }

@@ -62,6 +62,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
+import pl.masslany.podkop.common.composer.Composer
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
@@ -71,7 +72,6 @@ import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.common.theme.colorsPalette
 import pl.masslany.podkop.features.entrydetails.preview.EntryDetailsScreenStateProvider
 import pl.masslany.podkop.features.entrydetails.preview.NoOpEntryDetailsActions
-import pl.masslany.podkop.features.resources.components.ReplyComposer
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
@@ -198,7 +198,7 @@ fun EntryDetailsScreenContent(
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = showFab && !state.isComposerVisible,
+                visible = showFab && !state.composer.isVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
@@ -224,7 +224,11 @@ fun EntryDetailsScreenContent(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPaddingValues ->
-        val composerBottomPadding = if (state.isComposerVisible) 232.dp else 0.dp
+        val composerBottomPadding = if (state.composer.isVisible) {
+            if (state.composer.photoUrl != null) 304.dp else 232.dp
+        } else {
+            0.dp
+        }
 
         Box(
             modifier = Modifier
@@ -260,16 +264,14 @@ fun EntryDetailsScreenContent(
                 }
             }
 
-            ReplyComposer(
+            Composer(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                isVisible = state.isComposerVisible,
-                content = state.composerContent,
-                isAdult = state.composerAdult,
+                state = state.composer,
                 hintText = stringResource(resource = Res.string.entry_details_reply_composer_hint),
-                replyTarget = state.composerReplyTarget,
-                isSubmitting = state.isComposerSubmitting,
                 onContentChanged = actions::onComposerTextChanged,
                 onAdultChanged = actions::onComposerAdultChanged,
+                onPhotoAttachClicked = actions::onComposerPhotoAttachClicked,
+                onPhotoRemoved = actions::onComposerPhotoRemoved,
                 onDismiss = actions::onComposerDismissed,
                 onSubmit = actions::onComposerSubmit,
             )

@@ -1,8 +1,8 @@
 package pl.masslany.podkop.features.entrydetails
 
-import androidx.compose.ui.text.input.TextFieldValue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import pl.masslany.podkop.common.composer.ComposerState
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 data class EntryDetailsScreenState(
@@ -15,13 +15,9 @@ data class EntryDetailsScreenState(
     val entry: ResourceItemState?,
     val comments: ImmutableList<ResourceItemState>,
     val isPaginating: Boolean,
-    val isComposerVisible: Boolean,
-    val composerContent: TextFieldValue,
-    val composerReplyTarget: String?,
-    val composerAdult: Boolean,
-    val isComposerSubmitting: Boolean,
+    val composer: ComposerState,
 ) {
-    companion object Companion {
+    companion object {
         val initial = EntryDetailsScreenState(
             isLoading = true,
             isError = false,
@@ -32,13 +28,11 @@ data class EntryDetailsScreenState(
             entry = null,
             comments = persistentListOf(),
             isPaginating = false,
-            isComposerVisible = false,
-            composerContent = TextFieldValue(),
-            composerReplyTarget = null,
-            composerAdult = false,
-            isComposerSubmitting = false,
+            composer = ComposerState.initial,
         )
     }
+
+    fun updateComposer(transform: (ComposerState) -> ComposerState): EntryDetailsScreenState = copy(composer = transform(composer))
 
     fun updateLoading(isLoading: Boolean) = this.copy(
         isLoading = isLoading,

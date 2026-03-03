@@ -84,14 +84,16 @@ class VoteStateMapperTest {
     }
 
     @Test
-    fun `link comment hides negative vote button`() {
+    fun `link comment preserves negative vote highlight from voted state`() {
         val state = comment(
             resource = Resource.LinkComment,
             voted = Voted.Negative,
             actions = actions(voteUp = true, voteDown = false, undoVote = true),
         ).toVoteState()
 
-        assertNull(state.negativeVoteButtonState)
+        val negative = state.negativeVoteButtonState
+        assertNotNull(negative)
+        assertTrue(negative.isVoted)
     }
 
     @Test
@@ -139,6 +141,7 @@ private fun resourceItem(
     title = "",
     voted = voted,
     votes = Votes(count = 0, down = 0, up = 0),
+    favourite = false,
 )
 
 private fun comment(

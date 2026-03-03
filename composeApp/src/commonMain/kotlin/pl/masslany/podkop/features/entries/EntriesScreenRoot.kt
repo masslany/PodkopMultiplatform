@@ -55,6 +55,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
+import pl.masslany.podkop.common.composer.Composer
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
@@ -62,7 +63,6 @@ import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.entries.preview.EntriesScreenStateProvider
 import pl.masslany.podkop.features.entries.preview.NoOpEntriesActions
-import pl.masslany.podkop.features.resources.components.ReplyComposer
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import podkop.composeapp.generated.resources.Res
@@ -178,7 +178,11 @@ fun EntriesScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
-    val composerBottomPadding = if (state.isComposerVisible) 232.dp else 0.dp
+    val composerBottomPadding = if (state.composer.isVisible) {
+        if (state.composer.photoUrl != null) 304.dp else 232.dp
+    } else {
+        0.dp
+    }
 
     Box(
         modifier = modifier
@@ -259,7 +263,7 @@ fun EntriesScreenContent(
                     end = 16.dp,
                     bottom = 16.dp + bottomPadding,
                 ),
-            visible = showFab && !state.isComposerVisible,
+            visible = showFab && !state.composer.isVisible,
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
@@ -282,16 +286,14 @@ fun EntriesScreenContent(
             }
         }
 
-        ReplyComposer(
+        Composer(
             modifier = Modifier.align(Alignment.BottomCenter),
-            isVisible = state.isComposerVisible,
-            content = state.composerContent,
-            isAdult = state.composerAdult,
+            state = state.composer,
             hintText = stringResource(resource = Res.string.entries_composer_hint),
-            replyTarget = null,
-            isSubmitting = state.isComposerSubmitting,
             onContentChanged = actions::onComposerTextChanged,
             onAdultChanged = actions::onComposerAdultChanged,
+            onPhotoAttachClicked = actions::onComposerPhotoAttachClicked,
+            onPhotoRemoved = actions::onComposerPhotoRemoved,
             onDismiss = actions::onComposerDismissed,
             onSubmit = actions::onComposerSubmit,
         )

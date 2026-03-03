@@ -12,6 +12,7 @@ val linkDetailsModule = module {
             linksRepository = get(),
             authRepository = get(),
             profileRepository = get(),
+            mediaRepository = get(),
             resourceItemStateHolder = get<ResourceItemStateHolder>(),
             appNavigator = get(),
             screenshotShareDraftStore = get(),

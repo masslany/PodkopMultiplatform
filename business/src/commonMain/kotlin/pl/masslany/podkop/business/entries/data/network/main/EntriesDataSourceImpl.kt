@@ -51,21 +51,25 @@ class EntriesDataSourceImpl(
         entryId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
         return entriesApi.createEntryComment(
             entryId = entryId,
             content = content,
             adult = adult,
+            photoKey = photoKey,
         )
     }
 
     override suspend fun createEntry(
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
         return entriesApi.createEntry(
             content = content,
             adult = adult,
+            photoKey = photoKey,
         )
     }
 

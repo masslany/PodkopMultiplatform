@@ -15,4 +15,6 @@ data class EntryCreateDataDto(
     val content: String,
     @SerialName("adult")
     val adult: Boolean,
+    @SerialName("photo")
+    val photo: String? = null,
 )

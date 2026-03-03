@@ -30,6 +30,7 @@ kotlin {
         androidMain.dependencies  {
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.browser)
+            implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.compose.ui.tooling)
         }
 

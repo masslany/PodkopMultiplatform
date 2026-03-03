@@ -50,11 +50,13 @@ class LinksDataSourceImpl(
         linkId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
         return linksApi.createLinkComment(
             linkId = linkId,
             content = content,
             adult = adult,
+            photoKey = photoKey,
         )
     }
 
@@ -63,12 +65,14 @@ class LinksDataSourceImpl(
         commentId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
         return linksApi.createLinkCommentReply(
             linkId = linkId,
             commentId = commentId,
             content = content,
             adult = adult,
+            photoKey = photoKey,
         )
     }
 

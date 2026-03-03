@@ -4,7 +4,9 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.setBody
+import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.url
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.util.reflect.TypeInfo
 import pl.masslany.podkop.common.network.models.request.Request
@@ -30,6 +32,9 @@ fun <T> Request<T>.toHttpRequestBuilder(): HttpRequestBuilder {
         }
 
         param.body?.let { requestBody ->
+            if (requestBody is MultiPartFormDataContent) {
+                headers.remove(HttpHeaders.ContentType)
+            }
             val requestBodyType =
                 TypeInfo(
                     type = requestBody::class,

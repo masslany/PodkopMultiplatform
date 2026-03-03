@@ -1,17 +1,21 @@
-package pl.masslany.podkop.features.resources.components
+package pl.masslany.podkop.common.composer
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -27,31 +31,40 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import pl.masslany.podkop.common.preview.PodkopPreview
 import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.accessibility_reply_composer_attach_photo
+import podkop.composeapp.generated.resources.accessibility_reply_composer_remove_photo
 import podkop.composeapp.generated.resources.accessibility_resource_reply_close
 import podkop.composeapp.generated.resources.composer_bold_placeholder
 import podkop.composeapp.generated.resources.composer_code_placeholder
 import podkop.composeapp.generated.resources.composer_italic_placeholder
 import podkop.composeapp.generated.resources.composer_link_description_placeholder
 import podkop.composeapp.generated.resources.composer_link_url_placeholder
+import podkop.composeapp.generated.resources.composer_photo_preview
+import podkop.composeapp.generated.resources.composer_photo_uploading
 import podkop.composeapp.generated.resources.composer_quote_placeholder
 import podkop.composeapp.generated.resources.entry_details_reply_composer_hint
 import podkop.composeapp.generated.resources.entry_details_reply_composer_send
 import podkop.composeapp.generated.resources.entry_details_reply_composer_target
+import podkop.composeapp.generated.resources.ic_add_photo
 import podkop.composeapp.generated.resources.ic_close
 import podkop.composeapp.generated.resources.ic_code
+import podkop.composeapp.generated.resources.ic_delete
 import podkop.composeapp.generated.resources.ic_exclamation
 import podkop.composeapp.generated.resources.ic_format_bold
 import podkop.composeapp.generated.resources.ic_format_italic
@@ -60,25 +73,23 @@ import podkop.composeapp.generated.resources.ic_link
 import podkop.composeapp.generated.resources.links_screen_label_adult_rating
 
 @Composable
-fun ReplyComposer(
-    isVisible: Boolean,
-    // TODO: Consider TextFieldState & removing Compose class from the state
-    content: TextFieldValue,
-    isAdult: Boolean,
+fun Composer(
+    state: ComposerState,
     hintText: String,
-    replyTarget: String?,
-    isSubmitting: Boolean,
     onContentChanged: (TextFieldValue) -> Unit,
     onAdultChanged: (Boolean) -> Unit,
+    onPhotoAttachClicked: () -> Unit,
+    onPhotoRemoved: () -> Unit,
     onDismiss: () -> Unit,
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+    val areMediaActionsEnabled = !state.isSubmitting && !state.isMediaUploading
 
-    LaunchedEffect(isVisible) {
-        if (isVisible) {
+    LaunchedEffect(state.isVisible) {
+        if (state.isVisible) {
             focusRequester.requestFocus()
         } else {
             focusManager.clearFocus()
@@ -87,7 +98,7 @@ fun ReplyComposer(
 
     AnimatedVisibility(
         modifier = modifier.fillMaxWidth(),
-        visible = isVisible,
+        visible = state.isVisible,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
@@ -106,7 +117,7 @@ fun ReplyComposer(
                 IconButton(
                     modifier = Modifier
                         .align(Alignment.End),
-                    enabled = !isSubmitting,
+                    enabled = !state.isSubmitting,
                     onClick = onDismiss,
                 ) {
                     Icon(
@@ -117,7 +128,7 @@ fun ReplyComposer(
                     )
                 }
 
-                replyTarget?.let { target ->
+                state.replyTarget?.let { target ->
                     Text(
                         text = stringResource(
                             resource = Res.string.entry_details_reply_composer_target,
@@ -138,9 +149,9 @@ fun ReplyComposer(
                     val boldPlaceholder = stringResource(resource = Res.string.composer_bold_placeholder)
                     MarkdownActionButton(
                         iconRes = Res.drawable.ic_format_bold,
-                        enabled = !isSubmitting,
+                        enabled = !state.isSubmitting,
                         onClick = {
-                            val updated = content.insertMarkdown(
+                            val updated = state.content.insertMarkdown(
                                 prefix = "**",
                                 placeholder = boldPlaceholder,
                                 suffix = "**",
@@ -152,9 +163,9 @@ fun ReplyComposer(
                     val italicPlaceholder = stringResource(resource = Res.string.composer_italic_placeholder)
                     MarkdownActionButton(
                         iconRes = Res.drawable.ic_format_italic,
-                        enabled = !isSubmitting,
+                        enabled = !state.isSubmitting,
                         onClick = {
-                            val updated = content.insertMarkdown(
+                            val updated = state.content.insertMarkdown(
                                 prefix = "__",
                                 placeholder = italicPlaceholder,
                                 suffix = "__",
@@ -168,9 +179,9 @@ fun ReplyComposer(
                     val linkUrlPlaceholder = stringResource(resource = Res.string.composer_link_url_placeholder)
                     MarkdownActionButton(
                         iconRes = Res.drawable.ic_link,
-                        enabled = !isSubmitting,
+                        enabled = !state.isSubmitting,
                         onClick = {
-                            val updated = content.insertMarkdown(
+                            val updated = state.content.insertMarkdown(
                                 prefix = "[$linkDescriptionPlaceholder]($linkUrlPlaceholder)",
                                 placeholder = "",
                                 suffix = "",
@@ -182,9 +193,9 @@ fun ReplyComposer(
                     val quotePlaceholder = stringResource(resource = Res.string.composer_quote_placeholder)
                     MarkdownActionButton(
                         iconRes = Res.drawable.ic_format_quote,
-                        enabled = !isSubmitting,
+                        enabled = !state.isSubmitting,
                         onClick = {
-                            val updated = content.insertMarkdown(
+                            val updated = state.content.insertMarkdown(
                                 prefix = ">",
                                 placeholder = quotePlaceholder,
                                 suffix = "",
@@ -196,9 +207,9 @@ fun ReplyComposer(
                     val codePlaceholder = stringResource(resource = Res.string.composer_code_placeholder)
                     MarkdownActionButton(
                         iconRes = Res.drawable.ic_code,
-                        enabled = !isSubmitting,
+                        enabled = !state.isSubmitting,
                         onClick = {
-                            val updated = content.insertMarkdown(
+                            val updated = state.content.insertMarkdown(
                                 prefix = "`",
                                 placeholder = codePlaceholder,
                                 suffix = "`",
@@ -209,9 +220,9 @@ fun ReplyComposer(
                     )
                     MarkdownActionButton(
                         iconRes = Res.drawable.ic_exclamation,
-                        enabled = !isSubmitting,
+                        enabled = !state.isSubmitting,
                         onClick = {
-                            val updated = content.addSpoilerAtLineStart()
+                            val updated = state.content.addSpoilerAtLineStart()
                             onContentChanged(updated)
                         },
                     )
@@ -221,17 +232,68 @@ fun ReplyComposer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
-                    value = content,
+                    value = state.content,
                     onValueChange = {
                         onContentChanged(it)
                     },
-                    enabled = !isSubmitting,
+                    enabled = !state.isSubmitting,
                     minLines = 3,
                     placeholder = {
                         Text(text = hintText)
                     },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
                 )
+
+                if (state.isMediaUploading) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                        )
+                        Text(
+                            text = stringResource(resource = Res.string.composer_photo_uploading),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+
+                state.photoUrl?.let { currentPhotoUrl ->
+                    Box(
+                        modifier = Modifier
+                            .size(width = 120.dp, height = 90.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest),
+                    ) {
+                        AsyncImage(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(8.dp)),
+                            model = currentPhotoUrl,
+                            contentDescription = stringResource(
+                                resource = Res.string.composer_photo_preview,
+                            ),
+                            contentScale = ContentScale.Crop,
+                        )
+                        IconButton(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(28.dp),
+                            enabled = areMediaActionsEnabled,
+                            onClick = onPhotoRemoved,
+                        ) {
+                            Icon(
+                                imageVector = vectorResource(resource = Res.drawable.ic_delete),
+                                contentDescription = stringResource(
+                                    resource = Res.string.accessibility_reply_composer_remove_photo,
+                                ),
+                            )
+                        }
+                    }
+                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -243,8 +305,8 @@ fun ReplyComposer(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Switch(
-                            checked = isAdult,
-                            enabled = !isSubmitting,
+                            checked = state.adult,
+                            enabled = !state.isSubmitting,
                             onCheckedChange = onAdultChanged,
                         )
                         Text(
@@ -252,13 +314,29 @@ fun ReplyComposer(
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                        IconButton(
+                            enabled = areMediaActionsEnabled && state.photoUrl == null,
+                            onClick = {
+                                focusManager.clearFocus()
+                                onPhotoAttachClicked()
+                            },
+                        ) {
+                            Icon(
+                                imageVector = vectorResource(resource = Res.drawable.ic_add_photo),
+                                contentDescription = stringResource(
+                                    resource = Res.string.accessibility_reply_composer_attach_photo,
+                                ),
+                            )
+                        }
                     }
 
                     Button(
                         onClick = onSubmit,
-                        enabled = !isSubmitting && content.text.isNotBlank(),
+                        enabled = !state.isSubmitting &&
+                            !state.isMediaUploading &&
+                            state.content.text.isNotBlank(),
                     ) {
-                        if (isSubmitting) {
+                        if (state.isSubmitting) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(16.dp),
                                 strokeWidth = 2.dp,
@@ -341,17 +419,23 @@ private fun TextFieldValue.addSpoilerAtLineStart(): TextFieldValue {
 
 @Preview
 @Composable
-private fun ReplyComposerPreview() {
+private fun ComposerPreview() {
     PodkopPreview(darkTheme = true) {
-        ReplyComposer(
-            isVisible = true,
-            content = TextFieldValue("test"),
-            isAdult = false,
+        Composer(
+            state = ComposerState.initial.copy(
+                isVisible = true,
+                content = TextFieldValue("test"),
+                adult = false,
+                photoUrl = null,
+                replyTarget = null,
+                isSubmitting = false,
+                isMediaUploading = false,
+            ),
             hintText = stringResource(resource = Res.string.entry_details_reply_composer_hint),
-            replyTarget = null,
-            isSubmitting = false,
             onContentChanged = {},
             onAdultChanged = {},
+            onPhotoAttachClicked = {},
+            onPhotoRemoved = {},
             onDismiss = {},
             onSubmit = {},
         )

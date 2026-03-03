@@ -187,6 +187,7 @@ class LinksRepositoryImplTest {
             linkId = 404,
             content = "@user: hello",
             adult = false,
+            photoKey = "photo-key-3",
         )
 
         assertEquals(
@@ -195,6 +196,7 @@ class LinksRepositoryImplTest {
                     linkId = 404,
                     content = "@user: hello",
                     adult = false,
+                    photoKey = "photo-key-3",
                 ),
             ),
             linksDataSource.createLinkCommentCalls,
@@ -229,6 +231,7 @@ class LinksRepositoryImplTest {
             commentId = 505,
             content = "@author: reply",
             adult = false,
+            photoKey = "photo-key-4",
         )
 
         assertEquals(
@@ -238,6 +241,7 @@ class LinksRepositoryImplTest {
                     commentId = 505,
                     content = "@author: reply",
                     adult = false,
+                    photoKey = "photo-key-4",
                 ),
             ),
             linksDataSource.createLinkCommentReplyCalls,
@@ -316,6 +320,7 @@ class LinksRepositoryImplTest {
             linkId = 12,
             content = "payload",
             adult = false,
+            photoKey = null,
         )
 
         assertTrue(actual.isFailure)

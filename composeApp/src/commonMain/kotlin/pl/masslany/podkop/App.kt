@@ -22,6 +22,12 @@ import org.koin.compose.koinInject
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.components.dialog.DefaultGenericDialog
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreen
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreenRoot
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalScreen
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalScreenRoot
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogScreen
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogScreenRoot
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.BottomSheetSceneStrategy
 import pl.masslany.podkop.common.navigation.GenericDialog
@@ -189,6 +195,41 @@ fun App() {
                     ) {
                         ResourceScreenshotPreviewDialogScreenRoot(
                             screen = it,
+                        )
+                    }
+
+                    entry<ComposerMediaAttachBottomSheetScreen>(
+                        metadata = BottomSheetSceneStrategy.bottomSheet(),
+                    ) {
+                        ComposerMediaAttachBottomSheetScreenRoot(
+                            screen = it,
+                            appNavigator = appNavigator,
+                        )
+                    }
+
+                    entry<ComposerMediaUrlDialogScreen>(
+                        metadata = DialogSceneStrategy.dialog(
+                            DialogProperties(
+                                usePlatformDefaultWidth = false,
+                            ),
+                        ),
+                    ) {
+                        ComposerMediaUrlDialogScreenRoot(
+                            screen = it,
+                            appNavigator = appNavigator,
+                        )
+                    }
+
+                    entry<ComposerMediaPickLocalScreen>(
+                        metadata = DialogSceneStrategy.dialog(
+                            DialogProperties(
+                                usePlatformDefaultWidth = false,
+                            ),
+                        ),
+                    ) {
+                        ComposerMediaPickLocalScreenRoot(
+                            screen = it,
+                            appNavigator = appNavigator,
                         )
                     }
 

@@ -99,12 +99,14 @@ class EntriesRepositoryImpl(
         entryId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<ResourceItem> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.createEntryComment(
                 entryId = entryId,
                 content = content,
                 adult = adult,
+                photoKey = photoKey,
             ).mapCatching {
                 listOf(it.data).toResourceItemList().first()
             }
@@ -114,11 +116,13 @@ class EntriesRepositoryImpl(
     override suspend fun createEntry(
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<ResourceItem> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.createEntry(
                 content = content,
                 adult = adult,
+                photoKey = photoKey,
             ).mapCatching {
                 listOf(it.data).toResourceItemList().first()
             }

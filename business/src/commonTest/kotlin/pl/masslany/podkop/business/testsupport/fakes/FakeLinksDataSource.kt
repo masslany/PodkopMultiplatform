@@ -3,6 +3,7 @@ package pl.masslany.podkop.business.testsupport.fakes
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.links.data.api.LinksDataSource
+import pl.masslany.podkop.business.links.data.network.models.LinkUpvotesResponseDto
 
 class FakeLinksDataSource : LinksDataSource {
     data class GetLinksCall(
@@ -37,6 +38,7 @@ class FakeLinksDataSource : LinksDataSource {
         val linkId: Int,
         val content: String,
         val adult: Boolean,
+        val photoKey: String?,
     )
 
     data class CreateLinkCommentReplyCall(
@@ -44,6 +46,13 @@ class FakeLinksDataSource : LinksDataSource {
         val commentId: Int,
         val content: String,
         val adult: Boolean,
+        val photoKey: String?,
+    )
+
+    data class GetLinkUpvotesCall(
+        val linkId: Int,
+        val type: String,
+        val page: Int?,
     )
 
     var getLinksResult: Result<ResourceResponseDto> = unstubbedResult("LinksDataSource.getLinks")
@@ -55,6 +64,7 @@ class FakeLinksDataSource : LinksDataSource {
         unstubbedResult("LinksDataSource.createLinkComment")
     var createLinkCommentReplyResult: Result<SingleResourceResponseDto> =
         unstubbedResult("LinksDataSource.createLinkCommentReply")
+    var getLinkUpvotesResult: Result<LinkUpvotesResponseDto> = unstubbedResult("LinksDataSource.getLinkUpvotes")
     var voteOnLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.voteOnLink")
     var removeVoteOnLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.removeVoteOnLink")
     var voteOnLinkCommentResult: Result<Unit> = unstubbedResult("LinksDataSource.voteOnLinkComment")
@@ -67,6 +77,7 @@ class FakeLinksDataSource : LinksDataSource {
     val getRelatedLinksCalls = mutableListOf<Int>()
     val createLinkCommentCalls = mutableListOf<CreateLinkCommentCall>()
     val createLinkCommentReplyCalls = mutableListOf<CreateLinkCommentReplyCall>()
+    val getLinkUpvotesCalls = mutableListOf<GetLinkUpvotesCall>()
     val voteOnLinkCalls = mutableListOf<Int>()
     val removeVoteOnLinkCalls = mutableListOf<Int>()
     val voteOnLinkCommentCalls = mutableListOf<LinkCommentVoteCall>()
@@ -118,8 +129,9 @@ class FakeLinksDataSource : LinksDataSource {
         linkId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
-        createLinkCommentCalls += CreateLinkCommentCall(linkId, content, adult)
+        createLinkCommentCalls += CreateLinkCommentCall(linkId, content, adult, photoKey)
         return createLinkCommentResult
     }
 
@@ -128,9 +140,15 @@ class FakeLinksDataSource : LinksDataSource {
         commentId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
-        createLinkCommentReplyCalls += CreateLinkCommentReplyCall(linkId, commentId, content, adult)
+        createLinkCommentReplyCalls += CreateLinkCommentReplyCall(linkId, commentId, content, adult, photoKey)
         return createLinkCommentReplyResult
+    }
+
+    override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto> {
+        getLinkUpvotesCalls += GetLinkUpvotesCall(linkId, type, page)
+        return getLinkUpvotesResult
     }
 
     override suspend fun voteOnLink(linkId: Int): Result<Unit> {

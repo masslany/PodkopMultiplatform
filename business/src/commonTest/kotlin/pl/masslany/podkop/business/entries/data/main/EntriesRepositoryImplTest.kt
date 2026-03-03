@@ -261,6 +261,7 @@ class EntriesRepositoryImplTest {
             entryId = 77,
             content = "@author: hello there",
             adult = false,
+            photoKey = "photo-key-1",
         )
 
         assertEquals(
@@ -269,6 +270,7 @@ class EntriesRepositoryImplTest {
                     entryId = 77,
                     content = "@author: hello there",
                     adult = false,
+                    photoKey = "photo-key-1",
                 ),
             ),
             entriesDataSource.createEntryCommentCalls,
@@ -296,6 +298,7 @@ class EntriesRepositoryImplTest {
             entryId = 8,
             content = "foo",
             adult = false,
+            photoKey = null,
         )
 
         assertTrue(actual.isFailure)
@@ -320,6 +323,7 @@ class EntriesRepositoryImplTest {
         val actual = sut.createEntry(
             content = "new entry content",
             adult = true,
+            photoKey = "photo-key-2",
         )
 
         assertEquals(
@@ -327,6 +331,7 @@ class EntriesRepositoryImplTest {
                 FakeEntriesDataSource.CreateEntryCall(
                     content = "new entry content",
                     adult = true,
+                    photoKey = "photo-key-2",
                 ),
             ),
             entriesDataSource.createEntryCalls,
@@ -352,6 +357,7 @@ class EntriesRepositoryImplTest {
         val actual = sut.createEntry(
             content = "foo",
             adult = false,
+            photoKey = null,
         )
 
         assertTrue(actual.isFailure)

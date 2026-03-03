@@ -213,6 +213,7 @@ private fun resourceLinkComment(
     title = "",
     voted = Voted.None,
     votes = votes(),
+    favourite = false,
 )
 
 private fun commentLinkReply(

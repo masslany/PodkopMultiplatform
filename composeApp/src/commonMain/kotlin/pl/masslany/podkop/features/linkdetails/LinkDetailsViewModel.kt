@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,13 +17,25 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
+import pl.masslany.podkop.business.media.domain.main.MediaPhotoType
+import pl.masslany.podkop.business.media.domain.main.MediaRepository
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
+import pl.masslany.podkop.common.composer.ComposerPickedImage
+import pl.masslany.podkop.common.composer.ComposerState
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreen
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachResult
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalResult
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalScreen
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogResult
+import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogScreen
+import pl.masslany.podkop.common.composer.isComposerImagePickerAvailable
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
@@ -50,6 +63,7 @@ class LinkDetailsViewModel(
     private val linksRepository: LinksRepository,
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
+    private val mediaRepository: MediaRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val appNavigator: AppNavigator,
     private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
@@ -158,61 +172,166 @@ class LinkDetailsViewModel(
 
     override fun onComposerTextChanged(content: TextFieldValue) {
         updateState { previousState ->
-            previousState.copy(composerContent = content)
+            previousState.updateComposer { composer ->
+                composer.copy(content = content)
+            }
         }
     }
 
     override fun onComposerAdultChanged(adult: Boolean) {
         updateState { previousState ->
-            previousState.copy(composerAdult = adult)
+            previousState.updateComposer { composer ->
+                composer.copy(adult = adult)
+            }
         }
     }
 
+    override fun onComposerPhotoAttachClicked() {
+        viewModelScope.launch {
+            val attachResultKey = "link-details-attach-$id-${kotlin.random.Random.nextInt()}"
+            val attachResult = appNavigator.awaitResult<ComposerMediaAttachResult>(
+                target = ComposerMediaAttachBottomSheetScreen(
+                    resultKey = attachResultKey,
+                    showLocalPicker = isComposerImagePickerAvailable(),
+                ),
+                key = attachResultKey,
+            )
+
+            when (attachResult) {
+                ComposerMediaAttachResult.Url -> {
+                    val urlResultKey = "link-details-url-$id-${kotlin.random.Random.nextInt()}"
+                    val result = appNavigator.awaitResult<ComposerMediaUrlDialogResult>(
+                        target = ComposerMediaUrlDialogScreen(resultKey = urlResultKey),
+                        key = urlResultKey,
+                    )
+                    val url = result.url?.trim().orEmpty()
+                    if (url.isNotBlank()) {
+                        attachComposerPhotoFromUrl(url)
+                    }
+                }
+
+                ComposerMediaAttachResult.Local -> {
+                    val localResultKey = "link-details-local-$id-${kotlin.random.Random.nextInt()}"
+                    val result = appNavigator.awaitResult<ComposerMediaPickLocalResult>(
+                        target = ComposerMediaPickLocalScreen(resultKey = localResultKey),
+                        key = localResultKey,
+                    )
+                    result.image?.let(::attachComposerPhotoFromLocal)
+                }
+
+                ComposerMediaAttachResult.Dismissed -> Unit
+            }
+        }
+    }
+
+    private fun attachComposerPhotoFromUrl(url: String) {
+        val normalizedUrl = url.trim()
+        if (!isHttpUrl(normalizedUrl)) {
+            snackbarManager.tryEmitGenericError()
+            return
+        }
+
+        uploadComposerPhoto {
+            mediaRepository.uploadPhotoFromUrl(
+                url = normalizedUrl,
+                type = MediaPhotoType.Links,
+            )
+        }
+    }
+
+    private fun attachComposerPhotoFromLocal(image: ComposerPickedImage) {
+        uploadComposerPhoto {
+            mediaRepository.uploadPhotoFromDevice(
+                bytes = image.bytes,
+                fileName = image.fileName,
+                mimeType = image.mimeType,
+                type = MediaPhotoType.Links,
+            )
+        }
+    }
+
+    override fun onComposerPhotoRemoved() {
+        val currentState = state.value
+        if (!currentState.composer.isVisible || currentState.composer.isSubmitting ||
+            currentState.composer.isMediaUploading
+        ) {
+            return
+        }
+
+        val photoKey = currentState.composer.photoKey
+        if (photoKey == null && currentState.composer.photoUrl == null) {
+            return
+        }
+
+        updateState { previousState ->
+            previousState.updateComposer { composer ->
+                composer.copy(
+                    photoKey = null,
+                    photoUrl = null,
+                )
+            }
+        }
+        photoKey?.let { deletePhoto(photoKey = it, showError = true) }
+    }
+
     override fun onComposerDismissed() {
+        val photoKey = state.value.composer.photoKey
         updateState(::clearComposerState)
+        photoKey?.let { deletePhoto(photoKey = it, showError = true) }
     }
 
     override fun onComposerSubmit() {
         val currentState = state.value
-        if (!currentState.isLoggedIn || !currentState.isComposerVisible || currentState.isComposerSubmitting) {
+        if (!currentState.isLoggedIn ||
+            !currentState.composer.isVisible ||
+            currentState.composer.isSubmitting ||
+            currentState.composer.isMediaUploading
+        ) {
             return
         }
 
-        val content = currentState.composerContent.text.trim()
+        val content = currentState.composer.content.text.trim()
         if (content.isBlank()) {
             return
         }
 
         updateState { previousState ->
-            previousState.copy(isComposerSubmitting = true)
+            previousState.updateComposer { composer ->
+                composer.copy(isSubmitting = true)
+            }
         }
 
         viewModelScope.launch {
-            val submitResult = if (currentState.composerParentCommentId == null) {
+            val parentCommentId = currentState.composer.parentCommentId
+            val submitResult = if (parentCommentId == null) {
                 linksRepository.createLinkComment(
                     linkId = id,
                     content = content,
-                    adult = currentState.composerAdult,
+                    adult = currentState.composer.adult,
+                    photoKey = currentState.composer.photoKey,
                 )
             } else {
                 linksRepository.createLinkCommentReply(
                     linkId = id,
-                    commentId = currentState.composerParentCommentId,
+                    commentId = parentCommentId,
                     content = content,
-                    adult = currentState.composerAdult,
+                    adult = currentState.composer.adult,
+                    photoKey = currentState.composer.photoKey,
                 )
             }
 
             submitResult.onSuccess { createdComment ->
                 appendCreatedComment(
                     createdComment = createdComment,
-                    repliedCommentId = currentState.composerParentCommentId,
+                    repliedCommentId = parentCommentId,
                 )
                 updateState(::clearComposerState)
             }.onFailure {
                 logger.error("Failed to create link comment for id=$id", it)
                 updateState { previousState ->
-                    previousState.copy(isComposerSubmitting = false)
+                    previousState.updateComposer { composer ->
+                        composer.copy(isSubmitting = false)
+                    }
                 }
                 snackbarManager.tryEmitGenericError()
             }
@@ -399,6 +518,13 @@ class LinkDetailsViewModel(
         paginator.paginate()
     }
 
+    override fun onCleared() {
+        _state.value.composer.photoKey?.let { photoKey ->
+            deletePhoto(photoKey = photoKey)
+        }
+        super.onCleared()
+    }
+
     override fun onLinkVoteClicked(id: Int, voted: Boolean) {
         viewModelScope.launch {
             val voteResult = if (voted) {
@@ -409,6 +535,62 @@ class LinkDetailsViewModel(
 
             voteResult.onSuccess {
                 refreshLink(id)
+            }
+        }
+    }
+
+    private fun uploadComposerPhoto(upload: suspend () -> Result<pl.masslany.podkop.business.common.domain.models.common.Photo>) {
+        val currentState = state.value
+        if (!currentState.composer.isVisible || currentState.composer.isSubmitting ||
+            currentState.composer.isMediaUploading
+        ) {
+            return
+        }
+
+        val previousPhotoKey = currentState.composer.photoKey
+
+        updateState { previousState ->
+            previousState.updateComposer { composer ->
+                composer.copy(isMediaUploading = true)
+            }
+        }
+
+        viewModelScope.launch {
+            upload().onSuccess { photo ->
+                updateState { previousState ->
+                    previousState.updateComposer { composer ->
+                        composer.copy(
+                            photoKey = photo.key,
+                            photoUrl = photo.url,
+                            isMediaUploading = false,
+                        )
+                    }
+                }
+
+                if (previousPhotoKey != null && previousPhotoKey != photo.key) {
+                    deletePhoto(photoKey = previousPhotoKey)
+                }
+            }.onFailure {
+                logger.error("Failed to upload link details composer media for linkId=$id", it)
+                updateState { previousState ->
+                    previousState.updateComposer { composer ->
+                        composer.copy(isMediaUploading = false)
+                    }
+                }
+                snackbarManager.tryEmitGenericError()
+            }
+        }
+    }
+
+    private fun deletePhoto(photoKey: String, showError: Boolean = false) {
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                mediaRepository.deletePhoto(key = photoKey).onFailure {
+                    logger.error("Failed to delete uploaded link details composer photo for key=$photoKey", it)
+                    if (showError) {
+                        snackbarManager.tryEmitGenericError()
+                    }
+                }
             }
         }
     }
@@ -460,39 +642,20 @@ class LinkDetailsViewModel(
                     .isSuccess
 
                 viewerContextDeferred.await().let { viewerContext ->
+                    if (!viewerContext.isLoggedIn) {
+                        _state.value.composer.photoKey?.let { previousPhotoKey ->
+                            deletePhoto(photoKey = previousPhotoKey)
+                        }
+                    }
+
                     updateState { previousState ->
                         previousState.copy(
                             isLoggedIn = viewerContext.isLoggedIn,
                             currentUsername = viewerContext.username,
-                            isComposerVisible = if (viewerContext.isLoggedIn) {
-                                previousState.isComposerVisible
+                            composer = if (viewerContext.isLoggedIn) {
+                                previousState.composer
                             } else {
-                                false
-                            },
-                            composerContent = if (viewerContext.isLoggedIn) {
-                                previousState.composerContent
-                            } else {
-                                TextFieldValue()
-                            },
-                            composerReplyTarget = if (viewerContext.isLoggedIn) {
-                                previousState.composerReplyTarget
-                            } else {
-                                null
-                            },
-                            composerParentCommentId = if (viewerContext.isLoggedIn) {
-                                previousState.composerParentCommentId
-                            } else {
-                                null
-                            },
-                            composerAdult = if (viewerContext.isLoggedIn) {
-                                previousState.composerAdult
-                            } else {
-                                false
-                            },
-                            isComposerSubmitting = if (viewerContext.isLoggedIn) {
-                                previousState.isComposerSubmitting
-                            } else {
-                                false
+                                ComposerState.initial
                             },
                         )
                     }
@@ -696,6 +859,10 @@ class LinkDetailsViewModel(
             return
         }
 
+        state.value.composer.photoKey?.let { previousPhotoKey ->
+            deletePhoto(photoKey = previousPhotoKey)
+        }
+
         val normalizedAuthor = author?.trim().orEmpty()
         val prefill = if (normalizedAuthor.isEmpty()) {
             ""
@@ -704,17 +871,22 @@ class LinkDetailsViewModel(
         }
 
         updateState { previousState ->
-            previousState.copy(
-                isComposerVisible = true,
-                composerReplyTarget = if (normalizedAuthor.isEmpty()) null else "@$normalizedAuthor",
-                composerContent = TextFieldValue(
-                    text = prefill,
-                    selection = TextRange(prefill.length),
-                ),
-                composerParentCommentId = parentCommentId,
-                composerAdult = false,
-                isComposerSubmitting = false,
-            )
+            previousState.updateComposer {
+                ComposerState(
+                    isVisible = true,
+                    replyTarget = if (normalizedAuthor.isEmpty()) null else "@$normalizedAuthor",
+                    content = TextFieldValue(
+                        text = prefill,
+                        selection = TextRange(prefill.length),
+                    ),
+                    parentCommentId = parentCommentId,
+                    adult = false,
+                    photoKey = null,
+                    photoUrl = null,
+                    isSubmitting = false,
+                    isMediaUploading = false,
+                )
+            }
         }
     }
 
@@ -804,14 +976,7 @@ class LinkDetailsViewModel(
 
     private fun clearComposerState(
         previousState: LinkDetailsScreenState,
-    ): LinkDetailsScreenState = previousState.copy(
-        isComposerVisible = false,
-        composerContent = TextFieldValue(),
-        composerReplyTarget = null,
-        composerParentCommentId = null,
-        composerAdult = false,
-        isComposerSubmitting = false,
-    )
+    ): LinkDetailsScreenState = previousState.updateComposer { ComposerState.initial }
 
     private inline fun updateState(transform: (LinkDetailsScreenState) -> LinkDetailsScreenState) {
         _state.update { previousState ->
@@ -831,11 +996,17 @@ class LinkDetailsViewModel(
                     expanded = false,
                 ),
             ),
-            isComposerVisible = draft?.isVisible ?: false,
-            composerContent = draft?.content ?: TextFieldValue(),
-            composerReplyTarget = draft?.replyTarget,
-            composerParentCommentId = draft?.parentCommentId,
-            composerAdult = draft?.adult ?: false,
+            composer = ComposerState(
+                isVisible = draft?.isVisible ?: false,
+                content = draft?.content ?: TextFieldValue(),
+                replyTarget = draft?.replyTarget,
+                parentCommentId = draft?.parentCommentId,
+                adult = draft?.adult ?: false,
+                photoKey = draft?.photoKey,
+                photoUrl = draft?.photoUrl,
+                isSubmitting = false,
+                isMediaUploading = false,
+            ),
         )
     }
 
@@ -847,8 +1018,16 @@ class LinkDetailsViewModel(
         val replyTarget = savedStateHandle.get<String>(STATE_COMPOSER_REPLY_TARGET)
         val parentCommentId = savedStateHandle.get<Int>(STATE_COMPOSER_PARENT_COMMENT_ID)
         val adult = savedStateHandle.get<Boolean>(STATE_COMPOSER_ADULT) ?: false
+        val photoKey = savedStateHandle.get<String>(STATE_COMPOSER_PHOTO_KEY)
+        val photoUrl = savedStateHandle.get<String>(STATE_COMPOSER_PHOTO_URL)
 
-        val hasPersistedDraft = visible || text.isNotEmpty() || replyTarget != null || parentCommentId != null || adult
+        val hasPersistedDraft = visible ||
+            text.isNotEmpty() ||
+            replyTarget != null ||
+            parentCommentId != null ||
+            adult ||
+            photoKey != null ||
+            photoUrl != null
         if (!hasPersistedDraft) {
             return null
         }
@@ -857,7 +1036,7 @@ class LinkDetailsViewModel(
         val clampedSelectionEnd = selectionEnd.coerceIn(0, text.length)
 
         return RestoredComposerDraft(
-            isVisible = visible || text.isNotEmpty(),
+            isVisible = visible || text.isNotEmpty() || photoKey != null || photoUrl != null,
             content = TextFieldValue(
                 text = text,
                 selection = TextRange(clampedSelectionStart, clampedSelectionEnd),
@@ -865,15 +1044,19 @@ class LinkDetailsViewModel(
             replyTarget = replyTarget,
             parentCommentId = parentCommentId,
             adult = adult,
+            photoKey = photoKey,
+            photoUrl = photoUrl,
         )
     }
 
     private fun persistComposerDraft(state: LinkDetailsScreenState) {
-        val hasPersistedDraft = state.isComposerVisible ||
-            state.composerContent.text.isNotEmpty() ||
-            state.composerReplyTarget != null ||
-            state.composerParentCommentId != null ||
-            state.composerAdult
+        val hasPersistedDraft = state.composer.isVisible ||
+            state.composer.content.text.isNotEmpty() ||
+            state.composer.replyTarget != null ||
+            state.composer.parentCommentId != null ||
+            state.composer.adult ||
+            state.composer.photoKey != null ||
+            state.composer.photoUrl != null
 
         if (!hasPersistedDraft) {
             savedStateHandle.remove<Any?>(STATE_COMPOSER_VISIBLE)
@@ -883,16 +1066,25 @@ class LinkDetailsViewModel(
             savedStateHandle.remove<Any?>(STATE_COMPOSER_REPLY_TARGET)
             savedStateHandle.remove<Any?>(STATE_COMPOSER_PARENT_COMMENT_ID)
             savedStateHandle.remove<Any?>(STATE_COMPOSER_ADULT)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_PHOTO_KEY)
+            savedStateHandle.remove<Any?>(STATE_COMPOSER_PHOTO_URL)
             return
         }
 
-        savedStateHandle[STATE_COMPOSER_VISIBLE] = state.isComposerVisible
-        savedStateHandle[STATE_COMPOSER_CONTENT] = state.composerContent.text
-        savedStateHandle[STATE_COMPOSER_SELECTION_START] = state.composerContent.selection.start
-        savedStateHandle[STATE_COMPOSER_SELECTION_END] = state.composerContent.selection.end
-        savedStateHandle[STATE_COMPOSER_REPLY_TARGET] = state.composerReplyTarget
-        savedStateHandle[STATE_COMPOSER_PARENT_COMMENT_ID] = state.composerParentCommentId
-        savedStateHandle[STATE_COMPOSER_ADULT] = state.composerAdult
+        savedStateHandle[STATE_COMPOSER_VISIBLE] = state.composer.isVisible
+        savedStateHandle[STATE_COMPOSER_CONTENT] = state.composer.content.text
+        savedStateHandle[STATE_COMPOSER_SELECTION_START] = state.composer.content.selection.start
+        savedStateHandle[STATE_COMPOSER_SELECTION_END] = state.composer.content.selection.end
+        savedStateHandle[STATE_COMPOSER_REPLY_TARGET] = state.composer.replyTarget
+        savedStateHandle[STATE_COMPOSER_PARENT_COMMENT_ID] = state.composer.parentCommentId
+        savedStateHandle[STATE_COMPOSER_ADULT] = state.composer.adult
+        savedStateHandle[STATE_COMPOSER_PHOTO_KEY] = state.composer.photoKey
+        savedStateHandle[STATE_COMPOSER_PHOTO_URL] = state.composer.photoUrl
+    }
+
+    private fun isHttpUrl(value: String): Boolean {
+        val normalized = value.lowercase()
+        return normalized.startsWith("http://") || normalized.startsWith("https://")
     }
 
     private fun CommentRepliesState.mergeReplies(
@@ -926,6 +1118,8 @@ class LinkDetailsViewModel(
         val replyTarget: String?,
         val parentCommentId: Int?,
         val adult: Boolean,
+        val photoKey: String?,
+        val photoUrl: String?,
     )
 
     private data class ViewerContext(val isLoggedIn: Boolean, val username: String?)
@@ -938,6 +1132,8 @@ class LinkDetailsViewModel(
         const val STATE_COMPOSER_REPLY_TARGET = "link_details_composer_reply_target"
         const val STATE_COMPOSER_PARENT_COMMENT_ID = "link_details_composer_parent_comment_id"
         const val STATE_COMPOSER_ADULT = "link_details_composer_adult"
+        const val STATE_COMPOSER_PHOTO_KEY = "link_details_composer_photo_key"
+        const val STATE_COMPOSER_PHOTO_URL = "link_details_composer_photo_url"
     }
 }
 

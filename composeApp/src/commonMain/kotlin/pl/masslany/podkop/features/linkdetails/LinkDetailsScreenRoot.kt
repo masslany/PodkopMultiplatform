@@ -65,6 +65,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.composer.Composer
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
@@ -77,7 +78,6 @@ import pl.masslany.podkop.features.linkdetails.models.LinkDetailsCommentItemStat
 import pl.masslany.podkop.features.linkdetails.preview.LinkDetailsScreenStateProvider
 import pl.masslany.podkop.features.linkdetails.preview.NoOpLinkDetailsActions
 import pl.masslany.podkop.features.resources.components.LinkCommentItem
-import pl.masslany.podkop.features.resources.components.ReplyComposer
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
@@ -213,7 +213,7 @@ fun LinkDetailsScreenContent(
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = showFab && !state.isComposerVisible,
+                visible = showFab && !state.composer.isVisible,
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
@@ -239,7 +239,11 @@ fun LinkDetailsScreenContent(
         containerColor = MaterialTheme.colorScheme.surface,
     ) { innerPaddingValues ->
         // TODO: Rethink this with imePadding() and what now
-        val composerBottomPadding = if (state.isComposerVisible) 232.dp else 0.dp
+        val composerBottomPadding = if (state.composer.isVisible) {
+            if (state.composer.photoUrl != null) 304.dp else 232.dp
+        } else {
+            0.dp
+        }
 
         Box(
             modifier = Modifier
@@ -275,16 +279,14 @@ fun LinkDetailsScreenContent(
                 }
             }
 
-            ReplyComposer(
+            Composer(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                isVisible = state.isComposerVisible,
-                content = state.composerContent,
-                isAdult = state.composerAdult,
+                state = state.composer,
                 hintText = stringResource(resource = Res.string.entry_details_reply_composer_hint),
-                replyTarget = state.composerReplyTarget,
-                isSubmitting = state.isComposerSubmitting,
                 onContentChanged = actions::onComposerTextChanged,
                 onAdultChanged = actions::onComposerAdultChanged,
+                onPhotoAttachClicked = actions::onComposerPhotoAttachClicked,
+                onPhotoRemoved = actions::onComposerPhotoRemoved,
                 onDismiss = actions::onComposerDismissed,
                 onSubmit = actions::onComposerSubmit,
             )

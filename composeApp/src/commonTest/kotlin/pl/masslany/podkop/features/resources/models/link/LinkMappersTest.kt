@@ -108,6 +108,7 @@ private fun linkResource(
     title = "title",
     voted = Voted.None,
     votes = Votes(count = 0, down = 0, up = 0),
+    favourite = false,
 )
 
 private fun linkComment(

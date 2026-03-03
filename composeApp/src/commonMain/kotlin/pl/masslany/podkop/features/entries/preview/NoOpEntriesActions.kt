@@ -25,6 +25,8 @@ object NoOpEntriesActions :
     override fun onRefresh(sortType: DropdownMenuItemType) = Unit
     override fun onComposerTextChanged(content: TextFieldValue) = Unit
     override fun onComposerAdultChanged(adult: Boolean) = Unit
+    override fun onComposerPhotoAttachClicked() = Unit
+    override fun onComposerPhotoRemoved() = Unit
     override fun onComposerDismissed() = Unit
     override fun onComposerSubmit() = Unit
 }

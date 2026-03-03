@@ -15,4 +15,6 @@ data class LinkCommentCreateDataDto(
     val content: String,
     @SerialName("adult")
     val adult: Boolean,
+    @SerialName("photo")
+    val photo: String? = null,
 )

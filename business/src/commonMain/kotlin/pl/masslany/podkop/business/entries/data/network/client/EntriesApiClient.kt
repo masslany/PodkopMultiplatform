@@ -124,11 +124,13 @@ class EntriesApiClient(
         entryId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
         val body = EntryCommentCreateRequestDto(
             data = EntryCommentCreateDataDto(
                 content = content,
                 adult = adult,
+                photo = photoKey,
             ),
         )
         val request =
@@ -147,11 +149,13 @@ class EntriesApiClient(
     override suspend fun createEntry(
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
         val body = EntryCreateRequestDto(
             data = EntryCreateDataDto(
                 content = content,
                 adult = adult,
+                photo = photoKey,
             ),
         )
         val request =

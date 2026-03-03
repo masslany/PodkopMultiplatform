@@ -35,11 +35,13 @@ class FakeEntriesDataSource : EntriesDataSource {
         val entryId: Int,
         val content: String,
         val adult: Boolean,
+        val photoKey: String?,
     )
 
     data class CreateEntryCall(
         val content: String,
         val adult: Boolean,
+        val photoKey: String?,
     )
 
     var getEntriesResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntries")
@@ -119,11 +121,13 @@ class FakeEntriesDataSource : EntriesDataSource {
         entryId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
         createEntryCommentCalls += CreateEntryCommentCall(
             entryId = entryId,
             content = content,
             adult = adult,
+            photoKey = photoKey,
         )
         return createEntryCommentResult
     }
@@ -131,10 +135,12 @@ class FakeEntriesDataSource : EntriesDataSource {
     override suspend fun createEntry(
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto> {
         createEntryCalls += CreateEntryCall(
             content = content,
             adult = adult,
+            photoKey = photoKey,
         )
         return createEntryResult
     }

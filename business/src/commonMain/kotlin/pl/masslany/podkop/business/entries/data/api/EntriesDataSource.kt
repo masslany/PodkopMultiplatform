@@ -38,11 +38,13 @@ interface EntriesDataSource {
         entryId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto>
 
     suspend fun createEntry(
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto>
 
     suspend fun voteUp(entryId: Int): Result<Unit>

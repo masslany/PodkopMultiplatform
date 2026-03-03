@@ -37,6 +37,7 @@ interface LinksApi {
         linkId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto>
 
     suspend fun createLinkCommentReply(
@@ -44,6 +45,7 @@ interface LinksApi {
         commentId: Int,
         content: String,
         adult: Boolean,
+        photoKey: String?,
     ): Result<SingleResourceResponseDto>
 
     suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto>

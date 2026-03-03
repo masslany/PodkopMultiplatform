@@ -18,6 +18,10 @@ interface EntryDetailsActions :
 
     fun onComposerAdultChanged(adult: Boolean)
 
+    fun onComposerPhotoAttachClicked()
+
+    fun onComposerPhotoRemoved()
+
     fun onComposerDismissed()
 
     fun onComposerSubmit()

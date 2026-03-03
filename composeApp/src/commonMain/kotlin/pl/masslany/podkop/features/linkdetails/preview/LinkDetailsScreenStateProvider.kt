@@ -1,8 +1,8 @@
 package pl.masslany.podkop.features.linkdetails.preview
 
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.collections.immutable.persistentListOf
+import pl.masslany.podkop.common.composer.ComposerState
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.features.linkdetails.LinkDetailsCommentsState
@@ -63,12 +63,7 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
                     ),
                 ),
             ),
-            isComposerVisible = false,
-            composerContent = TextFieldValue(),
-            composerReplyTarget = null,
-            composerParentCommentId = null,
-            composerAdult = false,
-            isComposerSubmitting = false,
+            composer = ComposerState.initial,
         ),
         LinkDetailsScreenState(
             isLoading = false,
@@ -81,12 +76,7 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
                 sortMenuState = DropdownMenuState.initial,
             ),
             relatedState = LinkDetailsRelatedState.Empty,
-            isComposerVisible = false,
-            composerContent = TextFieldValue(),
-            composerReplyTarget = null,
-            composerParentCommentId = null,
-            composerAdult = false,
-            isComposerSubmitting = false,
+            composer = ComposerState.initial,
         ),
     )
 }
