@@ -18,6 +18,7 @@ android {
     namespace = "pl.masslany.podkop"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
+        applicationId = "pl.masslany.podkop"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 10
@@ -31,6 +32,10 @@ android {
         buildConfig = true
     }
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
