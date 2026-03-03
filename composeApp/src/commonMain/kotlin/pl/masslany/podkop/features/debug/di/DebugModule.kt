@@ -8,6 +8,7 @@ val debugModule = module {
     viewModel {
         DebugViewModel(
             appNavigator = get(),
+            buildInfo = get(),
             topBarActions = get(),
         )
     }

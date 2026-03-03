@@ -50,8 +50,8 @@ import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.profile_log_out_button
 import podkop.composeapp.generated.resources.settings_body_dynamic_colors
 import podkop.composeapp.generated.resources.settings_body_gif_autoplay
-import podkop.composeapp.generated.resources.settings_body_version
 import podkop.composeapp.generated.resources.settings_body_open_debug
+import podkop.composeapp.generated.resources.settings_body_version
 import podkop.composeapp.generated.resources.settings_button_open_debug
 import podkop.composeapp.generated.resources.settings_headline_account
 import podkop.composeapp.generated.resources.settings_headline_debug

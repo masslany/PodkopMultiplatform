@@ -5,13 +5,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import pl.masslany.podkop.common.navigation.AppNavigator
-import pl.masslany.podkop.common.platform.isDebugBuild
+import pl.masslany.podkop.common.platform.BuildInfo
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.topbar.TopBarActions
 
-class DebugViewModel(private val appNavigator: AppNavigator, topBarActions: TopBarActions) :
-    ViewModel(),
+class DebugViewModel(
+    private val appNavigator: AppNavigator,
+    private val buildInfo: BuildInfo,
+    topBarActions: TopBarActions,
+) : ViewModel(),
     DebugActions,
     TopBarActions by topBarActions {
 
@@ -19,7 +22,7 @@ class DebugViewModel(private val appNavigator: AppNavigator, topBarActions: TopB
     val state = _state.asStateFlow()
 
     init {
-        if (!isDebugBuild()) {
+        if (!buildInfo.isDebugBuild) {
             appNavigator.back()
         }
     }

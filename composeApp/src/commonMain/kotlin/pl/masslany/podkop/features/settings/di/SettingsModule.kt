@@ -13,6 +13,7 @@ val settingsModule = module {
             appNavigator = get(),
             logger = get(),
             snackbarManager = get(),
+            buildInfo = get(),
             topBarActions = get(),
         )
     }

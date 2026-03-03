@@ -1,5 +1,7 @@
 package pl.masslany.podkop.common
 
+import kotlin.experimental.ExperimentalNativeApi
+import kotlin.native.Platform
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -14,9 +16,11 @@ import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.deeplink.AppDeepLinkHandler
 import pl.masslany.podkop.common.navigation.ExternalBrowser
+import pl.masslany.podkop.common.platform.BuildInfo
 import pl.masslany.podkop.common.platform.ImageDownloader
 import pl.masslany.podkop.common.platform.ScreenshotExporter
 import pl.masslany.podkop.initKoin
+import platform.Foundation.NSBundle
 
 fun initKoinIos() {
     initKoin {
@@ -26,6 +30,12 @@ fun initKoinIos() {
 
 val iOSModule = module {
     single { IOSViewControllerHolder() }
+    single {
+        BuildInfo(
+            isDebugBuild = isIosDebugBinary(),
+            appVersionName = iosAppVersionName(),
+        )
+    }
     single {
         ExternalBrowser(
             viewControllerProvider = get<IOSViewControllerHolder>().provider,
@@ -94,4 +104,24 @@ private fun AppState.toIOSAppStartupState(): IOSAppStartupState = when (this) {
     AppState.Initializing -> IOSAppStartupState.Initializing
     AppState.Ready -> IOSAppStartupState.Ready
     AppState.Error -> IOSAppStartupState.Error
+}
+
+@OptIn(ExperimentalNativeApi::class)
+private fun isIosDebugBinary(): Boolean = Platform.isDebugBinary
+
+private fun iosAppVersionName(): String {
+    val bundle = NSBundle.mainBundle
+    val shortVersion = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String
+    val buildVersion = bundle.objectForInfoDictionaryKey("CFBundleVersion") as? String
+
+    return when {
+        !shortVersion.isNullOrBlank() && !buildVersion.isNullOrBlank() && shortVersion != buildVersion ->
+            "$shortVersion ($buildVersion)"
+
+        !shortVersion.isNullOrBlank() -> shortVersion
+
+        !buildVersion.isNullOrBlank() -> buildVersion
+
+        else -> "unknown"
+    }
 }

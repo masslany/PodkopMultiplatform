@@ -13,8 +13,7 @@ import pl.masslany.podkop.common.deeplink.AuthSessionEvents
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.GenericDialog
-import pl.masslany.podkop.common.platform.appVersionName
-import pl.masslany.podkop.common.platform.isDebugBuild
+import pl.masslany.podkop.common.platform.BuildInfo
 import pl.masslany.podkop.common.platform.supportsDynamicColorsToggle
 import pl.masslany.podkop.common.settings.AppSettings
 import pl.masslany.podkop.common.settings.ThemeOverride
@@ -34,12 +33,12 @@ class SettingsViewModel(
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
+    private val buildInfo: BuildInfo,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     SettingsActions,
     TopBarActions by topBarActions {
     private val isLoggedIn = MutableStateFlow(false)
-    private val appVersion = appVersionName()
 
     val state = combine(
         appSettings.autoplayGifs,
@@ -52,9 +51,9 @@ class SettingsViewModel(
             themeOverride = themeOverride,
             dynamicColorsEnabled = dynamicColorsEnabled,
             supportsDynamicColorsToggle = supportsDynamicColorsToggle(),
-            showDebugTools = isDebugBuild(),
+            showDebugTools = buildInfo.isDebugBuild,
             showLogoutButton = isLoggedIn,
-            appVersion = appVersion,
+            appVersion = buildInfo.appVersionName,
         )
     }
         .stateIn(
