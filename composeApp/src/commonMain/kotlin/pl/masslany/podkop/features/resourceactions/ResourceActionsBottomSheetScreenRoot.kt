@@ -100,7 +100,7 @@ internal fun ResourceActionsBottomSheetContent(
                             tint = if (item.isDestructive) {
                                 MaterialTheme.colorScheme.error
                             } else {
-                                Color.Unspecified
+                                MaterialTheme.colorScheme.onSurface
                             },
                         )
                     },
