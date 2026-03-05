@@ -16,8 +16,6 @@ object NoOpProfileActions :
     PaginationActions by NoOpPaginationActions,
     TopBarActions by NoOpTopBarActions {
 
-    override fun onLoginClicked() = Unit
-    override fun onTopBarSettingsClicked() = Unit
     override fun onRetryClicked() = Unit
     override fun onSummarySelected(type: ProfileSummaryType) = Unit
     override fun onSubActionExpandedChanged(expanded: Boolean) = Unit

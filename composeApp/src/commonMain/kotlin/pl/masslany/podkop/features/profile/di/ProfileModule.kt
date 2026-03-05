@@ -7,12 +7,9 @@ import pl.masslany.podkop.features.profile.ProfileViewModel
 val profileModule = module {
     viewModel { params ->
         ProfileViewModel(
-            username = params.getOrNull<String>(),
-            authRepository = get(),
-            authSessionEvents = get(),
+            username = params.get<String>(),
             profileRepository = get(),
             resourceItemStateHolder = get(),
-            appNavigator = get(),
             logger = get(),
             snackbarManager = get(),
             topBarActions = get(),

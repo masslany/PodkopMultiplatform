@@ -79,11 +79,9 @@ import pl.masslany.podkop.features.resources.components.LinkCommentItem
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
-import podkop.composeapp.generated.resources.accessibility_topbar_profile
 import podkop.composeapp.generated.resources.comment_button_load_all_comments
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
-import podkop.composeapp.generated.resources.ic_person
 import podkop.composeapp.generated.resources.links_details_screen_error_loading_comments
 import podkop.composeapp.generated.resources.links_details_screen_error_loading_related
 import podkop.composeapp.generated.resources.links_details_screen_no_comments
@@ -175,17 +173,6 @@ fun LinkDetailsScreenContent(
                                 maxLines = 1,
                                 style = MaterialTheme.typography.titleSmall,
                                 overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = actions::onTopBarProfileClicked) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = vectorResource(resource = Res.drawable.ic_person),
-                                contentDescription = stringResource(
-                                    resource = Res.string.accessibility_topbar_profile,
-                                ),
                             )
                         }
                     },

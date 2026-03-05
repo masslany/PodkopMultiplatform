@@ -12,8 +12,4 @@ object NoOpSearchActions : SearchActions {
     override fun onRetryClicked() = Unit
 
     override fun onTopBarBackClicked() = Unit
-
-    override fun onTopBarProfileClicked() = Unit
-
-    override fun onTopBarSearchClicked() = Unit
 }

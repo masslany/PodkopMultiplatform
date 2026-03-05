@@ -76,11 +76,9 @@ import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentIte
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
-import podkop.composeapp.generated.resources.accessibility_topbar_profile
 import podkop.composeapp.generated.resources.entry_details_screen_error_loading_comments
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
-import podkop.composeapp.generated.resources.ic_person
 import podkop.composeapp.generated.resources.topbar_label_entry
 
 private const val FAB_ITEMS_OFFSET = 10
@@ -162,17 +160,6 @@ fun EntryDetailsScreenContent(
                                 resource = Res.string.topbar_label_entry,
                             ),
                         )
-                    },
-                    actions = {
-                        IconButton(onClick = actions::onTopBarProfileClicked) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = vectorResource(resource = Res.drawable.ic_person),
-                                contentDescription = stringResource(
-                                    resource = Res.string.accessibility_topbar_profile,
-                                ),
-                            )
-                        }
                     },
                     navigationIcon = {
                         IconButton(onClick = actions::onTopBarBackClicked) {

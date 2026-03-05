@@ -65,11 +65,7 @@ import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
-import podkop.composeapp.generated.resources.accessibility_topbar_profile
-import podkop.composeapp.generated.resources.accessibility_topbar_search
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
-import podkop.composeapp.generated.resources.ic_person
-import podkop.composeapp.generated.resources.ic_search
 import podkop.composeapp.generated.resources.topbar_label_homepage
 import podkop.composeapp.generated.resources.topbar_label_upcoming
 
@@ -159,28 +155,6 @@ fun LinksScreenContent(
         ) {
             TopAppBar(
                 title = { Text(text = getTopBarTitle(state.isUpcoming)) },
-                actions = {
-                    if (!state.isUpcoming) {
-                        IconButton(onClick = actions::onTopBarSearchClicked) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = vectorResource(resource = Res.drawable.ic_search),
-                                contentDescription = stringResource(
-                                    resource = Res.string.accessibility_topbar_search,
-                                ),
-                            )
-                        }
-                    }
-                    IconButton(onClick = actions::onTopBarProfileClicked) {
-                        Icon(
-                            modifier = Modifier.size(24.dp),
-                            imageVector = vectorResource(resource = Res.drawable.ic_person),
-                            contentDescription = stringResource(
-                                resource = Res.string.accessibility_topbar_profile,
-                            ),
-                        )
-                    }
-                },
                 scrollBehavior = scrollBehavior,
                 windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
             )

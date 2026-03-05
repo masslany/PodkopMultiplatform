@@ -12,10 +12,6 @@ interface ProfileActions :
     TopBarActions,
     ResourceItemActions,
     PaginationActions {
-    fun onLoginClicked()
-
-    fun onTopBarSettingsClicked()
-
     fun onRetryClicked()
 
     fun onSummarySelected(type: ProfileSummaryType)

@@ -7,8 +7,6 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 
 object NoOpTopBarActions : TopBarActions {
     override fun onTopBarBackClicked() = Unit
-    override fun onTopBarProfileClicked() = Unit
-    override fun onTopBarSearchClicked() = Unit
 }
 
 object NoOpPaginationActions : PaginationActions {

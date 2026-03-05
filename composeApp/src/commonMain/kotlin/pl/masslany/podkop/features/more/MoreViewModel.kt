@@ -22,6 +22,7 @@ import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
+import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.more.models.MoreSectionItemState
 import pl.masslany.podkop.features.more.models.MoreSectionItemType
 import pl.masslany.podkop.features.more.models.MoreSectionState
@@ -55,7 +56,8 @@ class MoreViewModel(
     }
 
     override fun onProfileClicked() {
-        appNavigator.navigateTo(ProfileScreen())
+        val username = _state.value.profileHeader?.username ?: return
+        appNavigator.navigateTo(ProfileScreen(username = username))
     }
 
     override fun onLoginClicked() {
@@ -66,6 +68,7 @@ class MoreViewModel(
                 }
                 .onFailure {
                     logger.error("Failed to resolve wykop connect url in More screen", it)
+                    snackbarManager.tryEmitGenericError()
                 }
         }
     }

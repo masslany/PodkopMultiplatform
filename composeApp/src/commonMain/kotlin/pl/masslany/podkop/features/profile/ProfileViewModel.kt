@@ -7,24 +7,18 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
-import pl.masslany.podkop.common.deeplink.AuthSessionEvent
-import pl.masslany.podkop.common.deeplink.AuthSessionEvents
 import pl.masslany.podkop.common.logging.api.AppLogger
-import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.pagination.toPage
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
-import pl.masslany.podkop.features.profile.models.ProfileContentState
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileListItem
 import pl.masslany.podkop.features.profile.models.ProfileSubActionState
@@ -37,16 +31,12 @@ import pl.masslany.podkop.features.profile.models.toSubActionItems
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.resources.models.ResourceItemState
-import pl.masslany.podkop.features.settings.SettingsScreen
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 class ProfileViewModel(
-    private val username: String?,
-    private val authRepository: AuthRepository,
-    private val authSessionEvents: AuthSessionEvents,
+    private val username: String,
     private val profileRepository: ProfileRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
-    private val appNavigator: AppNavigator,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
@@ -55,7 +45,6 @@ class ProfileViewModel(
     TopBarActions by topBarActions,
     ResourceItemActions by resourceItemStateHolder {
 
-    private var profileUsername: String? = null
     private var selectedSubActionType: ProfileSubActionType = ProfileSubActionType.Actions
     private var paginatedSubActionType: ProfileSubActionType? = null
     private var resourcesLoadRequestId: Int = 0
@@ -90,8 +79,6 @@ class ProfileViewModel(
             snackbarManager.tryEmitGenericError()
         },
     ) { request ->
-        val username = profileUsername
-            ?: return@Paginator Result.failure(IllegalStateException("Missing username for profile resources"))
         val page = request.toPage()
             ?: return@Paginator Result.failure(
                 IllegalArgumentException("Unsupported profile pagination request: $request"),
@@ -111,7 +98,7 @@ class ProfileViewModel(
         }
     }
 
-    private val _state = MutableStateFlow(ProfileScreenState.initial)
+    private val _state = MutableStateFlow(ProfileScreenState.initial.copy(username = username))
     val state = combine(
         _state,
         resourceItemStateHolder.items,
@@ -123,13 +110,9 @@ class ProfileViewModel(
             paginatedSubActionType = null
         }
 
-        val selectedSubAction = (state.content as? ProfileContentState.Loaded)
-            ?.subActionState
-            ?.selected
-
         state.copy(
             listContent = resolveVisibleListContent(
-                selectedSubAction = selectedSubAction,
+                selectedSubAction = state.subActionState.selected,
                 owner = owner,
                 resources = resources,
                 observedContent = observedContent,
@@ -141,31 +124,14 @@ class ProfileViewModel(
         .stateIn(
             scope = viewModelScope,
             started = WhileSubscribed(5000),
-            initialValue = ProfileScreenState.initial,
+            initialValue = ProfileScreenState.initial.copy(username = username),
         )
 
     init {
         resourceItemStateHolder.init(viewModelScope)
-        observeAuthSessionChanges()
         viewModelScope.launch {
             loadData()
         }
-    }
-
-    override fun onLoginClicked() {
-        viewModelScope.launch {
-            authRepository.getWykopConnect()
-                .onSuccess { connectUrl ->
-                    appNavigator.openExternalLink(connectUrl)
-                }
-                .onFailure {
-                    logger.error("Failed to resolve wykop connect url", it)
-                }
-        }
-    }
-
-    override fun onTopBarSettingsClicked() {
-        appNavigator.navigateTo(SettingsScreen)
     }
 
     override fun onRetryClicked() {
@@ -175,23 +141,20 @@ class ProfileViewModel(
     }
 
     override fun onSummarySelected(type: ProfileSummaryType) {
-        val loadedState = _state.value.content as? ProfileContentState.Loaded ?: return
-        if (loadedState.selectedSummaryType == type) return
-
+        val currentSummaryType = _state.value.selectedSummaryType
         val subActionItems = type.toSubActionItems()
         val selectedSubAction = subActionItems.firstOrNull() ?: return
+        if (currentSummaryType == type) return
 
         _state.update { previousState ->
-            previousState.updateLoaded { loadedState ->
-                loadedState.copy(
-                    selectedSummaryType = type,
-                    subActionState = ProfileSubActionState(
-                        items = subActionItems,
-                        selected = selectedSubAction,
-                        expanded = false,
-                    ),
-                )
-            }
+            previousState.copy(
+                selectedSummaryType = type,
+                subActionState = ProfileSubActionState(
+                    items = subActionItems,
+                    selected = selectedSubAction,
+                    expanded = false,
+                ),
+            )
         }
 
         viewModelScope.launch {
@@ -205,37 +168,31 @@ class ProfileViewModel(
 
     override fun onSubActionExpandedChanged(expanded: Boolean) {
         _state.update { previousState ->
-            previousState.updateLoaded { loadedState ->
-                loadedState.copy(
-                    subActionState = loadedState.subActionState.copy(expanded = expanded),
-                )
-            }
+            previousState.copy(
+                subActionState = previousState.subActionState.copy(expanded = expanded),
+            )
         }
     }
 
     override fun onSubActionDismissed() {
         _state.update { previousState ->
-            previousState.updateLoaded { loadedState ->
-                loadedState.copy(
-                    subActionState = loadedState.subActionState.copy(expanded = false),
-                )
-            }
+            previousState.copy(
+                subActionState = previousState.subActionState.copy(expanded = false),
+            )
         }
     }
 
     override fun onSubActionSelected(type: ProfileSubActionType) {
-        val loadedState = _state.value.content as? ProfileContentState.Loaded ?: return
-        if (type !in loadedState.subActionState.items) return
+        val currentSubActionState = _state.value.subActionState
+        if (type !in currentSubActionState.items) return
 
         _state.update { previousState ->
-            previousState.updateLoaded { loadedState ->
-                loadedState.copy(
-                    subActionState = loadedState.subActionState.copy(
-                        selected = type,
-                        expanded = false,
-                    ),
-                )
-            }
+            previousState.copy(
+                subActionState = previousState.subActionState.copy(
+                    selected = type,
+                    expanded = false,
+                ),
+            )
         }
 
         if (type == selectedSubActionType) return
@@ -261,23 +218,9 @@ class ProfileViewModel(
         paginator.paginate()
     }
 
-    private fun observeAuthSessionChanges() {
-        if (!username.isNullOrBlank()) return
-
-        viewModelScope.launch {
-            authSessionEvents.events.collect { event ->
-                when (event) {
-                    AuthSessionEvent.TokensUpdated -> loadData()
-                }
-            }
-        }
-    }
-
     private suspend fun loadData() {
-        val isLoggedIn = authRepository.isLoggedIn()
         listCache.clear()
         resourcesLoadRequestId = 0
-        profileUsername = null
         selectedSubActionType = ProfileSubActionType.Actions
         paginatedSubActionType = null
         listOwner.value = null
@@ -287,49 +230,33 @@ class ProfileViewModel(
         _state.update { previousState ->
             previousState.copy(
                 isLoading = true,
+                isError = false,
                 isResourcesLoading = false,
-                isLoggedIn = isLoggedIn,
+                isPaginating = false,
+                header = null,
+                summary = persistentListOf(),
+                selectedSummaryType = ProfileSummaryType.Actions,
+                subActionState = ProfileSubActionState(
+                    items = persistentListOf(ProfileSubActionType.Actions),
+                    selected = ProfileSubActionType.Actions,
+                    expanded = false,
+                ),
+                listContent = ProfileListContentState.Empty,
             )
         }
 
-        val requestedUsername = username?.trim()?.takeIf { it.isNotEmpty() }
-        val isCurrentUserProfile = requestedUsername == null
+        profileRepository.getProfile(username)
+            .onSuccess { profile ->
+                val selectedSummaryType = ProfileSummaryType.Actions
+                val subActionItems = selectedSummaryType.toSubActionItems()
+                val selectedSubAction = subActionItems.first()
+                selectedSubActionType = selectedSubAction
 
-        if (isCurrentUserProfile && !isLoggedIn) {
-            listOwner.value = null
-            observedListContent.value = ProfileListContentState.Empty
-            resourceItemStateHolder.updateData(emptyList())
-            _state.update { previousState ->
-                previousState.copy(
-                    isLoading = false,
-                    isResourcesLoading = false,
-                    isLoggedIn = false,
-                    content = ProfileContentState.LoggedOut,
-                )
-            }
-            return
-        }
-
-        val profileResult = if (isCurrentUserProfile) {
-            profileRepository.getProfile()
-        } else {
-            profileRepository.getProfile(requestedUsername)
-        }
-
-        profileResult.onSuccess { profile ->
-            val resolvedUsername = requestedUsername ?: profile.name
-            profileUsername = resolvedUsername
-            val selectedSummaryType = ProfileSummaryType.Actions
-            val subActionItems = selectedSummaryType.toSubActionItems()
-            val selectedSubAction = subActionItems.first()
-            selectedSubActionType = selectedSubAction
-
-            _state.update { previousState ->
-                previousState.copy(
-                    isLoading = false,
-                    isResourcesLoading = false,
-                    content = ProfileContentState.Loaded(
-                        isCurrentUser = isCurrentUserProfile,
+                _state.update { previousState ->
+                    previousState.copy(
+                        isLoading = false,
+                        isError = false,
+                        isResourcesLoading = false,
                         header = profile.toProfileHeaderState(),
                         summary = profile.summary.toSummaryItems(),
                         selectedSummaryType = selectedSummaryType,
@@ -338,34 +265,42 @@ class ProfileViewModel(
                             selected = selectedSubAction,
                             expanded = false,
                         ),
-                    ),
-                )
-            }
+                    )
+                }
 
-            loadItemsForSubAction(
-                subActionType = selectedSubAction,
-                forceNetwork = true,
-            )
-        }.onFailure {
-            listOwner.value = null
-            observedListContent.value = ProfileListContentState.Empty
-            resourceItemStateHolder.updateData(emptyList())
-            _state.update { previousState ->
-                previousState.copy(
-                    isLoading = false,
-                    isResourcesLoading = false,
-                    content = ProfileContentState.Error,
+                loadItemsForSubAction(
+                    subActionType = selectedSubAction,
+                    forceNetwork = true,
                 )
             }
-            logger.error("Failed to load profile", it)
-        }
+            .onFailure {
+                listOwner.value = null
+                observedListContent.value = ProfileListContentState.Empty
+                resourceItemStateHolder.updateData(emptyList())
+                _state.update { previousState ->
+                    previousState.copy(
+                        isLoading = false,
+                        isError = true,
+                        isResourcesLoading = false,
+                        header = null,
+                        summary = persistentListOf(),
+                        selectedSummaryType = ProfileSummaryType.Actions,
+                        subActionState = ProfileSubActionState(
+                            items = persistentListOf(ProfileSubActionType.Actions),
+                            selected = ProfileSubActionType.Actions,
+                            expanded = false,
+                        ),
+                        listContent = ProfileListContentState.Empty,
+                    )
+                }
+                logger.error("Failed to load profile", it)
+            }
     }
 
     private suspend fun loadItemsForSubAction(
         subActionType: ProfileSubActionType,
         forceNetwork: Boolean,
     ) {
-        val username = profileUsername ?: return
         val requestId = ++resourcesLoadRequestId
 
         if (!forceNetwork) {

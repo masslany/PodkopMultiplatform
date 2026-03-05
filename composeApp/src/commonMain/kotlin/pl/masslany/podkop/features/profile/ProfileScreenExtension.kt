@@ -13,7 +13,6 @@ import pl.masslany.podkop.business.profile.domain.models.Summary
 import pl.masslany.podkop.common.extensions.toMemberSinceState
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
 import pl.masslany.podkop.common.models.toNameColorType
-import pl.masslany.podkop.features.profile.models.ProfileContentState
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import pl.masslany.podkop.features.profile.models.ProfileListItem
 import pl.masslany.podkop.features.profile.models.ProfileListItemsPage
@@ -117,13 +116,6 @@ internal fun ObservedTag.toItemState(): ProfileObservedTagItemState = ProfileObs
     name = name,
     pinned = pinned,
 )
-
-internal fun ProfileScreenState.updateLoaded(
-    updater: (ProfileContentState.Loaded) -> ProfileContentState.Loaded,
-): ProfileScreenState {
-    val contentState = content as? ProfileContentState.Loaded ?: return this
-    return copy(content = updater(contentState))
-}
 
 internal fun List<ProfileListItem>.appendDistinct(incomingItems: List<ProfileListItem>): List<ProfileListItem> {
     val knownIds = mapTo(mutableSetOf()) { it.uniqueKey() }

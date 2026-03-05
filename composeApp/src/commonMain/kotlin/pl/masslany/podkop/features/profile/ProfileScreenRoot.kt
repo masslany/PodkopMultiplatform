@@ -61,10 +61,8 @@ import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.profile.components.ObservedTagItem
 import pl.masslany.podkop.features.profile.components.ObservedUserItem
 import pl.masslany.podkop.features.profile.components.ProfileHeader
-import pl.masslany.podkop.features.profile.components.ProfileLoggedOutContent
 import pl.masslany.podkop.features.profile.components.ProfileSubActionDropdown
 import pl.masslany.podkop.features.profile.components.ProfileSummary
-import pl.masslany.podkop.features.profile.models.ProfileContentState
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
 import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
@@ -76,10 +74,8 @@ import pl.masslany.podkop.features.resources.models.ResourceItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
-import podkop.composeapp.generated.resources.accessibility_topbar_settings
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
-import podkop.composeapp.generated.resources.ic_settings
 import podkop.composeapp.generated.resources.profile_no_observed_tags
 import podkop.composeapp.generated.resources.profile_no_observed_users
 import podkop.composeapp.generated.resources.topbar_label_profile
@@ -89,7 +85,7 @@ private const val FAB_ITEMS_OFFSET = 10
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProfileScreenRoot(
-    username: String?,
+    username: String,
     paddingValues: PaddingValues,
 ) {
     val viewModel = koinViewModel<ProfileViewModel>(
@@ -150,22 +146,12 @@ fun ProfileScreenContent(
         topBar = {
             TopAppBar(
                 title = {
-                    when (state.content) {
-                        is ProfileContentState.Loaded -> {
-                            if (showProfileName) {
-                                Text(text = state.content.header.username)
-                            }
+                    if (state.isError) {
+                        Text(text = stringResource(resource = Res.string.topbar_label_profile))
+                    } else if (showProfileName) {
+                        state.header?.let { header ->
+                            Text(text = header.username)
                         }
-
-                        ProfileContentState.Error -> {
-                            Text(text = stringResource(resource = Res.string.topbar_label_profile))
-                        }
-
-                        ProfileContentState.LoggedOut -> {
-                            Text(text = stringResource(resource = Res.string.topbar_label_profile))
-                        }
-
-                        ProfileContentState.Empty -> Unit
                     }
                 },
                 navigationIcon = {
@@ -177,19 +163,6 @@ fun ProfileScreenContent(
                                 resource = Res.string.accessibility_topbar_back,
                             ),
                         )
-                    }
-                },
-                actions = {
-                    if (state.content.shouldShowSettingsButton()) {
-                        IconButton(onClick = actions::onTopBarSettingsClicked) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = vectorResource(resource = Res.drawable.ic_settings),
-                                contentDescription = stringResource(
-                                    resource = Res.string.accessibility_topbar_settings,
-                                ),
-                            )
-                        }
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -233,6 +206,10 @@ fun ProfileScreenContent(
                     modifier = Modifier.align(Alignment.Center),
                 )
             }
+        } else if (state.isError) {
+            GenericErrorScreen(
+                onRefreshClicked = actions::onRetryClicked,
+            )
         } else {
             ProfileScreenBody(
                 modifier = Modifier
@@ -257,36 +234,16 @@ private fun ProfileScreenBody(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        when (val content = state.content) {
-            ProfileContentState.Empty -> Unit
-
-            ProfileContentState.LoggedOut -> {
-                ProfileLoggedOutContent(
-                    onLoginClicked = actions::onLoginClicked,
-                )
-            }
-
-            is ProfileContentState.Loaded -> {
-                ProfileLoadedContent(
-                    content = content,
-                    state = state,
-                    actions = actions,
-                    lazyListState = lazyListState,
-                )
-            }
-
-            ProfileContentState.Error -> {
-                GenericErrorScreen(
-                    onRefreshClicked = actions::onRetryClicked,
-                )
-            }
-        }
+        ProfileLoadedContent(
+            state = state,
+            actions = actions,
+            lazyListState = lazyListState,
+        )
     }
 }
 
 @Composable
 private fun ProfileLoadedContent(
-    content: ProfileContentState.Loaded,
     state: ProfileScreenState,
     actions: ProfileActions,
     lazyListState: LazyListState,
@@ -305,29 +262,31 @@ private fun ProfileLoadedContent(
         item(
             key = "ProfileHeader",
         ) {
-            ProfileHeader(
-                state = content.header,
-            )
-            Spacer(modifier = Modifier.size(16.dp))
+            state.header?.let {
+                ProfileHeader(
+                    state = state.header,
+                )
+                Spacer(modifier = Modifier.size(16.dp))
+            }
         }
 
         item(
             key = "ProfileSummary",
         ) {
             ProfileSummary(
-                summary = content.summary,
-                selectedType = content.selectedSummaryType,
+                summary = state.summary,
+                selectedType = state.selectedSummaryType,
                 onSelected = actions::onSummarySelected,
             )
             Spacer(modifier = Modifier.size(8.dp))
         }
 
-        if (content.subActionState.items.size > 1) {
+        if (state.subActionState.items.size > 1) {
             item(
                 key = "ProfileSubActionDropdown",
             ) {
                 ProfileSubActionDropdown(
-                    subActionState = content.subActionState,
+                    subActionState = state.subActionState,
                     actions = actions,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 )
@@ -346,7 +305,6 @@ private fun ProfileLoadedContent(
         renderListContent(
             listContent = state.listContent,
             actions = actions,
-            isLoggedIn = state.isLoggedIn,
         )
 
         if (state.isPaginating) {
@@ -362,7 +320,6 @@ private fun ProfileLoadedContent(
 private fun LazyListScope.renderListContent(
     listContent: ProfileListContentState,
     actions: ProfileActions,
-    isLoggedIn: Boolean,
 ) {
     when (listContent) {
         ProfileListContentState.Empty -> Unit
@@ -371,7 +328,6 @@ private fun LazyListScope.renderListContent(
             renderResources(
                 resources = listContent.items,
                 actions = actions,
-                isLoggedIn = isLoggedIn,
             )
         }
 
@@ -394,7 +350,6 @@ private fun LazyListScope.renderListContent(
 private fun LazyListScope.renderResources(
     resources: ImmutableList<ResourceItemState>,
     actions: ProfileActions,
-    isLoggedIn: Boolean,
 ) {
     if (resources.isEmpty()) return
 
@@ -410,7 +365,7 @@ private fun LazyListScope.renderResources(
                 actions = actions,
                 config = ResourceItemConfig(
                     showReplyAction = true,
-                    isReplyActionEnabled = isLoggedIn,
+                    isReplyActionEnabled = true,
                 ),
             )
         }
@@ -488,13 +443,6 @@ private fun LazyListScope.renderObservedTags(
         }
     }
 }
-
-private fun ProfileContentState.shouldShowSettingsButton(): Boolean =
-    when (this) {
-        ProfileContentState.LoggedOut -> true
-        is ProfileContentState.Loaded -> isCurrentUser
-        else -> false
-    }
 
 @Preview
 @Composable

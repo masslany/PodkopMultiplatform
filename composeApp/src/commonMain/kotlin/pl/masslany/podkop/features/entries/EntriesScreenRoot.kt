@@ -66,10 +66,8 @@ import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_add
-import podkop.composeapp.generated.resources.accessibility_topbar_profile
 import podkop.composeapp.generated.resources.ic_add
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
-import podkop.composeapp.generated.resources.ic_person
 import podkop.composeapp.generated.resources.topbar_label_entries
 
 private const val FAB_ITEMS_OFFSET = 10
@@ -201,15 +199,6 @@ fun EntriesScreenContent(
                                 ),
                             )
                         }
-                    }
-                    IconButton(onClick = actions::onTopBarProfileClicked) {
-                        Icon(
-                            modifier = Modifier.size(24.dp),
-                            imageVector = vectorResource(resource = Res.drawable.ic_person),
-                            contentDescription = stringResource(
-                                resource = Res.string.accessibility_topbar_profile,
-                            ),
-                        )
                     }
                 },
                 scrollBehavior = scrollBehavior,
