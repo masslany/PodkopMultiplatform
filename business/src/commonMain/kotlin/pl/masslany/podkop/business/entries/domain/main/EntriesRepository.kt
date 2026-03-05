@@ -55,6 +55,21 @@ interface EntriesRepository {
         photoKey: String?,
     ): Result<ResourceItem>
 
+    suspend fun updateEntry(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<ResourceItem>
+
+    suspend fun updateEntryComment(
+        entryId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<ResourceItem>
+
     suspend fun voteUp(entryId: Int): Result<Unit>
 
     suspend fun removeVoteUp(entryId: Int): Result<Unit>

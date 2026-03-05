@@ -46,6 +46,21 @@ interface EntriesApi {
         photoKey: String?,
     ): Result<SingleResourceResponseDto>
 
+    suspend fun updateEntry(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto>
+
+    suspend fun updateEntryComment(
+        entryId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto>
+
     suspend fun voteUp(entryId: Int): Result<Unit>
 
     suspend fun removeVoteUp(entryId: Int): Result<Unit>

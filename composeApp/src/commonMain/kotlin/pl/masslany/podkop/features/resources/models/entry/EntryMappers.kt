@@ -57,10 +57,12 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
     val embedMimeType = this.media?.photo?.mimeType
     val embedWidth = this.media?.photo?.width
     val embedHeight = this.media?.photo?.height
+    val embedKey = this.media?.photo?.key
 
     val embedImageState = if (embedUrl != null) {
         EmbedImageState(
             url = embedUrl,
+            key = embedKey,
             source = embedSource.orEmpty(),
             isAdult = this.adult,
             isGif = isGifImage(
@@ -89,6 +91,11 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
         isDeleteEnabled = this.actions?.delete == true || this.deletable,
+        isEditEnabled = this.actions?.update == true || this.editable,
+        rawContent = this.content,
+        adult = this.adult,
+        photoKey = this.media?.photo?.key,
+        photoUrl = embedUrl,
         entryContentState = entryContentState,
         surveyState = this.media?.survey.toSurveyState(),
         embedImageState = embedImageState,
@@ -122,10 +129,12 @@ private fun Comment.toEntryCommentItemState(parentId: Int? = null): EntryComment
     val embedMimeType = this.media.photo?.mimeType
     val embedWidth = this.media.photo?.width
     val embedHeight = this.media.photo?.height
+    val embedKey = this.media.photo?.key
 
     val embedImageState = if (embedUrl != null) {
         EmbedImageState(
             url = embedUrl,
+            key = embedKey,
             source = embedSource.orEmpty(),
             isAdult = this.adult,
             isGif = isGifImage(
@@ -150,6 +159,9 @@ private fun Comment.toEntryCommentItemState(parentId: Int? = null): EntryComment
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions.createFavourite || this.actions.deleteFavourite,
         isDeleteEnabled = this.actions.delete || this.deletable,
+        isEditEnabled = this.actions.update || this.editable,
+        rawContent = this.content,
+        adult = this.adult,
         entryContentState = entryContentState,
         embedImageState = embedImageState,
         embedContentState = this.media.embed.toEmbedContentState(),

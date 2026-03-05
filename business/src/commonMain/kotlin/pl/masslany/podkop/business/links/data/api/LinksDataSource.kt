@@ -49,6 +49,14 @@ interface LinksDataSource {
         photoKey: String?,
     ): Result<SingleResourceResponseDto>
 
+    suspend fun updateLinkComment(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto>
+
     suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto>
 
     suspend fun voteOnLink(linkId: Int): Result<Unit>

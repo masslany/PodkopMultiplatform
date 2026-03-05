@@ -13,6 +13,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Gender
 import pl.masslany.podkop.business.common.domain.models.common.Media
 import pl.masslany.podkop.business.common.domain.models.common.NameColor
 import pl.masslany.podkop.business.common.domain.models.common.Parent
+import pl.masslany.podkop.business.common.domain.models.common.Photo
 import pl.masslany.podkop.business.common.domain.models.common.Rank
 import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
@@ -152,6 +153,32 @@ class LinkCommentMappersTest {
     }
 
     @Test
+    fun `resource mapper maps edit prefill fields`() {
+        val state = resourceLinkComment(
+            id = 135740393,
+            slug = "comment-slug",
+            parent = Parent(id = 7896627),
+            parentId = 7896627,
+            content = "link comment raw content",
+            adult = true,
+            editable = true,
+            actions = actions(update = false),
+            media = media(
+                photo = photo(
+                    key = "link-comment-photo-key",
+                    url = "https://cdn.example/link-comment.jpg",
+                ),
+            ),
+        ).toLinkCommentItemState()
+
+        assertEquals(true, state.isEditEnabled)
+        assertEquals("link comment raw content", state.rawContent)
+        assertEquals(true, state.adult)
+        assertEquals("link-comment-photo-key", state.photoKey)
+        assertEquals("https://cdn.example/link-comment.jpg", state.photoUrl)
+    }
+
+    @Test
     fun `resource mapper marks content as downvoted when vote is negative`() {
         val state = resourceLinkComment(
             id = 135740393,
@@ -222,21 +249,26 @@ private fun resourceLinkComment(
     comments: Comments? = null,
     voted: Voted = Voted.None,
     votes: Votes = votes(),
+    content: String = "test",
+    adult: Boolean = false,
+    editable: Boolean = false,
+    actions: Actions = actions(),
+    media: Media = media(),
 ): ResourceItem = ResourceItem(
-    actions = actions(),
-    adult = false,
+    actions = actions,
+    adult = adult,
     archive = false,
     author = null,
     comments = comments,
-    content = "test",
+    content = content,
     createdAt = null,
     deleted = Deleted.None,
     deletable = false,
     description = "",
-    editable = false,
+    editable = editable,
     hot = false,
     id = id,
-    media = media(),
+    media = media,
     name = "",
     parent = parent,
     parentId = parentId,
@@ -258,22 +290,27 @@ private fun commentLinkReply(
     slug: String,
     voted: Voted = Voted.None,
     votes: Votes = votes(),
+    content: String = "reply",
+    adult: Boolean = false,
+    editable: Boolean = false,
+    actions: Actions = actions(),
+    media: Media = media(),
 ): Comment = Comment(
-    actions = actions(),
-    adult = false,
+    actions = actions,
+    adult = adult,
     archive = false,
     author = author(),
     blacklist = false,
     comments = null,
-    content = "reply",
+    content = content,
     createdAt = null,
     deletable = false,
     deleted = Deleted.None,
     device = "",
-    editable = false,
+    editable = editable,
     favourite = false,
     id = id,
-    media = media(),
+    media = media,
     parentId = parentId,
     resource = Resource.LinkComment,
     slug = slug,
@@ -303,10 +340,23 @@ private fun author(): Author = Author(
     verified = false,
 )
 
-private fun media(): Media = Media(
+private fun media(photo: Photo? = null): Media = Media(
     embed = null,
-    photo = null,
+    photo = photo,
     survey = null,
+)
+
+private fun photo(
+    key: String,
+    url: String,
+): Photo = Photo(
+    height = 100,
+    key = key,
+    label = "",
+    mimeType = "image/jpeg",
+    size = 1,
+    url = url,
+    width = 100,
 )
 
 private fun votes(): Votes = Votes(
@@ -315,7 +365,7 @@ private fun votes(): Votes = Votes(
     up = 0,
 )
 
-private fun actions(): Actions = Actions(
+private fun actions(update: Boolean = false): Actions = Actions(
     create = false,
     createFavourite = false,
     delete = false,
@@ -324,7 +374,7 @@ private fun actions(): Actions = Actions(
     report = false,
     startAma = false,
     undoVote = false,
-    update = false,
+    update = update,
     voteDown = false,
     voteUp = false,
 )

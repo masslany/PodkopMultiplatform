@@ -44,6 +44,21 @@ class FakeEntriesDataSource : EntriesDataSource {
         val photoKey: String?,
     )
 
+    data class UpdateEntryCall(
+        val entryId: Int,
+        val content: String,
+        val adult: Boolean,
+        val photoKey: String?,
+    )
+
+    data class UpdateEntryCommentCall(
+        val entryId: Int,
+        val commentId: Int,
+        val content: String,
+        val adult: Boolean,
+        val photoKey: String?,
+    )
+
     var getEntriesResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntries")
     var getEntryResult: Result<SingleResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntry")
     var getEntryCommentsResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntryComments")
@@ -54,6 +69,10 @@ class FakeEntriesDataSource : EntriesDataSource {
         unstubbedResult("EntriesDataSource.createEntryComment")
     var createEntryResult: Result<SingleResourceResponseDto> =
         unstubbedResult("EntriesDataSource.createEntry")
+    var updateEntryResult: Result<SingleResourceResponseDto> =
+        unstubbedResult("EntriesDataSource.updateEntry")
+    var updateEntryCommentResult: Result<SingleResourceResponseDto> =
+        unstubbedResult("EntriesDataSource.updateEntryComment")
     var voteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.voteUp")
     var removeVoteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.removeVoteUp")
     var deleteEntryResult: Result<Unit> = unstubbedResult("EntriesDataSource.deleteEntry")
@@ -68,6 +87,8 @@ class FakeEntriesDataSource : EntriesDataSource {
     val getEntryCommentVotesCalls = mutableListOf<GetEntryCommentVotesCall>()
     val createEntryCommentCalls = mutableListOf<CreateEntryCommentCall>()
     val createEntryCalls = mutableListOf<CreateEntryCall>()
+    val updateEntryCalls = mutableListOf<UpdateEntryCall>()
+    val updateEntryCommentCalls = mutableListOf<UpdateEntryCommentCall>()
     val voteUpCalls = mutableListOf<Int>()
     val removeVoteUpCalls = mutableListOf<Int>()
     val deleteEntryCalls = mutableListOf<Int>()
@@ -143,6 +164,38 @@ class FakeEntriesDataSource : EntriesDataSource {
             photoKey = photoKey,
         )
         return createEntryResult
+    }
+
+    override suspend fun updateEntry(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto> {
+        updateEntryCalls += UpdateEntryCall(
+            entryId = entryId,
+            content = content,
+            adult = adult,
+            photoKey = photoKey,
+        )
+        return updateEntryResult
+    }
+
+    override suspend fun updateEntryComment(
+        entryId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto> {
+        updateEntryCommentCalls += UpdateEntryCommentCall(
+            entryId = entryId,
+            commentId = commentId,
+            content = content,
+            adult = adult,
+            photoKey = photoKey,
+        )
+        return updateEntryCommentResult
     }
 
     override suspend fun voteUp(entryId: Int): Result<Unit> {

@@ -10,6 +10,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Gender
 import pl.masslany.podkop.business.common.domain.models.common.Media
 import pl.masslany.podkop.business.common.domain.models.common.NameColor
 import pl.masslany.podkop.business.common.domain.models.common.Parent
+import pl.masslany.podkop.business.common.domain.models.common.Photo
 import pl.masslany.podkop.business.common.domain.models.common.Rank
 import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
@@ -26,25 +27,52 @@ class EntryCommentMappersTest {
         val contentState = assertIs<EntryContentState.Content>(state.entryContentState)
         assertEquals(false, contentState.isDownVoted)
     }
+
+    @Test
+    fun `entry comment mapper maps edit prefill fields`() {
+        val state = entryCommentResource(
+            content = "entry comment raw content",
+            adult = true,
+            editable = true,
+            actions = actions(update = false),
+            media = media(
+                photo = photo(
+                    key = "comment-photo-key",
+                    url = "https://cdn.example/entry-comment.jpg",
+                ),
+            ),
+        ).toEntryCommentItemState()
+
+        assertEquals(true, state.isEditEnabled)
+        assertEquals("entry comment raw content", state.rawContent)
+        assertEquals(true, state.adult)
+        assertEquals("comment-photo-key", state.photoKey)
+        assertEquals("https://cdn.example/entry-comment.jpg", state.photoUrl)
+    }
 }
 
 private fun entryCommentResource(
     voted: Voted = Voted.None,
+    content: String = "entry comment",
+    adult: Boolean = false,
+    editable: Boolean = false,
+    actions: Actions = actions(),
+    media: Media = media(),
 ): ResourceItem = ResourceItem(
-    actions = actions(),
-    adult = false,
+    actions = actions,
+    adult = adult,
     archive = false,
     author = author(),
     comments = null,
-    content = "entry comment",
+    content = content,
     createdAt = null,
     deleted = Deleted.None,
     deletable = false,
     description = "",
-    editable = false,
+    editable = editable,
     hot = false,
     id = 1,
-    media = media(),
+    media = media,
     name = "",
     parent = Parent(id = 999),
     parentId = 999,
@@ -75,10 +103,23 @@ private fun author(): Author = Author(
     verified = false,
 )
 
-private fun media(): Media = Media(
+private fun media(photo: Photo? = null): Media = Media(
     embed = null,
-    photo = null,
+    photo = photo,
     survey = null,
+)
+
+private fun photo(
+    key: String,
+    url: String,
+): Photo = Photo(
+    height = 100,
+    key = key,
+    label = "",
+    mimeType = "image/jpeg",
+    size = 1,
+    url = url,
+    width = 100,
 )
 
 private fun votes(): Votes = Votes(
@@ -87,7 +128,7 @@ private fun votes(): Votes = Votes(
     up = 0,
 )
 
-private fun actions(): Actions = Actions(
+private fun actions(update: Boolean = false): Actions = Actions(
     create = false,
     createFavourite = false,
     delete = false,
@@ -96,7 +137,7 @@ private fun actions(): Actions = Actions(
     report = false,
     startAma = false,
     undoVote = false,
-    update = false,
+    update = update,
     voteDown = true,
     voteUp = true,
 )

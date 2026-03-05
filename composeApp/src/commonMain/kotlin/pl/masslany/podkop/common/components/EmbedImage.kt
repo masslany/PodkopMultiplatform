@@ -322,6 +322,7 @@ private fun EmbedImagePreview() {
                 .padding(16.dp),
             state = EmbedImageState(
                 url = "https://picsum.photos/seed/embed-image/800/600",
+                key = "embed-image",
                 source = PreviewFixtures.DOMAIN,
                 isAdult = false,
                 isGif = false,

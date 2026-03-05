@@ -257,6 +257,51 @@ class LinksRepositoryImplTest {
     }
 
     @Test
+    fun `update link comment forwards payload and maps single resource item`() = runBlocking {
+        val linksDataSource = FakeLinksDataSource().apply {
+            updateLinkCommentResult = Result.success(
+                Fixtures.singleResourceResponseDto(
+                    data = Fixtures.resourceItemDto(
+                        id = 919,
+                        resource = "link_comment",
+                        parentId = 505,
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(linksDataSource)
+
+        val actual = sut.updateLinkComment(
+            linkId = 404,
+            commentId = 505,
+            content = "updated comment payload",
+            adult = true,
+            photoKey = "photo-key-update-5",
+        )
+
+        assertEquals(
+            listOf(
+                FakeLinksDataSource.UpdateLinkCommentCall(
+                    linkId = 404,
+                    commentId = 505,
+                    content = "updated comment payload",
+                    adult = true,
+                    photoKey = "photo-key-update-5",
+                ),
+            ),
+            linksDataSource.updateLinkCommentCalls,
+        )
+        assertEquals(
+            Fixtures.resourceItem(
+                id = 919,
+                resource = Resource.LinkComment,
+                parentId = 505,
+            ),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
     fun `vote operations delegate to data source`() = runBlocking {
         val linksDataSource = FakeLinksDataSource().apply {
             voteOnLinkResult = Result.success(Unit)

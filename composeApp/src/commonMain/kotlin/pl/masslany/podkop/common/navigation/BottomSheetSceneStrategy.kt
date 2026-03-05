@@ -1,5 +1,6 @@
 package pl.masslany.podkop.common.navigation
 
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -22,6 +23,8 @@ internal class BottomSheetScene<T : Any>(
     private val entry: NavEntry<T>,
     private val modalBottomSheetProperties: ModalBottomSheetProperties,
     private val skipPartiallyExpanded: Boolean,
+    private val sheetGesturesEnabled: Boolean,
+    private val hideDragHandle: Boolean,
     private val onBack: () -> Unit,
 ) : OverlayScene<T> {
 
@@ -34,6 +37,12 @@ internal class BottomSheetScene<T : Any>(
         ModalBottomSheet(
             onDismissRequest = onBack,
             sheetState = sheetState,
+            sheetGesturesEnabled = sheetGesturesEnabled,
+            dragHandle = if (hideDragHandle) {
+                null
+            } else {
+                @Composable { BottomSheetDefaults.DragHandle() }
+            },
             properties = modalBottomSheetProperties,
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
@@ -56,6 +65,9 @@ class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
         val bottomSheetProperties = lastEntry?.metadata?.get(BOTTOM_SHEET_KEY) as? ModalBottomSheetProperties
         val skipPartiallyExpanded =
             lastEntry?.metadata?.get(SKIP_PARTIALLY_EXPANDED_KEY) as? Boolean ?: false
+        val sheetGesturesEnabled = lastEntry?.metadata?.get(SHEET_GESTURES_ENABLED_KEY) as? Boolean ?: true
+        val hideDragHandle = lastEntry?.metadata?.get(HIDE_DRAG_HANDLE_KEY) as? Boolean ?: false
+
         return bottomSheetProperties?.let { properties ->
             @Suppress("UNCHECKED_CAST")
             BottomSheetScene(
@@ -65,6 +77,8 @@ class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
                 entry = lastEntry,
                 modalBottomSheetProperties = properties,
                 skipPartiallyExpanded = skipPartiallyExpanded,
+                sheetGesturesEnabled = sheetGesturesEnabled,
+                hideDragHandle = hideDragHandle,
                 onBack = onBack,
             )
         }
@@ -82,12 +96,18 @@ class BottomSheetSceneStrategy<T : Any> : SceneStrategy<T> {
         fun bottomSheet(
             modalBottomSheetProperties: ModalBottomSheetProperties = ModalBottomSheetProperties(),
             skipPartiallyExpanded: Boolean = false,
+            sheetGesturesEnabled: Boolean = true,
+            hideDragHandle: Boolean = false,
         ): Map<String, Any> = mapOf(
             BOTTOM_SHEET_KEY to modalBottomSheetProperties,
             SKIP_PARTIALLY_EXPANDED_KEY to skipPartiallyExpanded,
+            SHEET_GESTURES_ENABLED_KEY to sheetGesturesEnabled,
+            HIDE_DRAG_HANDLE_KEY to hideDragHandle,
         )
 
         internal const val BOTTOM_SHEET_KEY = "bottomsheet"
         internal const val SKIP_PARTIALLY_EXPANDED_KEY = "bottomsheet_skip_partially_expanded"
+        internal const val SHEET_GESTURES_ENABLED_KEY = "bottomsheet_gestures_enabled"
+        internal const val HIDE_DRAG_HANDLE_KEY = "bottomsheet_hide_drag_handle"
     }
 }

@@ -40,6 +40,7 @@ class LinkCommentItemStateProvider : PreviewParameterProvider<LinkCommentItemSta
             vote = PreviewFixtures.voteState(value = VoteValueType.Negative("-2")),
             embedImageState = EmbedImageState(
                 url = "https://picsum.photos/seed/comment/600/400",
+                key = "comment",
                 source = PreviewFixtures.DOMAIN,
                 isAdult = false,
                 isGif = false,
@@ -147,6 +148,7 @@ class EntryItemStateProvider : PreviewParameterProvider<EntryItemState> {
             surveyState = null,
             embedImageState = EmbedImageState(
                 url = "https://picsum.photos/seed/entry/800/600",
+                key = "comment",
                 source = PreviewFixtures.DOMAIN,
                 isAdult = false,
                 isGif = false,

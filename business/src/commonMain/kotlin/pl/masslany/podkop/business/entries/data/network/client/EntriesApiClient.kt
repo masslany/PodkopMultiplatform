@@ -171,6 +171,57 @@ class EntriesApiClient(
         )
     }
 
+    override suspend fun updateEntry(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto> {
+        val body = EntryCreateRequestDto(
+            data = EntryCreateDataDto(
+                content = content,
+                adult = adult,
+                photo = photoKey,
+            ),
+        )
+        val request = Request<SingleResourceResponseDto>(
+            method = Request.HttpMethod.PUT,
+            path = "api/v3/entries/$entryId",
+            body = body,
+        )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun updateEntryComment(
+        entryId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto> {
+        val body = EntryCommentCreateRequestDto(
+            data = EntryCommentCreateDataDto(
+                content = content,
+                adult = adult,
+                photo = photoKey,
+            ),
+        )
+        val request = Request<SingleResourceResponseDto>(
+            method = Request.HttpMethod.PUT,
+            path = "api/v3/entries/$entryId/comments/$commentId",
+            body = body,
+        )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
     override suspend fun voteUp(entryId: Int): Result<Unit> {
         val request =
             Request<Unit>(

@@ -2,7 +2,6 @@ package pl.masslany.podkop.features.entrydetails
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import pl.masslany.podkop.common.composer.ComposerState
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 data class EntryDetailsScreenState(
@@ -15,7 +14,6 @@ data class EntryDetailsScreenState(
     val entry: ResourceItemState?,
     val comments: ImmutableList<ResourceItemState>,
     val isPaginating: Boolean,
-    val composer: ComposerState,
 ) {
     companion object {
         val initial = EntryDetailsScreenState(
@@ -28,11 +26,8 @@ data class EntryDetailsScreenState(
             entry = null,
             comments = persistentListOf(),
             isPaginating = false,
-            composer = ComposerState.initial,
         )
     }
-
-    fun updateComposer(transform: (ComposerState) -> ComposerState): EntryDetailsScreenState = copy(composer = transform(composer))
 
     fun updateLoading(isLoading: Boolean) = this.copy(
         isLoading = isLoading,

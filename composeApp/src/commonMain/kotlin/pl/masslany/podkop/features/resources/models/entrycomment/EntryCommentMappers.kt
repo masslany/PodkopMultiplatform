@@ -54,10 +54,12 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
     val embedMimeType = this.media?.photo?.mimeType
     val embedWidth = this.media?.photo?.width
     val embedHeight = this.media?.photo?.height
+    val embedKey = this.media?.embed?.key
 
     val embedImageState = if (embedUrl != null) {
         EmbedImageState(
             url = embedUrl,
+            key = embedKey,
             source = embedSource.orEmpty(),
             isAdult = this.adult,
             isGif = isGifImage(
@@ -82,6 +84,9 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
         isDeleteEnabled = this.actions?.delete == true || this.deletable,
+        isEditEnabled = this.actions?.update == true || this.editable,
+        rawContent = this.content,
+        adult = this.adult,
         entryContentState = entryContentState,
         embedImageState = embedImageState,
         embedContentState = this.media?.embed.toEmbedContentState(),

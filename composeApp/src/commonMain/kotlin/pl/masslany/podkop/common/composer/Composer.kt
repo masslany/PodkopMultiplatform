@@ -1,8 +1,5 @@
 package pl.masslany.podkop.common.composer
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -88,264 +86,256 @@ fun Composer(
     val focusManager = LocalFocusManager.current
     val areMediaActionsEnabled = !state.isSubmitting && !state.isMediaUploading
 
-    LaunchedEffect(state.isVisible) {
-        if (state.isVisible) {
-            focusRequester.requestFocus()
-        } else {
-            focusManager.clearFocus()
-        }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 
-    AnimatedVisibility(
-        modifier = modifier.fillMaxWidth(),
-        visible = state.isVisible,
-        enter = fadeIn(),
-        exit = fadeOut(),
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .imePadding()
+            .navigationBarsPadding()
+            .padding(bottom = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp)
-                .imePadding()
-                .navigationBarsPadding()
-                .padding(bottom = 8.dp),
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            IconButton(
+                modifier = Modifier
+                    .align(Alignment.End),
+                enabled = !state.isSubmitting,
+                onClick = onDismiss,
             ) {
-                IconButton(
-                    modifier = Modifier
-                        .align(Alignment.End),
-                    enabled = !state.isSubmitting,
-                    onClick = onDismiss,
-                ) {
-                    Icon(
-                        imageVector = vectorResource(resource = Res.drawable.ic_close),
-                        contentDescription = stringResource(
-                            resource = Res.string.accessibility_resource_reply_close,
-                        ),
-                    )
-                }
+                Icon(
+                    imageVector = vectorResource(resource = Res.drawable.ic_close),
+                    contentDescription = stringResource(
+                        resource = Res.string.accessibility_resource_reply_close,
+                    ),
+                )
+            }
 
-                state.replyTarget?.let { target ->
+            state.replyTarget?.let { target ->
+                Text(
+                    text = stringResource(
+                        resource = Res.string.entry_details_reply_composer_target,
+                        target,
+                    ),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                itemVerticalAlignment = Alignment.CenterVertically,
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                val boldPlaceholder = stringResource(resource = Res.string.composer_bold_placeholder)
+                MarkdownActionButton(
+                    iconRes = Res.drawable.ic_format_bold,
+                    enabled = !state.isSubmitting,
+                    onClick = {
+                        val updated = state.content.insertMarkdown(
+                            prefix = "**",
+                            placeholder = boldPlaceholder,
+                            suffix = "**",
+                            highlightPlaceholder = true,
+                        )
+                        onContentChanged(updated)
+                    },
+                )
+                val italicPlaceholder = stringResource(resource = Res.string.composer_italic_placeholder)
+                MarkdownActionButton(
+                    iconRes = Res.drawable.ic_format_italic,
+                    enabled = !state.isSubmitting,
+                    onClick = {
+                        val updated = state.content.insertMarkdown(
+                            prefix = "__",
+                            placeholder = italicPlaceholder,
+                            suffix = "__",
+                            highlightPlaceholder = true,
+                        )
+                        onContentChanged(updated)
+                    },
+                )
+                val linkDescriptionPlaceholder =
+                    stringResource(resource = Res.string.composer_link_description_placeholder)
+                val linkUrlPlaceholder = stringResource(resource = Res.string.composer_link_url_placeholder)
+                MarkdownActionButton(
+                    iconRes = Res.drawable.ic_link,
+                    enabled = !state.isSubmitting,
+                    onClick = {
+                        val updated = state.content.insertMarkdown(
+                            prefix = "[$linkDescriptionPlaceholder]($linkUrlPlaceholder)",
+                            placeholder = "",
+                            suffix = "",
+                            highlightPlaceholder = false,
+                        )
+                        onContentChanged(updated)
+                    },
+                )
+                val quotePlaceholder = stringResource(resource = Res.string.composer_quote_placeholder)
+                MarkdownActionButton(
+                    iconRes = Res.drawable.ic_format_quote,
+                    enabled = !state.isSubmitting,
+                    onClick = {
+                        val updated = state.content.insertMarkdown(
+                            prefix = ">",
+                            placeholder = quotePlaceholder,
+                            suffix = "",
+                            highlightPlaceholder = true,
+                        )
+                        onContentChanged(updated)
+                    },
+                )
+                val codePlaceholder = stringResource(resource = Res.string.composer_code_placeholder)
+                MarkdownActionButton(
+                    iconRes = Res.drawable.ic_code,
+                    enabled = !state.isSubmitting,
+                    onClick = {
+                        val updated = state.content.insertMarkdown(
+                            prefix = "`",
+                            placeholder = codePlaceholder,
+                            suffix = "`",
+                            highlightPlaceholder = true,
+                        )
+                        onContentChanged(updated)
+                    },
+                )
+                MarkdownActionButton(
+                    iconRes = Res.drawable.ic_exclamation,
+                    enabled = !state.isSubmitting,
+                    onClick = {
+                        val updated = state.content.addSpoilerAtLineStart()
+                        onContentChanged(updated)
+                    },
+                )
+            }
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                value = state.content,
+                onValueChange = {
+                    onContentChanged(it)
+                },
+                enabled = !state.isSubmitting,
+                minLines = 3,
+                placeholder = {
+                    Text(text = hintText)
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
+            )
+
+            if (state.isMediaUploading) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                    )
                     Text(
-                        text = stringResource(
-                            resource = Res.string.entry_details_reply_composer_target,
-                            target,
-                        ),
+                        text = stringResource(resource = Res.string.composer_photo_uploading),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+            }
 
-                FlowRow(
+            state.photoUrl?.let { currentPhotoUrl ->
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    itemVerticalAlignment = Alignment.CenterVertically,
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                        .size(width = 120.dp, height = 90.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest),
                 ) {
-                    val boldPlaceholder = stringResource(resource = Res.string.composer_bold_placeholder)
-                    MarkdownActionButton(
-                        iconRes = Res.drawable.ic_format_bold,
-                        enabled = !state.isSubmitting,
-                        onClick = {
-                            val updated = state.content.insertMarkdown(
-                                prefix = "**",
-                                placeholder = boldPlaceholder,
-                                suffix = "**",
-                                highlightPlaceholder = true,
-                            )
-                            onContentChanged(updated)
-                        },
+                    AsyncImage(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(8.dp)),
+                        model = currentPhotoUrl,
+                        contentDescription = stringResource(
+                            resource = Res.string.composer_photo_preview,
+                        ),
+                        contentScale = ContentScale.Crop,
                     )
-                    val italicPlaceholder = stringResource(resource = Res.string.composer_italic_placeholder)
-                    MarkdownActionButton(
-                        iconRes = Res.drawable.ic_format_italic,
+                    IconButton(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(28.dp),
+                        enabled = areMediaActionsEnabled,
+                        onClick = onPhotoRemoved,
+                    ) {
+                        Icon(
+                            imageVector = vectorResource(resource = Res.drawable.ic_delete),
+                            contentDescription = stringResource(
+                                resource = Res.string.accessibility_reply_composer_remove_photo,
+                            ),
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Switch(
+                        checked = state.adult,
                         enabled = !state.isSubmitting,
-                        onClick = {
-                            val updated = state.content.insertMarkdown(
-                                prefix = "__",
-                                placeholder = italicPlaceholder,
-                                suffix = "__",
-                                highlightPlaceholder = true,
-                            )
-                            onContentChanged(updated)
-                        },
+                        onCheckedChange = onAdultChanged,
                     )
-                    val linkDescriptionPlaceholder =
-                        stringResource(resource = Res.string.composer_link_description_placeholder)
-                    val linkUrlPlaceholder = stringResource(resource = Res.string.composer_link_url_placeholder)
-                    MarkdownActionButton(
-                        iconRes = Res.drawable.ic_link,
-                        enabled = !state.isSubmitting,
-                        onClick = {
-                            val updated = state.content.insertMarkdown(
-                                prefix = "[$linkDescriptionPlaceholder]($linkUrlPlaceholder)",
-                                placeholder = "",
-                                suffix = "",
-                                highlightPlaceholder = false,
-                            )
-                            onContentChanged(updated)
-                        },
+                    Text(
+                        text = stringResource(resource = Res.string.links_screen_label_adult_rating),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    val quotePlaceholder = stringResource(resource = Res.string.composer_quote_placeholder)
-                    MarkdownActionButton(
-                        iconRes = Res.drawable.ic_format_quote,
-                        enabled = !state.isSubmitting,
+                    IconButton(
+                        enabled = areMediaActionsEnabled && state.photoUrl == null,
                         onClick = {
-                            val updated = state.content.insertMarkdown(
-                                prefix = ">",
-                                placeholder = quotePlaceholder,
-                                suffix = "",
-                                highlightPlaceholder = true,
-                            )
-                            onContentChanged(updated)
+                            focusManager.clearFocus()
+                            onPhotoAttachClicked()
                         },
-                    )
-                    val codePlaceholder = stringResource(resource = Res.string.composer_code_placeholder)
-                    MarkdownActionButton(
-                        iconRes = Res.drawable.ic_code,
-                        enabled = !state.isSubmitting,
-                        onClick = {
-                            val updated = state.content.insertMarkdown(
-                                prefix = "`",
-                                placeholder = codePlaceholder,
-                                suffix = "`",
-                                highlightPlaceholder = true,
-                            )
-                            onContentChanged(updated)
-                        },
-                    )
-                    MarkdownActionButton(
-                        iconRes = Res.drawable.ic_exclamation,
-                        enabled = !state.isSubmitting,
-                        onClick = {
-                            val updated = state.content.addSpoilerAtLineStart()
-                            onContentChanged(updated)
-                        },
-                    )
+                    ) {
+                        Icon(
+                            imageVector = vectorResource(resource = Res.drawable.ic_add_photo),
+                            contentDescription = stringResource(
+                                resource = Res.string.accessibility_reply_composer_attach_photo,
+                            ),
+                        )
+                    }
                 }
 
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
-                    value = state.content,
-                    onValueChange = {
-                        onContentChanged(it)
-                    },
-                    enabled = !state.isSubmitting,
-                    minLines = 3,
-                    placeholder = {
-                        Text(text = hintText)
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
-                )
-
-                if (state.isMediaUploading) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                Button(
+                    onClick = onSubmit,
+                    enabled = !state.isSubmitting &&
+                        !state.isMediaUploading &&
+                        state.content.text.isNotBlank(),
+                ) {
+                    if (state.isSubmitting) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(16.dp),
                             strokeWidth = 2.dp,
                         )
+                    } else {
                         Text(
-                            text = stringResource(resource = Res.string.composer_photo_uploading),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            text = stringResource(resource = Res.string.entry_details_reply_composer_send),
                         )
-                    }
-                }
-
-                state.photoUrl?.let { currentPhotoUrl ->
-                    Box(
-                        modifier = Modifier
-                            .size(width = 120.dp, height = 90.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainerHighest),
-                    ) {
-                        AsyncImage(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(8.dp)),
-                            model = currentPhotoUrl,
-                            contentDescription = stringResource(
-                                resource = Res.string.composer_photo_preview,
-                            ),
-                            contentScale = ContentScale.Crop,
-                        )
-                        IconButton(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .size(28.dp),
-                            enabled = areMediaActionsEnabled,
-                            onClick = onPhotoRemoved,
-                        ) {
-                            Icon(
-                                imageVector = vectorResource(resource = Res.drawable.ic_delete),
-                                contentDescription = stringResource(
-                                    resource = Res.string.accessibility_reply_composer_remove_photo,
-                                ),
-                            )
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Switch(
-                            checked = state.adult,
-                            enabled = !state.isSubmitting,
-                            onCheckedChange = onAdultChanged,
-                        )
-                        Text(
-                            text = stringResource(resource = Res.string.links_screen_label_adult_rating),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        IconButton(
-                            enabled = areMediaActionsEnabled && state.photoUrl == null,
-                            onClick = {
-                                focusManager.clearFocus()
-                                onPhotoAttachClicked()
-                            },
-                        ) {
-                            Icon(
-                                imageVector = vectorResource(resource = Res.drawable.ic_add_photo),
-                                contentDescription = stringResource(
-                                    resource = Res.string.accessibility_reply_composer_attach_photo,
-                                ),
-                            )
-                        }
-                    }
-
-                    Button(
-                        onClick = onSubmit,
-                        enabled = !state.isSubmitting &&
-                            !state.isMediaUploading &&
-                            state.content.text.isNotBlank(),
-                    ) {
-                        if (state.isSubmitting) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                strokeWidth = 2.dp,
-                            )
-                        } else {
-                            Text(
-                                text = stringResource(resource = Res.string.entry_details_reply_composer_send),
-                            )
-                        }
                     }
                 }
             }
@@ -423,7 +413,6 @@ private fun ComposerPreview() {
     PodkopPreview(darkTheme = true) {
         Composer(
             state = ComposerState.initial.copy(
-                isVisible = true,
                 content = TextFieldValue("test"),
                 adult = false,
                 photoUrl = null,

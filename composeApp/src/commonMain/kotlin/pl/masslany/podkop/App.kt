@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -41,6 +42,8 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.common.theme.SystemAppearance
+import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
+import pl.masslany.podkop.features.composer.ComposerBottomSheetScreenRoot
 import pl.masslany.podkop.features.debug.DebugScreen
 import pl.masslany.podkop.features.debug.DebugScreenRoot
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
@@ -174,6 +177,20 @@ fun App() {
                         metadata = BottomSheetSceneStrategy.bottomSheet(),
                     ) {
                         ResourceActionsBottomSheetScreenRoot(
+                            screen = it,
+                        )
+                    }
+
+                    entry<ComposerBottomSheetScreen>(
+                        metadata = BottomSheetSceneStrategy.bottomSheet(
+                            modalBottomSheetProperties = ModalBottomSheetProperties(
+                                shouldDismissOnClickOutside = false,
+                            ),
+                            sheetGesturesEnabled = false,
+                            hideDragHandle = true,
+                        ),
+                    ) {
+                        ComposerBottomSheetScreenRoot(
                             screen = it,
                         )
                     }

@@ -170,6 +170,32 @@ class LinksApiClient(
         )
     }
 
+    override suspend fun updateLinkComment(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto> {
+        val body = LinkCommentCreateRequestDto(
+            data = LinkCommentCreateDataDto(
+                content = content,
+                adult = adult,
+                photo = photoKey,
+            ),
+        )
+        val request = Request<SingleResourceResponseDto>(
+            method = Request.HttpMethod.PUT,
+            path = "api/v3/links/$linkId/comments/$commentId",
+            body = body,
+        )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
     override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto> {
         val queryParams = mutableMapOf<String, String>()
         page?.let { queryParams["page"] = it.toString() }

@@ -27,6 +27,9 @@ enum class ResourceActionId {
     ShowLinkDownvoters,
     DeleteEntry,
     DeleteEntryComment,
+    EditEntry,
+    EditEntryComment,
+    EditLinkComment,
 }
 
 sealed interface ResourceActionLocalAction {
@@ -41,4 +44,9 @@ data class ResourceActionsParams(
     val childId: Int? = null,
     val screenshotDraftId: String? = null,
     val canDelete: Boolean = false,
+    val canEdit: Boolean = false,
+    val content: String = "",
+    val adult: Boolean = false,
+    val photoKey: String? = null,
+    val photoUrl: String? = null,
 )

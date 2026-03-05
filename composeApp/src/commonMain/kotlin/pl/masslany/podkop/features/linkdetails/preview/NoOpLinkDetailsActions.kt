@@ -1,6 +1,5 @@
 package pl.masslany.podkop.features.linkdetails.preview
 
-import androidx.compose.ui.text.input.TextFieldValue
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.pagination.PaginationActions
 import pl.masslany.podkop.common.preview.NoOpPaginationActions
@@ -21,10 +20,4 @@ object NoOpLinkDetailsActions :
     override fun onSortExpandedChanged(expanded: Boolean) = Unit
     override fun onSortDismissed() = Unit
     override fun onShowMoreRepliesClicked(commentId: Int, nextPage: Int) = Unit
-    override fun onComposerTextChanged(content: TextFieldValue) = Unit
-    override fun onComposerAdultChanged(adult: Boolean) = Unit
-    override fun onComposerPhotoAttachClicked() = Unit
-    override fun onComposerPhotoRemoved() = Unit
-    override fun onComposerDismissed() = Unit
-    override fun onComposerSubmit() = Unit
 }

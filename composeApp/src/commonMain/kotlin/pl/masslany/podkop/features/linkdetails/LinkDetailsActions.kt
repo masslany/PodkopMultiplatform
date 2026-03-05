@@ -1,7 +1,6 @@
 package pl.masslany.podkop.features.linkdetails
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.text.input.TextFieldValue
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.pagination.PaginationActions
 import pl.masslany.podkop.features.resources.ResourceItemActions
@@ -22,16 +21,4 @@ interface LinkDetailsActions :
     fun onSortDismissed()
 
     fun onShowMoreRepliesClicked(commentId: Int, nextPage: Int)
-
-    fun onComposerTextChanged(content: TextFieldValue)
-
-    fun onComposerAdultChanged(adult: Boolean)
-
-    fun onComposerPhotoAttachClicked()
-
-    fun onComposerPhotoRemoved()
-
-    fun onComposerDismissed()
-
-    fun onComposerSubmit()
 }

@@ -3,7 +3,6 @@ package pl.masslany.podkop.common.composer
 import androidx.compose.ui.text.input.TextFieldValue
 
 data class ComposerState(
-    val isVisible: Boolean,
     val content: TextFieldValue,
     val replyTarget: String?,
     val parentCommentId: Int?,
@@ -15,7 +14,6 @@ data class ComposerState(
 ) {
     companion object {
         val initial = ComposerState(
-            isVisible = false,
             content = TextFieldValue(),
             replyTarget = null,
             parentCommentId = null,

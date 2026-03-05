@@ -11,12 +11,10 @@ val entryDetailsModule = module {
             entriesRepository = get(),
             authRepository = get(),
             profileRepository = get(),
-            mediaRepository = get(),
             resourceItemStateHolder = get(),
             logger = get(),
             topBarActions = get(),
             snackbarManager = get(),
-            savedStateHandle = get(),
             appNavigator = get(),
         )
     }

@@ -14,6 +14,10 @@ import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
+import pl.masslany.podkop.features.composer.ComposerPrefill
+import pl.masslany.podkop.features.composer.ComposerRequest
+import pl.masslany.podkop.features.composer.ComposerResult
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.dialog_button_delete
@@ -25,10 +29,13 @@ import podkop.composeapp.generated.resources.ic_arrow_down
 import podkop.composeapp.generated.resources.ic_arrow_up
 import podkop.composeapp.generated.resources.ic_copy
 import podkop.composeapp.generated.resources.ic_delete
+import podkop.composeapp.generated.resources.ic_edit
 import podkop.composeapp.generated.resources.ic_share
 import podkop.composeapp.generated.resources.resource_actions_copy_as_link
 import podkop.composeapp.generated.resources.resource_actions_delete_entry
 import podkop.composeapp.generated.resources.resource_actions_delete_entry_comment
+import podkop.composeapp.generated.resources.resource_actions_edit_comment
+import podkop.composeapp.generated.resources.resource_actions_edit_entry
 import podkop.composeapp.generated.resources.resource_actions_share_as_screenshot
 import podkop.composeapp.generated.resources.resource_actions_show_link_downvoters
 import podkop.composeapp.generated.resources.resource_actions_show_link_upvoters
@@ -106,6 +113,12 @@ class ResourceActionsBottomSheetViewModel(
             ResourceActionId.DeleteEntry -> onDeleteEntryClicked()
 
             ResourceActionId.DeleteEntryComment -> onDeleteEntryCommentClicked()
+
+            ResourceActionId.EditEntry -> onEditEntryClicked()
+
+            ResourceActionId.EditEntryComment -> onEditEntryCommentClicked()
+
+            ResourceActionId.EditLinkComment -> onEditLinkCommentClicked()
         }
     }
 
@@ -177,13 +190,114 @@ class ResourceActionsBottomSheetViewModel(
         }
     }
 
+    private fun onEditEntryClicked() {
+        viewModelScope.launch {
+            if (!authRepository.isLoggedIn() || !params.canEdit) return@launch
+            val request = buildEditComposerRequest(params) as? ComposerRequest.EditEntry ?: return@launch
+
+            val resultKey = "resource-actions-edit-entry-${params.rootId}-${kotlin.random.Random.nextInt()}"
+            val result = appNavigator.awaitResult<ComposerResult>(
+                target = ComposerBottomSheetScreen(
+                    resultKey = resultKey,
+                    request = request,
+                ),
+                key = resultKey,
+            )
+
+            if (result is ComposerResult.Submitted) {
+                resourceActionUpdatesStore.tryEmit(ResourceActionUpdate.ResourceEdited(result.resource))
+            }
+            appNavigator.back()
+        }
+    }
+
+    private fun onEditEntryCommentClicked() {
+        viewModelScope.launch {
+            if (!authRepository.isLoggedIn() || !params.canEdit) return@launch
+            val request = buildEditComposerRequest(params) as? ComposerRequest.EditEntryComment ?: return@launch
+            val commentId = params.childId ?: return@launch
+
+            val resultKey = "resource-actions-edit-entry-comment-${params.rootId}-$commentId-${kotlin.random.Random.nextInt()}"
+            val result = appNavigator.awaitResult<ComposerResult>(
+                target = ComposerBottomSheetScreen(
+                    resultKey = resultKey,
+                    request = request,
+                ),
+                key = resultKey,
+            )
+
+            if (result is ComposerResult.Submitted) {
+                resourceActionUpdatesStore.tryEmit(ResourceActionUpdate.ResourceEdited(result.resource))
+            }
+            appNavigator.back()
+        }
+    }
+
+    private fun onEditLinkCommentClicked() {
+        viewModelScope.launch {
+            if (!authRepository.isLoggedIn() || !params.canEdit) return@launch
+            val request = buildEditComposerRequest(params) as? ComposerRequest.EditLinkComment ?: return@launch
+            val commentId = params.childId ?: return@launch
+
+            val resultKey = "resource-actions-edit-link-comment-${params.rootId}-$commentId-${kotlin.random.Random.nextInt()}"
+            val result = appNavigator.awaitResult<ComposerResult>(
+                target = ComposerBottomSheetScreen(
+                    resultKey = resultKey,
+                    request = request,
+                ),
+                key = resultKey,
+            )
+
+            if (result is ComposerResult.Submitted) {
+                resourceActionUpdatesStore.tryEmit(ResourceActionUpdate.ResourceEdited(result.resource))
+            }
+            appNavigator.back()
+        }
+    }
+
     private fun isOpenedFromEntryDetails(): Boolean {
         val stack = appNavigator.state.value.rootStack
         return stack.dropLast(1).lastOrNull() is EntryDetailsScreen
     }
 }
 
-private fun buildState(params: ResourceActionsParams): ResourceActionsBottomSheetState {
+internal fun buildEditComposerRequest(params: ResourceActionsParams): ComposerRequest? {
+    val prefill = ComposerPrefill(
+        content = params.content,
+        adult = params.adult,
+        photoKey = params.photoKey,
+        photoUrl = params.photoUrl,
+    )
+
+    return when (params.resourceType) {
+        ResourceActionsType.Entry -> ComposerRequest.EditEntry(
+            entryId = params.rootId,
+            prefill = prefill,
+        )
+
+        ResourceActionsType.EntryComment -> {
+            val commentId = params.childId ?: return null
+            ComposerRequest.EditEntryComment(
+                entryId = params.rootId,
+                commentId = commentId,
+                prefill = prefill,
+            )
+        }
+
+        ResourceActionsType.LinkComment -> {
+            val commentId = params.childId ?: return null
+            ComposerRequest.EditLinkComment(
+                linkId = params.rootId,
+                commentId = commentId,
+                prefill = prefill,
+            )
+        }
+
+        ResourceActionsType.Link -> null
+    }
+}
+
+internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomSheetState {
     val showVotersAction = ResourceActionItemState(
         id = ResourceActionId.ShowVoters,
         title = Res.string.resource_actions_show_voters,
@@ -240,6 +354,39 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
                 isDestructive = true,
             )
         }
+    val editEntryAction = params
+        .takeIf {
+            params.resourceType == ResourceActionsType.Entry && params.canEdit
+        }
+        ?.let {
+            ResourceActionItemState(
+                id = ResourceActionId.EditEntry,
+                title = Res.string.resource_actions_edit_entry,
+                icon = Res.drawable.ic_edit,
+            )
+        }
+    val editEntryCommentAction = params
+        .takeIf {
+            params.resourceType == ResourceActionsType.EntryComment && params.canEdit
+        }
+        ?.let {
+            ResourceActionItemState(
+                id = ResourceActionId.EditEntryComment,
+                title = Res.string.resource_actions_edit_comment,
+                icon = Res.drawable.ic_edit,
+            )
+        }
+    val editLinkCommentAction = params
+        .takeIf {
+            params.resourceType == ResourceActionsType.LinkComment && params.canEdit
+        }
+        ?.let {
+            ResourceActionItemState(
+                id = ResourceActionId.EditLinkComment,
+                title = Res.string.resource_actions_edit_comment,
+                icon = Res.drawable.ic_edit,
+            )
+        }
 
     return ResourceActionsBottomSheetState(
         actions = when (params.resourceType) {
@@ -254,6 +401,7 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
                 showVotersAction,
                 screenshotAction,
                 copyLinkAction,
+                editEntryAction,
                 deleteEntryAction,
             ).toPersistentList()
 
@@ -262,6 +410,7 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
                 showVotersAction,
                 screenshotAction,
                 copyLinkAction,
+                editEntryCommentAction,
                 deleteEntryCommentAction,
             ).toPersistentList()
 
@@ -269,6 +418,7 @@ private fun buildState(params: ResourceActionsParams): ResourceActionsBottomShee
             -> listOfNotNull(
                 screenshotAction,
                 copyLinkAction,
+                editLinkCommentAction,
             ).toPersistentList()
         },
     )

@@ -202,6 +202,8 @@
     <string name="resource_actions_show_link_downvoters">Pokaż zakopujących</string>
     <string name="resource_actions_delete_entry">Usuń wpis</string>
     <string name="resource_actions_delete_entry_comment">Usuń komentarz</string>
+    <string name="resource_actions_edit_entry">Edytuj wpis</string>
+    <string name="resource_actions_edit_comment">Edytuj komentarz</string>
     <string name="resource_actions_reply">Odpowiedz</string>
 
     <!-- Screenshot preview -->
@@ -233,7 +235,9 @@
     <string name="dialog_title_logout">Czy na pewno chcesz się wylogować?</string>
     <string name="dialog_title_delete_entry">Czy na pewno chcesz usunąć wpis?</string>
     <string name="dialog_title_delete_entry_comment">Czy na pewno chcesz usunąć komentarz?</string>
+    <string name="dialog_title_discard_composer_changes">Czy na pewno chcesz porzucić zmiany?</string>
     <string name="dialog_button_delete">Usuń</string>
+    <string name="dialog_button_discard">Porzuć</string>
     <string name="dialog_button_confirm">Potwierdź</string>
     <string name="dialog_button_dismiss">Anuluj</string>
 

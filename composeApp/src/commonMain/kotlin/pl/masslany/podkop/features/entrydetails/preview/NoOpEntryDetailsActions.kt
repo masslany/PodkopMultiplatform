@@ -1,6 +1,5 @@
 package pl.masslany.podkop.features.entrydetails.preview
 
-import androidx.compose.ui.text.input.TextFieldValue
 import pl.masslany.podkop.common.pagination.PaginationActions
 import pl.masslany.podkop.common.preview.NoOpPaginationActions
 import pl.masslany.podkop.common.preview.NoOpResourceItemActions
@@ -15,10 +14,4 @@ object NoOpEntryDetailsActions :
     PaginationActions by NoOpPaginationActions,
     TopBarActions by NoOpTopBarActions {
     override fun onRefresh() = Unit
-    override fun onComposerTextChanged(content: TextFieldValue) = Unit
-    override fun onComposerAdultChanged(adult: Boolean) = Unit
-    override fun onComposerPhotoAttachClicked() = Unit
-    override fun onComposerPhotoRemoved() = Unit
-    override fun onComposerDismissed() = Unit
-    override fun onComposerSubmit() = Unit
 }

@@ -37,8 +37,10 @@ import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryVoteAction
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
+import pl.masslany.podkop.features.resources.models.entrycomment.toEntryCommentItemState
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
+import pl.masslany.podkop.features.resources.models.linkcomment.toLinkCommentItemState
 import pl.masslany.podkop.features.resources.models.toDeletedByAuthor
 import pl.masslany.podkop.features.resources.models.toResourceItemState
 import pl.masslany.podkop.features.tag.TagScreen
@@ -80,6 +82,10 @@ open class BaseResourceItemStateHolder(
                         updateItem(update.commentId) { current ->
                             current.toDeletedByAuthor()
                         }
+                    }
+
+                    is ResourceActionUpdate.ResourceEdited -> {
+                        applyResourceEdited(update.resource)
                     }
                 }
             }
@@ -278,15 +284,20 @@ open class BaseResourceItemStateHolder(
 
     override fun onEntryMoreClicked(entryId: Int) {
         val draftId = createEntryScreenshotDraftId(entryId)
-        val canDelete = _items.value
+        val entry = _items.value
             .filterIsInstance<EntryItemState>()
             .firstOrNull { it.id == entryId }
-            ?.isDeleteEnabled == true
+        val canDelete = entry?.isDeleteEnabled == true
         appNavigator.navigateTo(
             ResourceActionsBottomSheetScreen.forEntry(
                 entryId = entryId,
                 screenshotDraftId = draftId,
                 canDelete = canDelete,
+                canEdit = entry?.isEditEnabled == true,
+                content = entry?.rawContent.orEmpty(),
+                adult = entry?.adult == true,
+                photoKey = entry?.photoKey,
+                photoUrl = entry?.photoUrl,
             ),
         )
     }
@@ -339,18 +350,18 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onEntryCommentMoreClicked(entryId: Int, entryCommentId: Int) {
-        val canDelete = _items.value
+        val comment = _items.value
             .asSequence()
             .filterIsInstance<EntryCommentItemState>()
             .firstOrNull { it.id == entryCommentId }
-            ?.isDeleteEnabled
             ?: _items.value
                 .asSequence()
                 .filterIsInstance<EntryItemState>()
                 .firstOrNull { it.id == entryId }
                 ?.comments
                 ?.firstOrNull { it.id == entryCommentId }
-                ?.isDeleteEnabled
+        val canDelete = comment
+            ?.isDeleteEnabled
             ?: false
         val draftId = createEntryCommentScreenshotDraftId(
             entryId = entryId,
@@ -362,6 +373,11 @@ open class BaseResourceItemStateHolder(
                 entryCommentId = entryCommentId,
                 screenshotDraftId = draftId,
                 canDelete = canDelete,
+                canEdit = comment?.isEditEnabled == true,
+                content = comment?.rawContent.orEmpty(),
+                adult = comment?.adult == true,
+                photoKey = comment?.embedImageState?.key,
+                photoUrl = comment?.embedImageState?.url,
             ),
         )
     }
@@ -373,6 +389,9 @@ open class BaseResourceItemStateHolder(
         parentCommentId: Int?,
     ) {
         val draftId = createTopLevelLinkCommentScreenshotDraftId(commentId)
+        val comment = _items.value
+            .filterIsInstance<LinkCommentItemState>()
+            .firstOrNull { it.id == commentId }
         appNavigator.navigateTo(
             ResourceActionsBottomSheetScreen.forLinkComment(
                 linkId = linkId,
@@ -380,6 +399,11 @@ open class BaseResourceItemStateHolder(
                 linkCommentId = commentId,
                 parentCommentId = parentCommentId,
                 screenshotDraftId = draftId,
+                canEdit = comment?.isEditEnabled == true,
+                content = comment?.rawContent.orEmpty(),
+                adult = comment?.adult == true,
+                photoKey = comment?.embedImageState?.key,
+                photoUrl = comment?.embedImageState?.url,
             ),
         )
     }
@@ -582,6 +606,27 @@ open class BaseResourceItemStateHolder(
                     updater = updater,
                 )
             }.toImmutableList()
+        }
+    }
+
+    private fun applyResourceEdited(resource: ResourceItem) {
+        updateItem(resource.id) { existingState ->
+            when (existingState) {
+                is EntryCommentItemState -> {
+                    resource.toEntryCommentItemState().copy(
+                        parentId = existingState.parentId,
+                    )
+                }
+
+                is LinkCommentItemState -> {
+                    resource.toLinkCommentItemState(
+                        linkIdOverride = existingState.linkId,
+                        linkSlugOverride = existingState.linkSlug,
+                    )
+                }
+
+                else -> resource.toResourceItemState(isUpcoming)
+            }
         }
     }
 

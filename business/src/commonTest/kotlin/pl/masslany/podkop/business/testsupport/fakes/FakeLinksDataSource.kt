@@ -49,6 +49,14 @@ class FakeLinksDataSource : LinksDataSource {
         val photoKey: String?,
     )
 
+    data class UpdateLinkCommentCall(
+        val linkId: Int,
+        val commentId: Int,
+        val content: String,
+        val adult: Boolean,
+        val photoKey: String?,
+    )
+
     data class GetLinkUpvotesCall(
         val linkId: Int,
         val type: String,
@@ -64,6 +72,8 @@ class FakeLinksDataSource : LinksDataSource {
         unstubbedResult("LinksDataSource.createLinkComment")
     var createLinkCommentReplyResult: Result<SingleResourceResponseDto> =
         unstubbedResult("LinksDataSource.createLinkCommentReply")
+    var updateLinkCommentResult: Result<SingleResourceResponseDto> =
+        unstubbedResult("LinksDataSource.updateLinkComment")
     var getLinkUpvotesResult: Result<LinkUpvotesResponseDto> = unstubbedResult("LinksDataSource.getLinkUpvotes")
     var voteOnLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.voteOnLink")
     var removeVoteOnLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.removeVoteOnLink")
@@ -77,6 +87,7 @@ class FakeLinksDataSource : LinksDataSource {
     val getRelatedLinksCalls = mutableListOf<Int>()
     val createLinkCommentCalls = mutableListOf<CreateLinkCommentCall>()
     val createLinkCommentReplyCalls = mutableListOf<CreateLinkCommentReplyCall>()
+    val updateLinkCommentCalls = mutableListOf<UpdateLinkCommentCall>()
     val getLinkUpvotesCalls = mutableListOf<GetLinkUpvotesCall>()
     val voteOnLinkCalls = mutableListOf<Int>()
     val removeVoteOnLinkCalls = mutableListOf<Int>()
@@ -144,6 +155,17 @@ class FakeLinksDataSource : LinksDataSource {
     ): Result<SingleResourceResponseDto> {
         createLinkCommentReplyCalls += CreateLinkCommentReplyCall(linkId, commentId, content, adult, photoKey)
         return createLinkCommentReplyResult
+    }
+
+    override suspend fun updateLinkComment(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto> {
+        updateLinkCommentCalls += UpdateLinkCommentCall(linkId, commentId, content, adult, photoKey)
+        return updateLinkCommentResult
     }
 
     override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto> {

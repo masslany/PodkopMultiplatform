@@ -139,6 +139,26 @@ class LinksRepositoryImpl(
         }
     }
 
+    override suspend fun updateLinkComment(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<ResourceItem> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.updateLinkComment(
+                linkId = linkId,
+                commentId = commentId,
+                content = content,
+                adult = adult,
+                photoKey = photoKey,
+            ).mapCatching {
+                listOf(it.data).toResourceItemList().first()
+            }
+        }
+    }
+
     override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<Voters> {
         return withContext(dispatcherProvider.io) {
             linksDataSource.getLinkUpvotes(linkId, type, page).mapCatching {

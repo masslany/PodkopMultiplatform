@@ -59,6 +59,8 @@ import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.bottombar.BottomBarDestinationState
 import pl.masslany.podkop.features.bottombar.BottomBarRoot
 import pl.masslany.podkop.features.bottombar.SideBarRoot
+import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
+import pl.masslany.podkop.features.composer.ComposerBottomSheetScreenRoot
 import pl.masslany.podkop.features.entries.EntriesScreen
 import pl.masslany.podkop.features.entries.EntriesScreenContent
 import pl.masslany.podkop.features.entries.EntriesScreenRoot
@@ -264,6 +266,7 @@ fun HomeScreenContent(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun HomeNavDisplay(
     backStack: ImmutableList<NavTarget>,
     contentPadding: PaddingValues,
@@ -342,6 +345,14 @@ private fun HomeNavDisplay(
                 screen = it,
                 paddingValues = contentPadding,
                 showTopBar = !inlineSceneEnabled,
+            )
+        }
+
+        entry<ComposerBottomSheetScreen>(
+            metadata = BottomSheetSceneStrategy.bottomSheet(),
+        ) {
+            ComposerBottomSheetScreenRoot(
+                screen = it,
             )
         }
     }

@@ -365,6 +365,96 @@ class EntriesRepositoryImplTest {
     }
 
     @Test
+    fun `update entry forwards payload and maps single resource item`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            updateEntryResult = Result.success(
+                Fixtures.singleResourceResponseDto(
+                    data = Fixtures.resourceItemDto(
+                        id = 333,
+                        resource = "entry",
+                        voted = 0,
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.updateEntry(
+            entryId = 333,
+            content = "updated entry content",
+            adult = true,
+            photoKey = "photo-key-update",
+        )
+
+        assertEquals(
+            listOf(
+                FakeEntriesDataSource.UpdateEntryCall(
+                    entryId = 333,
+                    content = "updated entry content",
+                    adult = true,
+                    photoKey = "photo-key-update",
+                ),
+            ),
+            entriesDataSource.updateEntryCalls,
+        )
+        assertEquals(
+            Fixtures.resourceItem(
+                id = 333,
+                resource = Resource.Entry,
+                voted = Voted.None,
+            ),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `update entry comment forwards payload and maps single resource item`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            updateEntryCommentResult = Result.success(
+                Fixtures.singleResourceResponseDto(
+                    data = Fixtures.resourceItemDto(
+                        id = 444,
+                        resource = "entry_comment",
+                        parent = Fixtures.parentDto(id = 333),
+                        voted = 0,
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.updateEntryComment(
+            entryId = 333,
+            commentId = 444,
+            content = "updated entry comment",
+            adult = false,
+            photoKey = "photo-key-comment-update",
+        )
+
+        assertEquals(
+            listOf(
+                FakeEntriesDataSource.UpdateEntryCommentCall(
+                    entryId = 333,
+                    commentId = 444,
+                    content = "updated entry comment",
+                    adult = false,
+                    photoKey = "photo-key-comment-update",
+                ),
+            ),
+            entriesDataSource.updateEntryCommentCalls,
+        )
+        assertEquals(
+            Fixtures.resourceItem(
+                id = 444,
+                resource = Resource.EntryComment,
+                parent = Fixtures.parent(id = 333),
+                voted = Voted.None,
+            ),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
     fun `vote up delegates to data source`() = runBlocking {
         val entriesDataSource = FakeEntriesDataSource().apply {
             voteUpResult = Result.success(Unit)

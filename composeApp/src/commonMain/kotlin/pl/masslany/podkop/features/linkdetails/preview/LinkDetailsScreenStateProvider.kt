@@ -2,7 +2,6 @@ package pl.masslany.podkop.features.linkdetails.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.collections.immutable.persistentListOf
-import pl.masslany.podkop.common.composer.ComposerState
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.features.linkdetails.LinkDetailsCommentsState
@@ -63,7 +62,6 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
                     ),
                 ),
             ),
-            composer = ComposerState.initial,
         ),
         LinkDetailsScreenState(
             isLoading = false,
@@ -76,7 +74,6 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
                 sortMenuState = DropdownMenuState.initial,
             ),
             relatedState = LinkDetailsRelatedState.Empty,
-            composer = ComposerState.initial,
         ),
     )
 }

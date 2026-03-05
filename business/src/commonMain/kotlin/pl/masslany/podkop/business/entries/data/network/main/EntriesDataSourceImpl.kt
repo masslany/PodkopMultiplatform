@@ -73,6 +73,36 @@ class EntriesDataSourceImpl(
         )
     }
 
+    override suspend fun updateEntry(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto> {
+        return entriesApi.updateEntry(
+            entryId = entryId,
+            content = content,
+            adult = adult,
+            photoKey = photoKey,
+        )
+    }
+
+    override suspend fun updateEntryComment(
+        entryId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto> {
+        return entriesApi.updateEntryComment(
+            entryId = entryId,
+            commentId = commentId,
+            content = content,
+            adult = adult,
+            photoKey = photoKey,
+        )
+    }
+
     override suspend fun voteUp(entryId: Int): Result<Unit> {
         return entriesApi.voteUp(entryId)
     }

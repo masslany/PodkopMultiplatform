@@ -44,7 +44,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,7 +54,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
-import pl.masslany.podkop.common.composer.Composer
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
@@ -69,7 +67,6 @@ import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_add
 import podkop.composeapp.generated.resources.accessibility_topbar_profile
-import podkop.composeapp.generated.resources.entries_composer_hint
 import podkop.composeapp.generated.resources.ic_add
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_person
@@ -178,12 +175,6 @@ fun EntriesScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
-    val composerBottomPadding = if (state.composer.isVisible) {
-        if (state.composer.photoUrl != null) 304.dp else 232.dp
-    } else {
-        0.dp
-    }
-
     Box(
         modifier = modifier
             .padding(
@@ -252,7 +243,6 @@ fun EntriesScreenContent(
                         state = state,
                         actions = actions,
                         lazyListState = lazyListState,
-                        composerBottomPadding = composerBottomPadding,
                     )
                 }
             }
@@ -265,7 +255,7 @@ fun EntriesScreenContent(
                     end = 16.dp,
                     bottom = 16.dp + bottomPadding,
                 ),
-            visible = showFab && !state.composer.isVisible,
+            visible = showFab,
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
@@ -288,18 +278,6 @@ fun EntriesScreenContent(
             }
         }
 
-        Composer(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            state = state.composer,
-            hintText = stringResource(resource = Res.string.entries_composer_hint),
-            onContentChanged = actions::onComposerTextChanged,
-            onAdultChanged = actions::onComposerAdultChanged,
-            onPhotoAttachClicked = actions::onComposerPhotoAttachClicked,
-            onPhotoRemoved = actions::onComposerPhotoRemoved,
-            onDismiss = actions::onComposerDismissed,
-            onSubmit = actions::onComposerSubmit,
-        )
-
         Box(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -316,7 +294,6 @@ private fun EntriesScreenList(
     state: EntriesScreenState,
     actions: EntriesActions,
     lazyListState: LazyListState,
-    composerBottomPadding: Dp,
 ) {
     val systemBottomPadding = WindowInsets
         .systemBars
@@ -328,7 +305,7 @@ private fun EntriesScreenList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
         contentPadding = PaddingValues(
-            bottom = systemBottomPadding + composerBottomPadding,
+            bottom = systemBottomPadding,
         ),
     ) {
         item(

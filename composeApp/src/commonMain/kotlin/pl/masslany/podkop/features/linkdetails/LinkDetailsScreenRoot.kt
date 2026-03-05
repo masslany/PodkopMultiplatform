@@ -55,7 +55,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -65,7 +64,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
-import pl.masslany.podkop.common.composer.Composer
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
@@ -83,7 +81,6 @@ import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.accessibility_topbar_profile
 import podkop.composeapp.generated.resources.comment_button_load_all_comments
-import podkop.composeapp.generated.resources.entry_details_reply_composer_hint
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.ic_person
@@ -213,7 +210,7 @@ fun LinkDetailsScreenContent(
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = showFab && !state.composer.isVisible,
+                visible = showFab,
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
@@ -238,13 +235,6 @@ fun LinkDetailsScreenContent(
         },
         containerColor = MaterialTheme.colorScheme.surface,
     ) { innerPaddingValues ->
-        // TODO: Rethink this with imePadding() and what now
-        val composerBottomPadding = if (state.composer.isVisible) {
-            if (state.composer.photoUrl != null) 304.dp else 232.dp
-        } else {
-            0.dp
-        }
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -274,22 +264,9 @@ fun LinkDetailsScreenContent(
                         state = state,
                         actions = actions,
                         lazyListState = lazyListState,
-                        composerBottomPadding = composerBottomPadding,
                     )
                 }
             }
-
-            Composer(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                state = state.composer,
-                hintText = stringResource(resource = Res.string.entry_details_reply_composer_hint),
-                onContentChanged = actions::onComposerTextChanged,
-                onAdultChanged = actions::onComposerAdultChanged,
-                onPhotoAttachClicked = actions::onComposerPhotoAttachClicked,
-                onPhotoRemoved = actions::onComposerPhotoRemoved,
-                onDismiss = actions::onComposerDismissed,
-                onSubmit = actions::onComposerSubmit,
-            )
         }
     }
 }
@@ -301,7 +278,6 @@ private fun LinkDetailsScreenList(
     state: LinkDetailsScreenState,
     actions: LinkDetailsActions,
     lazyListState: LazyListState,
-    composerBottomPadding: Dp,
 ) {
     LazyColumn(
         modifier = modifier,
@@ -311,7 +287,7 @@ private fun LinkDetailsScreenList(
             bottom = WindowInsets
                 .systemBars
                 .asPaddingValues()
-                .calculateBottomPadding() + 16.dp + composerBottomPadding,
+                .calculateBottomPadding() + 16.dp,
         ),
     ) {
         state.link?.let { link ->

@@ -76,6 +76,22 @@ class LinksDataSourceImpl(
         )
     }
 
+    override suspend fun updateLinkComment(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<SingleResourceResponseDto> {
+        return linksApi.updateLinkComment(
+            linkId = linkId,
+            commentId = commentId,
+            content = content,
+            adult = adult,
+            photoKey = photoKey,
+        )
+    }
+
     override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto> {
         return linksApi.getLinkUpvotes(linkId, type, page)
     }

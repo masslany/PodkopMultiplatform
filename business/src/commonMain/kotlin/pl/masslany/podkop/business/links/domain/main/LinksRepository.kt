@@ -58,6 +58,14 @@ interface LinksRepository {
         photoKey: String?,
     ): Result<ResourceItem>
 
+    suspend fun updateLinkComment(
+        linkId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<ResourceItem>
+
     suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<Voters>
 
     suspend fun voteOnLink(linkId: Int): Result<Unit>

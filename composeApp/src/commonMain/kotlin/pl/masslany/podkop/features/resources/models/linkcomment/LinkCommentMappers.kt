@@ -63,10 +63,12 @@ internal fun ResourceItem.toLinkCommentItemState(
     val embedMimeType = this.media?.photo?.mimeType
     val embedWidth = this.media?.photo?.width
     val embedHeight = this.media?.photo?.height
+    val embedKey = this.media?.embed?.key
 
     val embedImageState = if (embedUrl != null) {
         EmbedImageState(
             url = embedUrl,
+            key = embedKey,
             source = embedSource.orEmpty(),
             isAdult = this.adult,
             isGif = isGifImage(
@@ -102,6 +104,9 @@ internal fun ResourceItem.toLinkCommentItemState(
         voteState = voteState,
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
+        isEditEnabled = this.actions?.update == true || this.editable,
+        rawContent = this.content,
+        adult = this.adult,
         embedImageState = embedImageState,
         replies = replies,
         embedContentState = this.media?.embed.toEmbedContentState(),
@@ -140,10 +145,12 @@ internal fun Comment.toLinkCommentItemState(
     val embedMimeType = this.media.photo?.mimeType
     val embedWidth = this.media.photo?.width
     val embedHeight = this.media.photo?.height
+    val embedKey = this.media.embed?.key
 
     val embedImageState = if (embedUrl != null) {
         EmbedImageState(
             url = embedUrl,
+            key = embedKey,
             source = embedSource.orEmpty(),
             isAdult = this.adult,
             isGif = isGifImage(
@@ -170,6 +177,9 @@ internal fun Comment.toLinkCommentItemState(
         voteState = voteState,
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions.createFavourite || this.actions.deleteFavourite,
+        isEditEnabled = this.actions.update || this.editable,
+        rawContent = this.content,
+        adult = this.adult,
         embedImageState = embedImageState,
         replies = persistentListOf(),
         embedContentState = this.media.embed.toEmbedContentState(),

@@ -129,6 +129,44 @@ class EntriesRepositoryImpl(
         }
     }
 
+    override suspend fun updateEntry(
+        entryId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<ResourceItem> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.updateEntry(
+                entryId = entryId,
+                content = content,
+                adult = adult,
+                photoKey = photoKey,
+            ).mapCatching {
+                listOf(it.data).toResourceItemList().first()
+            }
+        }
+    }
+
+    override suspend fun updateEntryComment(
+        entryId: Int,
+        commentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<ResourceItem> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.updateEntryComment(
+                entryId = entryId,
+                commentId = commentId,
+                content = content,
+                adult = adult,
+                photoKey = photoKey,
+            ).mapCatching {
+                listOf(it.data).toResourceItemList().first()
+            }
+        }
+    }
+
     override suspend fun voteUp(entryId: Int): Result<Unit> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.voteUp(entryId)
