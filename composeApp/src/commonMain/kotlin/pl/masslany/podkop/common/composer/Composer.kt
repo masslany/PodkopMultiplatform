@@ -26,7 +26,10 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -74,6 +77,7 @@ import podkop.composeapp.generated.resources.links_screen_label_adult_rating
 fun Composer(
     state: ComposerState,
     hintText: String,
+    autoFocus: Boolean,
     onContentChanged: (TextFieldValue) -> Unit,
     onAdultChanged: (Boolean) -> Unit,
     onPhotoAttachClicked: () -> Unit,
@@ -85,9 +89,13 @@ fun Composer(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val areMediaActionsEnabled = !state.isSubmitting && !state.isMediaUploading
+    var hasRequestedAutoFocus by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+    LaunchedEffect(autoFocus, hasRequestedAutoFocus) {
+        if (autoFocus && !hasRequestedAutoFocus) {
+            focusRequester.requestFocus()
+            hasRequestedAutoFocus = true
+        }
     }
 
     Card(
@@ -421,6 +429,7 @@ private fun ComposerPreview() {
                 isMediaUploading = false,
             ),
             hintText = stringResource(resource = Res.string.entry_details_reply_composer_hint),
+            autoFocus = false,
             onContentChanged = {},
             onAdultChanged = {},
             onPhotoAttachClicked = {},

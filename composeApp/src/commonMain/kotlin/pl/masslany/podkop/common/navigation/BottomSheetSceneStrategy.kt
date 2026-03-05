@@ -7,6 +7,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.scene.OverlayScene
 import androidx.navigation3.scene.Scene
@@ -46,7 +47,9 @@ internal class BottomSheetScene<T : Any>(
             properties = modalBottomSheetProperties,
             containerColor = MaterialTheme.colorScheme.surface,
         ) {
-            entry.Content()
+            CompositionLocalProvider(LocalBottomSheetState provides sheetState) {
+                entry.Content()
+            }
         }
     }
 }
