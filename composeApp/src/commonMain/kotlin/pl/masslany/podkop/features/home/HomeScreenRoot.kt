@@ -75,6 +75,8 @@ import pl.masslany.podkop.features.links.LinksScreenContent
 import pl.masslany.podkop.features.links.LinksScreenRoot
 import pl.masslany.podkop.features.links.preview.LinksScreenStateProvider
 import pl.masslany.podkop.features.links.preview.NoOpLinksActions
+import pl.masslany.podkop.features.more.MoreScreen
+import pl.masslany.podkop.features.more.MoreScreenRoot
 import pl.masslany.podkop.features.upcoming.UpcomingScreen
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.home_link_details_placeholder_body
@@ -325,6 +327,12 @@ private fun HomeNavDisplay(
                 onEntryClicked = onEntryClicked,
                 onEntryReplyClicked = onEntryReplyClicked,
                 onEntryCommentReplyClicked = onEntryCommentReplyClicked,
+            )
+        }
+
+        entry<MoreScreen> {
+            MoreScreenRoot(
+                paddingValues = contentPadding,
             )
         }
 

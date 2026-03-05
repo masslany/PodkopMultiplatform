@@ -3,6 +3,7 @@
     <string name="navigation_label_homepage">Główna</string>
     <string name="navigation_label_upcoming">Wykopalisko</string>
     <string name="navigation_label_entries">Mikroblog</string>
+    <string name="navigation_label_more">Więcej</string>
 
     <!-- Top Bar  -->
     <string name="topbar_label_homepage">Strona główna</string>

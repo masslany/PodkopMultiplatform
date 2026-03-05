@@ -6,13 +6,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import pl.masslany.podkop.features.entries.EntriesScreen
 import pl.masslany.podkop.features.links.LinksScreen
+import pl.masslany.podkop.features.more.MoreScreen
 import pl.masslany.podkop.features.upcoming.UpcomingScreen
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_home
+import podkop.composeapp.generated.resources.ic_more_horizontal
 import podkop.composeapp.generated.resources.ic_nav_letter_m
 import podkop.composeapp.generated.resources.ic_nav_shovel
 import podkop.composeapp.generated.resources.navigation_label_entries
 import podkop.composeapp.generated.resources.navigation_label_homepage
+import podkop.composeapp.generated.resources.navigation_label_more
 import podkop.composeapp.generated.resources.navigation_label_upcoming
 
 class AppConfigProvider : NavigationConfigProvider {
@@ -41,8 +44,15 @@ class AppConfigProvider : NavigationConfigProvider {
             enabled = true,
         )
 
+        val more = TopLevelDestination(
+            root = MoreScreen,
+            iconRes = Res.drawable.ic_more_horizontal,
+            labelRes = Res.string.navigation_label_more,
+            enabled = true,
+        )
+
         emit(
-            persistentListOf(links, upcoming, entries),
+            persistentListOf(links, upcoming, entries, more),
         )
     }
 }
