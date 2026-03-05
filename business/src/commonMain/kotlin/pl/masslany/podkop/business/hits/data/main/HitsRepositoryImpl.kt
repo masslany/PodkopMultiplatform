@@ -12,9 +12,19 @@ class HitsRepositoryImpl(
     private val hitsDataSource: HitsDataSource,
     private val dispatcherProvider: DispatcherProvider,
 ) : HitsRepository {
-    override suspend fun getLinkHits(hitsSortType: HitsSortType): Result<Resources> {
+    override suspend fun getLinkHits(
+        page: Any?,
+        hitsSortType: HitsSortType,
+        year: Int?,
+        month: Int?,
+    ): Result<Resources> {
         return withContext(dispatcherProvider.io) {
-            hitsDataSource.getLinkHits(hitsSortType.value).mapCatching {
+            hitsDataSource.getLinkHits(
+                page = page,
+                sort = hitsSortType.value,
+                year = year,
+                month = month,
+            ).mapCatching {
                 it.toResources()
             }
         }

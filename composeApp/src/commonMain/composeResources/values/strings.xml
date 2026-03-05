@@ -15,6 +15,7 @@
     <string name="topbar_label_entry">Wpis</string>
     <string name="topbar_label_link">Znalezisko</string>
     <string name="topbar_label_search">Szukaj</string>
+    <string name="topbar_label_hits">Hity</string>
 
     <!-- More -->
     <string name="more_group_social">Społeczność</string>
@@ -131,9 +132,31 @@
     <string name="dropdown_menu_label_hot_6h">6h</string>
     <string name="dropdown_menu_label_hot_12h">12h</string>
     <string name="dropdown_menu_label_all">Wszystko</string>
+    <string name="dropdown_menu_label_day">Dzień</string>
+    <string name="dropdown_menu_label_week">Tydzień</string>
+    <string name="dropdown_menu_label_month">Miesiąc</string>
+    <string name="dropdown_menu_label_year">Rok</string>
     <string name="dropdown_menu_label_everything">Wszystkie</string>
     <string name="dropdown_menu_label_links">Znaleziska</string>
     <string name="dropdown_menu_label_entries">Wpisy</string>
+
+    <!-- Hits -->
+    <string name="hits_archive_button">Archiwum</string>
+    <string name="hits_archive_picker_title">Wybierz miesiąc</string>
+    <string name="hits_archive_picker_previous_year">Poprzedni rok</string>
+    <string name="hits_archive_picker_next_year">Następny rok</string>
+    <string name="hits_archive_picker_january">sty</string>
+    <string name="hits_archive_picker_february">lut</string>
+    <string name="hits_archive_picker_march">mar</string>
+    <string name="hits_archive_picker_april">kwi</string>
+    <string name="hits_archive_picker_may">maj</string>
+    <string name="hits_archive_picker_june">cze</string>
+    <string name="hits_archive_picker_july">lip</string>
+    <string name="hits_archive_picker_august">sie</string>
+    <string name="hits_archive_picker_september">wrz</string>
+    <string name="hits_archive_picker_october">paź</string>
+    <string name="hits_archive_picker_november">lis</string>
+    <string name="hits_archive_picker_december">gru</string>
 
     <!-- Comments -->
     <string name="comment_label_removed_by_moderator">Komentarz usunięty przez moderatora</string>

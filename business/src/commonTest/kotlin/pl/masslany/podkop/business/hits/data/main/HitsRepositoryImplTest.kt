@@ -26,14 +26,50 @@ class HitsRepositoryImplTest {
             dispatcherProvider = FakeDispatcherProvider(),
         )
 
-        val actual = sut.getLinkHits(HitsSortType.Day)
+        val actual = sut.getLinkHits(hitsSortType = HitsSortType.Day)
 
-        assertEquals("day", hitsDataSource.getLinkHitsCalls.single())
+        assertEquals(
+            FakeHitsDataSource.GetLinkHitsCall(
+                page = null,
+                sort = "day",
+                year = null,
+                month = null,
+            ),
+            hitsDataSource.getLinkHitsCalls.single(),
+        )
         assertEquals(
             Fixtures.resources(
                 data = listOf(Fixtures.resourceItem(id = 1)),
             ),
             actual.getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `get link hits passes archive params`() = runBlocking {
+        val hitsDataSource = FakeHitsDataSource().apply {
+            getLinkHitsResult = Result.success(Fixtures.resourceResponseDto())
+        }
+        val sut = HitsRepositoryImpl(
+            hitsDataSource = hitsDataSource,
+            dispatcherProvider = FakeDispatcherProvider(),
+        )
+
+        sut.getLinkHits(
+            page = 3,
+            hitsSortType = HitsSortType.All,
+            year = 2026,
+            month = 1,
+        )
+
+        assertEquals(
+            FakeHitsDataSource.GetLinkHitsCall(
+                page = 3,
+                sort = "all",
+                year = 2026,
+                month = 1,
+            ),
+            hitsDataSource.getLinkHitsCalls.single(),
         )
     }
 
@@ -48,7 +84,7 @@ class HitsRepositoryImplTest {
             dispatcherProvider = FakeDispatcherProvider(),
         )
 
-        val actual = sut.getLinkHits(HitsSortType.Day)
+        val actual = sut.getLinkHits(hitsSortType = HitsSortType.Day)
 
         assertTrue(actual.isFailure)
         assertSame(expected, actual.exceptionOrNull())

@@ -137,7 +137,11 @@ class LinksViewModel(
                 }
 
             if (!isUpcoming) {
-                hitsRepository.getLinkHits(hitsSortType = HitsSortType.Day)
+                hitsRepository.getLinkHits(
+                    hitsSortType = HitsSortType.Day,
+                    year = null,
+                    month = null,
+                )
                     .onSuccess {
                         linksResourceItemStateHolder.updateHits(it.data)
                     }

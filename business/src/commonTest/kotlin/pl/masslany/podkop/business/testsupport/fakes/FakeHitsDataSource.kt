@@ -4,11 +4,28 @@ import pl.masslany.podkop.business.common.data.network.models.common.ResourceRes
 import pl.masslany.podkop.business.hits.data.api.HitsDataSource
 
 class FakeHitsDataSource : HitsDataSource {
-    var getLinkHitsResult: Result<ResourceResponseDto> = unstubbedResult("HitsDataSource.getLinkHits")
-    val getLinkHitsCalls = mutableListOf<String>()
+    data class GetLinkHitsCall(
+        val page: Any?,
+        val sort: String,
+        val year: Int?,
+        val month: Int?,
+    )
 
-    override suspend fun getLinkHits(sort: String): Result<ResourceResponseDto> {
-        getLinkHitsCalls += sort
+    var getLinkHitsResult: Result<ResourceResponseDto> = unstubbedResult("HitsDataSource.getLinkHits")
+    val getLinkHitsCalls = mutableListOf<GetLinkHitsCall>()
+
+    override suspend fun getLinkHits(
+        page: Any?,
+        sort: String,
+        year: Int?,
+        month: Int?,
+    ): Result<ResourceResponseDto> {
+        getLinkHitsCalls += GetLinkHitsCall(
+            page = page,
+            sort = sort,
+            year = year,
+            month = month,
+        )
         return getLinkHitsResult
     }
 }

@@ -19,6 +19,7 @@ import pl.masslany.podkop.common.models.vote.VoteValueType
 class CountStateProvider : PreviewParameterProvider<CountState> {
     override val values: Sequence<CountState> = sequenceOf(
         PreviewFixtures.countState(count = "1", isHot = false, isVoted = false, canVote = true),
+        PreviewFixtures.countState(count = "12888", isHot = true, isVoted = false, canVote = true),
         PreviewFixtures.countState(count = "128", isHot = true, isVoted = false, canVote = true),
         PreviewFixtures.countState(count = "42", isHot = false, isVoted = true, canVote = true),
         PreviewFixtures.countState(count = "0", isHot = false, isVoted = false, canVote = false),

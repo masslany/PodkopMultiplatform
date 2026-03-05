@@ -23,6 +23,7 @@ import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.hits.HitsScreen
 import pl.masslany.podkop.features.more.models.MoreSectionItemState
 import pl.masslany.podkop.features.more.models.MoreSectionItemType
 import pl.masslany.podkop.features.more.models.MoreSectionState
@@ -86,7 +87,7 @@ class MoreViewModel(
     }
 
     override fun onHitsClicked() {
-        emitComingSoon()
+        appNavigator.navigateTo(HitsScreen)
     }
 
     override fun onSearchClicked() {

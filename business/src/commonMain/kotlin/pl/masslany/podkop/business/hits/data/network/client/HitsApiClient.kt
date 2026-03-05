@@ -10,11 +10,21 @@ import pl.masslany.podkop.common.network.models.request.Request
 class HitsApiClient(
     private val apiClient: ApiClient,
 ) : HitsApi {
-    override suspend fun getLinkHits(sort: String): Result<ResourceResponseDto> {
+    override suspend fun getLinkHits(
+        page: Any?,
+        sort: String,
+        year: Int?,
+        month: Int?,
+    ): Result<ResourceResponseDto> {
         val queryParams =
             mutableMapOf(
                 "sort" to sort,
             )
+                .apply {
+                    page?.let { put("page", it.toString()) }
+                    year?.let { put("year", it.toString()) }
+                    month?.let { put("month", it.toString().padStart(2, '0')) }
+                }
 
         val request =
             Request<ResourceResponseDto>(

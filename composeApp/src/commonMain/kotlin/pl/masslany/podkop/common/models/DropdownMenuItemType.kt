@@ -27,6 +27,14 @@ sealed class DropdownMenuItemType {
 
     data object All : DropdownMenuItemType()
 
+    data object Day : DropdownMenuItemType()
+
+    data object Week : DropdownMenuItemType()
+
+    data object Month : DropdownMenuItemType()
+
+    data object Year : DropdownMenuItemType()
+
     data object Links : DropdownMenuItemType()
 
     data object Entries : DropdownMenuItemType()

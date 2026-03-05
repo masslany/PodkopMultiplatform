@@ -12,9 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import pl.masslany.podkop.common.models.CountState
 import pl.masslany.podkop.common.preview.CountStateProvider
@@ -40,7 +41,7 @@ fun Count(
     onClick: () -> Unit,
 ) {
     Box(modifier = modifier) {
-        BasicText(
+        Text(
             text = state.count,
             style = MaterialTheme.typography.labelMedium.copy(
                 color = countTextColor(isHot = state.isHot, isVoted = state.isVoted),
@@ -59,6 +60,7 @@ fun Count(
                 .padding(4.dp)
                 .wrapContentSize(),
             autoSize = TextAutoSize.StepBased(
+                minFontSize = 8.sp,
                 maxFontSize = MaterialTheme.typography.labelMedium.fontSize,
             ),
             maxLines = 1,

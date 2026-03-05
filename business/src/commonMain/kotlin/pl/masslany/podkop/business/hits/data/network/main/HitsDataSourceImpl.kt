@@ -8,7 +8,12 @@ import pl.masslany.podkop.business.hits.data.network.api.HitsApi
 class HitsDataSourceImpl(
     private val hitsApi: HitsApi,
 ) : HitsDataSource {
-    override suspend fun getLinkHits(sort: String): Result<ResourceResponseDto> {
-        return hitsApi.getLinkHits(sort)
+    override suspend fun getLinkHits(
+        page: Any?,
+        sort: String,
+        year: Int?,
+        month: Int?,
+    ): Result<ResourceResponseDto> {
+        return hitsApi.getLinkHits(page, sort, year, month)
     }
 }

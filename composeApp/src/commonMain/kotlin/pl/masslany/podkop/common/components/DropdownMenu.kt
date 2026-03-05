@@ -26,6 +26,7 @@ import podkop.composeapp.generated.resources.dropdown_menu_label_active
 import podkop.composeapp.generated.resources.dropdown_menu_label_all
 import podkop.composeapp.generated.resources.dropdown_menu_label_best
 import podkop.composeapp.generated.resources.dropdown_menu_label_commented
+import podkop.composeapp.generated.resources.dropdown_menu_label_day
 import podkop.composeapp.generated.resources.dropdown_menu_label_digged
 import podkop.composeapp.generated.resources.dropdown_menu_label_entries
 import podkop.composeapp.generated.resources.dropdown_menu_label_everything
@@ -34,8 +35,11 @@ import podkop.composeapp.generated.resources.dropdown_menu_label_hot_12h
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot_2h
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot_6h
 import podkop.composeapp.generated.resources.dropdown_menu_label_links
+import podkop.composeapp.generated.resources.dropdown_menu_label_month
 import podkop.composeapp.generated.resources.dropdown_menu_label_newest
 import podkop.composeapp.generated.resources.dropdown_menu_label_oldest
+import podkop.composeapp.generated.resources.dropdown_menu_label_week
+import podkop.composeapp.generated.resources.dropdown_menu_label_year
 import podkop.composeapp.generated.resources.ic_arrow_dropdown
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -131,6 +135,18 @@ private fun DropdownMenuItemType.toText(): String = when (this) {
 
     DropdownMenuItemType.All ->
         stringResource(resource = Res.string.dropdown_menu_label_all)
+
+    DropdownMenuItemType.Day ->
+        stringResource(resource = Res.string.dropdown_menu_label_day)
+
+    DropdownMenuItemType.Week ->
+        stringResource(resource = Res.string.dropdown_menu_label_week)
+
+    DropdownMenuItemType.Month ->
+        stringResource(resource = Res.string.dropdown_menu_label_month)
+
+    DropdownMenuItemType.Year ->
+        stringResource(resource = Res.string.dropdown_menu_label_year)
 
     DropdownMenuItemType.Entries ->
         stringResource(resource = Res.string.dropdown_menu_label_entries)

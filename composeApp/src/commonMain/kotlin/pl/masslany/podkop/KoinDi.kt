@@ -17,6 +17,7 @@ import pl.masslany.podkop.features.composer.di.composerModule
 import pl.masslany.podkop.features.debug.di.debugModule
 import pl.masslany.podkop.features.entries.di.entriesModule
 import pl.masslany.podkop.features.entrydetails.di.entryDetailsModule
+import pl.masslany.podkop.features.hits.di.hitsModule
 import pl.masslany.podkop.features.home.di.homeModule
 import pl.masslany.podkop.features.imageviewer.di.imageViewerModule
 import pl.masslany.podkop.features.linkdetails.di.linkDetailsModule
@@ -39,6 +40,7 @@ val composeAppModule = module {
         navigationModule,
         deepLinkModule,
         homeModule,
+        hitsModule,
         linksModule,
         entriesModule,
         composerModule,
