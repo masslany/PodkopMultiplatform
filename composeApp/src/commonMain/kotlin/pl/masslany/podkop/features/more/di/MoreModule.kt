@@ -6,6 +6,13 @@ import pl.masslany.podkop.features.more.MoreViewModel
 
 val moreModule = module {
     viewModel {
-        MoreViewModel()
+        MoreViewModel(
+            authRepository = get(),
+            authSessionEvents = get(),
+            profileRepository = get(),
+            appNavigator = get(),
+            logger = get(),
+            snackbarManager = get(),
+        )
     }
 }

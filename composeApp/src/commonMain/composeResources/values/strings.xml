@@ -16,6 +16,22 @@
     <string name="topbar_label_link">Znalezisko</string>
     <string name="topbar_label_search">Szukaj</string>
 
+    <!-- More -->
+    <string name="more_group_social">Społeczność</string>
+    <string name="more_group_content">Treści</string>
+    <string name="more_group_system">System</string>
+    <string name="more_item_notifications">Powiadomienia</string>
+    <string name="more_item_messages">Wiadomości</string>
+    <string name="more_item_favorites">Ulubione</string>
+    <string name="more_item_hits">Hity</string>
+    <string name="more_item_search">Wyszukaj</string>
+    <string name="more_item_my_wykop">Mój wykop</string>
+    <string name="more_item_about">O aplikacji</string>
+    <string name="more_profile_preview_unavailable">Twoje konto</string>
+    <string name="more_snackbar_coming_soon">Wkrótce</string>
+    <string name="more_about_title">O aplikacji</string>
+    <string name="more_about_body"></string>
+
     <!-- Links screen -->
     <string name="links_screen_label_hits">Hity</string>
     <string name="links_screen_label_hits_error">Wystąpił problem podczas wczytywania</string>
