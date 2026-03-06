@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import org.koin.compose.viewmodel.koinViewModel
@@ -39,6 +40,13 @@ internal fun MoreScreenRoot(
 ) {
     val viewModel = koinViewModel<MoreViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LifecycleStartEffect(viewModel) {
+        viewModel.onScreenOpened()
+        onStopOrDispose {
+            // no-op
+        }
+    }
 
     MoreScreenContent(
         paddingValues = paddingValues,

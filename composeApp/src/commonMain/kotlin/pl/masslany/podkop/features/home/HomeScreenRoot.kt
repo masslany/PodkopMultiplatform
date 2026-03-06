@@ -466,6 +466,7 @@ private fun HomeScreenContentPreviewLinksTab() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_home,
                     labelRes = Res.string.navigation_label_homepage,
+                    badgeCount = 0,
                 ),
                 BottomBarDestinationState(
                     screen = UpcomingScreen,
@@ -473,6 +474,7 @@ private fun HomeScreenContentPreviewLinksTab() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_nav_shovel,
                     labelRes = Res.string.navigation_label_upcoming,
+                    badgeCount = 0,
                 ),
                 BottomBarDestinationState(
                     screen = EntriesScreen,
@@ -480,6 +482,7 @@ private fun HomeScreenContentPreviewLinksTab() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_nav_letter_m,
                     labelRes = Res.string.navigation_label_entries,
+                    badgeCount = 0,
                 ),
             ),
             currentTabKey = LinksScreen.toString(),
@@ -526,6 +529,7 @@ private fun HomeScreenContentPreviewEntriesTab() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_home,
                     labelRes = Res.string.navigation_label_homepage,
+                    badgeCount = 0,
                 ),
                 BottomBarDestinationState(
                     screen = UpcomingScreen,
@@ -533,6 +537,7 @@ private fun HomeScreenContentPreviewEntriesTab() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_nav_shovel,
                     labelRes = Res.string.navigation_label_upcoming,
+                    badgeCount = 0,
                 ),
                 BottomBarDestinationState(
                     screen = EntriesScreen,
@@ -540,6 +545,7 @@ private fun HomeScreenContentPreviewEntriesTab() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_nav_letter_m,
                     labelRes = Res.string.navigation_label_entries,
+                    badgeCount = 0,
                 ),
             ),
             currentTabKey = EntriesScreen.toString(),

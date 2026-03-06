@@ -15,6 +15,8 @@ val navigationModule = module {
     }
 
     factory<NavigationConfigProvider> {
-        AppConfigProvider()
+        AppConfigProvider(
+            notificationsRepository = get(),
+        )
     }
 }

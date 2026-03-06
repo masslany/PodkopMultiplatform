@@ -1,6 +1,8 @@
 package pl.masslany.podkop.features.bottombar
 
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -19,6 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.navigation.NavTarget
@@ -64,6 +68,7 @@ private fun BottomBar(
             NavigationBarItemContent(
                 iconRes = bottomBarDestinationState.iconRes,
                 labelRes = bottomBarDestinationState.labelRes,
+                badgeCount = bottomBarDestinationState.badgeCount,
                 content = { itemModifier, icon, label ->
                     NavigationBarItem(
                         modifier = itemModifier,
@@ -102,6 +107,7 @@ fun SideBarRoot(
             NavigationBarItemContent(
                 iconRes = destination.iconRes,
                 labelRes = destination.labelRes,
+                badgeCount = destination.badgeCount,
                 content = { itemModifier, icon, label ->
                     NavigationRailItem(
                         modifier = itemModifier,
@@ -121,8 +127,9 @@ fun SideBarRoot(
 
 @Composable
 private fun NavigationBarItemContent(
-    iconRes: org.jetbrains.compose.resources.DrawableResource,
-    labelRes: org.jetbrains.compose.resources.StringResource,
+    iconRes: DrawableResource,
+    labelRes: StringResource,
+    badgeCount: Int,
     content: @Composable (
         itemModifier: Modifier,
         icon: @Composable () -> Unit,
@@ -135,10 +142,20 @@ private fun NavigationBarItemContent(
                 role = Role.Tab
             },
         {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-            )
+            BadgedBox(
+                badge = {
+                    if (badgeCount > 0) {
+                        Badge {
+                            Text(text = badgeCount.toBadgeLabel())
+                        }
+                    }
+                },
+            ) {
+                Icon(
+                    painter = painterResource(iconRes),
+                    contentDescription = null,
+                )
+            }
         },
         {
             Text(
@@ -161,6 +178,7 @@ private fun BottomBarRootPreview() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_home,
                     labelRes = Res.string.navigation_label_homepage,
+                    badgeCount = 0,
                 ),
                 BottomBarDestinationState(
                     screen = UpcomingScreen,
@@ -168,6 +186,7 @@ private fun BottomBarRootPreview() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_nav_shovel,
                     labelRes = Res.string.navigation_label_upcoming,
+                    badgeCount = 0,
                 ),
                 BottomBarDestinationState(
                     screen = EntriesScreen,
@@ -175,6 +194,7 @@ private fun BottomBarRootPreview() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_nav_letter_m,
                     labelRes = Res.string.navigation_label_entries,
+                    badgeCount = 12,
                 ),
             ),
             onScreenChanged = {},
@@ -195,6 +215,7 @@ private fun SideBarRootPreview() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_home,
                     labelRes = Res.string.navigation_label_homepage,
+                    badgeCount = 0,
                 ),
                 BottomBarDestinationState(
                     screen = EntriesScreen,
@@ -202,9 +223,12 @@ private fun SideBarRootPreview() {
                     isEnabled = true,
                     iconRes = Res.drawable.ic_nav_letter_m,
                     labelRes = Res.string.navigation_label_entries,
+                    badgeCount = 3,
                 ),
             ),
             onScreenChanged = {},
         )
     }
 }
+
+private fun Int.toBadgeLabel(): String = if (this > 99) "99+" else toString()

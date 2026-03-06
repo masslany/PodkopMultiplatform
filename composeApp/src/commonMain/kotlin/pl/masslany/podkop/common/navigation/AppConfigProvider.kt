@@ -3,7 +3,8 @@ package pl.masslany.podkop.common.navigation
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.features.entries.EntriesScreen
 import pl.masslany.podkop.features.links.LinksScreen
 import pl.masslany.podkop.features.more.MoreScreen
@@ -18,41 +19,38 @@ import podkop.composeapp.generated.resources.navigation_label_homepage
 import podkop.composeapp.generated.resources.navigation_label_more
 import podkop.composeapp.generated.resources.navigation_label_upcoming
 
-class AppConfigProvider : NavigationConfigProvider {
+class AppConfigProvider(private val notificationsRepository: NotificationsRepository) : NavigationConfigProvider {
 
     override suspend fun resolveStartDestination(): NavTarget = HomeScreen
 
-    override val topLevelDestinations: Flow<ImmutableList<TopLevelDestination>> = flow {
-        val links = TopLevelDestination(
-            root = LinksScreen,
-            iconRes = Res.drawable.ic_home,
-            labelRes = Res.string.navigation_label_homepage,
-            enabled = true,
-        )
-
-        val upcoming = TopLevelDestination(
-            root = UpcomingScreen,
-            iconRes = Res.drawable.ic_nav_shovel,
-            labelRes = Res.string.navigation_label_upcoming,
-            enabled = true,
-        )
-
-        val entries = TopLevelDestination(
-            root = EntriesScreen,
-            iconRes = Res.drawable.ic_nav_letter_m,
-            labelRes = Res.string.navigation_label_entries,
-            enabled = true,
-        )
-
-        val more = TopLevelDestination(
-            root = MoreScreen,
-            iconRes = Res.drawable.ic_more_horizontal,
-            labelRes = Res.string.navigation_label_more,
-            enabled = true,
-        )
-
-        emit(
-            persistentListOf(links, upcoming, entries, more),
-        )
-    }
+    override val topLevelDestinations: Flow<ImmutableList<TopLevelDestination>> =
+        notificationsRepository.unreadCount.map { notificationsUnreadCount ->
+            persistentListOf(
+                TopLevelDestination(
+                    root = LinksScreen,
+                    iconRes = Res.drawable.ic_home,
+                    labelRes = Res.string.navigation_label_homepage,
+                    enabled = true,
+                ),
+                TopLevelDestination(
+                    root = UpcomingScreen,
+                    iconRes = Res.drawable.ic_nav_shovel,
+                    labelRes = Res.string.navigation_label_upcoming,
+                    enabled = true,
+                ),
+                TopLevelDestination(
+                    root = EntriesScreen,
+                    iconRes = Res.drawable.ic_nav_letter_m,
+                    labelRes = Res.string.navigation_label_entries,
+                    enabled = true,
+                ),
+                TopLevelDestination(
+                    root = MoreScreen,
+                    iconRes = Res.drawable.ic_more_horizontal,
+                    labelRes = Res.string.navigation_label_more,
+                    badgeCount = notificationsUnreadCount,
+                    enabled = true,
+                ),
+            )
+        }
 }

@@ -15,12 +15,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.DialogSceneStrategy
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
-import pl.masslany.podkop.business.startup.api.StartupManager
+import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.components.dialog.DefaultGenericDialog
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreen
@@ -77,7 +78,7 @@ import pl.masslany.podkop.features.tag.TagScreenRoot
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
-    val startupManager = koinInject<StartupManager>()
+    val viewModel = koinViewModel<AppViewModel>()
     val appNavigator = koinInject<AppNavigator>()
     val snackbarManager = koinInject<SnackbarManager>()
     val appSettings = koinInject<AppSettings>()
@@ -95,8 +96,8 @@ fun App() {
         darkTheme = darkTheme,
         dynamicColor = dynamicColorsEnabled,
     ) {
-        val startupState by startupManager.state.collectAsStateWithLifecycle()
-        val state by appNavigator.state.collectAsStateWithLifecycle()
+        val startupState by viewModel.startupState.collectAsStateWithLifecycle()
+        val state by viewModel.navigationState.collectAsStateWithLifecycle()
         val snackbarHostState = remember { SnackbarHostState() }
 
         if (startupState !is AppState.Ready) {
@@ -114,13 +115,20 @@ fun App() {
             }
         }
 
+        LifecycleStartEffect(viewModel) {
+            viewModel.onAppForegrounded()
+            onStopOrDispose {
+                viewModel.onAppBackgrounded()
+            }
+        }
+
         CompositionLocalProvider(
             LocalAppSnackbarHostState provides snackbarHostState,
             LocalAppSettings provides appSettings,
         ) {
             NavigationContent(
                 state = state,
-                onBack = { appNavigator.back() },
+                onBack = viewModel::onBack,
                 entryProvider = entryProvider {
                     entry<HomeScreen> {
                         HomeScreenRoot()

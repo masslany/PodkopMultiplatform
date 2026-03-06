@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 import pl.masslany.podkop.business.di.businessModule
@@ -37,6 +38,7 @@ val composeAppModule = module {
     single<CoroutineScope> { CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate) }
     single<SnackbarManager> { SnackbarManagerImpl() }
     single<AppSettings> { AppSettingsImpl(keyValueStorage = get()) }
+    viewModelOf(::AppViewModel)
 
     includes(
         navigationModule,

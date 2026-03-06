@@ -9,6 +9,7 @@ val moreModule = module {
         MoreViewModel(
             authRepository = get(),
             authSessionEvents = get(),
+            notificationsRepository = get(),
             profileRepository = get(),
             appNavigator = get(),
             logger = get(),

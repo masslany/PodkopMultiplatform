@@ -10,4 +10,5 @@ data class BottomBarDestinationState(
     val isEnabled: Boolean,
     val iconRes: DrawableResource,
     val labelRes: StringResource,
+    val badgeCount: Int,
 )

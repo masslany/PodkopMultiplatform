@@ -7,9 +7,11 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.auth.domain.AuthRepository
+import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.common.deeplink.AuthSessionEvent
 import pl.masslany.podkop.common.deeplink.AuthSessionEvents
@@ -40,6 +42,7 @@ import podkop.composeapp.generated.resources.more_snackbar_coming_soon
 class MoreViewModel(
     private val authRepository: AuthRepository,
     private val authSessionEvents: AuthSessionEvents,
+    private val notificationsRepository: NotificationsRepository,
     private val profileRepository: ProfileRepository,
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
@@ -55,6 +58,13 @@ class MoreViewModel(
             loadData()
         }
         observeAuthSessionChanges()
+        observeNotificationsUnreadCount()
+    }
+
+    fun onScreenOpened() {
+        viewModelScope.launch {
+            notificationsRepository.refreshStatus()
+        }
     }
 
     override fun onProfileClicked() {
@@ -117,6 +127,21 @@ class MoreViewModel(
         }
     }
 
+    private fun observeNotificationsUnreadCount() {
+        viewModelScope.launch {
+            notificationsRepository.unreadCount.collectLatest { unreadCount ->
+                _state.update { currentState ->
+                    currentState.copy(
+                        sections = buildMoreSections(
+                            notificationsUnreadCount = unreadCount,
+                            isLoggedIn = currentState.isLoggedIn,
+                        ),
+                    )
+                }
+            }
+        }
+    }
+
     private suspend fun loadData() {
         _state.update { previous ->
             previous.copy(isLoading = true)
@@ -129,6 +154,7 @@ class MoreViewModel(
                 isLoggedIn = false,
                 profileHeader = null,
                 sections = buildMoreSections(
+                    notificationsUnreadCount = notificationsRepository.unreadCount.value,
                     isLoggedIn = false,
                 ),
             )
@@ -149,6 +175,7 @@ class MoreViewModel(
                         memberSinceState = profile.memberSince.toMemberSinceState(),
                     ),
                     sections = buildMoreSections(
+                        notificationsUnreadCount = notificationsRepository.unreadCount.value,
                         isLoggedIn = true,
                     ),
                 )
@@ -160,6 +187,7 @@ class MoreViewModel(
                     isLoggedIn = true,
                     profileHeader = null,
                     sections = buildMoreSections(
+                        notificationsUnreadCount = notificationsRepository.unreadCount.value,
                         isLoggedIn = true,
                     ),
                 )
@@ -173,7 +201,7 @@ class MoreViewModel(
         MoreSectionState(
             type = MoreSectionType.Social,
             items = buildList {
-                if (buildInfo.isDebugBuild && isLoggedIn) {
+                if (isLoggedIn) {
                     add(
                         MoreSectionItemState(
                             type = MoreSectionItemType.Notifications,

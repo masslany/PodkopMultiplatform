@@ -30,6 +30,7 @@ class HomeViewModel(
                         isEnabled = destination.enabled,
                         iconRes = destination.iconRes,
                         labelRes = destination.labelRes,
+                        badgeCount = destination.badgeCount,
                     )
                 }.toImmutableList(),
                 currentTabKey = navigatorState.currentTabRoot.toString(),
