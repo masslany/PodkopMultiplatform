@@ -18,6 +18,7 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.navigation.AppNavigator
+import pl.masslany.podkop.common.platform.BuildInfo
 import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
@@ -42,6 +43,7 @@ class MoreViewModel(
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
+    private val buildInfo: BuildInfo,
 ) : ViewModel(),
     MoreActions {
     private val _state = MutableStateFlow(MoreScreenState.initial)
@@ -126,7 +128,6 @@ class MoreViewModel(
                 isLoggedIn = false,
                 profileHeader = null,
                 sections = buildMoreSections(
-                    notificationsUnreadCount = 0,
                     isLoggedIn = false,
                 ),
             )
@@ -147,7 +148,6 @@ class MoreViewModel(
                         memberSinceState = profile.memberSince.toMemberSinceState(),
                     ),
                     sections = buildMoreSections(
-                        notificationsUnreadCount = 0,
                         isLoggedIn = true,
                     ),
                 )
@@ -159,7 +159,6 @@ class MoreViewModel(
                     isLoggedIn = true,
                     profileHeader = null,
                     sections = buildMoreSections(
-                        notificationsUnreadCount = 0,
                         isLoggedIn = true,
                     ),
                 )
@@ -167,28 +166,37 @@ class MoreViewModel(
     }
 
     private fun buildMoreSections(
-        notificationsUnreadCount: Int,
+        notificationsUnreadCount: Int? = null,
         isLoggedIn: Boolean,
     ): ImmutableList<MoreSectionState> = persistentListOf(
         MoreSectionState(
             type = MoreSectionType.Social,
-            items = persistentListOf(
-                MoreSectionItemState(
-                    type = MoreSectionItemType.Notifications,
-                    badgeCount = notificationsUnreadCount,
-                    onClick = { onNotificationsClicked() },
-                ),
-                MoreSectionItemState(
-                    type = MoreSectionItemType.Messages,
-                    badgeCount = 0,
-                    onClick = { onMessagesClicked() },
-                ),
-                MoreSectionItemState(
-                    type = MoreSectionItemType.Favorites,
-                    badgeCount = 0,
-                    onClick = { onFavoritesClicked() },
-                ),
-            ),
+            items = buildList {
+                if (buildInfo.isDebugBuild && isLoggedIn) {
+                    add(
+                        MoreSectionItemState(
+                            type = MoreSectionItemType.Notifications,
+                            badgeCount = notificationsUnreadCount,
+                        ),
+                    )
+                }
+                if (buildInfo.isDebugBuild && isLoggedIn) {
+                    add(
+                        MoreSectionItemState(
+                            type = MoreSectionItemType.Messages,
+                            badgeCount = null,
+                        ),
+                    )
+                }
+                if (buildInfo.isDebugBuild && isLoggedIn) {
+                    add(
+                        MoreSectionItemState(
+                            type = MoreSectionItemType.Favorites,
+                            badgeCount = null,
+                        ),
+                    )
+                }
+            }.toPersistentList(),
         ),
         MoreSectionState(
             type = MoreSectionType.Content,
@@ -199,42 +207,41 @@ class MoreViewModel(
             items = persistentListOf(
                 MoreSectionItemState(
                     type = MoreSectionItemType.Settings,
-                    badgeCount = 0,
-                    onClick = { onSettingsClicked() },
+                    badgeCount = null,
                 ),
                 MoreSectionItemState(
                     type = MoreSectionItemType.About,
-                    badgeCount = 0,
-                    onClick = { onAboutClicked() },
+                    badgeCount = null,
                 ),
             ),
         ),
     )
 
-    private fun buildContentSectionItems(isLoggedIn: Boolean): ImmutableList<MoreSectionItemState> {
-        val baseItems = mutableListOf(
+    private fun buildContentSectionItems(
+        isLoggedIn: Boolean,
+
+    ): ImmutableList<MoreSectionItemState> = buildList {
+        add(
             MoreSectionItemState(
                 type = MoreSectionItemType.Hits,
-                badgeCount = 0,
-                onClick = { onHitsClicked() },
-            ),
-            MoreSectionItemState(
-                type = MoreSectionItemType.Search,
-                badgeCount = 0,
-                onClick = { onSearchClicked() },
+                badgeCount = null,
             ),
         )
-
-        if (isLoggedIn) {
-            baseItems += MoreSectionItemState(
-                type = MoreSectionItemType.MyWykop,
-                badgeCount = 0,
-                onClick = { onMyWykopClicked() },
+        add(
+            MoreSectionItemState(
+                type = MoreSectionItemType.Search,
+                badgeCount = null,
+            ),
+        )
+        if (isLoggedIn && buildInfo.isDebugBuild) {
+            add(
+                MoreSectionItemState(
+                    type = MoreSectionItemType.MyWykop,
+                    badgeCount = null,
+                ),
             )
         }
-
-        return baseItems.toPersistentList()
-    }
+    }.toPersistentList()
 
     private fun emitComingSoon() {
         snackbarManager.tryEmit(

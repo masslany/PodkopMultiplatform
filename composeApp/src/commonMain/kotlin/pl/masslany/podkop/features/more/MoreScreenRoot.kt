@@ -120,7 +120,6 @@ private fun MoreScreenContentLoggedOutPreview() {
                             MoreSectionItemState(
                                 type = MoreSectionItemType.Notifications,
                                 badgeCount = 2,
-                                onClick = { onNotificationsClicked() },
                             ),
                         ),
                     ),
@@ -158,12 +157,10 @@ private fun MoreScreenContentLoggedInPreview() {
                             MoreSectionItemState(
                                 type = MoreSectionItemType.Settings,
                                 badgeCount = 0,
-                                onClick = { onSettingsClicked() },
                             ),
                             MoreSectionItemState(
                                 type = MoreSectionItemType.About,
                                 badgeCount = 0,
-                                onClick = { onAboutClicked() },
                             ),
                         ),
                     ),

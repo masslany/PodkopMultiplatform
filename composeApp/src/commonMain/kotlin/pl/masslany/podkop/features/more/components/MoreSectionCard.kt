@@ -40,34 +40,36 @@ fun MoreSectionCard(
     actions: MoreActions,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Text(
-            text = stringResource(resource = section.type.labelRes),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
-            ),
+    if (section.items.isNotEmpty()) {
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Column {
-                section.items.forEachIndexed { index, item ->
-                    MoreSectionRow(
-                        item = item,
-                        onClick = { item.onClick(actions) },
-                    )
+            Text(
+                text = stringResource(resource = section.type.labelRes),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
 
-                    if (index < section.items.lastIndex) {
-                        HorizontalDivider(
-                            thickness = Dp.Hairline,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                            modifier = Modifier.padding(start = 52.dp),
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
+                ),
+            ) {
+                Column {
+                    section.items.forEachIndexed { index, item ->
+                        MoreSectionRow(
+                            item = item,
+                            onClick = { actions.onSectionItemClicked(item.type) },
                         )
+
+                        if (index < section.items.lastIndex) {
+                            HorizontalDivider(
+                                thickness = Dp.Hairline,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                modifier = Modifier.padding(start = 52.dp),
+                            )
+                        }
                     }
                 }
             }
@@ -100,7 +102,7 @@ private fun MoreSectionRow(
             style = MaterialTheme.typography.bodyLarge,
         )
 
-        if (item.badgeCount > 0) {
+        if (item.badgeCount != null && item.badgeCount > 0) {
             Badge(
                 containerColor = MaterialTheme.colorScheme.error,
             ) {
@@ -133,12 +135,10 @@ private fun MoreSectionCardPreview() {
                     MoreSectionItemState(
                         type = MoreSectionItemType.Notifications,
                         badgeCount = 5,
-                        onClick = { onNotificationsClicked() },
                     ),
                     MoreSectionItemState(
                         type = MoreSectionItemType.Messages,
                         badgeCount = 0,
-                        onClick = { onMessagesClicked() },
                     ),
                 ),
             ),
