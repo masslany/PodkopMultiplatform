@@ -40,6 +40,10 @@ sealed class DropdownMenuItemType {
     data object Entries : DropdownMenuItemType()
 
     data object Everything : DropdownMenuItemType()
+
+    data object LinkComments : DropdownMenuItemType()
+
+    data object EntryComments : DropdownMenuItemType()
 }
 
 fun EntriesSortType.toDropdownMenuItemType(): DropdownMenuItemType = when (this) {

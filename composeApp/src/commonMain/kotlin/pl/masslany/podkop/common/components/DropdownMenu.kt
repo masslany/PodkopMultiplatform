@@ -29,11 +29,13 @@ import podkop.composeapp.generated.resources.dropdown_menu_label_commented
 import podkop.composeapp.generated.resources.dropdown_menu_label_day
 import podkop.composeapp.generated.resources.dropdown_menu_label_digged
 import podkop.composeapp.generated.resources.dropdown_menu_label_entries
+import podkop.composeapp.generated.resources.dropdown_menu_label_entry_comments
 import podkop.composeapp.generated.resources.dropdown_menu_label_everything
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot_12h
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot_2h
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot_6h
+import podkop.composeapp.generated.resources.dropdown_menu_label_link_comments
 import podkop.composeapp.generated.resources.dropdown_menu_label_links
 import podkop.composeapp.generated.resources.dropdown_menu_label_month
 import podkop.composeapp.generated.resources.dropdown_menu_label_newest
@@ -156,6 +158,12 @@ private fun DropdownMenuItemType.toText(): String = when (this) {
 
     DropdownMenuItemType.Everything ->
         stringResource(resource = Res.string.dropdown_menu_label_everything)
+
+    DropdownMenuItemType.LinkComments ->
+        stringResource(resource = Res.string.dropdown_menu_label_link_comments)
+
+    DropdownMenuItemType.EntryComments ->
+        stringResource(resource = Res.string.dropdown_menu_label_entry_comments)
 }
 
 private const val DEFAULT_ROTATION = 0f

@@ -50,6 +50,8 @@ import pl.masslany.podkop.features.debug.DebugScreen
 import pl.masslany.podkop.features.debug.DebugScreenRoot
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreenRoot
+import pl.masslany.podkop.features.favorites.FavoritesScreen
+import pl.masslany.podkop.features.favorites.FavoritesScreenRoot
 import pl.masslany.podkop.features.hits.HitsScreen
 import pl.masslany.podkop.features.hits.HitsScreenRoot
 import pl.masslany.podkop.features.home.HomeScreenRoot
@@ -170,6 +172,12 @@ fun App() {
 
                     entry<HitsScreen> {
                         HitsScreenRoot(
+                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<FavoritesScreen> {
+                        FavoritesScreenRoot(
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )
                     }

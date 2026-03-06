@@ -24,6 +24,7 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.about.AboutAppScreen
+import pl.masslany.podkop.features.favorites.FavoritesScreen
 import pl.masslany.podkop.features.hits.HitsScreen
 import pl.masslany.podkop.features.more.models.MoreSectionItemState
 import pl.masslany.podkop.features.more.models.MoreSectionItemType
@@ -83,7 +84,7 @@ class MoreViewModel(
     }
 
     override fun onFavoritesClicked() {
-        emitComingSoon()
+        appNavigator.navigateTo(FavoritesScreen)
     }
 
     override fun onHitsClicked() {
@@ -188,7 +189,7 @@ class MoreViewModel(
                         ),
                     )
                 }
-                if (buildInfo.isDebugBuild && isLoggedIn) {
+                if (isLoggedIn) {
                     add(
                         MoreSectionItemState(
                             type = MoreSectionItemType.Favorites,

@@ -284,46 +284,103 @@ private fun EntryCommentItemRenderer(
     actions: ResourceItemActions,
     config: ResourceItemConfig,
 ) {
-    EntryCommentItem(
-        modifier = modifier,
-        state = state,
-        isReplyEnabled = config.isReplyActionEnabled,
-        onProfileClick = { actions.onProfileClicked(it) },
-        onTagClick = { actions.onTagClicked(it) },
-        onUrlClick = { actions.onLinkUrlClicked(it) },
-        onImageClick = { actions.onImageClicked(it) },
-        onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
-        onVoteUpClick = {
-            actions.onEntryCommentVoteUpClick(
-                entryCommentId = state.id,
-                parentEntryId = state.parentId,
-                voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
-            )
-        },
-        onFavouriteClick = {
-            actions.onEntryCommentFavouriteClicked(
-                entryCommentId = state.id,
-                favourited = state.isFavourite,
-            )
-        },
-        onReplyClick = if (config.showReplyAction) {
-            {
-                actions.onEntryCommentReplyClicked(
-                    entryId = state.parentId,
-                    entryCommentId = state.id,
-                    author = state.authorState?.name,
+    if (config.renderCommentAsCard) {
+        Card(
+            modifier = modifier
+                .clip(CardDefaults.shape)
+                .clickable { actions.onEntryClicked(state.parentId) },
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
+            ),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 16.dp),
+            ) {
+                EntryCommentItem(
+                    modifier = modifier,
+                    state = state,
+                    isReplyEnabled = config.isReplyActionEnabled,
+                    onProfileClick = { actions.onProfileClicked(it) },
+                    onTagClick = { actions.onTagClicked(it) },
+                    onUrlClick = { actions.onLinkUrlClicked(it) },
+                    onImageClick = { actions.onImageClicked(it) },
+                    onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
+                    onVoteUpClick = {
+                        actions.onEntryCommentVoteUpClick(
+                            entryCommentId = state.id,
+                            parentEntryId = state.parentId,
+                            voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+                        )
+                    },
+                    onFavouriteClick = {
+                        actions.onEntryCommentFavouriteClicked(
+                            entryCommentId = state.id,
+                            favourited = state.isFavourite,
+                        )
+                    },
+                    onReplyClick = if (config.showReplyAction) {
+                        {
+                            actions.onEntryCommentReplyClicked(
+                                entryId = state.parentId,
+                                entryCommentId = state.id,
+                                author = state.authorState?.name,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                    onMoreClick = {
+                        actions.onEntryCommentMoreClicked(
+                            entryId = state.parentId,
+                            entryCommentId = state.id,
+                        )
+                    },
                 )
             }
-        } else {
-            null
-        },
-        onMoreClick = {
-            actions.onEntryCommentMoreClicked(
-                entryId = state.parentId,
-                entryCommentId = state.id,
-            )
-        },
-    )
+        }
+    } else {
+        EntryCommentItem(
+            modifier = modifier,
+            state = state,
+            isReplyEnabled = config.isReplyActionEnabled,
+            onProfileClick = { actions.onProfileClicked(it) },
+            onTagClick = { actions.onTagClicked(it) },
+            onUrlClick = { actions.onLinkUrlClicked(it) },
+            onImageClick = { actions.onImageClicked(it) },
+            onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
+            onVoteUpClick = {
+                actions.onEntryCommentVoteUpClick(
+                    entryCommentId = state.id,
+                    parentEntryId = state.parentId,
+                    voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+                )
+            },
+            onFavouriteClick = {
+                actions.onEntryCommentFavouriteClicked(
+                    entryCommentId = state.id,
+                    favourited = state.isFavourite,
+                )
+            },
+            onReplyClick = if (config.showReplyAction) {
+                {
+                    actions.onEntryCommentReplyClicked(
+                        entryId = state.parentId,
+                        entryCommentId = state.id,
+                        author = state.authorState?.name,
+                    )
+                }
+            } else {
+                null
+            },
+            onMoreClick = {
+                actions.onEntryCommentMoreClicked(
+                    entryId = state.parentId,
+                    entryCommentId = state.id,
+                )
+            },
+        )
+    }
 }
 
 @Composable
@@ -347,49 +404,109 @@ private fun LinkCommentItemRenderer(
     actions: ResourceItemActions,
     config: ResourceItemConfig,
 ) {
-    LinkCommentItem(
-        modifier = modifier,
-        state = state,
-        isReplyEnabled = config.isReplyActionEnabled,
-        onProfileClick = { actions.onProfileClicked(it) },
-        onTagClick = { actions.onTagClicked(it) },
-        onUrlClick = { actions.onLinkUrlClicked(it) },
-        onImageClick = { actions.onImageClicked(it) },
-        onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
-        onVoteUpClick = {
-            actions.onLinkCommentVoteUpClick(
-                linkId = state.linkId,
-                commentId = state.id,
-                voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
-            )
-        },
-        onFavouriteClick = {
-            actions.onLinkCommentFavouriteClicked(
-                linkId = state.linkId,
-                commentId = state.id,
-                favourited = state.isFavourite,
-            )
-        },
-        onMoreClick = {
-            actions.onLinkCommentMoreClicked(
-                linkId = state.linkId,
-                commentId = state.id,
-                linkSlug = state.linkSlug,
-                parentCommentId = state.parentCommentIdOrNull,
-            )
-        },
-        onReplyClick = if (config.showLinkCommentReplyAction) {
-            {
-                actions.onLinkCommentReplyClicked(
-                    linkId = state.linkId,
-                    commentId = state.id,
-                    author = state.authorState?.name,
+    if (config.renderCommentAsCard) {
+        Card(
+            modifier = modifier
+                .clip(CardDefaults.shape)
+                .clickable { actions.onLinkClicked(state.linkId) },
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
+            ),
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 16.dp),
+            ) {
+                LinkCommentItem(
+                    modifier = modifier,
+                    state = state,
+                    isReplyEnabled = config.isReplyActionEnabled,
+                    onProfileClick = { actions.onProfileClicked(it) },
+                    onTagClick = { actions.onTagClicked(it) },
+                    onUrlClick = { actions.onLinkUrlClicked(it) },
+                    onImageClick = { actions.onImageClicked(it) },
+                    onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
+                    onVoteUpClick = {
+                        actions.onLinkCommentVoteUpClick(
+                            linkId = state.linkId,
+                            commentId = state.id,
+                            voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+                        )
+                    },
+                    onFavouriteClick = {
+                        actions.onLinkCommentFavouriteClicked(
+                            linkId = state.linkId,
+                            commentId = state.id,
+                            favourited = state.isFavourite,
+                        )
+                    },
+                    onMoreClick = {
+                        actions.onLinkCommentMoreClicked(
+                            linkId = state.linkId,
+                            commentId = state.id,
+                            linkSlug = state.linkSlug,
+                            parentCommentId = state.parentCommentIdOrNull,
+                        )
+                    },
+                    onReplyClick = if (config.showLinkCommentReplyAction) {
+                        {
+                            actions.onLinkCommentReplyClicked(
+                                linkId = state.linkId,
+                                commentId = state.id,
+                                author = state.authorState?.name,
+                            )
+                        }
+                    } else {
+                        null
+                    },
                 )
             }
-        } else {
-            null
-        },
-    )
+        }
+    } else {
+        LinkCommentItem(
+            modifier = modifier,
+            state = state,
+            isReplyEnabled = config.isReplyActionEnabled,
+            onProfileClick = { actions.onProfileClicked(it) },
+            onTagClick = { actions.onTagClicked(it) },
+            onUrlClick = { actions.onLinkUrlClicked(it) },
+            onImageClick = { actions.onImageClicked(it) },
+            onEmbedPreviewClick = { embed -> actions.onEmbedPreviewClicked(state.id, embed) },
+            onVoteUpClick = {
+                actions.onLinkCommentVoteUpClick(
+                    linkId = state.linkId,
+                    commentId = state.id,
+                    voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+                )
+            },
+            onFavouriteClick = {
+                actions.onLinkCommentFavouriteClicked(
+                    linkId = state.linkId,
+                    commentId = state.id,
+                    favourited = state.isFavourite,
+                )
+            },
+            onMoreClick = {
+                actions.onLinkCommentMoreClicked(
+                    linkId = state.linkId,
+                    commentId = state.id,
+                    linkSlug = state.linkSlug,
+                    parentCommentId = state.parentCommentIdOrNull,
+                )
+            },
+            onReplyClick = if (config.showLinkCommentReplyAction) {
+                {
+                    actions.onLinkCommentReplyClicked(
+                        linkId = state.linkId,
+                        commentId = state.id,
+                        author = state.authorState?.name,
+                    )
+                }
+            } else {
+                null
+            },
+        )
+    }
 }
 
 @Preview

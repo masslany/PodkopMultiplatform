@@ -7,6 +7,16 @@ import pl.masslany.podkop.business.favourites.domain.models.FavouriteType
 class FavouritesDataSourceImpl(
     private val favouritesApi: FavouritesApi,
 ) : FavouritesDataSource {
+    override suspend fun getFavourites(
+        page: Any?,
+        sort: String,
+        resource: String?,
+    ) = favouritesApi.getFavourites(
+        page = page,
+        sort = sort,
+        resource = resource,
+    )
+
     override suspend fun createFavourite(
         type: FavouriteType,
         sourceId: Int,
