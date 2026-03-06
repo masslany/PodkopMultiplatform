@@ -348,7 +348,26 @@ private fun HomeNavDisplay(
             )
         }
 
-        entry<EntryDetailsScreen> {
+        entry<EntryDetailsScreen>(
+            clazzContentKey = { screen ->
+                buildString {
+                    append(HOME_KEY_ENTRY_DETAILS_PREFIX)
+                    append(screen.id)
+                    screen.pendingComposerIntent?.let { intent ->
+                        append(':')
+                        append(intent.type.name)
+                        intent.author?.let { author ->
+                            append(':')
+                            append(author)
+                        }
+                        intent.entryCommentId?.let { entryCommentId ->
+                            append(':')
+                            append(entryCommentId)
+                        }
+                    }
+                }
+            },
+        ) {
             EntryDetailsScreenRoot(
                 screen = it,
                 paddingValues = contentPadding,
