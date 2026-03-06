@@ -13,6 +13,7 @@ import pl.masslany.podkop.common.settings.AppSettings
 import pl.masslany.podkop.common.settings.AppSettingsImpl
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarManagerImpl
+import pl.masslany.podkop.features.about.di.aboutAppModule
 import pl.masslany.podkop.features.composer.di.composerModule
 import pl.masslany.podkop.features.debug.di.debugModule
 import pl.masslany.podkop.features.entries.di.entriesModule
@@ -39,6 +40,7 @@ val composeAppModule = module {
     includes(
         navigationModule,
         deepLinkModule,
+        aboutAppModule,
         homeModule,
         hitsModule,
         linksModule,

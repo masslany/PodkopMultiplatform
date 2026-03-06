@@ -18,11 +18,11 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.navigation.AppNavigator
-import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.about.AboutAppScreen
 import pl.masslany.podkop.features.hits.HitsScreen
 import pl.masslany.podkop.features.more.models.MoreSectionItemState
 import pl.masslany.podkop.features.more.models.MoreSectionItemType
@@ -33,8 +33,6 @@ import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import pl.masslany.podkop.features.search.SearchScreen
 import pl.masslany.podkop.features.settings.SettingsScreen
 import podkop.composeapp.generated.resources.Res
-import podkop.composeapp.generated.resources.more_about_body
-import podkop.composeapp.generated.resources.more_about_title
 import podkop.composeapp.generated.resources.more_snackbar_coming_soon
 
 class MoreViewModel(
@@ -103,12 +101,7 @@ class MoreViewModel(
     }
 
     override fun onAboutClicked() {
-        appNavigator.navigateTo(
-            GenericDialog.fromResources(
-                title = Res.string.more_about_title,
-                description = Res.string.more_about_body,
-            ),
-        )
+        appNavigator.navigateTo(AboutAppScreen)
     }
 
     private fun observeAuthSessionChanges() {

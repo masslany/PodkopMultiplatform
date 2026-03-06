@@ -42,6 +42,8 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.common.theme.SystemAppearance
+import pl.masslany.podkop.features.about.AboutAppScreen
+import pl.masslany.podkop.features.about.AboutAppScreenRoot
 import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
 import pl.masslany.podkop.features.composer.ComposerBottomSheetScreenRoot
 import pl.masslany.podkop.features.debug.DebugScreen
@@ -154,6 +156,16 @@ fun App() {
                         SettingsScreenRoot(
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )
+                    }
+
+                    entry<AboutAppScreen>(
+                        metadata = DialogSceneStrategy.dialog(
+                            DialogProperties(
+                                usePlatformDefaultWidth = false,
+                            ),
+                        ),
+                    ) {
+                        AboutAppScreenRoot()
                     }
 
                     entry<HitsScreen> {

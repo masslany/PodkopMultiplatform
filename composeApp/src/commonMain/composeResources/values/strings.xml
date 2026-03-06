@@ -33,6 +33,15 @@
     <string name="more_about_title">O aplikacji</string>
     <string name="more_about_body"></string>
 
+    <!-- About -->
+    <string name="app_name">Podkop</string>
+    <string name="about_app_title">O aplikacji</string>
+    <string name="about_app_libraries_title">Biblioteki open source</string>
+    <string name="about_app_no_libraries">Brak bibliotek do wyświetlenia.</string>
+    <string name="about_app_license_unknown">Licencja nie została wykryta w metadanych pakietu.</string>
+    <string name="about_app_button_open_license">Otwórz licencję</string>
+    <string name="about_app_button_open_project">Otwórz stronę projektu</string>
+
     <!-- Links screen -->
     <string name="links_screen_label_hits">Hity</string>
     <string name="links_screen_label_hits_error">Wystąpił problem podczas wczytywania</string>
@@ -69,6 +78,7 @@
     <!-- Accessibility -->
     <string name="accessibility_topbar_add">Dodaj</string>
     <string name="accessibility_topbar_back">Cofnij</string>
+    <string name="accessibility_dialog_close">Zamknij okno</string>
     <string name="accessibility_topbar_downloads">Pobierz</string>
     <string name="accessibility_topbar_gallery_view">Widok galerii</string>
     <string name="accessibility_topbar_list_view">Widok listy</string>
