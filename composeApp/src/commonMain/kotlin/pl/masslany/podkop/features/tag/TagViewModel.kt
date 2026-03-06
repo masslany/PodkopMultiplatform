@@ -89,10 +89,11 @@ class TagViewModel(
         resourceItemStateHolder.init(viewModelScope)
 
         viewModelScope.launch {
+            val isLoggedIn = authRepository.isLoggedIn()
             _state.update { previousState ->
                 previousState.copy(
                     tag = tag,
-                    isLoggedIn = authRepository.isLoggedIn(),
+                    isLoggedIn = isLoggedIn,
                     sortMenuState = DropdownMenuState(
                         items = tagsRepository.getTagsSorts()
                             .map { it.toDropdownMenuItemType() }
@@ -176,6 +177,83 @@ class TagViewModel(
         loadTagStream()
     }
 
+    override fun onObserveClicked() {
+        if (!state.value.isLoggedIn || state.value.isObserveActionLoading) {
+            return
+        }
+
+        viewModelScope.launch {
+            val shouldObserve = !state.value.isObserved
+            _state.update { previousState ->
+                previousState.updateObserveActionLoading(true)
+            }
+
+            val action = if (shouldObserve) {
+                tagsRepository.observeTag(tag)
+            } else {
+                tagsRepository.unobserveTag(tag)
+            }
+
+            action.onSuccess {
+                _state.update { previousState ->
+                    previousState
+                        .updateObserved(
+                            isObserved = shouldObserve,
+                            areNotificationsEnabled = if (shouldObserve) {
+                                previousState.areNotificationsEnabled
+                            } else {
+                                false
+                            },
+                        )
+                        .updateObserveActionLoading(false)
+                }
+            }.onFailure {
+                logger.error("Failed to update observed status for tag $tag", it)
+                _state.update { previousState ->
+                    previousState.updateObserveActionLoading(false)
+                }
+                snackbarManager.tryEmitGenericError()
+            }
+        }
+    }
+
+    override fun onNotificationsClicked() {
+        val currentState = state.value
+        if (!currentState.isLoggedIn ||
+            !currentState.isObserved ||
+            currentState.isNotificationsActionLoading
+        ) {
+            return
+        }
+
+        viewModelScope.launch {
+            val shouldEnableNotifications = !state.value.areNotificationsEnabled
+            _state.update { previousState ->
+                previousState.updateNotificationsActionLoading(true)
+            }
+
+            val action = if (shouldEnableNotifications) {
+                tagsRepository.enableTagNotifications(tag)
+            } else {
+                tagsRepository.disableTagNotifications(tag)
+            }
+
+            action.onSuccess {
+                _state.update { previousState ->
+                    previousState
+                        .updateNotificationsEnabled(shouldEnableNotifications)
+                        .updateNotificationsActionLoading(false)
+                }
+            }.onFailure {
+                logger.error("Failed to update notifications status for tag $tag", it)
+                _state.update { previousState ->
+                    previousState.updateNotificationsActionLoading(false)
+                }
+                snackbarManager.tryEmitGenericError()
+            }
+        }
+    }
+
     override fun shouldPaginate(
         lastVisibleIndex: Int?,
         totalItems: Int,
@@ -193,6 +271,10 @@ class TagViewModel(
                         previousState
                             .updateBannerUrl(
                                 details.media?.photo?.url ?: details.media?.embed?.thumbnail.orEmpty(),
+                            )
+                            .updateObserved(
+                                isObserved = details.isObserved,
+                                areNotificationsEnabled = details.areNotificationsEnabled,
                             )
                             .updateTagContentError(false)
                     }

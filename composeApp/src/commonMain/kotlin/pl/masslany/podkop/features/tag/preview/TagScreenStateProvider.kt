@@ -23,6 +23,10 @@ class TagScreenStateProvider : PreviewParameterProvider<TagScreenState> {
             isError = false,
             isRefreshing = false,
             isTagContentError = false,
+            isLoggedIn = true,
+            isObserved = true,
+            areNotificationsEnabled = true,
+            canManageObservation = true,
             resources = resources,
             galleryItems = resources.toTagGalleryItems(),
             sortMenuState = DropdownMenuState(
@@ -52,6 +56,9 @@ class TagScreenStateProvider : PreviewParameterProvider<TagScreenState> {
             isGalleryMode = true,
             isLoading = false,
             isError = false,
+            isLoggedIn = true,
+            isObserved = true,
+            canManageObservation = true,
             resources = resources,
             galleryItems = resources.toTagGalleryItems(),
             sortMenuState = DropdownMenuState(

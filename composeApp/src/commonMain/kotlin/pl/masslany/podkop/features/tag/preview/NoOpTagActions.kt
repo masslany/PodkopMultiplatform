@@ -23,4 +23,6 @@ object NoOpTagActions :
     override fun onTypeDismissed() = Unit
     override fun onGalleryModeToggled() = Unit
     override fun onRefresh() = Unit
+    override fun onObserveClicked() = Unit
+    override fun onNotificationsClicked() = Unit
 }

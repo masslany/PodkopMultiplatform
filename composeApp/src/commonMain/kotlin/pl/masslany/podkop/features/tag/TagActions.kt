@@ -27,4 +27,8 @@ interface TagActions :
     fun onGalleryModeToggled()
 
     fun onRefresh()
+
+    fun onObserveClicked()
+
+    fun onNotificationsClicked()
 }

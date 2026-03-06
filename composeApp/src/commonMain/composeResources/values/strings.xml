@@ -87,6 +87,8 @@
     <string name="accessibility_fab_scroll_to_top">Przewiń do góry</string>
     <string name="accessibility_resource_more_actions">Więcej akcji</string>
     <string name="accessibility_tag_gallery_open_entry">Otwórz wpis</string>
+    <string name="accessibility_tag_enable_notifications">Włącz powiadomienia dla tagu</string>
+    <string name="accessibility_tag_disable_notifications">Wyłącz powiadomienia dla tagu</string>
 
     <!-- Profile -->
     <string name="profile_not_logged_in_message">Nie jesteś zalogowany</string>
@@ -207,7 +209,7 @@
 
     <!-- Tag details -->
     <string name="tag_details_screen_observe_button">Obserwuj</string>
-    <string name="tag_details_screen_observed_button">Obserwowany</string>
+    <string name="tag_details_screen_observed_button">Obserwujesz</string>
     <string name="tag_details_screen_no_results_label">Brak wyników</string>
     <string name="tag_details_screen_error_label">Wystąpił problem podczas wczytywania danych</string>
     <string name="tag_details_screen_error_loading_tags">Wystąpił problem podczas wczytywania tagu</string>

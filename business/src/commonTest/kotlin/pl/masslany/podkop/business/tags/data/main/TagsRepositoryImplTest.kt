@@ -17,8 +17,16 @@ class TagsRepositoryImplTest {
     fun `get tag details maps single resource response`() = runBlocking {
         val tagsDataSource = FakeTagsDataSource().apply {
             getTagDetailsResult = Result.success(
-                Fixtures.singleResourceResponseDto(
-                    data = Fixtures.resourceItemDto(id = 321, resource = "entry", voted = -1),
+                Fixtures.tagDetailsResponseDto(
+                    data = Fixtures.tagDetailsDto(
+                        name = "compose",
+                        description = "Compose tag",
+                        followers = 44,
+                        media = Fixtures.mediaDto(photo = Fixtures.photoDto(url = "https://example.com/banner.jpg")),
+                        follow = true,
+                        notifications = true,
+                        actions = Fixtures.tagDetailsActionsDto(blacklist = true),
+                    ),
                 ),
             )
         }
@@ -30,7 +38,18 @@ class TagsRepositoryImplTest {
         val actual = sut.getTagDetails("kotlin")
 
         assertEquals(listOf("kotlin"), tagsDataSource.getTagDetailsCalls)
-        assertEquals(Fixtures.resourceItem(id = 321, resource = pl.masslany.podkop.business.common.domain.models.common.Resource.Entry, voted = pl.masslany.podkop.business.common.domain.models.common.Voted.Negative), actual.getOrThrow())
+        assertEquals(
+            Fixtures.tagDetails(
+                name = "compose",
+                description = "Compose tag",
+                followers = 44,
+                media = Fixtures.media(photo = Fixtures.photo(url = "https://example.com/banner.jpg")),
+                isObserved = true,
+                areNotificationsEnabled = true,
+                canManageObservation = true,
+            ),
+            actual.getOrThrow(),
+        )
     }
 
     @Test
@@ -64,6 +83,70 @@ class TagsRepositoryImplTest {
             tagsDataSource.getTagStreamCalls,
         )
         assertEquals(Fixtures.resources(), actual.getOrThrow())
+    }
+
+    @Test
+    fun `observe tag forwards tag name`() = runBlocking {
+        val tagsDataSource = FakeTagsDataSource().apply {
+            observeTagResult = Result.success(Unit)
+        }
+        val sut = TagsRepositoryImpl(
+            tagsDataSource = tagsDataSource,
+            dispatcherProvider = FakeDispatcherProvider(),
+        )
+
+        val actual = sut.observeTag("compose")
+
+        assertEquals(Unit, actual.getOrThrow())
+        assertEquals(listOf("compose"), tagsDataSource.observeTagCalls)
+    }
+
+    @Test
+    fun `unobserve tag forwards tag name`() = runBlocking {
+        val tagsDataSource = FakeTagsDataSource().apply {
+            unobserveTagResult = Result.success(Unit)
+        }
+        val sut = TagsRepositoryImpl(
+            tagsDataSource = tagsDataSource,
+            dispatcherProvider = FakeDispatcherProvider(),
+        )
+
+        val actual = sut.unobserveTag("compose")
+
+        assertEquals(Unit, actual.getOrThrow())
+        assertEquals(listOf("compose"), tagsDataSource.unobserveTagCalls)
+    }
+
+    @Test
+    fun `enable tag notifications forwards tag name`() = runBlocking {
+        val tagsDataSource = FakeTagsDataSource().apply {
+            enableTagNotificationsResult = Result.success(Unit)
+        }
+        val sut = TagsRepositoryImpl(
+            tagsDataSource = tagsDataSource,
+            dispatcherProvider = FakeDispatcherProvider(),
+        )
+
+        val actual = sut.enableTagNotifications("compose")
+
+        assertEquals(Unit, actual.getOrThrow())
+        assertEquals(listOf("compose"), tagsDataSource.enableTagNotificationsCalls)
+    }
+
+    @Test
+    fun `disable tag notifications forwards tag name`() = runBlocking {
+        val tagsDataSource = FakeTagsDataSource().apply {
+            disableTagNotificationsResult = Result.success(Unit)
+        }
+        val sut = TagsRepositoryImpl(
+            tagsDataSource = tagsDataSource,
+            dispatcherProvider = FakeDispatcherProvider(),
+        )
+
+        val actual = sut.disableTagNotifications("compose")
+
+        assertEquals(Unit, actual.getOrThrow())
+        assertEquals(listOf("compose"), tagsDataSource.disableTagNotificationsCalls)
     }
 
     @Test

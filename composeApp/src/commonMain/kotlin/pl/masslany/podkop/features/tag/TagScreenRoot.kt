@@ -74,8 +74,8 @@ import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import pl.masslany.podkop.features.tag.components.TagBanner
 import pl.masslany.podkop.features.tag.components.TagContentError
+import pl.masslany.podkop.features.tag.components.TagDetails
 import pl.masslany.podkop.features.tag.components.TagGalleryImageItem
-import pl.masslany.podkop.features.tag.components.TagName
 import pl.masslany.podkop.features.tag.preview.NoOpTagActions
 import pl.masslany.podkop.features.tag.preview.TagScreenStateProvider
 import podkop.composeapp.generated.resources.Res
@@ -463,9 +463,12 @@ private fun LazyListScope.screenHeader(
     }
 
     item(
-        key = "TagName",
+        key = "TagDetails",
     ) {
-        TagName(tag = state.tag)
+        TagDetails(
+            state = state,
+            actions = actions,
+        )
     }
 
     if (state.isTagContentError) {
@@ -501,7 +504,10 @@ private fun LazyStaggeredGridScope.screenHeader(
         key = "TagName",
         span = StaggeredGridItemSpan.FullLine,
     ) {
-        TagName(tag = state.tag)
+        TagDetails(
+            state = state,
+            actions = actions,
+        )
     }
 
     if (state.isTagContentError) {

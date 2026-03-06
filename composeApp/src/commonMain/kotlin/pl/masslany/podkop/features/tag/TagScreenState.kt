@@ -21,6 +21,11 @@ data class TagScreenState(
     val typeMenuState: DropdownMenuState,
     val isPaginating: Boolean,
     val isLoggedIn: Boolean,
+    val isObserved: Boolean,
+    val areNotificationsEnabled: Boolean,
+    val canManageObservation: Boolean,
+    val isObserveActionLoading: Boolean,
+    val isNotificationsActionLoading: Boolean,
 ) {
     companion object {
         val initial = TagScreenState(
@@ -38,6 +43,11 @@ data class TagScreenState(
             typeMenuState = DropdownMenuState.initial,
             isPaginating = false,
             isLoggedIn = false,
+            isObserved = false,
+            areNotificationsEnabled = false,
+            canManageObservation = false,
+            isObserveActionLoading = false,
+            isNotificationsActionLoading = false,
         )
 
         private const val TAG_GALLERY_BASE_HEADER_ITEMS_COUNT = 3
@@ -125,5 +135,27 @@ data class TagScreenState(
 
     fun updateRefreshing(isRefreshing: Boolean) = this.copy(
         isRefreshing = isRefreshing,
+    )
+
+    fun updateObserved(
+        isObserved: Boolean,
+        areNotificationsEnabled: Boolean = this.areNotificationsEnabled,
+        canManageObservation: Boolean = this.canManageObservation,
+    ) = this.copy(
+        isObserved = isObserved,
+        areNotificationsEnabled = areNotificationsEnabled,
+        canManageObservation = canManageObservation,
+    )
+
+    fun updateNotificationsEnabled(areNotificationsEnabled: Boolean) = this.copy(
+        areNotificationsEnabled = areNotificationsEnabled,
+    )
+
+    fun updateObserveActionLoading(isLoading: Boolean) = this.copy(
+        isObserveActionLoading = isLoading,
+    )
+
+    fun updateNotificationsActionLoading(isLoading: Boolean) = this.copy(
+        isNotificationsActionLoading = isLoading,
     )
 }

@@ -73,8 +73,12 @@ import pl.masslany.podkop.business.profile.domain.models.ProfileShort
 import pl.masslany.podkop.business.profile.domain.models.Summary
 import pl.masslany.podkop.business.profile.domain.models.UserAutoCompleteItem
 import pl.masslany.podkop.business.profile.domain.models.UsersAutoComplete
+import pl.masslany.podkop.business.tags.data.network.models.TagDetailsActionsDto
 import pl.masslany.podkop.business.tags.data.network.models.TagsAutoCompleteDataDto
+import pl.masslany.podkop.business.tags.data.network.models.TagDetailsDto
+import pl.masslany.podkop.business.tags.data.network.models.TagDetailsResponseDto
 import pl.masslany.podkop.business.tags.data.network.models.TagsAutoCompleteResponseDto
+import pl.masslany.podkop.business.tags.domain.models.TagDetails
 import pl.masslany.podkop.business.tags.domain.models.TagsAutoComplete
 import pl.masslany.podkop.business.tags.domain.models.TagsAutoCompleteItem
 
@@ -471,6 +475,44 @@ object BusinessFixtures {
         data = data,
     )
 
+    fun tagDetailsDto(
+        name: String? = "heheszki",
+        description: String? = "Tag description",
+        followers: Int? = 212,
+        media: MediaDto? = mediaDto(),
+        follow: Boolean? = false,
+        notifications: Boolean? = false,
+        actions: TagDetailsActionsDto? = tagDetailsActionsDto(),
+    ): TagDetailsDto = TagDetailsDto(
+        name = name,
+        description = description,
+        followers = followers,
+        media = media,
+        follow = follow,
+        notifications = notifications,
+        actions = actions,
+    )
+
+    fun tagDetailsActionsDto(
+        report: Boolean? = false,
+        update: Boolean? = false,
+        createCoauthor: Boolean? = false,
+        deleteCoauthor: Boolean? = false,
+        blacklist: Boolean? = true,
+    ): TagDetailsActionsDto = TagDetailsActionsDto(
+        report = report,
+        update = update,
+        createCoauthor = createCoauthor,
+        deleteCoauthor = deleteCoauthor,
+        blacklist = blacklist,
+    )
+
+    fun tagDetailsResponseDto(
+        data: TagDetailsDto = tagDetailsDto(),
+    ): TagDetailsResponseDto = TagDetailsResponseDto(
+        data = data,
+    )
+
     fun actions(
         create: Boolean = true,
         createFavourite: Boolean = false,
@@ -645,6 +687,24 @@ object BusinessFixtures {
         embed = embed,
         photo = photo,
         survey = survey,
+    )
+
+    fun tagDetails(
+        name: String = "heheszki",
+        description: String = "Tag description",
+        followers: Int = 212,
+        media: Media? = media(),
+        isObserved: Boolean = false,
+        areNotificationsEnabled: Boolean = false,
+        canManageObservation: Boolean = true,
+    ): TagDetails = TagDetails(
+        name = name,
+        description = description,
+        followers = followers,
+        media = media,
+        isObserved = isObserved,
+        areNotificationsEnabled = areNotificationsEnabled,
+        canManageObservation = canManageObservation,
     )
 
     fun comment(
