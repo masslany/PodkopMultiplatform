@@ -217,7 +217,14 @@ class ResourceActionsBottomSheetViewModel(
             val request = buildEditComposerRequest(params) as? ComposerRequest.EditEntryComment ?: return@launch
             val commentId = params.childId ?: return@launch
 
-            val resultKey = "resource-actions-edit-entry-comment-${params.rootId}-$commentId-${kotlin.random.Random.nextInt()}"
+            val resultKey = buildString {
+                append("resource-actions-edit-entry-comment-")
+                append(params.rootId)
+                append('-')
+                append(commentId)
+                append('-')
+                append(kotlin.random.Random.nextInt())
+            }
             val result = appNavigator.awaitResult<ComposerResult>(
                 target = ComposerBottomSheetScreen(
                     resultKey = resultKey,
@@ -239,7 +246,14 @@ class ResourceActionsBottomSheetViewModel(
             val request = buildEditComposerRequest(params) as? ComposerRequest.EditLinkComment ?: return@launch
             val commentId = params.childId ?: return@launch
 
-            val resultKey = "resource-actions-edit-link-comment-${params.rootId}-$commentId-${kotlin.random.Random.nextInt()}"
+            val resultKey = buildString {
+                append("resource-actions-edit-link-comment-")
+                append(params.rootId)
+                append('-')
+                append(commentId)
+                append('-')
+                append(kotlin.random.Random.nextInt())
+            }
             val result = appNavigator.awaitResult<ComposerResult>(
                 target = ComposerBottomSheetScreen(
                     resultKey = resultKey,

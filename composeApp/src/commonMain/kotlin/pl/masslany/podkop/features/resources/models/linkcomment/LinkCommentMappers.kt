@@ -63,7 +63,7 @@ internal fun ResourceItem.toLinkCommentItemState(
     val embedMimeType = this.media?.photo?.mimeType
     val embedWidth = this.media?.photo?.width
     val embedHeight = this.media?.photo?.height
-    val embedKey = this.media?.embed?.key
+    val embedKey = this.media?.photo?.key
 
     val embedImageState = if (embedUrl != null) {
         EmbedImageState(

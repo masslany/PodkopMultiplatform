@@ -80,7 +80,13 @@ internal fun HitsScreenRoot(
     val viewModel = koinViewModel<HitsViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListPaginator(
-        resetStateKey = "${state.sortMenuState.selected}:${state.selectedArchive?.year}:${state.selectedArchive?.month}",
+        resetStateKey = buildString {
+            append(state.sortMenuState.selected)
+            append(':')
+            append(state.selectedArchive?.year)
+            append(':')
+            append(state.selectedArchive?.month)
+        },
         shouldPaginate = { lastVisibleIndex, totalItems ->
             viewModel.shouldPaginate(lastVisibleIndex, totalItems)
         },

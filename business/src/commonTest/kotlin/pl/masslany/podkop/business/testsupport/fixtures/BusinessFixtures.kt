@@ -696,7 +696,6 @@ object BusinessFixtures {
         media: Media? = media(),
         isObserved: Boolean = false,
         areNotificationsEnabled: Boolean = false,
-        canManageObservation: Boolean = true,
     ): TagDetails = TagDetails(
         name = name,
         description = description,
@@ -704,7 +703,6 @@ object BusinessFixtures {
         media = media,
         isObserved = isObserved,
         areNotificationsEnabled = areNotificationsEnabled,
-        canManageObservation = canManageObservation,
     )
 
     fun comment(

@@ -96,8 +96,8 @@ class EntryMappersTest {
         assertEquals(true, comment.isEditEnabled)
         assertEquals("edited comment raw", comment.rawContent)
         assertEquals(true, comment.adult)
-        assertEquals("comment-photo-key", comment.photoKey)
-        assertEquals("https://cdn.example/comment.jpg", comment.photoUrl)
+        assertEquals("comment-photo-key", comment.embedImageState?.key)
+        assertEquals("https://cdn.example/comment.jpg", comment.embedImageState?.url)
     }
 }
 

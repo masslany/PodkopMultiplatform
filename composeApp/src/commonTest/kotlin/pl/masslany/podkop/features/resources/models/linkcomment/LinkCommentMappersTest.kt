@@ -174,8 +174,8 @@ class LinkCommentMappersTest {
         assertEquals(true, state.isEditEnabled)
         assertEquals("link comment raw content", state.rawContent)
         assertEquals(true, state.adult)
-        assertEquals("link-comment-photo-key", state.photoKey)
-        assertEquals("https://cdn.example/link-comment.jpg", state.photoUrl)
+        assertEquals("link-comment-photo-key", state.embedImageState?.key)
+        assertEquals("https://cdn.example/link-comment.jpg", state.embedImageState?.url)
     }
 
     @Test

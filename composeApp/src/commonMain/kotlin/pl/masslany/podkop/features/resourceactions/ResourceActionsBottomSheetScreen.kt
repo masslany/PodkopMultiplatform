@@ -27,7 +27,11 @@ data class ResourceActionsBottomSheetScreen(
     val photoUrl: String? = null,
 ) : NavTarget {
     init {
-        require(resourceType == ResourceActionsType.Entry || resourceType == ResourceActionsType.Link || childId != null) {
+        require(
+            resourceType == ResourceActionsType.Entry ||
+                resourceType == ResourceActionsType.Link ||
+                childId != null,
+        ) {
             "Comment actions require childId"
         }
         require(resourceType != ResourceActionsType.Link || !rootSlug.isNullOrBlank()) {

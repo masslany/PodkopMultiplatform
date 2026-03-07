@@ -46,7 +46,6 @@ class TagsRepositoryImplTest {
                 media = Fixtures.media(photo = Fixtures.photo(url = "https://example.com/banner.jpg")),
                 isObserved = true,
                 areNotificationsEnabled = true,
-                canManageObservation = true,
             ),
             actual.getOrThrow(),
         )
