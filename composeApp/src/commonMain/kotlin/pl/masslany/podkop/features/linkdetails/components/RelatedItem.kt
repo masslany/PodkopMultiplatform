@@ -44,7 +44,8 @@ fun RelatedItem(
     onItemClick: () -> Unit,
     onAuthorClick: (String) -> Unit,
     onSourceClick: () -> Unit,
-    onVoteClick: () -> Unit,
+    onVoteUpClick: () -> Unit,
+    onVoteDownClick: () -> Unit,
 ) {
     Card(
         modifier = modifier
@@ -95,8 +96,8 @@ fun RelatedItem(
                     state.voteState?.let {
                         Vote(
                             state = state.voteState,
-                            onVoteUpClick = onVoteClick,
-                            onVoteDownClick = { /* Links only expose upvote in current UX */ },
+                            onVoteUpClick = onVoteUpClick,
+                            onVoteDownClick = onVoteDownClick,
                         )
                     }
                 }
@@ -137,7 +138,8 @@ private fun RelatedItemPreview() {
             onItemClick = {},
             onAuthorClick = {},
             onSourceClick = {},
-            onVoteClick = {},
+            onVoteUpClick = {},
+            onVoteDownClick = {},
         )
     }
 }

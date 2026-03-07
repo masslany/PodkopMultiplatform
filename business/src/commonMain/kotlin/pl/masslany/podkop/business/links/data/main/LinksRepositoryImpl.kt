@@ -3,6 +3,7 @@ package pl.masslany.podkop.business.links.data.main
 import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResourceItemList
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
+import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.data.main.mapper.links.toLink
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
@@ -96,7 +97,7 @@ class LinksRepositoryImpl(
     override suspend fun getRelatedLinks(linkId: Int): Result<Resources> {
         return withContext(dispatcherProvider.io) {
             linksDataSource.getRelatedLinks(linkId).mapCatching {
-                it.toResources()
+                it.toResources(defaultResource = Resource.Link)
             }
         }
     }
@@ -176,6 +177,24 @@ class LinksRepositoryImpl(
     override suspend fun removeVoteOnLink(linkId: Int): Result<Unit> {
         return withContext(dispatcherProvider.io) {
             linksDataSource.removeVoteOnLink(linkId)
+        }
+    }
+
+    override suspend fun voteUpOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.voteUpOnRelatedLink(linkId, relatedId)
+        }
+    }
+
+    override suspend fun voteDownOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.voteDownOnRelatedLink(linkId, relatedId)
+        }
+    }
+
+    override suspend fun removeVoteOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.removeVoteOnRelatedLink(linkId, relatedId)
         }
     }
 

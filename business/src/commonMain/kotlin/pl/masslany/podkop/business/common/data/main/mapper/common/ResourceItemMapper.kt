@@ -2,9 +2,12 @@ package pl.masslany.podkop.business.common.data.main.mapper.common
 
 import pl.masslany.podkop.business.common.data.main.mapper.toResource
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceItemDto
+import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 
-fun List<ResourceItemDto>.toResourceItemList(): List<ResourceItem> {
+fun List<ResourceItemDto>.toResourceItemList(
+    defaultResource: Resource = Resource.Unknown,
+): List<ResourceItem> {
     return this.map {
         ResourceItem(
             actions = it.actions?.toActions(),
@@ -26,7 +29,7 @@ fun List<ResourceItemDto>.toResourceItemList(): List<ResourceItem> {
             parentId = it.parentId,
             publishedAt = it.publishedAt,
             recommended = it.recommended ?: false,
-            resource = it.resource.toResource(),
+            resource = it.resource.toResource(defaultResource = defaultResource),
             slug = it.slug.orEmpty(),
             source = it.source?.toSource(),
             tags = it.tags ?: emptyList(),

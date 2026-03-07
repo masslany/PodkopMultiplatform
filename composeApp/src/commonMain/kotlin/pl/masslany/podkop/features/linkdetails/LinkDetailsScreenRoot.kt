@@ -399,11 +399,20 @@ private fun LinkDetailsScreenList(
                                 onItemClick = { actions.onLinkUrlClicked(relatedItem.sourceUrl) },
                                 onAuthorClick = { actions.onProfileClicked(it) },
                                 onSourceClick = { actions.onLinkUrlClicked(relatedItem.sourceUrl) },
-                                onVoteClick = {
-                                    actions.onLinkVoteClicked(
-                                        id = relatedItem.id,
+                                onVoteUpClick = {
+                                    actions.onRelatedVoteUpClicked(
+                                        relatedId = relatedItem.id,
                                         voted = relatedItem.voteState
                                             ?.positiveVoteButtonState
+                                            ?.isVoted
+                                            ?: false,
+                                    )
+                                },
+                                onVoteDownClick = {
+                                    actions.onRelatedVoteDownClicked(
+                                        relatedId = relatedItem.id,
+                                        voted = relatedItem.voteState
+                                            ?.negativeVoteButtonState
                                             ?.isVoted
                                             ?: false,
                                     )

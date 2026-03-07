@@ -239,6 +239,44 @@ class LinksApiClient(
         )
     }
 
+    override suspend fun voteUpOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit> {
+        return voteOnRelatedLink(linkId = linkId, relatedId = relatedId, direction = "up")
+    }
+
+    override suspend fun voteDownOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit> {
+        return voteOnRelatedLink(linkId = linkId, relatedId = relatedId, direction = "down")
+    }
+
+    private suspend fun voteOnRelatedLink(
+        linkId: Int,
+        relatedId: Int,
+        direction: String,
+    ): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/links/$linkId/related/$relatedId/votes/$direction",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun removeVoteOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.DELETE,
+                path = "api/v3/links/$linkId/related/$relatedId/votes",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
     override suspend fun voteOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
         return voteOnLinkComment(linkId = linkId, commentId = commentId, direction = "up")
     }

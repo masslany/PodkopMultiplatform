@@ -20,4 +20,6 @@ object NoOpLinkDetailsActions :
     override fun onSortExpandedChanged(expanded: Boolean) = Unit
     override fun onSortDismissed() = Unit
     override fun onShowMoreRepliesClicked(commentId: Int, nextPage: Int) = Unit
+    override fun onRelatedVoteUpClicked(relatedId: Int, voted: Boolean) = Unit
+    override fun onRelatedVoteDownClicked(relatedId: Int, voted: Boolean) = Unit
 }

@@ -21,4 +21,8 @@ interface LinkDetailsActions :
     fun onSortDismissed()
 
     fun onShowMoreRepliesClicked(commentId: Int, nextPage: Int)
+
+    fun onRelatedVoteUpClicked(relatedId: Int, voted: Boolean)
+
+    fun onRelatedVoteDownClicked(relatedId: Int, voted: Boolean)
 }

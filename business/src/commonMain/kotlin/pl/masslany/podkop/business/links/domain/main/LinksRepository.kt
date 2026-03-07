@@ -72,6 +72,12 @@ interface LinksRepository {
 
     suspend fun removeVoteOnLink(linkId: Int): Result<Unit>
 
+    suspend fun voteUpOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit>
+
+    suspend fun voteDownOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit>
+
+    suspend fun removeVoteOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit>
+
     suspend fun voteOnLinkComment(linkId: Int, commentId: Int): Result<Unit>
 
     suspend fun voteDownOnLinkComment(linkId: Int, commentId: Int): Result<Unit>

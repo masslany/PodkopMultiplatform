@@ -158,14 +158,35 @@ class LinksRepositoryImplTest {
     @Test
     fun `get related links maps resources and forwards link id`() = runBlocking {
         val linksDataSource = FakeLinksDataSource().apply {
-            getRelatedLinksResult = Result.success(Fixtures.resourceResponseDto())
+            getRelatedLinksResult = Result.success(
+                Fixtures.resourceResponseDto(
+                    data = listOf(
+                        Fixtures.resourceItemDto(
+                            id = 999,
+                            resource = null,
+                            actions = Fixtures.commonActionsDto(voteUp = true, voteDown = true),
+                        ),
+                    ),
+                ),
+            )
         }
         val sut = createSut(linksDataSource)
 
         val actual = sut.getRelatedLinks(linkId = 999)
 
         assertEquals(listOf(999), linksDataSource.getRelatedLinksCalls)
-        assertEquals(Fixtures.resources(), actual.getOrThrow())
+        assertEquals(
+            Fixtures.resources(
+                data = listOf(
+                    Fixtures.resourceItem(
+                        id = 999,
+                        resource = Resource.Link,
+                        actions = Fixtures.actions(voteUp = true, voteDown = true),
+                    ),
+                ),
+            ),
+            actual.getOrThrow(),
+        )
     }
 
     @Test
@@ -306,6 +327,9 @@ class LinksRepositoryImplTest {
         val linksDataSource = FakeLinksDataSource().apply {
             voteOnLinkResult = Result.success(Unit)
             removeVoteOnLinkResult = Result.success(Unit)
+            voteUpOnRelatedLinkResult = Result.success(Unit)
+            voteDownOnRelatedLinkResult = Result.success(Unit)
+            removeVoteOnRelatedLinkResult = Result.success(Unit)
             voteOnLinkCommentResult = Result.success(Unit)
             voteDownOnLinkCommentResult = Result.success(Unit)
             removeVoteOnLinkCommentResult = Result.success(Unit)
@@ -314,17 +338,35 @@ class LinksRepositoryImplTest {
 
         val voteLink = sut.voteOnLink(1)
         val removeVoteLink = sut.removeVoteOnLink(2)
+        val voteUpRelated = sut.voteUpOnRelatedLink(linkId = 10, relatedId = 11)
+        val voteDownRelated = sut.voteDownOnRelatedLink(linkId = 12, relatedId = 13)
+        val removeVoteRelated = sut.removeVoteOnRelatedLink(linkId = 14, relatedId = 15)
         val voteComment = sut.voteOnLinkComment(linkId = 3, commentId = 4)
         val voteDownComment = sut.voteDownOnLinkComment(linkId = 5, commentId = 6)
         val removeVoteComment = sut.removeVoteOnLinkComment(linkId = 7, commentId = 8)
 
         assertTrue(voteLink.isSuccess)
         assertTrue(removeVoteLink.isSuccess)
+        assertTrue(voteUpRelated.isSuccess)
+        assertTrue(voteDownRelated.isSuccess)
+        assertTrue(removeVoteRelated.isSuccess)
         assertTrue(voteComment.isSuccess)
         assertTrue(voteDownComment.isSuccess)
         assertTrue(removeVoteComment.isSuccess)
         assertEquals(listOf(1), linksDataSource.voteOnLinkCalls)
         assertEquals(listOf(2), linksDataSource.removeVoteOnLinkCalls)
+        assertEquals(
+            listOf(FakeLinksDataSource.RelatedLinkVoteCall(linkId = 10, relatedId = 11)),
+            linksDataSource.voteUpOnRelatedLinkCalls,
+        )
+        assertEquals(
+            listOf(FakeLinksDataSource.RelatedLinkVoteCall(linkId = 12, relatedId = 13)),
+            linksDataSource.voteDownOnRelatedLinkCalls,
+        )
+        assertEquals(
+            listOf(FakeLinksDataSource.RelatedLinkVoteCall(linkId = 14, relatedId = 15)),
+            linksDataSource.removeVoteOnRelatedLinkCalls,
+        )
         assertEquals(
             listOf(FakeLinksDataSource.LinkCommentVoteCall(linkId = 3, commentId = 4)),
             linksDataSource.voteOnLinkCommentCalls,

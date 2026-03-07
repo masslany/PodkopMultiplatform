@@ -34,6 +34,11 @@ class FakeLinksDataSource : LinksDataSource {
         val commentId: Int,
     )
 
+    data class RelatedLinkVoteCall(
+        val linkId: Int,
+        val relatedId: Int,
+    )
+
     data class CreateLinkCommentCall(
         val linkId: Int,
         val content: String,
@@ -77,6 +82,9 @@ class FakeLinksDataSource : LinksDataSource {
     var getLinkUpvotesResult: Result<LinkUpvotesResponseDto> = unstubbedResult("LinksDataSource.getLinkUpvotes")
     var voteOnLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.voteOnLink")
     var removeVoteOnLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.removeVoteOnLink")
+    var voteUpOnRelatedLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.voteUpOnRelatedLink")
+    var voteDownOnRelatedLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.voteDownOnRelatedLink")
+    var removeVoteOnRelatedLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.removeVoteOnRelatedLink")
     var voteOnLinkCommentResult: Result<Unit> = unstubbedResult("LinksDataSource.voteOnLinkComment")
     var voteDownOnLinkCommentResult: Result<Unit> = unstubbedResult("LinksDataSource.voteDownOnLinkComment")
     var removeVoteOnLinkCommentResult: Result<Unit> = unstubbedResult("LinksDataSource.removeVoteOnLinkComment")
@@ -92,6 +100,9 @@ class FakeLinksDataSource : LinksDataSource {
     val getLinkUpvotesCalls = mutableListOf<GetLinkUpvotesCall>()
     val voteOnLinkCalls = mutableListOf<Int>()
     val removeVoteOnLinkCalls = mutableListOf<Int>()
+    val voteUpOnRelatedLinkCalls = mutableListOf<RelatedLinkVoteCall>()
+    val voteDownOnRelatedLinkCalls = mutableListOf<RelatedLinkVoteCall>()
+    val removeVoteOnRelatedLinkCalls = mutableListOf<RelatedLinkVoteCall>()
     val voteOnLinkCommentCalls = mutableListOf<LinkCommentVoteCall>()
     val voteDownOnLinkCommentCalls = mutableListOf<LinkCommentVoteCall>()
     val removeVoteOnLinkCommentCalls = mutableListOf<LinkCommentVoteCall>()
@@ -183,6 +194,21 @@ class FakeLinksDataSource : LinksDataSource {
     override suspend fun removeVoteOnLink(linkId: Int): Result<Unit> {
         removeVoteOnLinkCalls += linkId
         return removeVoteOnLinkResult
+    }
+
+    override suspend fun voteUpOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit> {
+        voteUpOnRelatedLinkCalls += RelatedLinkVoteCall(linkId, relatedId)
+        return voteUpOnRelatedLinkResult
+    }
+
+    override suspend fun voteDownOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit> {
+        voteDownOnRelatedLinkCalls += RelatedLinkVoteCall(linkId, relatedId)
+        return voteDownOnRelatedLinkResult
+    }
+
+    override suspend fun removeVoteOnRelatedLink(linkId: Int, relatedId: Int): Result<Unit> {
+        removeVoteOnRelatedLinkCalls += RelatedLinkVoteCall(linkId, relatedId)
+        return removeVoteOnRelatedLinkResult
     }
 
     override suspend fun voteOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {

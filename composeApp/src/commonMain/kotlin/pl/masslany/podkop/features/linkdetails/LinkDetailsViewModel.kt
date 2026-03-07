@@ -359,6 +359,22 @@ class LinkDetailsViewModel(
         }
     }
 
+    override fun onRelatedVoteUpClicked(relatedId: Int, voted: Boolean) {
+        updateRelatedVote(
+            relatedId = relatedId,
+            voted = voted,
+            direction = RelatedLinkVoteDirection.Up,
+        )
+    }
+
+    override fun onRelatedVoteDownClicked(relatedId: Int, voted: Boolean) {
+        updateRelatedVote(
+            relatedId = relatedId,
+            voted = voted,
+            direction = RelatedLinkVoteDirection.Down,
+        )
+    }
+
     override fun shouldPaginate(lastVisibleIndex: Int?, totalItems: Int): Boolean {
         if (state.value.commentsState !is LinkDetailsCommentsState.Content) {
             return false
@@ -454,15 +470,7 @@ class LinkDetailsViewModel(
                     .onSuccess { related ->
                         updateState { previousState ->
                             previousState.copy(
-                                relatedState = if (related.data.isEmpty()) {
-                                    LinkDetailsRelatedState.Empty
-                                } else {
-                                    LinkDetailsRelatedState.Content(
-                                        items = related.data
-                                            .map { item -> item.toRelatedItemState() }
-                                            .toImmutableList(),
-                                    )
-                                },
+                                relatedState = related.toRelatedState(),
                             )
                         }
                     }
@@ -488,6 +496,31 @@ class LinkDetailsViewModel(
                     isLoading = false,
                     isRefreshing = false,
                 )
+            }
+        }
+    }
+
+    private fun updateRelatedVote(
+        relatedId: Int,
+        voted: Boolean,
+        direction: RelatedLinkVoteDirection,
+    ) {
+        viewModelScope.launch {
+            val result = when {
+                voted -> linksRepository.removeVoteOnRelatedLink(linkId = id, relatedId = relatedId)
+                direction == RelatedLinkVoteDirection.Up ->
+                    linksRepository.voteUpOnRelatedLink(linkId = id, relatedId = relatedId)
+                else -> linksRepository.voteDownOnRelatedLink(linkId = id, relatedId = relatedId)
+            }
+
+            result.onSuccess {
+                refreshRelatedLinks()
+            }.onFailure {
+                logger.error(
+                    "Failed to update related vote for link id=$id, relatedId=$relatedId, direction=$direction, remove=$voted",
+                    it,
+                )
+                snackbarManager.tryEmitGenericError()
             }
         }
     }
@@ -584,6 +617,21 @@ class LinkDetailsViewModel(
                         },
                     )
                 }
+            }
+    }
+
+    private suspend fun refreshRelatedLinks() {
+        linksRepository.getRelatedLinks(linkId = id)
+            .onSuccess { related ->
+                updateState { previousState ->
+                    previousState.copy(
+                        relatedState = related.toRelatedState(),
+                    )
+                }
+            }
+            .onFailure {
+                logger.error("Failed to refresh related links for link id=$id", it)
+                snackbarManager.tryEmitGenericError()
             }
     }
 
@@ -865,6 +913,18 @@ private fun LinkDetailsCommentsState.toLoaded(): LinkDetailsCommentsState = Link
     sortMenuState = sortMenuState,
 )
 
+private fun Resources.toRelatedState(): LinkDetailsRelatedState {
+    return if (data.isEmpty()) {
+        LinkDetailsRelatedState.Empty
+    } else {
+        LinkDetailsRelatedState.Content(
+            items = data
+                .map { item -> item.toRelatedItemState() }
+                .toImmutableList(),
+        )
+    }
+}
+
 private fun LinkCommentItemState.applyVoteUp(isRemovingVote: Boolean): LinkCommentItemState = copy(
     voteState = if (isRemovingVote) {
         voteState.removeVoteUp()
@@ -972,6 +1032,11 @@ private fun LinkCommentItemState.applyFavouriteById(
 }
 
 private enum class LinkCommentVoteDirection {
+    Up,
+    Down,
+}
+
+private enum class RelatedLinkVoteDirection {
     Up,
     Down,
 }
