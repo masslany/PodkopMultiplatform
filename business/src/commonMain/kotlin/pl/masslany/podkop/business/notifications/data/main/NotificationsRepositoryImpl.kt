@@ -18,11 +18,14 @@ import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
 import pl.masslany.podkop.business.notifications.domain.models.NotificationItem
 import pl.masslany.podkop.business.notifications.domain.models.NotificationsPage
 import pl.masslany.podkop.business.notifications.domain.models.NotificationsStatus
+import pl.masslany.podkop.business.privatemessages.data.api.PrivateMessagesDataSource
+import pl.masslany.podkop.business.privatemessages.data.main.toPrivateMessagesPage
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import kotlin.time.Duration.Companion.minutes
 
 class NotificationsRepositoryImpl(
     private val notificationsDataSource: NotificationsDataSource,
+    private val privateMessagesDataSource: PrivateMessagesDataSource,
     private val authRepository: AuthRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val appScope: CoroutineScope,
@@ -57,8 +60,17 @@ class NotificationsRepositoryImpl(
         group: NotificationGroup,
         page: Any?,
     ): Result<NotificationsPage> = withContext(dispatcherProvider.io) {
-        notificationsDataSource.getNotifications(group = group, page = page)
-            .mapCatching { it.toNotificationsPage(group = group) }
+        when (group) {
+            NotificationGroup.PrivateMessages -> {
+                privateMessagesDataSource.getConversations(page = page)
+                    .mapCatching { it.toPrivateMessagesPage().toNotificationsPage() }
+            }
+
+            else -> {
+                notificationsDataSource.getNotifications(group = group, page = page)
+                    .mapCatching { it.toNotificationsPage(group = group) }
+            }
+        }
     }
 
     override suspend fun getNotification(

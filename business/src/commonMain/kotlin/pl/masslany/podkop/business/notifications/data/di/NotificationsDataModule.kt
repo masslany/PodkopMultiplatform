@@ -8,6 +8,7 @@ val notificationsDataModule = module {
     single<NotificationsRepository> {
         NotificationsRepositoryImpl(
             notificationsDataSource = get(),
+            privateMessagesDataSource = get(),
             authRepository = get(),
             dispatcherProvider = get(),
             appScope = get(),

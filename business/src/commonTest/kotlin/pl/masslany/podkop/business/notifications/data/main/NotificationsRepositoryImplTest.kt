@@ -1,5 +1,6 @@
 package pl.masslany.podkop.business.notifications.data.main
 
+import kotlinx.datetime.LocalDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -8,12 +9,18 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import pl.masslany.podkop.business.auth.data.main.AuthRepositoryImpl
 import pl.masslany.podkop.business.testsupport.fakes.FakeAuthDataSource
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeNotificationsDataSource
-import pl.masslany.podkop.business.auth.data.main.AuthRepositoryImpl
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationsStatusDataDto
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationsStatusDto
+import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
+import pl.masslany.podkop.business.privatemessages.data.api.PrivateMessagesDataSource
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageConversationDto
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageDto
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageUserDto
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessagesListDto
 
 class NotificationsRepositoryImplTest {
 
@@ -38,6 +45,7 @@ class NotificationsRepositoryImplTest {
         }
         val sut = NotificationsRepositoryImpl(
             notificationsDataSource = notificationsDataSource,
+            privateMessagesDataSource = FakePrivateMessagesDataSource(),
             authRepository = AuthRepositoryImpl(
                 authDataSource = FakeAuthDataSource().apply {
                     isLoggedInValue = true
@@ -59,6 +67,7 @@ class NotificationsRepositoryImplTest {
         val notificationsDataSource = FakeNotificationsDataSource()
         val sut = NotificationsRepositoryImpl(
             notificationsDataSource = notificationsDataSource,
+            privateMessagesDataSource = FakePrivateMessagesDataSource(),
             authRepository = AuthRepositoryImpl(
                 authDataSource = FakeAuthDataSource().apply {
                     isLoggedInValue = false
@@ -98,6 +107,7 @@ class NotificationsRepositoryImplTest {
         }
         val sut = NotificationsRepositoryImpl(
             notificationsDataSource = notificationsDataSource,
+            privateMessagesDataSource = FakePrivateMessagesDataSource(),
             authRepository = AuthRepositoryImpl(
                 authDataSource = FakeAuthDataSource().apply {
                     isLoggedInValue = true
@@ -114,5 +124,64 @@ class NotificationsRepositoryImplTest {
         assertTrue(actual.isFailure)
         assertSame(expected, actual.exceptionOrNull())
         assertEquals(3, sut.unreadCount.value)
+    }
+
+    @Test
+    fun `private messages group is loaded from conversations endpoint`() = runBlocking {
+        val privateMessagesDataSource = FakePrivateMessagesDataSource().apply {
+            getConversationsResult = Result.success(
+                PrivateMessagesListDto(
+                    data = listOf(
+                        PrivateMessageConversationDto(
+                            user = PrivateMessageUserDto(
+                                username = "ZjemCiWanne",
+                                avatar = null,
+                                gender = null,
+                                color = "orange",
+                            ),
+                            lastMessage = PrivateMessageDto(
+                                content = "2137",
+                                createdAt = LocalDateTime.parse("2026-03-07T00:11:32"),
+                                key = "gNQ0e6M6",
+                            ),
+                            unread = true,
+                        ),
+                    ),
+                    pagination = null,
+                ),
+            )
+        }
+        val sut = NotificationsRepositoryImpl(
+            notificationsDataSource = FakeNotificationsDataSource(),
+            privateMessagesDataSource = privateMessagesDataSource,
+            authRepository = AuthRepositoryImpl(
+                authDataSource = FakeAuthDataSource().apply {
+                    isLoggedInValue = true
+                },
+            ),
+            dispatcherProvider = FakeDispatcherProvider(),
+            appScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
+        )
+
+        val actual = sut.getNotifications(group = NotificationGroup.PrivateMessages, page = 1)
+
+        val item = actual.getOrThrow().data.single()
+        assertEquals(1, privateMessagesDataSource.getConversationsCalls)
+        assertEquals(NotificationGroup.PrivateMessages, item.group)
+        assertEquals("ZjemCiWanne", item.id)
+        assertEquals("ZjemCiWanne", item.actor?.username)
+        assertEquals("2137", item.message)
+        assertEquals(false, item.isRead)
+    }
+}
+
+private class FakePrivateMessagesDataSource : PrivateMessagesDataSource {
+    var getConversationsCalls = 0
+    var getConversationsResult: Result<PrivateMessagesListDto> =
+        Result.success(PrivateMessagesListDto(data = emptyList(), pagination = null))
+
+    override suspend fun getConversations(page: Any?): Result<PrivateMessagesListDto> {
+        getConversationsCalls += 1
+        return getConversationsResult
     }
 }

@@ -70,7 +70,11 @@ private fun NotificationItem.toNotificationListItemState(): NotificationListItem
     actorNameColorType = actor?.nameColor?.toNameColorType() ?: NotificationsDefaults.NameColor,
     actorGenderIndicatorType = actor?.gender?.toGenderIndicatorType() ?: NotificationsDefaults.GenderIndicator,
     publishedAt = createdAt.toPublishedTimeType(),
-    notificationIds = persistentListOf(id),
+    notificationIds = if (group == NotificationGroup.PrivateMessages) {
+        persistentListOf()
+    } else {
+        persistentListOf(id)
+    },
     headline = headline(),
     groupCount = groupCount,
     tagName = tagName,

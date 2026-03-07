@@ -17,7 +17,8 @@ data class NotificationsScreenState(
     val items: ImmutableList<NotificationListItemState>,
 ) {
     val canMarkAllAsRead: Boolean =
-        groups.firstOrNull { chip -> chip.group == selectedGroup }?.unreadCount?.let { it > 0 } == true
+        selectedGroup != NotificationGroup.PrivateMessages &&
+            groups.firstOrNull { chip -> chip.group == selectedGroup }?.unreadCount?.let { it > 0 } == true
 
     companion object {
         val initial = NotificationsScreenState(

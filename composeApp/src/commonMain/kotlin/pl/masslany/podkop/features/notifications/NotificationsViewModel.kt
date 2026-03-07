@@ -123,7 +123,7 @@ class NotificationsViewModel(
         val selectedGroup = state.value.selectedGroup
         navigateTo(item.navigationTarget)
 
-        if (item.isRead || item.notificationIds.size > 1) return
+        if (item.isRead || item.notificationIds.size != 1) return
 
         viewModelScope.launch {
             notificationsRepository.markAsRead(
@@ -195,8 +195,6 @@ class NotificationsViewModel(
 
     private fun fetchNotifications(refreshStatus: Boolean) {
         val selectedGroup = _state.value.selectedGroup
-        // TODO: It looks like wykop uses /conversations/ endpoint to fill PM notifications
-        //  current endpoint returns empty list even with unread notifications
 
         viewModelScope.launch {
             if (refreshStatus) {
