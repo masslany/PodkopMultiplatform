@@ -62,6 +62,7 @@ fun EmbedImage(
     modifier: Modifier = Modifier,
     state: EmbedImageState,
     onImageClick: () -> Unit,
+    showSourceLabel: Boolean = true,
 ) {
     val appSettings = LocalAppSettings.current
     val context = LocalPlatformContext.current
@@ -296,18 +297,20 @@ fun EmbedImage(
                     )
                 }
             }
-            Spacer(modifier = Modifier.size(4.dp))
-            Text(
-                text = stringResource(
-                    resource = Res.string.embed_image_source,
-                    state.source,
-                ),
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            if (showSourceLabel) {
+                Spacer(modifier = Modifier.size(4.dp))
+                Text(
+                    text = stringResource(
+                        resource = Res.string.embed_image_source,
+                        state.source,
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Normal,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

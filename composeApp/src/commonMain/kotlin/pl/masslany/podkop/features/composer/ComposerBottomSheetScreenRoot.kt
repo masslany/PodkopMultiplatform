@@ -13,6 +13,7 @@ import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.composer.Composer
 import pl.masslany.podkop.common.navigation.LocalBottomSheetState
 import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.composer_button_send
 import podkop.composeapp.generated.resources.entries_composer_hint
 import podkop.composeapp.generated.resources.entry_details_reply_composer_hint
 
@@ -35,6 +36,11 @@ fun ComposerBottomSheetScreenRoot(
         state = state.composer,
         autoFocus = autoFocusEnabled,
         hintText = stringResource(resource = screen.request.hintTextResource()),
+        submitText = stringResource(resource = Res.string.composer_button_send),
+        submitEnabled = !state.composer.isSubmitting &&
+            !state.composer.isMediaUploading &&
+            (state.composer.content.text.isNotBlank() || state.composer.photoKey != null),
+        showDismissButton = true,
         onContentChanged = viewModel::onComposerTextChanged,
         onAdultChanged = viewModel::onComposerAdultChanged,
         onPhotoAttachClicked = viewModel::onComposerPhotoAttachClicked,

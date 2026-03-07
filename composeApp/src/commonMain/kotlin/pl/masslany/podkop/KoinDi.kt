@@ -27,6 +27,7 @@ import pl.masslany.podkop.features.linkdetails.di.linkDetailsModule
 import pl.masslany.podkop.features.links.di.linksModule
 import pl.masslany.podkop.features.more.di.moreModule
 import pl.masslany.podkop.features.notifications.di.notificationsModule
+import pl.masslany.podkop.features.privatemessages.di.privateMessagesModule
 import pl.masslany.podkop.features.profile.di.profileModule
 import pl.masslany.podkop.features.resourceactions.di.resourceActionsModule
 import pl.masslany.podkop.features.resources.di.resourcesModule
@@ -59,6 +60,7 @@ val composeAppModule = module {
         profileModule,
         moreModule,
         notificationsModule,
+        privateMessagesModule,
         resourceActionsModule,
         searchModule,
         settingsModule,

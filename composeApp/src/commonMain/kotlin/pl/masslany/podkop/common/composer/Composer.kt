@@ -52,6 +52,7 @@ import podkop.composeapp.generated.resources.accessibility_reply_composer_attach
 import podkop.composeapp.generated.resources.accessibility_reply_composer_remove_photo
 import podkop.composeapp.generated.resources.accessibility_resource_reply_close
 import podkop.composeapp.generated.resources.composer_bold_placeholder
+import podkop.composeapp.generated.resources.composer_button_send
 import podkop.composeapp.generated.resources.composer_code_placeholder
 import podkop.composeapp.generated.resources.composer_italic_placeholder
 import podkop.composeapp.generated.resources.composer_link_description_placeholder
@@ -60,7 +61,6 @@ import podkop.composeapp.generated.resources.composer_photo_preview
 import podkop.composeapp.generated.resources.composer_photo_uploading
 import podkop.composeapp.generated.resources.composer_quote_placeholder
 import podkop.composeapp.generated.resources.entry_details_reply_composer_hint
-import podkop.composeapp.generated.resources.entry_details_reply_composer_send
 import podkop.composeapp.generated.resources.entry_details_reply_composer_target
 import podkop.composeapp.generated.resources.ic_add_photo
 import podkop.composeapp.generated.resources.ic_close
@@ -77,7 +77,10 @@ import podkop.composeapp.generated.resources.links_screen_label_adult_rating
 fun Composer(
     state: ComposerState,
     hintText: String,
+    submitText: String,
     autoFocus: Boolean,
+    submitEnabled: Boolean,
+    showDismissButton: Boolean,
     onContentChanged: (TextFieldValue) -> Unit,
     onAdultChanged: (Boolean) -> Unit,
     onPhotoAttachClicked: () -> Unit,
@@ -113,18 +116,20 @@ fun Composer(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            IconButton(
-                modifier = Modifier
-                    .align(Alignment.End),
-                enabled = !state.isSubmitting,
-                onClick = onDismiss,
-            ) {
-                Icon(
-                    imageVector = vectorResource(resource = Res.drawable.ic_close),
-                    contentDescription = stringResource(
-                        resource = Res.string.accessibility_resource_reply_close,
-                    ),
-                )
+            if (showDismissButton) {
+                IconButton(
+                    modifier = Modifier
+                        .align(Alignment.End),
+                    enabled = !state.isSubmitting,
+                    onClick = onDismiss,
+                ) {
+                    Icon(
+                        imageVector = vectorResource(resource = Res.drawable.ic_close),
+                        contentDescription = stringResource(
+                            resource = Res.string.accessibility_resource_reply_close,
+                        ),
+                    )
+                }
             }
 
             state.replyTarget?.let { target ->
@@ -331,9 +336,7 @@ fun Composer(
 
                 Button(
                     onClick = onSubmit,
-                    enabled = !state.isSubmitting &&
-                        !state.isMediaUploading &&
-                        state.content.text.isNotBlank(),
+                    enabled = submitEnabled,
                 ) {
                     if (state.isSubmitting) {
                         CircularProgressIndicator(
@@ -342,7 +345,7 @@ fun Composer(
                         )
                     } else {
                         Text(
-                            text = stringResource(resource = Res.string.entry_details_reply_composer_send),
+                            text = submitText,
                         )
                     }
                 }
@@ -429,7 +432,10 @@ private fun ComposerPreview() {
                 isMediaUploading = false,
             ),
             hintText = stringResource(resource = Res.string.entry_details_reply_composer_hint),
+            submitText = stringResource(resource = Res.string.composer_button_send),
             autoFocus = false,
+            submitEnabled = true,
+            showDismissButton = true,
             onContentChanged = {},
             onAdultChanged = {},
             onPhotoAttachClicked = {},

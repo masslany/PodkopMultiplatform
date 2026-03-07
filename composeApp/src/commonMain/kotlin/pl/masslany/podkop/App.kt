@@ -62,6 +62,12 @@ import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenRoot
 import pl.masslany.podkop.features.notifications.NotificationsScreen
 import pl.masslany.podkop.features.notifications.NotificationsScreenRoot
+import pl.masslany.podkop.features.privatemessages.ConversationScreen
+import pl.masslany.podkop.features.privatemessages.NewConversationScreen
+import pl.masslany.podkop.features.privatemessages.PrivateMessagesScreen
+import pl.masslany.podkop.features.privatemessages.conversation.ConversationScreenRoot
+import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesScreenRoot
+import pl.masslany.podkop.features.privatemessages.newconversation.NewConversationScreenRoot
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.ProfileScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
@@ -200,6 +206,25 @@ fun App() {
 
                     entry<NotificationsScreen> {
                         NotificationsScreenRoot(
+                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<PrivateMessagesScreen> {
+                        PrivateMessagesScreenRoot(
+                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<NewConversationScreen> {
+                        NewConversationScreenRoot(
+                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<ConversationScreen> {
+                        ConversationScreenRoot(
+                            screen = it,
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )
                     }

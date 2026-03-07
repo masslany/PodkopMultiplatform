@@ -62,7 +62,10 @@ class AppNavigator(
      */
     fun sendResult(key: String, result: Any) {
         back()
-        // Emit to the flow so the awaiting caller gets it
+        publishResult(key = key, result = result)
+    }
+
+    fun publishResult(key: String, result: Any) {
         results.tryEmit(key to result)
     }
 
@@ -86,26 +89,27 @@ class AppNavigator(
      * @return true if consumed, false if Activity should finish.
      */
     fun back(): Boolean {
-        var consumed = false
-        _state.update { previousState ->
-            val currentDestination = previousState.rootStack.lastOrNull()
-            val destinationBackHandler = currentDestination?.let { destinationBackHandlers[it] }
-            if (destinationBackHandler?.invoke() == true) {
-                consumed = true
-                return@update previousState
-            }
+        val currentState = _state.value
+        val currentDestination = currentState.rootStack.lastOrNull()
+        val destinationBackHandler = currentDestination?.let { destinationBackHandlers[it] }
+        if (destinationBackHandler?.invoke() == true) {
+            return true
+        }
 
-            if (previousState.rootStack.size > 1) {
-                consumed = true
+        if (currentState.rootStack.size <= 1) {
+            return false
+        }
+
+        _state.update { previousState ->
+            if (previousState.rootStack.size <= 1) {
+                previousState
+            } else {
                 previousState.copy(
                     rootStack = previousState.rootStack.dropLast(1).toPersistentList(),
                 )
-            } else {
-                consumed = false
-                previousState
             }
         }
-        return consumed
+        return true
     }
 
     fun openExternalLink(url: String) {

@@ -58,12 +58,10 @@ class PrivateMessagesApiClient(
         val request =
             Request<PrivateMessageItemResponseDto>(
                 method = Request.HttpMethod.POST,
-                path = "api/v3/pm/open",
+                path = "api/v3/pm/conversations/$username",
                 body = PrivateMessageOpenRequestDto(
                     data = PrivateMessageOpenDataDto(
-                        username = username,
                         content = content,
-                        adult = adult,
                         photo = photoKey,
                         embed = embed,
                     ),

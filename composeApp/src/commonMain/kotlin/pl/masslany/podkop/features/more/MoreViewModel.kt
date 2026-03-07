@@ -33,6 +33,7 @@ import pl.masslany.podkop.features.more.models.MoreSectionItemType
 import pl.masslany.podkop.features.more.models.MoreSectionState
 import pl.masslany.podkop.features.more.models.MoreSectionType
 import pl.masslany.podkop.features.notifications.NotificationsScreen
+import pl.masslany.podkop.features.privatemessages.PrivateMessagesScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import pl.masslany.podkop.features.search.SearchScreen
@@ -59,7 +60,7 @@ class MoreViewModel(
             loadData()
         }
         observeAuthSessionChanges()
-        observeNotificationsUnreadCount()
+        observeNotificationsStatus()
     }
 
     fun onScreenOpened() {
@@ -91,7 +92,7 @@ class MoreViewModel(
     }
 
     override fun onMessagesClicked() {
-        emitComingSoon()
+        appNavigator.navigateTo(PrivateMessagesScreen)
     }
 
     override fun onFavoritesClicked() {
@@ -128,13 +129,14 @@ class MoreViewModel(
         }
     }
 
-    private fun observeNotificationsUnreadCount() {
+    private fun observeNotificationsStatus() {
         viewModelScope.launch {
-            notificationsRepository.unreadCount.collectLatest { unreadCount ->
+            notificationsRepository.status.collectLatest { status ->
                 _state.update { currentState ->
                     currentState.copy(
                         sections = buildMoreSections(
-                            notificationsUnreadCount = unreadCount,
+                            notificationsUnreadCount = status.totalUnreadCount,
+                            privateMessagesUnreadCount = status.privateMessagesUnreadCount,
                             isLoggedIn = currentState.isLoggedIn,
                         ),
                     )
@@ -155,7 +157,8 @@ class MoreViewModel(
                 isLoggedIn = false,
                 profileHeader = null,
                 sections = buildMoreSections(
-                    notificationsUnreadCount = notificationsRepository.unreadCount.value,
+                    notificationsUnreadCount = notificationsRepository.status.value.totalUnreadCount,
+                    privateMessagesUnreadCount = notificationsRepository.status.value.privateMessagesUnreadCount,
                     isLoggedIn = false,
                 ),
             )
@@ -176,7 +179,8 @@ class MoreViewModel(
                         memberSinceState = profile.memberSince.toMemberSinceState(),
                     ),
                     sections = buildMoreSections(
-                        notificationsUnreadCount = notificationsRepository.unreadCount.value,
+                        notificationsUnreadCount = notificationsRepository.status.value.totalUnreadCount,
+                        privateMessagesUnreadCount = notificationsRepository.status.value.privateMessagesUnreadCount,
                         isLoggedIn = true,
                     ),
                 )
@@ -188,7 +192,8 @@ class MoreViewModel(
                     isLoggedIn = true,
                     profileHeader = null,
                     sections = buildMoreSections(
-                        notificationsUnreadCount = notificationsRepository.unreadCount.value,
+                        notificationsUnreadCount = notificationsRepository.status.value.totalUnreadCount,
+                        privateMessagesUnreadCount = notificationsRepository.status.value.privateMessagesUnreadCount,
                         isLoggedIn = true,
                     ),
                 )
@@ -197,6 +202,7 @@ class MoreViewModel(
 
     private fun buildMoreSections(
         notificationsUnreadCount: Int? = null,
+        privateMessagesUnreadCount: Int? = null,
         isLoggedIn: Boolean,
     ): ImmutableList<MoreSectionState> = persistentListOf(
         MoreSectionState(
@@ -210,11 +216,11 @@ class MoreViewModel(
                         ),
                     )
                 }
-                if (buildInfo.isDebugBuild && isLoggedIn) {
+                if (isLoggedIn) {
                     add(
                         MoreSectionItemState(
                             type = MoreSectionItemType.Messages,
-                            badgeCount = null,
+                            badgeCount = privateMessagesUnreadCount,
                         ),
                     )
                 }

@@ -24,6 +24,7 @@ import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.notifications.models.NotificationGroupChipState
 import pl.masslany.podkop.features.notifications.models.NotificationNavigationTarget
+import pl.masslany.podkop.features.privatemessages.ConversationScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.tag.TagScreen
 import pl.masslany.podkop.features.topbar.TopBarActions
@@ -239,6 +240,10 @@ class NotificationsViewModel(
 
     private fun navigateTo(target: NotificationNavigationTarget) {
         when (target) {
+            is NotificationNavigationTarget.Conversation -> {
+                appNavigator.navigateTo(ConversationScreen(username = target.username))
+            }
+
             is NotificationNavigationTarget.Entry -> {
                 appNavigator.navigateTo(EntryDetailsScreen.forEntry(id = target.id))
             }

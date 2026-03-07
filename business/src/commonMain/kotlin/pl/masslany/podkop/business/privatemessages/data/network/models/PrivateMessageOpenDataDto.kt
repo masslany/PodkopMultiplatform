@@ -5,12 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PrivateMessageOpenDataDto(
-    @SerialName("username")
-    val username: String,
     @SerialName("content")
     val content: String,
-    @SerialName("adult")
-    val adult: Boolean = false,
     @SerialName("photo")
     val photo: String? = null,
     @SerialName("embed")

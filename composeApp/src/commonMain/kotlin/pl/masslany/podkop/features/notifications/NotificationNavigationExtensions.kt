@@ -6,7 +6,9 @@ import pl.masslany.podkop.features.notifications.models.NotificationNavigationTa
 
 internal fun NotificationItem.navigationTarget(): NotificationNavigationTarget {
     if (group == NotificationGroup.PrivateMessages) {
-        return NotificationNavigationTarget.None
+        return NotificationNavigationTarget.Conversation(
+            username = actor?.username.orEmpty().ifBlank { id },
+        )
     }
 
     val notificationLinkId = linkId

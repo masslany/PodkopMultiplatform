@@ -18,6 +18,8 @@
     <string name="topbar_label_hits">Hity</string>
     <string name="topbar_label_favorites">Ulubione</string>
     <string name="topbar_label_notifications">Powiadomienia</string>
+    <string name="topbar_label_private_messages">Wiadomości prywatne</string>
+    <string name="topbar_label_new_conversation">Nowa wiadomość</string>
 
     <!-- More -->
     <string name="more_group_social">Społeczność</string>
@@ -69,6 +71,16 @@
         <item quantity="few">%1$d nowe komentarze do znaleziska</item>
         <item quantity="other">%1$d nowych komentarzy do znaleziska</item>
     </plurals>
+
+    <!-- Private messages -->
+    <string name="private_messages_empty">Nie masz jeszcze żadnych rozmów</string>
+    <string name="private_messages_thread_empty">Brak wiadomości w tej rozmowie</string>
+    <string name="private_messages_composer_hint">Napisz wiadomość</string>
+    <string name="private_messages_new_conversation_helper">Wpisz nazwę użytkownika i wybierz jedną z podpowiedzi.</string>
+    <string name="private_messages_new_conversation_suggestions_error">Wystąpił błąd podczas wczytywania podpowiedzi użytkowników</string>
+    <string name="private_messages_new_conversation_username">Nazwa użytkownika</string>
+    <string name="private_messages_user_suggestions_min_query">Podpowiedzi pojawią się po wpisaniu co najmniej %1$d znaków</string>
+    <string name="private_messages_embed_open">Otwórz link</string>
 
     <!-- About -->
     <string name="app_name">Podkop</string>
@@ -126,6 +138,8 @@
     <string name="accessibility_tag_gallery_open_entry">Otwórz wpis</string>
     <string name="accessibility_tag_enable_notifications">Włącz powiadomienia dla tagu</string>
     <string name="accessibility_tag_disable_notifications">Wyłącz powiadomienia dla tagu</string>
+    <string name="accessibility_private_messages_new_conversation">Rozpocznij nową rozmowę</string>
+    <string name="accessibility_private_messages_open_image">Otwórz obraz z wiadomości</string>
 
     <!-- Profile -->
     <string name="profile_not_logged_in_message">Nie jesteś zalogowany</string>

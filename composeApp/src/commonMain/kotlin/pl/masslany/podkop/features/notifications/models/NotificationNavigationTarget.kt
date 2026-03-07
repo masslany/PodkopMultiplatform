@@ -5,6 +5,8 @@ sealed interface NotificationNavigationTarget {
 
     data class Entry(val id: Int) : NotificationNavigationTarget
 
+    data class Conversation(val username: String) : NotificationNavigationTarget
+
     data class Profile(val username: String) : NotificationNavigationTarget
 
     data class Tag(val name: String) : NotificationNavigationTarget

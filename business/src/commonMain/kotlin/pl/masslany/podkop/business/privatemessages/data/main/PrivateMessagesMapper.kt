@@ -1,14 +1,16 @@
 package pl.masslany.podkop.business.privatemessages.data.main
 
+import pl.masslany.podkop.business.common.data.main.mapper.common.toEmbed
+import pl.masslany.podkop.business.common.data.main.mapper.common.toPhoto
 import pl.masslany.podkop.business.common.data.main.mapper.common.toPagination
 import pl.masslany.podkop.business.common.data.main.mapper.toGender
 import pl.masslany.podkop.business.common.data.main.mapper.toNameColor
 import pl.masslany.podkop.business.common.domain.models.common.NameColor
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageConversationDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageItemResponseDto
-import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageConversationDto
-import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageUserDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageThreadDto
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageUserDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessagesListDto
 import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessage
 import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessageConversation
@@ -24,7 +26,7 @@ internal fun PrivateMessagesListDto.toPrivateMessagesPage(): PrivateMessagesPage
 
 internal fun PrivateMessageThreadDto.toPrivateMessageThreadPage(): PrivateMessageThreadPage =
     PrivateMessageThreadPage(
-        data = data.map(PrivateMessageDto::toPrivateMessage),
+        data = data.messages.map(PrivateMessageDto::toPrivateMessage),
         pagination = pagination?.toPagination(),
     )
 
@@ -51,8 +53,8 @@ private fun PrivateMessageDto.toPrivateMessage(): PrivateMessage =
         adult = adult,
         type = type,
         sender = user?.toPrivateMessageSender(),
-        mediaPhotoUrl = media?.photo?.takeIf { it.isNotBlank() },
-        mediaEmbedUrl = media?.embed?.takeIf { it.isNotBlank() },
+        photo = media?.photo?.toPhoto(),
+        embed = media?.embed?.toEmbed(),
     )
 
 private fun PrivateMessageUserDto.toPrivateMessageSender(): PrivateMessageSender =
