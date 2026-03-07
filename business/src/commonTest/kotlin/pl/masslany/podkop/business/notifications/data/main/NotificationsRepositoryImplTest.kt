@@ -13,10 +13,10 @@ import pl.masslany.podkop.business.auth.data.main.AuthRepositoryImpl
 import pl.masslany.podkop.business.testsupport.fakes.FakeAuthDataSource
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeNotificationsDataSource
+import pl.masslany.podkop.business.testsupport.fakes.FakePrivateMessagesDataSource
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationsStatusDataDto
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationsStatusDto
 import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
-import pl.masslany.podkop.business.privatemessages.data.api.PrivateMessagesDataSource
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageConversationDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageUserDto
@@ -166,22 +166,11 @@ class NotificationsRepositoryImplTest {
         val actual = sut.getNotifications(group = NotificationGroup.PrivateMessages, page = 1)
 
         val item = actual.getOrThrow().data.single()
-        assertEquals(1, privateMessagesDataSource.getConversationsCalls)
+        assertEquals(listOf<Any?>(1), privateMessagesDataSource.getConversationsCalls)
         assertEquals(NotificationGroup.PrivateMessages, item.group)
         assertEquals("ZjemCiWanne", item.id)
         assertEquals("ZjemCiWanne", item.actor?.username)
         assertEquals("2137", item.message)
         assertEquals(false, item.isRead)
-    }
-}
-
-private class FakePrivateMessagesDataSource : PrivateMessagesDataSource {
-    var getConversationsCalls = 0
-    var getConversationsResult: Result<PrivateMessagesListDto> =
-        Result.success(PrivateMessagesListDto(data = emptyList(), pagination = null))
-
-    override suspend fun getConversations(page: Any?): Result<PrivateMessagesListDto> {
-        getConversationsCalls += 1
-        return getConversationsResult
     }
 }

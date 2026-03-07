@@ -52,7 +52,7 @@ fun NotificationsScreenHeader(
             contentPadding = PaddingValues(
                 start = 16.dp,
                 end = 16.dp,
-            )
+            ),
         ) {
             items(
                 items = state.groups,

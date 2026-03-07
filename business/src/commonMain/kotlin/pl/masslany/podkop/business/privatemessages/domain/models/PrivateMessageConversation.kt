@@ -17,7 +17,4 @@ data class PrivateMessageConversation(
     val unread: Boolean,
 )
 
-data class PrivateMessagesPage(
-    override val data: List<PrivateMessageConversation>,
-    override val pagination: Pagination?,
-) : PaginatedData<PrivateMessageConversation>
+

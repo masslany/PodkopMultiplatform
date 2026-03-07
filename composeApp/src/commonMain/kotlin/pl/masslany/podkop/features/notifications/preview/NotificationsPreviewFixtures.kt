@@ -116,6 +116,7 @@ internal object NotificationsPreviewFixtures {
         groups = groups(selectedGroup),
         items = when (selectedGroup) {
             NotificationGroup.Tags -> persistentListOf(groupedTagNotification(), regularNotification())
+
             NotificationGroup.ObservedDiscussions -> persistentListOf(
                 observedSingleNotification(),
                 groupedObservedNotification(),

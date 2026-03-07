@@ -1,6 +1,10 @@
 package pl.masslany.podkop.business.privatemessages.data.network.client
 
 import pl.masslany.podkop.business.privatemessages.data.network.api.PrivateMessagesApi
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageItemResponseDto
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageOpenDataDto
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageOpenRequestDto
+import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageThreadDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessagesListDto
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
@@ -15,6 +19,65 @@ class PrivateMessagesApiClient(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/pm/conversations",
                 queryParameters = page?.let { mapOf("page" to it.toString()) },
+            )
+
+        return execute(request)
+    }
+
+    override suspend fun getConversationMessages(
+        username: String,
+        page: Any?,
+    ): Result<PrivateMessageThreadDto> {
+        val request =
+            Request<PrivateMessageThreadDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/pm/conversations/$username",
+                queryParameters = page?.let { mapOf("page" to it.toString()) },
+            )
+
+        return execute(request)
+    }
+
+    override suspend fun getConversationMessagesNewer(username: String): Result<PrivateMessageThreadDto> {
+        val request =
+            Request<PrivateMessageThreadDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/pm/conversations/$username/newer",
+            )
+
+        return execute(request)
+    }
+
+    override suspend fun openConversation(
+        username: String,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+        embed: String?,
+    ): Result<PrivateMessageItemResponseDto> {
+        val request =
+            Request<PrivateMessageItemResponseDto>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/pm/open",
+                body = PrivateMessageOpenRequestDto(
+                    data = PrivateMessageOpenDataDto(
+                        username = username,
+                        content = content,
+                        adult = adult,
+                        photo = photoKey,
+                        embed = embed,
+                    ),
+                ),
+            )
+
+        return execute(request)
+    }
+
+    override suspend fun readAll(): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.PUT,
+                path = "api/v3/pm/read-all",
             )
 
         return execute(request)

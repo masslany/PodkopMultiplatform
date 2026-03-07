@@ -48,7 +48,6 @@ fun NotificationsList(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-
     } else {
         LazyColumn(
             modifier = modifier.fillMaxSize(),

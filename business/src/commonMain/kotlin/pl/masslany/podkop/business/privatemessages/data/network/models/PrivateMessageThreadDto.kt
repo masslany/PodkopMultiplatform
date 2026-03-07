@@ -5,9 +5,9 @@ import kotlinx.serialization.Serializable
 import pl.masslany.podkop.business.common.data.network.models.common.PaginationDto
 
 @Serializable
-data class PrivateMessagesListDto(
+data class PrivateMessageThreadDto(
     @SerialName("data")
-    val data: List<PrivateMessageConversationDto>,
+    val data: List<PrivateMessageDto>,
     @SerialName("pagination")
     val pagination: PaginationDto? = null,
 )
