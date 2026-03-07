@@ -437,6 +437,33 @@ open class BaseResourceItemStateHolder(
         }
     }
 
+    override fun onLinkCommentVoteDownClick(linkId: Int, commentId: Int, voted: Boolean) {
+        scope?.launch {
+            val result = if (voted) {
+                linksRepository.removeVoteOnLinkComment(
+                    linkId = linkId,
+                    commentId = commentId,
+                )
+            } else {
+                linksRepository.voteDownOnLinkComment(
+                    linkId = linkId,
+                    commentId = commentId,
+                )
+            }
+
+            result.onSuccess {
+                updateLinkCommentVote(
+                    commentId = commentId,
+                    action = if (voted) {
+                        LinkCommentVoteAction.RemoveVoteDown
+                    } else {
+                        LinkCommentVoteAction.VoteDown
+                    },
+                )
+            }
+        }
+    }
+
     override fun onLinkCommentFavouriteClicked(linkId: Int, commentId: Int, favourited: Boolean) {
         scope?.launch {
             toggleFavourite(
@@ -554,6 +581,12 @@ open class BaseResourceItemStateHolder(
 
                 LinkCommentVoteAction.RemoveVoteUp ->
                     comment.voteState.removeVoteUp()
+
+                LinkCommentVoteAction.VoteDown ->
+                    comment.voteState.increaseVoteDown()
+
+                LinkCommentVoteAction.RemoveVoteDown ->
+                    comment.voteState.removeVoteDown()
             }
 
             comment.copy(voteState = newVoteState)
@@ -726,6 +759,8 @@ open class BaseResourceItemStateHolder(
     private enum class LinkCommentVoteAction {
         VoteUp,
         RemoveVoteUp,
+        VoteDown,
+        RemoveVoteDown,
     }
 
     private enum class EntryCommentVoteAction {

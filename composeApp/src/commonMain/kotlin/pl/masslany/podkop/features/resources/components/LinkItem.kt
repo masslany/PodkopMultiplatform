@@ -60,6 +60,7 @@ fun LinkItem(
     onImageClicked: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
     onLinkCommentVoteUpClick: (linkId: Int, commentId: Int, voted: Boolean) -> Unit,
+    onLinkCommentVoteDownClick: (linkId: Int, commentId: Int, voted: Boolean) -> Unit,
     onLinkCommentFavouriteClick: (linkId: Int, commentId: Int, favourited: Boolean) -> Unit,
     onLinkCommentMoreClick: (
         linkId: Int,
@@ -217,6 +218,13 @@ fun LinkItem(
                                     comment.voteState.positiveVoteButtonState?.isVoted ?: false,
                                 )
                             },
+                            onVoteDownClick = {
+                                onLinkCommentVoteDownClick(
+                                    comment.linkId,
+                                    comment.id,
+                                    comment.voteState.negativeVoteButtonState?.isVoted ?: false,
+                                )
+                            },
                             onFavouriteClick = {
                                 onLinkCommentFavouriteClick(
                                     comment.linkId,
@@ -274,6 +282,7 @@ private fun LinkItemPreview(
             onImageClicked = {},
             onEmbedPreviewClick = {},
             onLinkCommentVoteUpClick = { _, _, _ -> },
+            onLinkCommentVoteDownClick = { _, _, _ -> },
             onLinkCommentFavouriteClick = { _, _, _ -> },
             onLinkCommentMoreClick = { _, _, _, _ -> },
         )

@@ -108,6 +108,10 @@ class LinksDataSourceImpl(
         return linksApi.voteOnLinkComment(linkId, commentId)
     }
 
+    override suspend fun voteDownOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
+        return linksApi.voteDownOnLinkComment(linkId, commentId)
+    }
+
     override suspend fun removeVoteOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
         return linksApi.removeVoteOnLinkComment(linkId, commentId)
     }

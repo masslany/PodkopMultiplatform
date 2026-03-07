@@ -27,6 +27,7 @@ object NoOpResourceItemActions : ResourceItemActions {
     override fun onLinkReplyClicked(linkId: Int, author: String?) = Unit
     override fun onLinkMoreClicked(linkId: Int, linkSlug: String) = Unit
     override fun onLinkCommentVoteUpClick(linkId: Int, commentId: Int, voted: Boolean) = Unit
+    override fun onLinkCommentVoteDownClick(linkId: Int, commentId: Int, voted: Boolean) = Unit
     override fun onLinkCommentFavouriteClicked(linkId: Int, commentId: Int, favourited: Boolean) = Unit
     override fun onLinkCommentReplyClicked(linkId: Int, commentId: Int, author: String?) = Unit
     override fun onLinkCommentMoreClicked(

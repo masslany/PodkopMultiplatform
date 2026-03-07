@@ -32,6 +32,7 @@ fun LinkCommentItem(
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
     onVoteUpClick: () -> Unit,
+    onVoteDownClick: () -> Unit,
     onFavouriteClick: () -> Unit,
     onImageClick: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
@@ -66,7 +67,7 @@ fun LinkCommentItem(
             Vote(
                 state = state.voteState,
                 onVoteUpClick = onVoteUpClick,
-                onVoteDownClick = { /* no-op */ },
+                onVoteDownClick = onVoteDownClick,
             )
         }
         Spacer(Modifier.size(8.dp))
@@ -118,6 +119,7 @@ private fun LinkCommentItemPreview(
             onTagClick = {},
             onUrlClick = {},
             onVoteUpClick = {},
+            onVoteDownClick = {},
             onFavouriteClick = {},
             onImageClick = {},
             onEmbedPreviewClick = {},

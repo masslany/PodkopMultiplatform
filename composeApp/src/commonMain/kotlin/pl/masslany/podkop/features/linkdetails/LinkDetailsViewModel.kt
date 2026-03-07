@@ -187,7 +187,27 @@ class LinkDetailsViewModel(
                 itemState.copy(
                     replies = itemState.replies.applyVoteById(
                         commentId = commentId,
-                        voted = voted,
+                        isRemovingVote = voted,
+                        direction = LinkCommentVoteDirection.Up,
+                    ),
+                )
+            }
+        }
+    }
+
+    override fun onLinkCommentVoteDownClick(linkId: Int, commentId: Int, voted: Boolean) {
+        resourceItemStateHolder.onLinkCommentVoteDownClick(
+            linkId = linkId,
+            commentId = commentId,
+            voted = voted,
+        )
+        commentRepliesStateById.update { previousState ->
+            previousState.mapValues { (_, itemState) ->
+                itemState.copy(
+                    replies = itemState.replies.applyVoteById(
+                        commentId = commentId,
+                        isRemovingVote = voted,
+                        direction = LinkCommentVoteDirection.Down,
                     ),
                 )
             }
@@ -845,11 +865,19 @@ private fun LinkDetailsCommentsState.toLoaded(): LinkDetailsCommentsState = Link
     sortMenuState = sortMenuState,
 )
 
-private fun LinkCommentItemState.applyVoteUp(voted: Boolean): LinkCommentItemState = copy(
-    voteState = if (voted) {
+private fun LinkCommentItemState.applyVoteUp(isRemovingVote: Boolean): LinkCommentItemState = copy(
+    voteState = if (isRemovingVote) {
         voteState.removeVoteUp()
     } else {
         voteState.increaseVoteUp()
+    },
+)
+
+private fun LinkCommentItemState.applyVoteDown(isRemovingVote: Boolean): LinkCommentItemState = copy(
+    voteState = if (isRemovingVote) {
+        voteState.removeVoteDown()
+    } else {
+        voteState.increaseVoteDown()
     },
 )
 
@@ -882,14 +910,26 @@ private fun LinkCommentItemState.patchEditedResource(
 
 private fun ImmutableList<LinkCommentItemState>.applyVoteById(
     commentId: Int,
-    voted: Boolean,
+    isRemovingVote: Boolean,
+    direction: LinkCommentVoteDirection,
 ): ImmutableList<LinkCommentItemState> = this.map { comment ->
-    comment.applyVoteById(commentId = commentId, voted = voted)
+    comment.applyVoteById(
+        commentId = commentId,
+        isRemovingVote = isRemovingVote,
+        direction = direction,
+    )
 }.toImmutableList()
 
-private fun LinkCommentItemState.applyVoteById(commentId: Int, voted: Boolean): LinkCommentItemState {
+private fun LinkCommentItemState.applyVoteById(
+    commentId: Int,
+    isRemovingVote: Boolean,
+    direction: LinkCommentVoteDirection,
+): LinkCommentItemState {
     val updated = if (this.id == commentId) {
-        this.applyVoteUp(voted)
+        when (direction) {
+            LinkCommentVoteDirection.Up -> this.applyVoteUp(isRemovingVote)
+            LinkCommentVoteDirection.Down -> this.applyVoteDown(isRemovingVote)
+        }
     } else {
         this
     }
@@ -897,7 +937,8 @@ private fun LinkCommentItemState.applyVoteById(commentId: Int, voted: Boolean): 
     return updated.copy(
         replies = updated.replies.applyVoteById(
             commentId = commentId,
-            voted = voted,
+            isRemovingVote = isRemovingVote,
+            direction = direction,
         ),
     )
 }
@@ -928,4 +969,9 @@ private fun LinkCommentItemState.applyFavouriteById(
             favourited = favourited,
         ),
     )
+}
+
+private enum class LinkCommentVoteDirection {
+    Up,
+    Down,
 }

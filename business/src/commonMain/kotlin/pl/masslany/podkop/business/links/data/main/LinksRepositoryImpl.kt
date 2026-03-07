@@ -185,6 +185,12 @@ class LinksRepositoryImpl(
         }
     }
 
+    override suspend fun voteDownOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.voteDownOnLinkComment(linkId, commentId)
+        }
+    }
+
     override suspend fun removeVoteOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
         return withContext(dispatcherProvider.io) {
             linksDataSource.removeVoteOnLinkComment(linkId, commentId)

@@ -307,6 +307,7 @@ class LinksRepositoryImplTest {
             voteOnLinkResult = Result.success(Unit)
             removeVoteOnLinkResult = Result.success(Unit)
             voteOnLinkCommentResult = Result.success(Unit)
+            voteDownOnLinkCommentResult = Result.success(Unit)
             removeVoteOnLinkCommentResult = Result.success(Unit)
         }
         val sut = createSut(linksDataSource)
@@ -314,11 +315,13 @@ class LinksRepositoryImplTest {
         val voteLink = sut.voteOnLink(1)
         val removeVoteLink = sut.removeVoteOnLink(2)
         val voteComment = sut.voteOnLinkComment(linkId = 3, commentId = 4)
-        val removeVoteComment = sut.removeVoteOnLinkComment(linkId = 5, commentId = 6)
+        val voteDownComment = sut.voteDownOnLinkComment(linkId = 5, commentId = 6)
+        val removeVoteComment = sut.removeVoteOnLinkComment(linkId = 7, commentId = 8)
 
         assertTrue(voteLink.isSuccess)
         assertTrue(removeVoteLink.isSuccess)
         assertTrue(voteComment.isSuccess)
+        assertTrue(voteDownComment.isSuccess)
         assertTrue(removeVoteComment.isSuccess)
         assertEquals(listOf(1), linksDataSource.voteOnLinkCalls)
         assertEquals(listOf(2), linksDataSource.removeVoteOnLinkCalls)
@@ -328,6 +331,10 @@ class LinksRepositoryImplTest {
         )
         assertEquals(
             listOf(FakeLinksDataSource.LinkCommentVoteCall(linkId = 5, commentId = 6)),
+            linksDataSource.voteDownOnLinkCommentCalls,
+        )
+        assertEquals(
+            listOf(FakeLinksDataSource.LinkCommentVoteCall(linkId = 7, commentId = 8)),
             linksDataSource.removeVoteOnLinkCommentCalls,
         )
     }

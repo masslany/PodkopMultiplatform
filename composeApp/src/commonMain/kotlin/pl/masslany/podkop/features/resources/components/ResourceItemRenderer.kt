@@ -246,6 +246,13 @@ private fun LinkItemRenderer(
                     voted = voted,
                 )
             },
+            onLinkCommentVoteDownClick = { linkId, commentId, voted ->
+                actions.onLinkCommentVoteDownClick(
+                    linkId = linkId,
+                    commentId = commentId,
+                    voted = voted,
+                )
+            },
             onLinkCommentFavouriteClick = { linkId, commentId, favourited ->
                 actions.onLinkCommentFavouriteClicked(
                     linkId = linkId,
@@ -433,6 +440,13 @@ private fun LinkCommentItemRenderer(
                             voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
                         )
                     },
+                    onVoteDownClick = {
+                        actions.onLinkCommentVoteDownClick(
+                            linkId = state.linkId,
+                            commentId = state.id,
+                            voted = state.voteState.negativeVoteButtonState?.isVoted ?: false,
+                        )
+                    },
                     onFavouriteClick = {
                         actions.onLinkCommentFavouriteClicked(
                             linkId = state.linkId,
@@ -477,6 +491,13 @@ private fun LinkCommentItemRenderer(
                     linkId = state.linkId,
                     commentId = state.id,
                     voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+                )
+            },
+            onVoteDownClick = {
+                actions.onLinkCommentVoteDownClick(
+                    linkId = state.linkId,
+                    commentId = state.id,
+                    voted = state.voteState.negativeVoteButtonState?.isVoted ?: false,
                 )
             },
             onFavouriteClick = {

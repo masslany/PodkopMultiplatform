@@ -240,10 +240,22 @@ class LinksApiClient(
     }
 
     override suspend fun voteOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
+        return voteOnLinkComment(linkId = linkId, commentId = commentId, direction = "up")
+    }
+
+    override suspend fun voteDownOnLinkComment(linkId: Int, commentId: Int): Result<Unit> {
+        return voteOnLinkComment(linkId = linkId, commentId = commentId, direction = "down")
+    }
+
+    private suspend fun voteOnLinkComment(
+        linkId: Int,
+        commentId: Int,
+        direction: String,
+    ): Result<Unit> {
         val request =
             Request<Unit>(
                 method = Request.HttpMethod.POST,
-                path = "api/v3/links/$linkId/comments/$commentId/votes/up",
+                path = "api/v3/links/$linkId/comments/$commentId/votes/$direction",
             )
 
         return apiClient.request(request).fold(
