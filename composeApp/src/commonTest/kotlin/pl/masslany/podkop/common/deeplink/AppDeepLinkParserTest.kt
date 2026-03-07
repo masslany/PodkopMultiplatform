@@ -54,6 +54,16 @@ class AppDeepLinkParserTest {
     }
 
     @Test
+    fun parsesPrivateMessagesInbox() {
+        val result = parser.parse("https://masslany.pl/app/private-messages")
+
+        assertEquals(
+            expected = AppDeepLink.PrivateMessagesInbox,
+            actual = result,
+        )
+    }
+
+    @Test
     fun ignoresUnsupportedHost() {
         val result = parser.parse("https://example.com/wykop/link/99999999/test")
 

@@ -20,6 +20,13 @@ internal class AppDeepLinkParser {
             .split('/')
             .filter { it.isNotBlank() }
 
+        if (segments.size == 2 &&
+            segments[0].lowercase() == APP_SEGMENT &&
+            segments[1].lowercase() == PRIVATE_MESSAGES_SEGMENT
+        ) {
+            return AppDeepLink.PrivateMessagesInbox
+        }
+
         if (segments.size < 3) return null
         if (segments[0].lowercase() != WYKOP_SEGMENT) return null
 
@@ -68,6 +75,8 @@ internal class AppDeepLinkParser {
         const val REFRESH_TOKEN = "rtoken"
 
         private const val SUPPORTED_HOST = "masslany.pl"
+        private const val APP_SEGMENT = "app"
+        private const val PRIVATE_MESSAGES_SEGMENT = "private-messages"
         private const val WYKOP_SEGMENT = "wykop"
         private const val LINK_SEGMENT = "link"
         private const val ENTRY_SEGMENT = "wpis"

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Podkop</string>
+    <string name="pm_notification_channel_name">Prywatne wiadomości</string>
+    <string name="pm_notification_title">Masz nową prywatną wiadomość</string>
+    <string name="pm_notification_title_plural">Masz nowe prywatne wiadomości</string>
+    <string name="pm_notification_body">Dotnij aby otworzyć</string>
 </resources>

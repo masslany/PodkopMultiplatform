@@ -44,6 +44,8 @@ import podkop.composeapp.generated.resources.debug_link_button_open
 import podkop.composeapp.generated.resources.debug_link_hint
 import podkop.composeapp.generated.resources.debug_link_title
 import podkop.composeapp.generated.resources.debug_link_validation_error
+import podkop.composeapp.generated.resources.debug_pm_notification_button_send
+import podkop.composeapp.generated.resources.debug_pm_notification_title
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.topbar_label_debug
 
@@ -163,6 +165,17 @@ fun DebugScreenContent(
                 enabled = state.linkIdInput.isNotBlank(),
             ) {
                 Text(text = stringResource(resource = Res.string.debug_link_button_open))
+            }
+
+            Text(
+                text = stringResource(resource = Res.string.debug_pm_notification_title),
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            Button(
+                onClick = actions::onSendPrivateMessagesNotificationClicked,
+            ) {
+                Text(text = stringResource(resource = Res.string.debug_pm_notification_button_send))
             }
         }
     }

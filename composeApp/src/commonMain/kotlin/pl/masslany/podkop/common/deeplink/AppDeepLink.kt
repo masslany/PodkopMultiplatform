@@ -6,4 +6,6 @@ internal sealed interface AppDeepLink {
     data class LinkDetails(val id: Int) : AppDeepLink
 
     data class EntryDetails(val id: Int) : AppDeepLink
+
+    data object PrivateMessagesInbox : AppDeepLink
 }

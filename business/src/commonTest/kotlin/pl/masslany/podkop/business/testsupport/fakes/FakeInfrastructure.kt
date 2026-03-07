@@ -38,6 +38,8 @@ class FakeKeyValueStorage : KeyValueStorage {
         booleans.getOrPut(key) { MutableStateFlow(null) }.value = value
     }
 
+    override suspend fun getBoolean(key: String): Boolean? = booleans[key]?.value
+
     override fun observeBoolean(key: String): Flow<Boolean?> {
         return booleans.getOrPut(key) { MutableStateFlow(null) }
     }

@@ -7,10 +7,23 @@ import pl.masslany.podkop.common.navigation.ExternalBrowser
 import pl.masslany.podkop.common.platform.BuildInfo
 import pl.masslany.podkop.common.platform.ImageDownloader
 import pl.masslany.podkop.common.platform.ScreenshotExporter
+import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesBackgroundNotificationsController
 
 val mainModule = module {
     viewModelOf(::MainActivityViewModel)
     single { AndroidActivityHolder() }
+    single {
+        AndroidPrivateMessagesBackgroundNotificationsController(
+            application = androidApplication(),
+            authRepository = get(),
+            notificationsRepository = get(),
+            keyValueStorage = get(),
+            logger = get(),
+        )
+    }
+    single<PrivateMessagesBackgroundNotificationsController> {
+        get<AndroidPrivateMessagesBackgroundNotificationsController>()
+    }
     single {
         BuildInfo(
             isDebugBuild = BuildConfig.DEBUG,

@@ -9,6 +9,8 @@ val debugModule = module {
         DebugViewModel(
             appNavigator = get(),
             buildInfo = get(),
+            privateMessagesBackgroundNotificationsController = get(),
+            snackbarManager = get(),
             topBarActions = get(),
         )
     }

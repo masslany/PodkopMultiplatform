@@ -1,18 +1,25 @@
 package pl.masslany.podkop.features.debug
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.platform.BuildInfo
+import pl.masslany.podkop.common.snackbar.SnackbarManager
+import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
+import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesBackgroundNotificationsController
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 class DebugViewModel(
     private val appNavigator: AppNavigator,
     private val buildInfo: BuildInfo,
+    private val privateMessagesBackgroundNotificationsController: PrivateMessagesBackgroundNotificationsController,
+    private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
 ) : ViewModel(),
     DebugActions,
@@ -63,5 +70,15 @@ class DebugViewModel(
         }
 
         appNavigator.navigateTo(LinkDetailsScreen(id = linkId))
+    }
+
+    override fun onSendPrivateMessagesNotificationClicked() {
+        viewModelScope.launch {
+            val didShow = privateMessagesBackgroundNotificationsController
+                .showDebugPrivateMessagesNotification()
+            if (!didShow) {
+                snackbarManager.tryEmitGenericError()
+            }
+        }
     }
 }

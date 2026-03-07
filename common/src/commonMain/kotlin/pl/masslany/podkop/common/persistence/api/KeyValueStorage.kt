@@ -17,6 +17,8 @@ interface KeyValueStorage {
         value: Boolean,
     )
 
+    suspend fun getBoolean(key: String): Boolean?
+
     fun observeBoolean(key: String): Flow<Boolean?>
 
     suspend fun putLong(

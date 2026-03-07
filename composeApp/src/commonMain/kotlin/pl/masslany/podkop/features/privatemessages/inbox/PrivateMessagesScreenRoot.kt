@@ -23,6 +23,11 @@ internal fun PrivateMessagesScreenRoot(
         paginate = viewModel::paginate,
     )
 
+    PrivateMessagesNotificationPermissionEffect(
+        shouldRequestPermission = state.shouldRequestNotificationPermission,
+        onPermissionResult = viewModel::onNotificationPermissionResult,
+    )
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { _ ->

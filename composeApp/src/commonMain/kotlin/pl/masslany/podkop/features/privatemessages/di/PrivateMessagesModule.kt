@@ -10,7 +10,9 @@ import pl.masslany.podkop.features.privatemessages.newconversation.NewConversati
 val privateMessagesModule = module {
     viewModel {
         PrivateMessagesViewModel(
+            authRepository = get(),
             privateMessagesRepository = get(),
+            privateMessagesBackgroundNotificationsController = get(),
             appNavigator = get(),
             logger = get(),
             snackbarManager = get(),

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.privatemessages.domain.main.PrivateMessagesRepository
 import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessageConversation
 import pl.masslany.podkop.common.logging.api.AppLogger
@@ -25,7 +26,9 @@ import pl.masslany.podkop.features.privatemessages.models.PrivateMessagesScreenS
 import pl.masslany.podkop.features.privatemessages.models.toInboxConversationItemStates
 
 class PrivateMessagesViewModel(
+    private val authRepository: AuthRepository,
     private val privateMessagesRepository: PrivateMessagesRepository,
+    private val privateMessagesBackgroundNotificationsController: PrivateMessagesBackgroundNotificationsController,
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
@@ -70,6 +73,7 @@ class PrivateMessagesViewModel(
 
     init {
         loadData(showLoading = true)
+        onScreenOpened()
     }
 
     fun onTopBarBackClicked() {
@@ -88,11 +92,44 @@ class PrivateMessagesViewModel(
         loadData(showLoading = false)
     }
 
+    fun onNotificationPermissionResult(granted: Boolean) {
+        _state.update {
+            it.copy(shouldRequestNotificationPermission = false)
+        }
+        if (!granted) return
+
+        viewModelScope.launch {
+            privateMessagesBackgroundNotificationsController.onNotificationPermissionGranted()
+        }
+    }
+
     fun shouldPaginate(lastVisibleIndex: Int?, totalItems: Int): Boolean =
         paginator.shouldPaginate(lastVisibleIndex, totalItems)
 
     fun paginate() {
         paginator.paginate()
+    }
+
+    private fun onScreenOpened() {
+        viewModelScope.launch {
+            if (!authRepository.isLoggedIn()) {
+                _state.update {
+                    it.copy(shouldRequestNotificationPermission = false)
+                }
+                return@launch
+            }
+
+            if (privateMessagesBackgroundNotificationsController.areSystemNotificationsEnabled()) {
+                _state.update {
+                    it.copy(shouldRequestNotificationPermission = false)
+                }
+                privateMessagesBackgroundNotificationsController.onNotificationPermissionGranted()
+            } else {
+                _state.update {
+                    it.copy(shouldRequestNotificationPermission = true)
+                }
+            }
+        }
     }
 
     private fun loadData(showLoading: Boolean) {

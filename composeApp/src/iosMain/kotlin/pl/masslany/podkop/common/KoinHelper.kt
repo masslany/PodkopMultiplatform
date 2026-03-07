@@ -19,6 +19,8 @@ import pl.masslany.podkop.common.navigation.ExternalBrowser
 import pl.masslany.podkop.common.platform.BuildInfo
 import pl.masslany.podkop.common.platform.ImageDownloader
 import pl.masslany.podkop.common.platform.ScreenshotExporter
+import pl.masslany.podkop.features.privatemessages.inbox.NoOpPrivateMessagesBackgroundNotificationsController
+import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesBackgroundNotificationsController
 import pl.masslany.podkop.initKoin
 import platform.Foundation.NSBundle
 
@@ -47,6 +49,9 @@ val iOSModule = module {
         ScreenshotExporter(
             viewControllerProvider = get<IOSViewControllerHolder>().provider,
         )
+    }
+    single<PrivateMessagesBackgroundNotificationsController> {
+        NoOpPrivateMessagesBackgroundNotificationsController()
     }
 }
 

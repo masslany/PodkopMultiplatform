@@ -37,9 +37,7 @@ internal fun List<PrivateMessageConversation>.toInboxConversationItemStates(): L
         )
     }
 
-internal fun List<PrivateMessage>.toConversationMessageItemStates(): List<ConversationMessageItemState> = map {
-        message,
-    ->
+internal fun List<PrivateMessage>.toConversationMessageItemStates(): List<ConversationMessageItemState> = map { message ->
     val sender = message.sender
 
     val avatarUrl = sender?.avatarUrl

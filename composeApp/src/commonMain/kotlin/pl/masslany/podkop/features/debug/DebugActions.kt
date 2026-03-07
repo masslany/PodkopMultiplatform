@@ -12,4 +12,6 @@ interface DebugActions : TopBarActions {
     fun onLinkIdChanged(value: String)
 
     fun onOpenLinkClicked()
+
+    fun onSendPrivateMessagesNotificationClicked()
 }

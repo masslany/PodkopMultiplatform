@@ -24,6 +24,7 @@ object PrivateMessagesPreviewFixtures {
         isRefreshing = false,
         isError = false,
         isPaginating = false,
+        shouldRequestNotificationPermission = false,
         conversations = listOf(
             InboxConversationItemState(
                 username = "ZjemCiWanne",

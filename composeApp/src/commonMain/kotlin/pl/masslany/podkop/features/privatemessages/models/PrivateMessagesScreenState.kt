@@ -8,6 +8,7 @@ data class PrivateMessagesScreenState(
     val isRefreshing: Boolean,
     val isError: Boolean,
     val isPaginating: Boolean,
+    val shouldRequestNotificationPermission: Boolean,
     val conversations: ImmutableList<InboxConversationItemState>,
 ) {
     companion object {
@@ -16,6 +17,7 @@ data class PrivateMessagesScreenState(
             isRefreshing = false,
             isError = false,
             isPaginating = false,
+            shouldRequestNotificationPermission = false,
             conversations = persistentListOf(),
         )
     }
