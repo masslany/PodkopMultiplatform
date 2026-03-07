@@ -17,6 +17,29 @@ data class NotificationsStatus(
             tagsUnreadCount +
             observedDiscussionsUnreadCount
 
+    fun unreadCount(group: NotificationGroup): Int = when (group) {
+        NotificationGroup.Entries -> entriesUnreadCount
+        NotificationGroup.PrivateMessages -> privateMessagesUnreadCount
+        NotificationGroup.Tags -> tagsUnreadCount
+        NotificationGroup.ObservedDiscussions -> observedDiscussionsUnreadCount
+    }
+
+    fun withUnreadCount(
+        group: NotificationGroup,
+        unreadCount: Int,
+    ): NotificationsStatus = when (group) {
+        NotificationGroup.Entries -> copy(entriesUnreadCount = unreadCount)
+        NotificationGroup.PrivateMessages -> copy(privateMessagesUnreadCount = unreadCount)
+        NotificationGroup.Tags -> copy(tagsUnreadCount = unreadCount)
+        NotificationGroup.ObservedDiscussions -> copy(observedDiscussionsUnreadCount = unreadCount)
+    }
+
+    fun decrementUnreadCount(group: NotificationGroup): NotificationsStatus =
+        withUnreadCount(
+            group = group,
+            unreadCount = (unreadCount(group) - 1).coerceAtLeast(0),
+        )
+
     companion object {
         val empty = NotificationsStatus(
             privateMessagesEnabled = false,

@@ -17,6 +17,7 @@
     <string name="topbar_label_search">Szukaj</string>
     <string name="topbar_label_hits">Hity</string>
     <string name="topbar_label_favorites">Ulubione</string>
+    <string name="topbar_label_notifications">Powiadomienia</string>
 
     <!-- More -->
     <string name="more_group_social">Społeczność</string>
@@ -32,6 +33,42 @@
     <string name="more_profile_preview_unavailable">Twoje konto</string>
     <string name="more_snackbar_coming_soon">Wkrótce</string>
     <string name="more_about_title">O aplikacji</string>
+
+    <!-- Notifications -->
+    <string name="notifications_group_entries">Wpisy</string>
+    <string name="notifications_group_private_messages">Wiadomości prywatne</string>
+    <string name="notifications_group_tags">Tagi</string>
+    <string name="notifications_group_observed_discussions">Obserwowane dyskusje</string>
+    <string name="notifications_button_mark_all_read">Oznacz wszystkie jako przeczytane</string>
+    <string name="notifications_empty_state">Brak powiadomień w tej kategorii</string>
+    <string name="notifications_fallback_title">Powiadomienie</string>
+    <plurals name="notifications_tag_grouped_entries_action">
+        <item quantity="one">Masz %1$d nowy wpis w obserwowanym przez Ciebie tagu</item>
+        <item quantity="few">Masz %1$d nowe wpisy w obserwowanym przez Ciebie tagu</item>
+        <item quantity="other">Masz %1$d nowych wpisów w obserwowanym przez Ciebie tagu</item>
+    </plurals>
+    <plurals name="notifications_tag_grouped_links_action">
+        <item quantity="one">Masz %1$d nowe znalezisko w obserwowanym przez Ciebie tagu</item>
+        <item quantity="few">Masz %1$d nowe znaleziska w obserwowanym przez Ciebie tagu</item>
+        <item quantity="other">Masz %1$d nowych znalezisk w obserwowanym przez Ciebie tagu</item>
+    </plurals>
+    <plurals name="notifications_tag_grouped_generic_action">
+        <item quantity="one">Masz %1$d nowe powiadomienie w obserwowanym przez Ciebie tagu</item>
+        <item quantity="few">Masz %1$d nowe powiadomienia w obserwowanym przez Ciebie tagu</item>
+        <item quantity="other">Masz %1$d nowych powiadomień w obserwowanym przez Ciebie tagu</item>
+    </plurals>
+    <string name="notifications_observed_entry_comment_action">Komentarz do obserwowanego przez Ciebie wpisu</string>
+    <plurals name="notifications_observed_entry_comments_action">
+        <item quantity="one">%1$d nowy komentarz do wpisu</item>
+        <item quantity="few">%1$d nowe komentarze do wpisu</item>
+        <item quantity="other">%1$d nowych komentarzy do wpisu</item>
+    </plurals>
+    <string name="notifications_observed_link_comment_action">Komentarz do obserwowanego przez Ciebie znaleziska</string>
+    <plurals name="notifications_observed_link_comments_action">
+        <item quantity="one">%1$d nowy komentarz do znaleziska</item>
+        <item quantity="few">%1$d nowe komentarze do znaleziska</item>
+        <item quantity="other">%1$d nowych komentarzy do znaleziska</item>
+    </plurals>
 
     <!-- About -->
     <string name="app_name">Podkop</string>

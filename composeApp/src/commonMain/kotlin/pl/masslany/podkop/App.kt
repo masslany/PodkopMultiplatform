@@ -60,6 +60,8 @@ import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreenRoot
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenRoot
+import pl.masslany.podkop.features.notifications.NotificationsScreen
+import pl.masslany.podkop.features.notifications.NotificationsScreenRoot
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.ProfileScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
@@ -192,6 +194,12 @@ fun App() {
 
                     entry<SearchScreen> {
                         SearchScreenRoot(
+                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                        )
+                    }
+
+                    entry<NotificationsScreen> {
+                        NotificationsScreenRoot(
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )
                     }

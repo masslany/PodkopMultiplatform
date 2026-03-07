@@ -32,6 +32,7 @@ import pl.masslany.podkop.features.more.models.MoreSectionItemState
 import pl.masslany.podkop.features.more.models.MoreSectionItemType
 import pl.masslany.podkop.features.more.models.MoreSectionState
 import pl.masslany.podkop.features.more.models.MoreSectionType
+import pl.masslany.podkop.features.notifications.NotificationsScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import pl.masslany.podkop.features.search.SearchScreen
@@ -86,7 +87,7 @@ class MoreViewModel(
     }
 
     override fun onNotificationsClicked() {
-        emitComingSoon()
+        appNavigator.navigateTo(NotificationsScreen)
     }
 
     override fun onMessagesClicked() {
