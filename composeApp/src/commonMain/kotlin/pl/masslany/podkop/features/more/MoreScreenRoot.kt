@@ -160,6 +160,7 @@ private fun MoreScreenContentLoggedInPreview() {
                     isLoggedIn = true,
                     isOwnProfile = true,
                     isObserved = false,
+                    isBlacklisted = false,
                     canManageObservation = false,
                     canSendPrivateMessage = false,
                 ),

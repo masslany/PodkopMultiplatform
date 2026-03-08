@@ -81,6 +81,7 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
         contentType = ResourceType.EntryItem,
         authorState = authorState,
         avatarState = avatarState,
+        isBlacklisted = author?.blacklist == true,
         totalCommentsCount = this.comments?.count ?: 0,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         comments = this.comments?.items
@@ -154,6 +155,7 @@ private fun Comment.toEntryCommentItemState(parentId: Int? = null): EntryComment
         parentId = parentId ?: this.parentId,
         authorState = authorState,
         avatarState = avatarState,
+        isBlacklisted = this.blacklist || this.author.blacklist,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
         isFavourite = this.favourite,

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.auth.domain.AuthRepository
+import pl.masslany.podkop.business.blacklists.domain.main.BlacklistsRepository
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
@@ -39,6 +40,7 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 class ProfileViewModel(
     private val username: String,
     private val authRepository: AuthRepository,
+    private val blacklistsRepository: BlacklistsRepository,
     private val profileRepository: ProfileRepository,
     private val appNavigator: AppNavigator,
     private val resourceItemStateHolder: ResourceItemStateHolder,
@@ -177,6 +179,42 @@ class ProfileViewModel(
                 logger.error("Failed to update observed status for profile $username", it)
                 _state.update { previousState ->
                     previousState.copy(isObserveActionLoading = false)
+                }
+                snackbarManager.tryEmitGenericError()
+            }
+        }
+    }
+
+    override fun onBlacklistClicked() {
+        println("MEOW state = ${state.value}")
+        val header = state.value.header ?: return
+        if (!header.isLoggedIn || header.isOwnProfile || state.value.isBlacklistActionLoading) {
+            return
+        }
+
+        viewModelScope.launch {
+            val shouldBlacklist = !header.isBlacklisted
+            _state.update { previousState ->
+                previousState.copy(isBlacklistActionLoading = true)
+            }
+
+            val action = if (shouldBlacklist) {
+                blacklistsRepository.addBlacklistedUser(username)
+            } else {
+                blacklistsRepository.removeBlacklistedUser(username)
+            }
+
+            action.onSuccess {
+                _state.update { previousState ->
+                    previousState.copy(
+                        isBlacklistActionLoading = false,
+                        header = previousState.header?.copy(isBlacklisted = shouldBlacklist),
+                    )
+                }
+            }.onFailure {
+                logger.error("Failed to update blacklist status for profile $username", it)
+                _state.update { previousState ->
+                    previousState.copy(isBlacklistActionLoading = false)
                 }
                 snackbarManager.tryEmitGenericError()
             }

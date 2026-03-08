@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.auth.domain.AuthRepository
+import pl.masslany.podkop.business.blacklists.domain.main.BlacklistsRepository
 import pl.masslany.podkop.business.tags.domain.main.TagsRepository
 import pl.masslany.podkop.business.tags.domain.models.request.TagsSort
 import pl.masslany.podkop.business.tags.domain.models.request.TagsType
@@ -30,6 +31,7 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 class TagViewModel(
     private val tag: String,
     private val authRepository: AuthRepository,
+    private val blacklistsRepository: BlacklistsRepository,
     private val tagsRepository: TagsRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
@@ -217,6 +219,39 @@ class TagViewModel(
         }
     }
 
+    override fun onBlacklistClicked() {
+        if (!state.value.isLoggedIn || state.value.isBlacklistActionLoading) {
+            return
+        }
+
+        viewModelScope.launch {
+            val shouldBlacklist = !state.value.isBlacklisted
+            _state.update { previousState ->
+                previousState.updateBlacklistActionLoading(true)
+            }
+
+            val action = if (shouldBlacklist) {
+                blacklistsRepository.addBlacklistedTag(tag)
+            } else {
+                blacklistsRepository.removeBlacklistedTag(tag)
+            }
+
+            action.onSuccess {
+                _state.update { previousState ->
+                    previousState
+                        .updateBlacklisted(shouldBlacklist)
+                        .updateBlacklistActionLoading(false)
+                }
+            }.onFailure {
+                logger.error("Failed to update blacklist status for tag $tag", it)
+                _state.update { previousState ->
+                    previousState.updateBlacklistActionLoading(false)
+                }
+                snackbarManager.tryEmitGenericError()
+            }
+        }
+    }
+
     override fun onNotificationsClicked() {
         val currentState = state.value
         if (!currentState.isLoggedIn ||
@@ -276,6 +311,7 @@ class TagViewModel(
                                 isObserved = details.isObserved,
                                 areNotificationsEnabled = details.areNotificationsEnabled,
                             )
+                            .updateBlacklisted(details.isBlacklisted)
                             .updateTagContentError(false)
                     }
                 }

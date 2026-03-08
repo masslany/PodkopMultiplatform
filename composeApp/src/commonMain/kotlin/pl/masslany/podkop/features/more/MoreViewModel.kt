@@ -180,6 +180,7 @@ class MoreViewModel(
                         isLoggedIn = true,
                         isOwnProfile = true,
                         isObserved = false,
+                        isBlacklisted = false,
                         canManageObservation = false,
                         canSendPrivateMessage = false,
                     ),

@@ -79,6 +79,7 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
         parentId = this.parent?.id ?: 0,
         authorState = authorState,
         avatarState = avatarState,
+        isBlacklisted = author?.blacklist == true,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
         isFavourite = this.favourite,

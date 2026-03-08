@@ -57,6 +57,7 @@ fun MoreHeader(
             isLoggedIn = true,
             isOwnProfile = true,
             isObserved = false,
+            isBlacklisted = false,
             canManageObservation = false,
             canSendPrivateMessage = false,
         )
@@ -173,6 +174,7 @@ private fun MoreHeaderLoggedInPreview() {
                     isLoggedIn = true,
                     isOwnProfile = true,
                     isObserved = false,
+                    isBlacklisted = false,
                     canManageObservation = false,
                     canSendPrivateMessage = false,
                 ),

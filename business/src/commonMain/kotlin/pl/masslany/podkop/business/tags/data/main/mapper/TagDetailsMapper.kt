@@ -12,5 +12,6 @@ fun TagDetailsDto.toTagDetails(): TagDetails {
         media = media?.toMedia(),
         isObserved = follow ?: false,
         areNotificationsEnabled = notifications ?: false,
+        isBlacklisted = blacklist ?: false,
     )
 }

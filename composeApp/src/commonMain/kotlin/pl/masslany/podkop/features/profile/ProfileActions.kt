@@ -16,6 +16,8 @@ interface ProfileActions :
 
     fun onObserveClicked()
 
+    fun onBlacklistClicked()
+
     fun onPrivateMessageClicked()
 
     fun onSummarySelected(type: ProfileSummaryType)

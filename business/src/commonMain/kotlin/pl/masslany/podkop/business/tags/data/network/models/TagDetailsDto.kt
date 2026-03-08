@@ -6,6 +6,8 @@ import pl.masslany.podkop.business.common.data.network.models.common.MediaDto
 
 @Serializable
 data class TagDetailsDto(
+    @SerialName("blacklist")
+    val blacklist: Boolean? = null,
     @SerialName("name")
     val name: String? = null,
     @SerialName("description")

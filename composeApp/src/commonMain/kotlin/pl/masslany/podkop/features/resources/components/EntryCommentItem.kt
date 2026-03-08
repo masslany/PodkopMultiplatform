@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import pl.masslany.podkop.common.components.Author
 import pl.masslany.podkop.common.components.Avatar
+import pl.masslany.podkop.common.components.BlacklistedContentGate
 import pl.masslany.podkop.common.components.EmbedImage
 import pl.masslany.podkop.common.components.EntryContent
 import pl.masslany.podkop.common.components.Published
@@ -70,26 +71,31 @@ fun EntryCommentItem(
             )
         }
         Spacer(Modifier.size(8.dp))
-        EntryContent(
-            state = state.entryContentState,
-            onProfileClick = onProfileClick,
-            onTagClick = onTagClick,
-            onUrlClick = onUrlClick,
-        )
-        state.embedImageState?.let {
-            Spacer(Modifier.size(8.dp))
-            EmbedImage(
-                state = state.embedImageState,
-                onImageClick = { onImageClick(state.embedImageState.url) },
+        BlacklistedContentGate(
+            isBlacklisted = state.isBlacklisted,
+            revealKey = "entry_comment_${state.id}",
+        ) {
+            EntryContent(
+                state = state.entryContentState,
+                onProfileClick = onProfileClick,
+                onTagClick = onTagClick,
+                onUrlClick = onUrlClick,
             )
-        }
-        state.embedContentState?.let {
-            Spacer(Modifier.size(8.dp))
-            EmbedContent(
-                state = state.embedContentState,
-                onPreviewClick = { onEmbedPreviewClick(state.embedContentState) },
-                onFetchedContentClick = { onUrlClick(state.embedContentState.url) },
-            )
+            state.embedImageState?.let {
+                Spacer(Modifier.size(8.dp))
+                EmbedImage(
+                    state = state.embedImageState,
+                    onImageClick = { onImageClick(state.embedImageState.url) },
+                )
+            }
+            state.embedContentState?.let {
+                Spacer(Modifier.size(8.dp))
+                EmbedContent(
+                    state = state.embedContentState,
+                    onPreviewClick = { onEmbedPreviewClick(state.embedContentState) },
+                    onFetchedContentClick = { onUrlClick(state.embedContentState.url) },
+                )
+            }
         }
         if (showInlineActions) {
             Spacer(Modifier.size(2.dp))

@@ -40,6 +40,7 @@ internal fun Profile.toProfileHeaderState(
         isLoggedIn = isLoggedIn,
         isOwnProfile = isOwnProfile,
         isObserved = isObserved,
+        isBlacklisted = isBlacklisted,
         canManageObservation = observationEnabled,
         canSendPrivateMessage = privateMessageEnabled,
     )

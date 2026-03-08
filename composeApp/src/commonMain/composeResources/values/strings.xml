@@ -144,7 +144,6 @@
     <string name="accessibility_tag_enable_notifications">Włącz powiadomienia dla tagu</string>
     <string name="accessibility_tag_disable_notifications">Wyłącz powiadomienia dla tagu</string>
     <string name="accessibility_private_messages_new_conversation">Rozpocznij nową rozmowę</string>
-    <string name="accessibility_private_messages_open_image">Otwórz obraz z wiadomości</string>
 
     <!-- Profile -->
     <string name="profile_not_logged_in_message">Nie jesteś zalogowany</string>
@@ -231,8 +230,10 @@
     <!-- Comments -->
     <string name="comment_label_removed_by_moderator">Komentarz usunięty przez moderatora</string>
     <string name="comment_label_removed_by_author">Komentarz usunięty przez autora</string>
+    <string name="comment_label_blacklisted_user">Komentarz od użytkownika z czarnej listy</string>
     <string name="comment_button_load_all_comments">Pokaż wszystkie (%1$d)</string>
     <string name="comment_button_show_comments">Pokaż komentarze (%1$d)</string>
+    <string name="comment_button_show_blacklisted_content">Pokaż treść</string>
     <string name="comment_button_show_spoiler">Pokaż spoiler</string>
 
     <!-- Published time -->

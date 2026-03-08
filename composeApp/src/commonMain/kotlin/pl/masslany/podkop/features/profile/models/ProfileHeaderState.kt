@@ -13,6 +13,7 @@ data class ProfileHeaderState(
     val isLoggedIn: Boolean,
     val isOwnProfile: Boolean,
     val isObserved: Boolean,
+    val isBlacklisted: Boolean,
     val canManageObservation: Boolean,
     val canSendPrivateMessage: Boolean,
 )

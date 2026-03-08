@@ -9,4 +9,5 @@ data class TagDetails(
     val media: Media?,
     val isObserved: Boolean,
     val areNotificationsEnabled: Boolean,
+    val isBlacklisted: Boolean,
 )

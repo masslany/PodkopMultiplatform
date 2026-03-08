@@ -22,9 +22,11 @@ data class TagScreenState(
     val isPaginating: Boolean,
     val isLoggedIn: Boolean,
     val isObserved: Boolean,
+    val isBlacklisted: Boolean,
     val areNotificationsEnabled: Boolean,
     val canManageObservation: Boolean,
     val isObserveActionLoading: Boolean,
+    val isBlacklistActionLoading: Boolean,
     val isNotificationsActionLoading: Boolean,
 ) {
     companion object {
@@ -44,9 +46,11 @@ data class TagScreenState(
             isPaginating = false,
             isLoggedIn = false,
             isObserved = false,
+            isBlacklisted = false,
             areNotificationsEnabled = false,
             canManageObservation = false,
             isObserveActionLoading = false,
+            isBlacklistActionLoading = false,
             isNotificationsActionLoading = false,
         )
 
@@ -147,12 +151,20 @@ data class TagScreenState(
         canManageObservation = canManageObservation,
     )
 
+    fun updateBlacklisted(isBlacklisted: Boolean) = this.copy(
+        isBlacklisted = isBlacklisted,
+    )
+
     fun updateNotificationsEnabled(areNotificationsEnabled: Boolean) = this.copy(
         areNotificationsEnabled = areNotificationsEnabled,
     )
 
     fun updateObserveActionLoading(isLoading: Boolean) = this.copy(
         isObserveActionLoading = isLoading,
+    )
+
+    fun updateBlacklistActionLoading(isLoading: Boolean) = this.copy(
+        isBlacklistActionLoading = isLoading,
     )
 
     fun updateNotificationsActionLoading(isLoading: Boolean) = this.copy(

@@ -9,6 +9,7 @@ val tagModule = module {
         TagViewModel(
             tag = params.get<String>(),
             authRepository = get(),
+            blacklistsRepository = get(),
             tagsRepository = get(),
             resourceItemStateHolder = get(),
             logger = get(),

@@ -19,6 +19,7 @@ data class LinkCommentItemState(
     val parentId: Int,
     val avatarState: AvatarState,
     val authorState: AuthorState?,
+    val isBlacklisted: Boolean = false,
     val entryContentState: EntryContentState,
     val publishedTimeType: PublishedTimeType?,
     val voteState: VoteState,

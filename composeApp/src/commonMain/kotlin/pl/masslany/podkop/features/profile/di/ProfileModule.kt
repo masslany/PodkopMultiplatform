@@ -9,6 +9,7 @@ val profileModule = module {
         ProfileViewModel(
             username = params.get<String>(),
             authRepository = get(),
+            blacklistsRepository = get(),
             profileRepository = get(),
             appNavigator = get(),
             resourceItemStateHolder = get(),

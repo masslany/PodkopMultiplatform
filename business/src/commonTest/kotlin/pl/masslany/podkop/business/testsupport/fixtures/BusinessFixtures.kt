@@ -476,6 +476,7 @@ object BusinessFixtures {
     )
 
     fun tagDetailsDto(
+        blacklist: Boolean? = false,
         name: String? = "heheszki",
         description: String? = "Tag description",
         followers: Int? = 212,
@@ -484,6 +485,7 @@ object BusinessFixtures {
         notifications: Boolean? = false,
         actions: TagDetailsActionsDto? = tagDetailsActionsDto(),
     ): TagDetailsDto = TagDetailsDto(
+        blacklist = blacklist,
         name = name,
         description = description,
         followers = followers,
@@ -696,6 +698,7 @@ object BusinessFixtures {
         media: Media? = media(),
         isObserved: Boolean = false,
         areNotificationsEnabled: Boolean = false,
+        isBlacklisted: Boolean = false,
     ): TagDetails = TagDetails(
         name = name,
         description = description,
@@ -703,6 +706,7 @@ object BusinessFixtures {
         media = media,
         isObserved = isObserved,
         areNotificationsEnabled = areNotificationsEnabled,
+        isBlacklisted = isBlacklisted,
     )
 
     fun comment(
@@ -925,6 +929,7 @@ object BusinessFixtures {
         avatar: String = "https://example.com/profile.png",
         background: String = "https://example.com/bg.png",
         banned: BannedDto? = null,
+        blacklist: Boolean = false,
         canChangeGender: Boolean? = true,
         city: String = "Krakow",
         color: String = "green",
@@ -950,6 +955,7 @@ object BusinessFixtures {
         avatar = avatar,
         background = background,
         banned = banned,
+        blacklist = blacklist,
         canChangeGender = canChangeGender,
         city = city,
         color = color,
@@ -1122,6 +1128,7 @@ object BusinessFixtures {
         profileSummary: Summary = summary(),
         memberSince: LocalDateTime? = dateTime,
         isObserved: Boolean = true,
+        isBlacklisted: Boolean = false,
         canManageObservation: Boolean = true,
     ): Profile = Profile(
         name = name,
@@ -1132,6 +1139,7 @@ object BusinessFixtures {
         summary = profileSummary,
         memberSince = memberSince,
         isObserved = isObserved,
+        isBlacklisted = isBlacklisted,
         canManageObservation = canManageObservation,
     )
 

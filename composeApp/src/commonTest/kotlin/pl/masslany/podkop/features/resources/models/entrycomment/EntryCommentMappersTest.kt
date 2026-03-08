@@ -49,6 +49,17 @@ class EntryCommentMappersTest {
         assertEquals("comment-photo-key", state.embedImageState?.key)
         assertEquals("https://cdn.example/entry-comment.jpg", state.embedImageState?.url)
     }
+
+    @Test
+    fun `entry comment mapper hides blacklisted content`() {
+        val state = entryCommentResource(
+            author = author(blacklist = true),
+            content = "hidden entry comment",
+        ).toEntryCommentItemState()
+
+        assertEquals(true, state.isBlacklisted)
+        assertIs<EntryContentState.Content>(state.entryContentState)
+    }
 }
 
 private fun entryCommentResource(
@@ -58,11 +69,12 @@ private fun entryCommentResource(
     editable: Boolean = false,
     actions: Actions = actions(),
     media: Media = media(),
+    author: Author = author(),
 ): ResourceItem = ResourceItem(
     actions = actions,
     adult = adult,
     archive = false,
-    author = author(),
+    author = author,
     comments = null,
     content = content,
     createdAt = null,
@@ -88,9 +100,9 @@ private fun entryCommentResource(
     favourite = false,
 )
 
-private fun author(): Author = Author(
+private fun author(blacklist: Boolean = false): Author = Author(
     avatar = "",
-    blacklist = false,
+    blacklist = blacklist,
     color = NameColor.Orange,
     company = false,
     follow = false,

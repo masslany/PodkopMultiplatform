@@ -18,6 +18,7 @@ object NoOpProfileActions :
 
     override fun onRetryClicked() = Unit
     override fun onObserveClicked() = Unit
+    override fun onBlacklistClicked() = Unit
     override fun onPrivateMessageClicked() = Unit
     override fun onSummarySelected(type: ProfileSummaryType) = Unit
     override fun onSubActionExpandedChanged(expanded: Boolean) = Unit

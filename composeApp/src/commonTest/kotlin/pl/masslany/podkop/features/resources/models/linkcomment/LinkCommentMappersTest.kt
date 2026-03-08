@@ -211,6 +211,36 @@ class LinkCommentMappersTest {
     }
 
     @Test
+    fun `resource mapper hides blacklisted comment content`() {
+        val state = resourceLinkComment(
+            id = 135740393,
+            slug = "comment-slug",
+            parent = Parent(id = 7896627),
+            parentId = 7896627,
+            author = author(blacklist = true),
+        ).toLinkCommentItemState()
+
+        assertEquals(true, state.isBlacklisted)
+        assertIs<EntryContentState.Content>(state.entryContentState)
+    }
+
+    @Test
+    fun `comment mapper hides blacklisted reply content`() {
+        val state = commentLinkReply(
+            id = 135740683,
+            parentId = 135740393,
+            slug = "komentarz",
+            blacklist = true,
+        ).toLinkCommentItemState(
+            linkId = 7896627,
+            linkSlug = "emulator-x86-css-bez-javascriptu",
+        )
+
+        assertEquals(true, state.isBlacklisted)
+        assertIs<EntryContentState.Content>(state.entryContentState)
+    }
+
+    @Test
     fun `parentCommentIdOrNull returns null when parent id equals comment id`() {
         val state = commentLinkReply(
             id = 135740393,
@@ -254,11 +284,12 @@ private fun resourceLinkComment(
     editable: Boolean = false,
     actions: Actions = actions(),
     media: Media = media(),
+    author: Author? = null,
 ): ResourceItem = ResourceItem(
     actions = actions,
     adult = adult,
     archive = false,
-    author = null,
+    author = author,
     comments = comments,
     content = content,
     createdAt = null,
@@ -295,12 +326,13 @@ private fun commentLinkReply(
     editable: Boolean = false,
     actions: Actions = actions(),
     media: Media = media(),
+    blacklist: Boolean = false,
 ): Comment = Comment(
     actions = actions,
     adult = adult,
     archive = false,
     author = author(),
-    blacklist = false,
+    blacklist = blacklist,
     comments = null,
     content = content,
     createdAt = null,
@@ -325,9 +357,9 @@ private fun comments(vararg items: Comment): Comments = Comments(
     items = items.toList(),
 )
 
-private fun author(): Author = Author(
+private fun author(blacklist: Boolean = false): Author = Author(
     avatar = "",
-    blacklist = false,
+    blacklist = blacklist,
     color = NameColor.Orange,
     company = false,
     follow = false,

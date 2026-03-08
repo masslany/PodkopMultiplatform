@@ -1,6 +1,7 @@
 package pl.masslany.podkop.features.tag.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,8 +21,12 @@ import org.jetbrains.compose.resources.vectorResource
 import pl.masslany.podkop.features.tag.TagActions
 import pl.masslany.podkop.features.tag.TagScreenState
 import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.accessibility_lock_icon
 import podkop.composeapp.generated.resources.accessibility_tag_disable_notifications
 import podkop.composeapp.generated.resources.accessibility_tag_enable_notifications
+import podkop.composeapp.generated.resources.accessibility_unlock_icon
+import podkop.composeapp.generated.resources.ic_lock
+import podkop.composeapp.generated.resources.ic_lock_open_right
 import podkop.composeapp.generated.resources.ic_notifications_active
 import podkop.composeapp.generated.resources.ic_notifications_off
 import podkop.composeapp.generated.resources.ic_visibility_on
@@ -52,6 +57,30 @@ fun TagDetails(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
+                FilledTonalIconButton(
+                    modifier = Modifier.size(32.dp),
+                    onClick = actions::onBlacklistClicked,
+                    enabled = !state.isBlacklistActionLoading,
+                ) {
+                    Icon(
+                        modifier = Modifier.size(20.dp),
+                        imageVector = vectorResource(
+                            resource = if (state.isBlacklisted) {
+                                Res.drawable.ic_lock_open_right
+                            } else {
+                                Res.drawable.ic_lock
+                            },
+                        ),
+                        contentDescription = stringResource(
+                            resource = if (state.isBlacklisted) {
+                                Res.string.accessibility_unlock_icon
+                            } else {
+                                Res.string.accessibility_lock_icon
+                            },
+                        ),
+                    )
+                }
+
                 if (state.isObserved) {
                     val notificationsEnabled = state.areNotificationsEnabled
                     val notificationIcon = if (notificationsEnabled) {
@@ -96,6 +125,7 @@ fun TagDetails(
                     modifier = Modifier.defaultMinSize(minHeight = 32.dp),
                     onClick = actions::onObserveClicked,
                     enabled = !state.isObserveActionLoading,
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                 ) {
                     Icon(
                         modifier = Modifier.size(18.dp),

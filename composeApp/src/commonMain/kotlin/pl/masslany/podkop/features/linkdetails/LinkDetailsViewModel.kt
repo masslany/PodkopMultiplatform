@@ -508,8 +508,10 @@ class LinkDetailsViewModel(
         viewModelScope.launch {
             val result = when {
                 voted -> linksRepository.removeVoteOnRelatedLink(linkId = id, relatedId = relatedId)
+
                 direction == RelatedLinkVoteDirection.Up ->
                     linksRepository.voteUpOnRelatedLink(linkId = id, relatedId = relatedId)
+
                 else -> linksRepository.voteDownOnRelatedLink(linkId = id, relatedId = relatedId)
             }
 
@@ -913,16 +915,14 @@ private fun LinkDetailsCommentsState.toLoaded(): LinkDetailsCommentsState = Link
     sortMenuState = sortMenuState,
 )
 
-private fun Resources.toRelatedState(): LinkDetailsRelatedState {
-    return if (data.isEmpty()) {
-        LinkDetailsRelatedState.Empty
-    } else {
-        LinkDetailsRelatedState.Content(
-            items = data
-                .map { item -> item.toRelatedItemState() }
-                .toImmutableList(),
-        )
-    }
+private fun Resources.toRelatedState(): LinkDetailsRelatedState = if (data.isEmpty()) {
+    LinkDetailsRelatedState.Empty
+} else {
+    LinkDetailsRelatedState.Content(
+        items = data
+            .map { item -> item.toRelatedItemState() }
+            .toImmutableList(),
+    )
 }
 
 private fun LinkCommentItemState.applyVoteUp(isRemovingVote: Boolean): LinkCommentItemState = copy(

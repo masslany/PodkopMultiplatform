@@ -13,5 +13,6 @@ data class Profile(
     val summary: Summary,
     val memberSince: LocalDateTime?,
     val isObserved: Boolean,
+    val isBlacklisted: Boolean,
     val canManageObservation: Boolean,
 )

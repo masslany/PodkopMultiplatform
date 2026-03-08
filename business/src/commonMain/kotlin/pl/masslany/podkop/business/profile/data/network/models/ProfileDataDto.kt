@@ -17,6 +17,8 @@ data class ProfileDataDto(
     val background: String,
     @SerialName("banned")
     val banned: BannedDto? = null,
+    @SerialName("blacklist")
+    val blacklist: Boolean = false,
     @SerialName("can_change_gender")
     val canChangeGender: Boolean? = null,
     @SerialName("city")

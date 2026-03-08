@@ -30,5 +30,7 @@ interface TagActions :
 
     fun onObserveClicked()
 
+    fun onBlacklistClicked()
+
     fun onNotificationsClicked()
 }

@@ -15,6 +15,7 @@ fun ProfileDto.toProfile(): Profile {
         summary = data.summary.toSummary(),
         memberSince = data.memberSince,
         isObserved = data.follow,
+        isBlacklisted = data.blacklist,
         canManageObservation = data.actions.follow,
     )
 }

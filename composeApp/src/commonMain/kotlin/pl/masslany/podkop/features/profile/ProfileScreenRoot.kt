@@ -73,12 +73,16 @@ import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
+import podkop.composeapp.generated.resources.accessibility_lock_icon
 import podkop.composeapp.generated.resources.accessibility_profile_observe
 import podkop.composeapp.generated.resources.accessibility_profile_send_private_message
 import podkop.composeapp.generated.resources.accessibility_profile_unobserve
 import podkop.composeapp.generated.resources.accessibility_topbar_back
+import podkop.composeapp.generated.resources.accessibility_unlock_icon
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
+import podkop.composeapp.generated.resources.ic_lock
+import podkop.composeapp.generated.resources.ic_lock_open_right
 import podkop.composeapp.generated.resources.ic_mail
 import podkop.composeapp.generated.resources.ic_visibility_off
 import podkop.composeapp.generated.resources.ic_visibility_on
@@ -180,6 +184,31 @@ fun ProfileScreenContent(
                                     imageVector = vectorResource(resource = Res.drawable.ic_mail),
                                     contentDescription = stringResource(
                                         resource = Res.string.accessibility_profile_send_private_message,
+                                    ),
+                                )
+                            }
+                        }
+
+                        if (header.isLoggedIn && !header.isOwnProfile) {
+                            IconButton(
+                                onClick = actions::onBlacklistClicked,
+                                enabled = !state.isBlacklistActionLoading,
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(24.dp),
+                                    imageVector = vectorResource(
+                                        resource = if (header.isBlacklisted) {
+                                            Res.drawable.ic_lock_open_right
+                                        } else {
+                                            Res.drawable.ic_lock
+                                        },
+                                    ),
+                                    contentDescription = stringResource(
+                                        resource = if (header.isBlacklisted) {
+                                            Res.string.accessibility_unlock_icon
+                                        } else {
+                                            Res.string.accessibility_lock_icon
+                                        },
                                     ),
                                 )
                             }

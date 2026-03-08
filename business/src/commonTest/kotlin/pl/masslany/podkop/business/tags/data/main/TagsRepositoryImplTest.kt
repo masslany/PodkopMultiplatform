@@ -19,13 +19,14 @@ class TagsRepositoryImplTest {
             getTagDetailsResult = Result.success(
                 Fixtures.tagDetailsResponseDto(
                     data = Fixtures.tagDetailsDto(
+                        blacklist = true,
                         name = "compose",
                         description = "Compose tag",
                         followers = 44,
                         media = Fixtures.mediaDto(photo = Fixtures.photoDto(url = "https://example.com/banner.jpg")),
                         follow = true,
                         notifications = true,
-                        actions = Fixtures.tagDetailsActionsDto(blacklist = true),
+                        actions = Fixtures.tagDetailsActionsDto(blacklist = false),
                     ),
                 ),
             )
@@ -46,6 +47,7 @@ class TagsRepositoryImplTest {
                 media = Fixtures.media(photo = Fixtures.photo(url = "https://example.com/banner.jpg")),
                 isObserved = true,
                 areNotificationsEnabled = true,
+                isBlacklisted = true,
             ),
             actual.getOrThrow(),
         )

@@ -18,6 +18,7 @@ data class EntryItemState(
     override val contentType: ResourceType,
     val avatarState: AvatarState,
     val authorState: AuthorState?,
+    val isBlacklisted: Boolean = false,
     val totalCommentsCount: Int,
     val comments: ImmutableList<EntryCommentItemState>,
     val entryContentState: EntryContentState,

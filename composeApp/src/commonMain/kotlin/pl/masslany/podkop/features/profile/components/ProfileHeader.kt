@@ -218,6 +218,7 @@ private fun ProfileHeaderPreview() {
                 isLoggedIn = true,
                 isOwnProfile = false,
                 isObserved = true,
+                isBlacklisted = false,
                 canManageObservation = true,
                 canSendPrivateMessage = true,
             ),
