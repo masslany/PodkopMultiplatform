@@ -1,5 +1,4 @@
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -60,12 +59,4 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
 
     implementation(libs.androidx.activity.compose)
-}
-
-tasks {
-    withType<KotlinCompile> {
-        compilerOptions {
-            freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
-        }
-    }
 }

@@ -81,10 +81,6 @@ kotlin {
         }
     }
     
-    compilerOptions {
-        freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
-    }
-    
     sourceSets {
         androidMain.dependencies  {
             implementation(libs.ktor.client.android)
@@ -141,7 +137,6 @@ kotlin {
 
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
-            freeCompilerArgs.add("-XXLanguage:+ExplicitBackingFields")
         }
     }
 }
