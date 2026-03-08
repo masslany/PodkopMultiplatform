@@ -50,11 +50,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -70,6 +75,7 @@ import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
+import pl.masslany.podkop.common.theme.colorsPalette
 import pl.masslany.podkop.features.linkdetails.components.LinkDetailsHeader
 import pl.masslany.podkop.features.linkdetails.components.RelatedItem
 import pl.masslany.podkop.features.linkdetails.models.LinkDetailsCommentItemState
@@ -88,7 +94,15 @@ import podkop.composeapp.generated.resources.links_details_screen_no_comments
 import podkop.composeapp.generated.resources.links_details_screen_no_related
 import podkop.composeapp.generated.resources.links_details_screen_related_label
 
-private const val FAB_ITEMS_OFFSET = 10
+private const val FabItemsOffset = 10
+private val CardContentPadding = 16.dp
+private val CommentAccentWidth = 3.dp
+private val CommentAccentVerticalInset = 6.dp
+private val ReplyAccentSpacing = 4.dp
+private val ReplyContentExtraSpacing = 4.dp
+private val ReplyAccentOffset = CardContentPadding + ReplyAccentSpacing
+private val ReplyContentStartPadding =
+    ReplyAccentOffset + CommentAccentWidth + ReplyAccentSpacing + ReplyContentExtraSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -136,7 +150,7 @@ fun LinkDetailsScreenContent(
     val isScrollingUp = lazyListState.isScrollingUp()
     val showFab by remember(isScrollingUp) {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex > FAB_ITEMS_OFFSET && isScrollingUp
+            lazyListState.firstVisibleItemIndex > FabItemsOffset && isScrollingUp
         }
     }
     val showTitle by remember {
@@ -519,6 +533,8 @@ private fun LinkDetailsScreenList(
                         state = comment,
                         actions = actions,
                         isReplyEnabled = state.isLoggedIn,
+                        currentUsername = state.currentUsername,
+                        linkAuthorName = state.link?.authorState?.name,
                     )
                 }
 
@@ -548,6 +564,8 @@ private fun LinkDetailsCommentItem(
     state: LinkDetailsCommentItemState,
     actions: LinkDetailsActions,
     isReplyEnabled: Boolean,
+    currentUsername: String?,
+    linkAuthorName: String?,
 ) {
     Card(
         modifier = modifier
@@ -556,9 +574,23 @@ private fun LinkDetailsCommentItem(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
         ),
     ) {
-        Box {
-            Column(
-                modifier = Modifier.padding(16.dp),
+        Column(
+            modifier = Modifier.padding(
+                top = CardContentPadding,
+                end = CardContentPadding,
+                bottom = CardContentPadding,
+            ),
+        ) {
+            LinkCommentAccentLayout(
+                modifier = Modifier.fillMaxWidth(),
+                contentStartPadding = CardContentPadding,
+                lineOffsetX = 0.dp,
+                accent = resolveLinkCommentAccent(
+                    commentAuthor = state.comment.authorState?.name,
+                    linkAuthorName = linkAuthorName,
+                    parentCommentAuthorName = null,
+                    currentUsername = currentUsername,
+                ),
             ) {
                 LinkCommentItem(
                     modifier = Modifier.fillMaxWidth(),
@@ -606,17 +638,28 @@ private fun LinkDetailsCommentItem(
                         )
                     },
                 )
+            }
 
-                state.replies.forEach { reply ->
-                    Spacer(Modifier.size(8.dp))
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                    )
-                    Spacer(Modifier.size(8.dp))
+            state.replies.forEach { reply ->
+                Spacer(Modifier.size(12.dp))
+                HorizontalDivider(
+                    modifier = Modifier.padding(start = CardContentPadding),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                )
+                Spacer(Modifier.size(12.dp))
+                LinkCommentAccentLayout(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentStartPadding = ReplyContentStartPadding,
+                    lineOffsetX = ReplyAccentOffset,
+                    accent = resolveLinkCommentAccent(
+                        commentAuthor = reply.authorState?.name,
+                        linkAuthorName = linkAuthorName,
+                        parentCommentAuthorName = state.comment.authorState?.name,
+                        currentUsername = currentUsername,
+                    ),
+                ) {
                     LinkCommentItem(
-                        modifier = Modifier
-                            .padding(start = 12.dp)
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         state = reply,
                         isReplyEnabled = isReplyEnabled,
                         onProfileClick = { actions.onProfileClicked(it) },
@@ -662,36 +705,36 @@ private fun LinkDetailsCommentItem(
                         },
                     )
                 }
+            }
 
-                state.nextRepliesPage?.let { nextPage ->
-                    Spacer(Modifier.size(12.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        OutlinedButton(
-                            onClick = {
-                                actions.onShowMoreRepliesClicked(
-                                    commentId = state.id,
-                                    nextPage = nextPage,
-                                )
-                            },
-                            enabled = !state.isLoadingReplies,
-                        ) {
-                            if (state.isLoadingReplies) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp,
-                                )
-                                Spacer(Modifier.size(8.dp))
-                            }
-                            Text(
-                                text = stringResource(
-                                    resource = Res.string.comment_button_load_all_comments,
-                                    state.remainingRepliesCount,
-                                ),
+            state.nextRepliesPage?.let { nextPage ->
+                Spacer(Modifier.size(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            actions.onShowMoreRepliesClicked(
+                                commentId = state.id,
+                                nextPage = nextPage,
                             )
+                        },
+                        enabled = !state.isLoadingReplies,
+                    ) {
+                        if (state.isLoadingReplies) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                            )
+                            Spacer(Modifier.size(8.dp))
                         }
+                        Text(
+                            text = stringResource(
+                                resource = Res.string.comment_button_load_all_comments,
+                                state.remainingRepliesCount,
+                            ),
+                        )
                     }
                 }
             }
@@ -699,7 +742,69 @@ private fun LinkDetailsCommentItem(
     }
 }
 
-@Preview
+@Composable
+private fun LinkCommentAccentLayout(
+    accent: LinkCommentAccent?,
+    modifier: Modifier = Modifier,
+    contentStartPadding: Dp,
+    lineOffsetX: Dp,
+    content: @Composable () -> Unit,
+) {
+    val accentColor = when (accent) {
+        LinkCommentAccent.LinkAuthor -> MaterialTheme.colorsPalette.linkAuthor
+        LinkCommentAccent.ParentAuthor -> MaterialTheme.colorsPalette.commentAuthor
+        LinkCommentAccent.CurrentUser -> MaterialTheme.colorsPalette.currentUserAuthor
+        null -> null
+    }
+
+    Box(
+        modifier = modifier
+            .drawBehind {
+                if (accentColor == null) return@drawBehind
+
+                val lineWidth = CommentAccentWidth.toPx()
+                val verticalInset = CommentAccentVerticalInset.toPx()
+                val lineHeight = (size.height - verticalInset * 2).coerceAtLeast(0f)
+
+                drawRoundRect(
+                    color = accentColor,
+                    topLeft = Offset(lineOffsetX.toPx(), verticalInset),
+                    size = Size(lineWidth, lineHeight),
+                    cornerRadius = CornerRadius(lineWidth, lineWidth),
+                )
+            },
+    ) {
+        Box(
+            modifier = Modifier.padding(start = contentStartPadding)
+        ) {
+            content()
+        }
+    }
+}
+
+internal enum class LinkCommentAccent {
+    LinkAuthor,
+    ParentAuthor,
+    CurrentUser,
+}
+
+internal fun resolveLinkCommentAccent(
+    commentAuthor: String?,
+    linkAuthorName: String?,
+    parentCommentAuthorName: String?,
+    currentUsername: String?,
+): LinkCommentAccent? {
+    if (commentAuthor.isNullOrBlank()) return null
+
+    return when {
+        !currentUsername.isNullOrBlank() && commentAuthor == currentUsername -> LinkCommentAccent.CurrentUser
+        !linkAuthorName.isNullOrBlank() && commentAuthor == linkAuthorName -> LinkCommentAccent.LinkAuthor
+        !parentCommentAuthorName.isNullOrBlank() && commentAuthor == parentCommentAuthorName -> LinkCommentAccent.ParentAuthor
+        else -> null
+    }
+}
+
+@Preview(heightDp = 1350)
 @Composable
 private fun LinkDetailsScreenContentPreview(
     @PreviewParameter(LinkDetailsScreenStateProvider::class) state: LinkDetailsScreenState,

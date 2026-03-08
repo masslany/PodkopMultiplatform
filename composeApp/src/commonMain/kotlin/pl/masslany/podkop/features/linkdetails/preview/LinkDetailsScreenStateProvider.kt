@@ -4,6 +4,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.collections.immutable.persistentListOf
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
+import pl.masslany.podkop.common.preview.PreviewFixtures
 import pl.masslany.podkop.features.linkdetails.LinkDetailsCommentsState
 import pl.masslany.podkop.features.linkdetails.LinkDetailsRelatedState
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenState
@@ -13,8 +14,28 @@ import pl.masslany.podkop.features.resources.preview.LinkCommentItemStateProvide
 import pl.masslany.podkop.features.resources.preview.LinkItemStateProvider
 
 class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScreenState> {
-    private val link = LinkItemStateProvider().values.first()
+    private val link = LinkItemStateProvider().values.first().copy(
+        authorState = PreviewFixtures.authorState(name = "link_author"),
+    )
     private val comment = LinkCommentItemStateProvider().values.first()
+    private val authorComment = comment.copy(
+        authorState = PreviewFixtures.authorState(name = "link_author"),
+    )
+    private val parentAuthorReply = comment.copy(
+        id = 2,
+        authorState = PreviewFixtures.authorState(name = "thread_parent"),
+        replies = persistentListOf(
+            comment.copy(
+                id = 3,
+                parentId = 2,
+                authorState = PreviewFixtures.authorState(name = "thread_parent"),
+            ),
+        ),
+    )
+    private val currentUserComment = comment.copy(
+        id = 4,
+        authorState = PreviewFixtures.authorState(name = "patryk"),
+    )
 
     override val values: Sequence<LinkDetailsScreenState> = sequenceOf(
         LinkDetailsScreenState.initial.copy(isLoading = true),
@@ -39,8 +60,24 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
                 comments = persistentListOf(
                     LinkDetailsCommentItemState(
                         id = 1,
-                        comment = comment,
-                        replies = comment.replies,
+                        comment = authorComment,
+                        replies = authorComment.replies,
+                        remainingRepliesCount = 0,
+                        nextRepliesPage = null,
+                        isLoadingReplies = false,
+                    ),
+                    LinkDetailsCommentItemState(
+                        id = 2,
+                        comment = parentAuthorReply,
+                        replies = parentAuthorReply.replies,
+                        remainingRepliesCount = 0,
+                        nextRepliesPage = null,
+                        isLoadingReplies = false,
+                    ),
+                    LinkDetailsCommentItemState(
+                        id = 4,
+                        comment = currentUserComment,
+                        replies = currentUserComment.replies,
                         remainingRepliesCount = 0,
                         nextRepliesPage = null,
                         isLoadingReplies = false,

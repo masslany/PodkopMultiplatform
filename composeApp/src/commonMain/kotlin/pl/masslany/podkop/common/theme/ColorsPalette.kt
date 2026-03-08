@@ -22,7 +22,9 @@ data class ColorsPalette(
     val favouriteGold: Color = Color.Unspecified,
     val votePositive: Color = Color.Unspecified,
     val voteNegative: Color = Color.Unspecified,
-    val authorComment: Color = Color.Unspecified,
+    val commentAuthor: Color = Color.Unspecified,
+    val linkAuthor: Color = Color.Unspecified,
+    val currentUserAuthor: Color = Color.Unspecified,
 )
 
 val LightNameOrange = Color(color = 0xFFFF5100)
@@ -39,6 +41,7 @@ val LightFavouriteGold = Color(color = 0xFFFFC107)
 val LightVotePositive = Color(color = 0xFF74BD74)
 val LightVoteNegative = Color(color = 0xFFE7625A)
 val LightAuthorComment = Color(color = 0xFF3A3A3A)
+val LightLinkAuthor = Color(color = 0xFF3D83CC)
 
 val DarkNameOrange = Color(color = 0xFFFE5000)
 val DarkNameBurgundy = Color(color = 0xFFD20000)
@@ -54,6 +57,8 @@ val DarkFavouriteGold = Color(color = 0xFFFFC107)
 val DarkVotePositive = Color(color = 0xFF74BD74)
 val DarkVoteNegative = Color(color = 0xFFE7625A)
 val DarkAuthorComment = Color(color = 0xFFE5E5E5)
+val DarkLinkAuthor = Color(color = 0xFF3D83CC)
+
 
 val LightColorsPalette = ColorsPalette(
     nameOrange = LightNameOrange,
@@ -69,7 +74,9 @@ val LightColorsPalette = ColorsPalette(
     favouriteGold = LightFavouriteGold,
     votePositive = LightVotePositive,
     voteNegative = LightVoteNegative,
-    authorComment = LightAuthorComment,
+    commentAuthor = LightAuthorComment,
+    linkAuthor = LightLinkAuthor,
+    currentUserAuthor = LightNameGreen,
 )
 
 val DarkColorsPalette = ColorsPalette(
@@ -86,7 +93,9 @@ val DarkColorsPalette = ColorsPalette(
     favouriteGold = DarkFavouriteGold,
     votePositive = DarkVotePositive,
     voteNegative = DarkVoteNegative,
-    authorComment = DarkAuthorComment,
+    commentAuthor = DarkAuthorComment,
+    linkAuthor = DarkLinkAuthor,
+    currentUserAuthor = DarkNameGreen,
 )
 
 val LocalColorsPalette = staticCompositionLocalOf { ColorsPalette() }
