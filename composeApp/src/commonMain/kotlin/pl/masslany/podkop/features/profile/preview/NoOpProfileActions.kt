@@ -17,6 +17,8 @@ object NoOpProfileActions :
     TopBarActions by NoOpTopBarActions {
 
     override fun onRetryClicked() = Unit
+    override fun onObserveClicked() = Unit
+    override fun onPrivateMessageClicked() = Unit
     override fun onSummarySelected(type: ProfileSummaryType) = Unit
     override fun onSubActionExpandedChanged(expanded: Boolean) = Unit
     override fun onSubActionDismissed() = Unit

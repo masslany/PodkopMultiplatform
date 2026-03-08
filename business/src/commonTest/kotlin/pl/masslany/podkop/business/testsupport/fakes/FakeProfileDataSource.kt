@@ -36,6 +36,8 @@ class FakeProfileDataSource : ProfileDataSource {
     var getProfileShortResult: Result<ProfileShortDto> = unstubbedResult("ProfileDataSource.getProfileShort")
     var getProfileResult: Result<ProfileDto> = unstubbedResult("ProfileDataSource.getProfile")
     var getProfileByNameResult: Result<ProfileDto> = unstubbedResult("ProfileDataSource.getProfile(name)")
+    var observeUserResult: Result<Unit> = unstubbedResult("ProfileDataSource.observeUser")
+    var unobserveUserResult: Result<Unit> = unstubbedResult("ProfileDataSource.unobserveUser")
     var getUsersAutoCompleteResult: Result<UsersAutoCompleteResponseDto> =
         unstubbedResult("ProfileDataSource.getUsersAutoComplete")
     var resourceResult: Result<ResourceResponseDto> = unstubbedResult("ProfileDataSource.profileResource")
@@ -48,6 +50,8 @@ class FakeProfileDataSource : ProfileDataSource {
     var getProfileShortCalls = 0
     var getProfileCalls = 0
     val getProfileByNameCalls = mutableListOf<String>()
+    val observeUserCalls = mutableListOf<String>()
+    val unobserveUserCalls = mutableListOf<String>()
     val getUsersAutoCompleteCalls = mutableListOf<String>()
     val resourceCalls = mutableListOf<ResourceCall>()
     val getProfileObservedTagsCalls = mutableListOf<Pair<String, Int>>()
@@ -67,6 +71,16 @@ class FakeProfileDataSource : ProfileDataSource {
     override suspend fun getProfile(name: String): Result<ProfileDto> {
         getProfileByNameCalls += name
         return getProfileByNameResult
+    }
+
+    override suspend fun observeUser(username: String): Result<Unit> {
+        observeUserCalls += username
+        return observeUserResult
+    }
+
+    override suspend fun unobserveUser(username: String): Result<Unit> {
+        unobserveUserCalls += username
+        return unobserveUserResult
     }
 
     override suspend fun getUsersAutoComplete(query: String): Result<UsersAutoCompleteResponseDto> {

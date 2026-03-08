@@ -24,6 +24,14 @@ class ProfileDataSourceImpl(
         return profileApi.getProfile(name)
     }
 
+    override suspend fun observeUser(username: String): Result<Unit> {
+        return profileApi.observeUser(username)
+    }
+
+    override suspend fun unobserveUser(username: String): Result<Unit> {
+        return profileApi.unobserveUser(username)
+    }
+
     override suspend fun getUsersAutoComplete(query: String): Result<UsersAutoCompleteResponseDto> {
         return profileApi.getUsersAutoComplete(query)
     }

@@ -177,6 +177,11 @@ class MoreViewModel(
                         genderIndicatorType = profile.gender.toGenderIndicatorType(),
                         nameColorType = profile.color.toNameColorType(),
                         memberSinceState = profile.memberSince.toMemberSinceState(),
+                        isLoggedIn = true,
+                        isOwnProfile = true,
+                        isObserved = false,
+                        canManageObservation = false,
+                        canSendPrivateMessage = false,
                     ),
                     sections = buildMoreSections(
                         notificationsUnreadCount = notificationsRepository.status.value.totalUnreadCount,

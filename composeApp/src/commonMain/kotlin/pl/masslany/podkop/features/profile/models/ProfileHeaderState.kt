@@ -10,4 +10,9 @@ data class ProfileHeaderState(
     val genderIndicatorType: GenderIndicatorType,
     val nameColorType: NameColorType,
     val memberSinceState: MemberSinceState,
+    val isLoggedIn: Boolean,
+    val isOwnProfile: Boolean,
+    val isObserved: Boolean,
+    val canManageObservation: Boolean,
+    val canSendPrivateMessage: Boolean,
 )

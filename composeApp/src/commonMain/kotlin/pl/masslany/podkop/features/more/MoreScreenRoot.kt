@@ -157,6 +157,11 @@ private fun MoreScreenContentLoggedInPreview() {
                         years = 6,
                         months = 2,
                     ),
+                    isLoggedIn = true,
+                    isOwnProfile = true,
+                    isObserved = false,
+                    canManageObservation = false,
+                    canSendPrivateMessage = false,
                 ),
                 sections = persistentListOf(
                     MoreSectionState(

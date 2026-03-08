@@ -12,4 +12,6 @@ data class Profile(
     val backgroundUrl: String,
     val summary: Summary,
     val memberSince: LocalDateTime?,
+    val isObserved: Boolean,
+    val canManageObservation: Boolean,
 )

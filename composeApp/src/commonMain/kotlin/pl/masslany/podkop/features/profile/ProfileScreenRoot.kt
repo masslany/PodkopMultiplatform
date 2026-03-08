@@ -73,9 +73,15 @@ import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
+import podkop.composeapp.generated.resources.accessibility_profile_observe
+import podkop.composeapp.generated.resources.accessibility_profile_send_private_message
+import podkop.composeapp.generated.resources.accessibility_profile_unobserve
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
+import podkop.composeapp.generated.resources.ic_mail
+import podkop.composeapp.generated.resources.ic_visibility_off
+import podkop.composeapp.generated.resources.ic_visibility_on
 import podkop.composeapp.generated.resources.profile_no_observed_tags
 import podkop.composeapp.generated.resources.profile_no_observed_users
 import podkop.composeapp.generated.resources.topbar_label_profile
@@ -163,6 +169,46 @@ fun ProfileScreenContent(
                                 resource = Res.string.accessibility_topbar_back,
                             ),
                         )
+                    }
+                },
+                actions = {
+                    state.header?.let { header ->
+                        if (header.canSendPrivateMessage) {
+                            IconButton(onClick = actions::onPrivateMessageClicked) {
+                                Icon(
+                                    modifier = Modifier.size(24.dp),
+                                    imageVector = vectorResource(resource = Res.drawable.ic_mail),
+                                    contentDescription = stringResource(
+                                        resource = Res.string.accessibility_profile_send_private_message,
+                                    ),
+                                )
+                            }
+                        }
+
+                        if (header.canManageObservation) {
+                            IconButton(
+                                onClick = actions::onObserveClicked,
+                                enabled = !state.isObserveActionLoading,
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(24.dp),
+                                    imageVector = vectorResource(
+                                        resource = if (header.isObserved) {
+                                            Res.drawable.ic_visibility_off
+                                        } else {
+                                            Res.drawable.ic_visibility_on
+                                        },
+                                    ),
+                                    contentDescription = stringResource(
+                                        resource = if (header.isObserved) {
+                                            Res.string.accessibility_profile_unobserve
+                                        } else {
+                                            Res.string.accessibility_profile_observe
+                                        },
+                                    ),
+                                )
+                            }
+                        }
                     }
                 },
                 scrollBehavior = scrollBehavior,

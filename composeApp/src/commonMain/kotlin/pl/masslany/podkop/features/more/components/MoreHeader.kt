@@ -54,6 +54,11 @@ fun MoreHeader(
             genderIndicatorType = GenderIndicatorType.Unspecified,
             nameColorType = NameColorType.Orange,
             memberSinceState = MemberSinceState.Unknown,
+            isLoggedIn = true,
+            isOwnProfile = true,
+            isObserved = false,
+            canManageObservation = false,
+            canSendPrivateMessage = false,
         )
 
         Box(
@@ -165,6 +170,11 @@ private fun MoreHeaderLoggedInPreview() {
                     genderIndicatorType = GenderIndicatorType.Unspecified,
                     nameColorType = NameColorType.Orange,
                     memberSinceState = MemberSinceState.Years(years = 2),
+                    isLoggedIn = true,
+                    isOwnProfile = true,
+                    isObserved = false,
+                    canManageObservation = false,
+                    canSendPrivateMessage = false,
                 ),
                 sections = persistentListOf(),
             ),

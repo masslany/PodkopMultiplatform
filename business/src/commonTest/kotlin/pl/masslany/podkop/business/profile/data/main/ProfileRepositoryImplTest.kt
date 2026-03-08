@@ -179,6 +179,32 @@ class ProfileRepositoryImplTest {
     }
 
     @Test
+    fun `observe user forwards username`() = runBlocking {
+        val profileDataSource = FakeProfileDataSource().apply {
+            observeUserResult = Result.success(Unit)
+        }
+        val sut = createSut(profileDataSource)
+
+        val actual = sut.observeUser("alice")
+
+        assertEquals(listOf("alice"), profileDataSource.observeUserCalls)
+        assertEquals(Unit, actual.getOrThrow())
+    }
+
+    @Test
+    fun `unobserve user forwards username`() = runBlocking {
+        val profileDataSource = FakeProfileDataSource().apply {
+            unobserveUserResult = Result.success(Unit)
+        }
+        val sut = createSut(profileDataSource)
+
+        val actual = sut.unobserveUser("alice")
+
+        assertEquals(listOf("alice"), profileDataSource.unobserveUserCalls)
+        assertEquals(Unit, actual.getOrThrow())
+    }
+
+    @Test
     fun `get users auto complete forwards query and maps response`() = runBlocking {
         val profileDataSource = FakeProfileDataSource().apply {
             getUsersAutoCompleteResult = Result.success(

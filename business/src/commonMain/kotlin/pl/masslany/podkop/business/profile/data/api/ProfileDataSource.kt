@@ -14,6 +14,10 @@ interface ProfileDataSource {
 
     suspend fun getProfile(name: String): Result<ProfileDto>
 
+    suspend fun observeUser(username: String): Result<Unit>
+
+    suspend fun unobserveUser(username: String): Result<Unit>
+
     suspend fun getUsersAutoComplete(query: String): Result<UsersAutoCompleteResponseDto>
 
     suspend fun getProfileActions(

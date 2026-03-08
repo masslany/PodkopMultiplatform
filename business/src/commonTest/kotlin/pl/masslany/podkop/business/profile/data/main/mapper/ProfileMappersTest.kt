@@ -140,6 +140,8 @@ class ProfileMappersTest {
             name = "Display Name",
             avatar = "avatar-url",
             background = "bg-url",
+            follow = false,
+            actions = Fixtures.profileActionsDto(follow = true),
             color = "burgundy",
             gender = null,
             memberSince = Fixtures.dateTime,
@@ -156,6 +158,8 @@ class ProfileMappersTest {
                 backgroundUrl = "bg-url",
                 profileSummary = Fixtures.summary(actions = 1, entries = 2, followers = 3, followingTags = 4, followingUsers = 5, links = 6),
                 memberSince = Fixtures.dateTime,
+                isObserved = false,
+                canManageObservation = true,
             ),
             dto.toProfile(),
         )

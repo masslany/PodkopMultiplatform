@@ -53,6 +53,32 @@ class ProfileApiClient(
         )
     }
 
+    override suspend fun observeUser(username: String): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/observed/users/$username",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(Unit) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun unobserveUser(username: String): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.DELETE,
+                path = "api/v3/observed/users/$username",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(Unit) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
     override suspend fun getUsersAutoComplete(query: String): Result<UsersAutoCompleteResponseDto> {
         val queryParams =
             mutableMapOf(

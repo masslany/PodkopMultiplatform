@@ -1121,6 +1121,8 @@ object BusinessFixtures {
         backgroundUrl: String = "https://example.com/bg.png",
         profileSummary: Summary = summary(),
         memberSince: LocalDateTime? = dateTime,
+        isObserved: Boolean = true,
+        canManageObservation: Boolean = true,
     ): Profile = Profile(
         name = name,
         avatarUrl = avatarUrl,
@@ -1129,6 +1131,8 @@ object BusinessFixtures {
         backgroundUrl = backgroundUrl,
         summary = profileSummary,
         memberSince = memberSince,
+        isObserved = isObserved,
+        canManageObservation = canManageObservation,
     )
 
     fun profileShort(

@@ -137,6 +137,9 @@
     <string name="accessibility_unlock_icon">Odblokuj</string>
     <string name="accessibility_fab_scroll_to_top">Przewiń do góry</string>
     <string name="accessibility_resource_more_actions">Więcej akcji</string>
+    <string name="accessibility_profile_observe">Obserwuj użytkownika</string>
+    <string name="accessibility_profile_send_private_message">Wyślij wiadomość prywatną</string>
+    <string name="accessibility_profile_unobserve">Przestań obserwować użytkownika</string>
     <string name="accessibility_tag_gallery_open_entry">Otwórz wpis</string>
     <string name="accessibility_tag_enable_notifications">Włącz powiadomienia dla tagu</string>
     <string name="accessibility_tag_disable_notifications">Wyłącz powiadomienia dla tagu</string>

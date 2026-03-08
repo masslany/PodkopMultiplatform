@@ -211,10 +211,15 @@ private fun ProfileHeaderPreview() {
             state = ProfileHeaderState(
                 username = "patryk",
                 avatarUrl = "https://picsum.photos/seed/profile-avatar/160/160",
-                backgroundUrl = "https://picsum.photos/seed/profile-bg/1200/600",
+                backgroundUrl = "",
                 genderIndicatorType = GenderIndicatorType.Male,
                 nameColorType = NameColorType.Orange,
                 memberSinceState = MemberSinceState.YearsAndMonths(years = 6, months = 2),
+                isLoggedIn = true,
+                isOwnProfile = false,
+                isObserved = true,
+                canManageObservation = true,
+                canSendPrivateMessage = true,
             ),
         )
     }

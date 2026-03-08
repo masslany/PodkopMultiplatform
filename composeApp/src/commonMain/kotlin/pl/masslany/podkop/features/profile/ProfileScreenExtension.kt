@@ -2,6 +2,7 @@ package pl.masslany.podkop.features.profile
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.business.profile.domain.models.ObservedTag
@@ -21,15 +22,28 @@ import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionType
 import pl.masslany.podkop.features.profile.models.ProfileSummaryItem
 
-internal fun Profile.toProfileHeaderState(): ProfileHeaderState =
-    ProfileHeaderState(
+internal fun Profile.toProfileHeaderState(
+    isLoggedIn: Boolean,
+    viewerUsername: String?,
+): ProfileHeaderState {
+    val isOwnProfile = viewerUsername?.equals(name, ignoreCase = true) == true
+    val observationEnabled = isLoggedIn && !isOwnProfile && canManageObservation
+    val privateMessageEnabled = isLoggedIn && !isOwnProfile && (viewerUsername != null || observationEnabled)
+
+    return ProfileHeaderState(
         username = name,
         avatarUrl = avatarUrl,
         backgroundUrl = backgroundUrl,
         genderIndicatorType = gender.toGenderIndicatorType(),
         nameColorType = color.toNameColorType(),
         memberSinceState = memberSince.toMemberSinceState(),
+        isLoggedIn = isLoggedIn,
+        isOwnProfile = isOwnProfile,
+        isObserved = isObserved,
+        canManageObservation = observationEnabled,
+        canSendPrivateMessage = privateMessageEnabled,
     )
+}
 
 internal fun Summary.toSummaryItems(): ImmutableList<ProfileSummaryItem> =
     persistentListOf(
@@ -116,6 +130,15 @@ internal fun ObservedTag.toItemState(): ProfileObservedTagItemState = ProfileObs
     name = name,
     pinned = pinned,
 )
+
+internal fun ImmutableList<ProfileSummaryItem>.updateFollowersCount(delta: Int): ImmutableList<ProfileSummaryItem> =
+    map { item ->
+        if (item is ProfileSummaryItem.Followers) {
+            ProfileSummaryItem.Followers((item.value + delta).coerceAtLeast(0))
+        } else {
+            item
+        }
+    }.toImmutableList()
 
 internal fun List<ProfileListItem>.appendDistinct(incomingItems: List<ProfileListItem>): List<ProfileListItem> {
     val knownIds = mapTo(mutableSetOf()) { it.uniqueKey() }

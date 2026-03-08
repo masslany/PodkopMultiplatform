@@ -56,6 +56,18 @@ class ProfileRepositoryImpl(
         }
     }
 
+    override suspend fun observeUser(username: String): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            profileDataSource.observeUser(username)
+        }
+    }
+
+    override suspend fun unobserveUser(username: String): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            profileDataSource.unobserveUser(username)
+        }
+    }
+
     override suspend fun getUsersAutoComplete(query: String): Result<UsersAutoComplete> {
         return withContext(dispatcherProvider.io) {
             profileDataSource.getUsersAutoComplete(query).mapCatching {

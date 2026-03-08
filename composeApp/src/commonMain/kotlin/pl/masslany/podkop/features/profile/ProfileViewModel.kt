@@ -11,14 +11,17 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
+import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.pagination.toPage
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.privatemessages.ConversationScreen
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileListItem
 import pl.masslany.podkop.features.profile.models.ProfileSubActionState
@@ -35,7 +38,9 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 
 class ProfileViewModel(
     private val username: String,
+    private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
+    private val appNavigator: AppNavigator,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
@@ -140,6 +145,53 @@ class ProfileViewModel(
         }
     }
 
+    override fun onObserveClicked() {
+        val header = state.value.header ?: return
+        if (!header.canManageObservation || state.value.isObserveActionLoading) {
+            return
+        }
+
+        viewModelScope.launch {
+            val shouldObserve = !header.isObserved
+            _state.update { previousState ->
+                previousState.copy(isObserveActionLoading = true)
+            }
+
+            val action = if (shouldObserve) {
+                profileRepository.observeUser(username)
+            } else {
+                profileRepository.unobserveUser(username)
+            }
+
+            action.onSuccess {
+                _state.update { previousState ->
+                    previousState.copy(
+                        isObserveActionLoading = false,
+                        header = previousState.header?.copy(isObserved = shouldObserve),
+                        summary = previousState.summary.updateFollowersCount(
+                            delta = if (shouldObserve) 1 else -1,
+                        ),
+                    )
+                }
+            }.onFailure {
+                logger.error("Failed to update observed status for profile $username", it)
+                _state.update { previousState ->
+                    previousState.copy(isObserveActionLoading = false)
+                }
+                snackbarManager.tryEmitGenericError()
+            }
+        }
+    }
+
+    override fun onPrivateMessageClicked() {
+        val header = state.value.header ?: return
+        if (!header.canSendPrivateMessage) {
+            return
+        }
+
+        appNavigator.navigateTo(ConversationScreen(username = username))
+    }
+
     override fun onSummarySelected(type: ProfileSummaryType) {
         val currentSummaryType = _state.value.selectedSummaryType
         val subActionItems = type.toSubActionItems()
@@ -233,6 +285,7 @@ class ProfileViewModel(
                 isError = false,
                 isResourcesLoading = false,
                 isPaginating = false,
+                isObserveActionLoading = false,
                 header = null,
                 summary = persistentListOf(),
                 selectedSummaryType = ProfileSummaryType.Actions,
@@ -244,6 +297,8 @@ class ProfileViewModel(
                 listContent = ProfileListContentState.Empty,
             )
         }
+
+        val viewerContext = resolveViewerContext()
 
         profileRepository.getProfile(username)
             .onSuccess { profile ->
@@ -257,7 +312,10 @@ class ProfileViewModel(
                         isLoading = false,
                         isError = false,
                         isResourcesLoading = false,
-                        header = profile.toProfileHeaderState(),
+                        header = profile.toProfileHeaderState(
+                            isLoggedIn = viewerContext.isLoggedIn,
+                            viewerUsername = viewerContext.username,
+                        ),
                         summary = profile.summary.toSummaryItems(),
                         selectedSummaryType = selectedSummaryType,
                         subActionState = ProfileSubActionState(
@@ -282,6 +340,7 @@ class ProfileViewModel(
                         isLoading = false,
                         isError = true,
                         isResourcesLoading = false,
+                        isObserveActionLoading = false,
                         header = null,
                         summary = persistentListOf(),
                         selectedSummaryType = ProfileSummaryType.Actions,
@@ -295,6 +354,28 @@ class ProfileViewModel(
                 }
                 logger.error("Failed to load profile", it)
             }
+    }
+
+    private suspend fun resolveViewerContext(): ViewerContext {
+        val isLoggedIn = authRepository.isLoggedIn()
+        if (!isLoggedIn) {
+            return ViewerContext(
+                isLoggedIn = false,
+                username = null,
+            )
+        }
+
+        val viewerUsername = profileRepository.getProfileShort()
+            .onFailure {
+                logger.warn("Failed to resolve viewer username for profile screen $username", it)
+            }
+            .getOrNull()
+            ?.name
+
+        return ViewerContext(
+            isLoggedIn = true,
+            username = viewerUsername,
+        )
     }
 
     private suspend fun loadItemsForSubAction(
@@ -433,4 +514,6 @@ class ProfileViewModel(
     }
 
     private data class CachedProfileItems(val items: List<ProfileListItem>, val pagination: Pagination?)
+
+    private data class ViewerContext(val isLoggedIn: Boolean, val username: String?)
 }

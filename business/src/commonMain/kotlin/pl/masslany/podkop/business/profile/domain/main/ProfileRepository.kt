@@ -14,6 +14,10 @@ interface ProfileRepository {
 
     suspend fun getProfile(name: String): Result<Profile>
 
+    suspend fun observeUser(username: String): Result<Unit>
+
+    suspend fun unobserveUser(username: String): Result<Unit>
+
     suspend fun getUsersAutoComplete(query: String): Result<UsersAutoComplete>
 
     suspend fun getProfileActions(

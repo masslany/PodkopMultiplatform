@@ -14,6 +14,10 @@ interface ProfileActions :
     PaginationActions {
     fun onRetryClicked()
 
+    fun onObserveClicked()
+
+    fun onPrivateMessageClicked()
+
     fun onSummarySelected(type: ProfileSummaryType)
 
     fun onSubActionExpandedChanged(expanded: Boolean)

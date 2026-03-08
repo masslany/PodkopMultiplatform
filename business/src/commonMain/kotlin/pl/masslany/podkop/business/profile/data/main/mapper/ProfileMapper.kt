@@ -14,5 +14,7 @@ fun ProfileDto.toProfile(): Profile {
         backgroundUrl = data.background,
         summary = data.summary.toSummary(),
         memberSince = data.memberSince,
+        isObserved = data.follow,
+        canManageObservation = data.actions.follow,
     )
 }
