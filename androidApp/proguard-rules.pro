@@ -24,3 +24,6 @@
 -dontwarn org.slf4j.impl.StaticLoggerBinder
 ##---------------End: proguard configuration for Pusher Java Client  ----------
 
+# Room instantiates generated database implementations reflectively.
+# In minified builds the no-arg constructor must be preserved as well.
+-keep class * extends androidx.room.RoomDatabase { <init>(); }
