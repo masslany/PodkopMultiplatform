@@ -36,6 +36,9 @@ android {
             versionNameSuffix = "-debug"
         }
         release {
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
