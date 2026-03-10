@@ -60,6 +60,7 @@ import podkop.composeapp.generated.resources.profile_header_years_since
 fun ProfileHeader(
     state: ProfileHeaderState,
     isDetailsExpanded: Boolean,
+    isDetailsToggleVisible: Boolean,
     onDetailsToggleClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -176,21 +177,22 @@ fun ProfileHeader(
                             )
                         }
                     }
-
-                    IconButton(onClick = onDetailsToggleClicked) {
-                        Icon(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .rotate(if (isDetailsExpanded) 270f else 90f),
-                            imageVector = vectorResource(resource = Res.drawable.ic_chevron_forward),
-                            contentDescription = stringResource(
-                                resource = if (isDetailsExpanded) {
-                                    Res.string.accessibility_profile_collapse_details
-                                } else {
-                                    Res.string.accessibility_profile_expand_details
-                                },
-                            ),
-                        )
+                    if (isDetailsToggleVisible) {
+                        IconButton(onClick = onDetailsToggleClicked) {
+                            Icon(
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .rotate(if (isDetailsExpanded) 270f else 90f),
+                                imageVector = vectorResource(resource = Res.drawable.ic_chevron_forward),
+                                contentDescription = stringResource(
+                                    resource = if (isDetailsExpanded) {
+                                        Res.string.accessibility_profile_collapse_details
+                                    } else {
+                                        Res.string.accessibility_profile_expand_details
+                                    },
+                                ),
+                            )
+                        }
                     }
                 }
             }
@@ -294,6 +296,7 @@ private fun ProfileHeaderPreview() {
                 canSendPrivateMessage = true,
             ),
             isDetailsExpanded = false,
+            isDetailsToggleVisible = true,
             onDetailsToggleClicked = {},
         )
     }

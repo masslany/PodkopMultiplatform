@@ -344,9 +344,10 @@ private fun ProfileLoadedContent(
                 ProfileHeader(
                     state = state.header,
                     isDetailsExpanded = state.isDetailsExpanded,
+                    isDetailsToggleVisible = true,
                     onDetailsToggleClicked = actions::onDetailsToggleClicked,
                 )
-                Spacer(modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.size(8.dp))
             }
         }
 
@@ -358,7 +359,7 @@ private fun ProfileLoadedContent(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    if (state.header?.isLoggedIn == true) {
+                    if (state.header?.isLoggedIn == true && !state.header.isOwnProfile) {
                         ProfileNoteSection(
                             state = state.noteState,
                             onContentChanged = actions::onNoteContentChanged,

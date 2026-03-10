@@ -71,6 +71,7 @@ fun MoreHeader(
             ProfileHeader(
                 state = state.profileHeader ?: fallbackHeaderState,
                 isDetailsExpanded = false,
+                isDetailsToggleVisible = false,
                 onDetailsToggleClicked = {},
             )
         }
