@@ -1,11 +1,8 @@
 package pl.masslany.podkop.features.home
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
@@ -21,6 +18,10 @@ import pl.masslany.podkop.features.upcoming.UpcomingScreen
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_home
 import podkop.composeapp.generated.resources.navigation_label_homepage
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class HomeNavigatorTest {
 
@@ -117,6 +118,42 @@ class HomeNavigatorTest {
         yield()
 
         assertFalse(sut.onBack())
+    }
+
+    @Test
+    fun `restored state keeps the selected tab and inline stack after destinations load`() = runBlocking {
+        val sut = createNavigator(
+            destinations = persistentListOf(
+                topLevelDestination(LinksScreen),
+                topLevelDestination(UpcomingScreen),
+                topLevelDestination(EntriesScreen),
+            ),
+        )
+        val serializedState = HomeNavigatorStateSerializer.serialize(
+            HomeNavigatorState(
+                currentTabRoot = EntriesScreen,
+                stacks = persistentMapOf(
+                    LinksScreen to persistentListOf(LinksScreen),
+                    UpcomingScreen to persistentListOf(UpcomingScreen),
+                    EntriesScreen to persistentListOf(
+                        EntriesScreen,
+                        EntryDetailsScreen.forEntry(44),
+                    ),
+                ),
+            ),
+        )
+
+        sut.restoreState(serializedState)
+        yield()
+
+        assertEquals(EntriesScreen, sut.state.value.currentTabRoot)
+        assertEquals(
+            persistentListOf(
+                EntriesScreen,
+                EntryDetailsScreen.forEntry(44),
+            ),
+            sut.currentStack(),
+        )
     }
 }
 

@@ -1,11 +1,14 @@
 package pl.masslany.podkop.features.home
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.HomeScreen
@@ -18,6 +21,7 @@ class HomeViewModel(
     private val appNavigator: AppNavigator,
     private val homeNavigator: HomeNavigator,
     private val logger: AppLogger,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     val state = homeNavigator.state
@@ -40,6 +44,19 @@ class HomeViewModel(
         .stateIn(viewModelScope, WhileSubscribed(5000), HomeScreenState())
 
     init {
+        homeNavigator.restoreState(savedStateHandle[HOME_NAVIGATOR_STATE_KEY])
+
+        viewModelScope.launch {
+            homeNavigator.state
+                .map { homeNavigator.serializeState() }
+                .distinctUntilChanged()
+                .collect { serializedState ->
+                    serializedState?.let {
+                        savedStateHandle[HOME_NAVIGATOR_STATE_KEY] = it
+                    }
+                }
+        }
+
         appNavigator.registerBackHandler(HomeScreen) { homeNavigator.onBack() }
     }
 
@@ -113,5 +130,9 @@ class HomeViewModel(
         appNavigator.unregisterBackHandler(HomeScreen)
         homeNavigator.close()
         super.onCleared()
+    }
+
+    private companion object {
+        const val HOME_NAVIGATOR_STATE_KEY = "home_navigator_state"
     }
 }

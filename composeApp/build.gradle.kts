@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinter)
+    kotlin("plugin.serialization") version libs.versions.kotlinx.serialization
 }
 
 private data class AboutDependencyCoordinate(

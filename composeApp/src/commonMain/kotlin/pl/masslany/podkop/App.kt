@@ -108,6 +108,10 @@ fun App() {
         val state by viewModel.navigationState.collectAsStateWithLifecycle()
         val snackbarHostState = remember { SnackbarHostState() }
 
+        LaunchedEffect(appNavigator) {
+            appNavigator.initialize()
+        }
+
         if (startupState !is AppState.Ready) {
             return@PodkopTheme
         }

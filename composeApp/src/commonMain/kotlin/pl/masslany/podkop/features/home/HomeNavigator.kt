@@ -44,6 +44,21 @@ class HomeNavigator(private val configProvider: NavigationConfigProvider) : Auto
         }
     }
 
+    fun restoreState(serializedState: String?) {
+        val restoredState = serializedState
+            ?.let(HomeNavigatorStateSerializer::deserialize)
+            ?: return
+
+        _state.update { previous ->
+            previous.copy(
+                currentTabRoot = restoredState.currentTabRoot,
+                stacks = restoredState.stacks,
+            )
+        }
+    }
+
+    fun serializeState(): String? = HomeNavigatorStateSerializer.serialize(_state.value)
+
     fun onTabChanged(root: NavTarget) {
         _state.update { previous ->
             if (root == previous.currentTabRoot) return@update previous

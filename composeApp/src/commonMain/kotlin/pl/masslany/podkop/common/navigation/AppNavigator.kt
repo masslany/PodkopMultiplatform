@@ -16,6 +16,7 @@ class AppNavigator(
     private val externalBrowser: ExternalBrowser,
 ) {
     private val destinationBackHandlers = mutableMapOf<NavTarget, () -> Boolean>()
+    private var initializationStarted = false
 
     private val _isReady = MutableStateFlow(false)
     val isReady = _isReady.asStateFlow()
@@ -25,13 +26,27 @@ class AppNavigator(
 
     val results = MutableSharedFlow<Pair<String, Any>>(extraBufferCapacity = 1)
 
-    init {
+    fun initialize(serializedBackStack: String? = null) {
+        if (initializationStarted) {
+            return
+        }
+        initializationStarted = true
+
         scope.launch {
-            val startTarget = configProvider.resolveStartDestination()
-            _state.update { it.copy(rootStack = persistentListOf(startTarget), overlay = OverlayState.None) }
+            val restoredBackStack = serializedBackStack
+                ?.let(NavigationBackstackSerializer::deserialize)
+                ?.toPersistentList()
+            val rootStack = restoredBackStack ?: persistentListOf(configProvider.resolveStartDestination())
+
+            _state.value = NavigationState(
+                rootStack = rootStack,
+                overlay = OverlayState.None,
+            )
             _isReady.value = true
         }
     }
+
+    fun serializeBackStack(): String? = NavigationBackstackSerializer.serialize(_state.value.rootStack)
 
     // --- Navigation ---
 
