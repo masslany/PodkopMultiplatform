@@ -13,16 +13,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.platform.rememberPlatformClipboard
 
 @Composable
 fun ResourceActionsBottomSheetScreenRoot(
@@ -64,7 +65,8 @@ internal fun ResourceActionsBottomSheetContent(
     actions: ResourceActionsBottomSheetActions,
     modifier: Modifier = Modifier,
 ) {
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = rememberPlatformClipboard()
+    val coroutineScope = rememberCoroutineScope()
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -85,7 +87,9 @@ internal fun ResourceActionsBottomSheetContent(
                         .clickable {
                             when (val localAction = item.localAction) {
                                 is ResourceActionLocalAction.CopyToClipboard -> {
-                                    clipboardManager.setText(AnnotatedString(localAction.value))
+                                    coroutineScope.launch {
+                                        clipboard.setText(localAction.value)
+                                    }
                                 }
 
                                 null -> Unit
