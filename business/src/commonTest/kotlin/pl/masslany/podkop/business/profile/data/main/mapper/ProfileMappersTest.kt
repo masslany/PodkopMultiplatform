@@ -1,5 +1,6 @@
 package pl.masslany.podkop.business.profile.data.main.mapper
 
+import kotlinx.datetime.LocalDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import pl.masslany.podkop.business.common.domain.models.common.Gender
@@ -164,6 +165,57 @@ class ProfileMappersTest {
                 canManageObservation = true,
             ),
             dto.toProfile(),
+        )
+    }
+
+    @Test
+    fun `profile badges mapper maps icon and metadata`() {
+        val dto = Fixtures.profileBadgesResponseDto(
+            data = listOf(
+                Fixtures.profileBadgeDto(
+                    label = "Odznaka",
+                    slug = "odznaka-1",
+                    description = "Opis odznaki",
+                    media = Fixtures.profileBadgeMediaDto(
+                        icon = Fixtures.profileBadgeIconDto(
+                            url = "https://example.com/odznaka.gif",
+                            mimeType = "image/gif",
+                        ),
+                    ),
+                    color = Fixtures.profileBadgeColorDto(hex = "123456", hexDark = "654321"),
+                    level = 3,
+                    progress = 80,
+                    achievedAt = LocalDateTime.parse("2024-02-03T10:11:12"),
+                ),
+            ),
+        )
+
+        assertEquals(
+            listOf(
+                Fixtures.profileBadge(
+                    label = "Odznaka",
+                    slug = "odznaka-1",
+                    description = "Opis odznaki",
+                    iconUrl = "https://example.com/odznaka.gif",
+                    iconMimeType = "image/gif",
+                    colorHex = "123456",
+                    colorHexDark = "654321",
+                    level = 3,
+                    progress = 80,
+                    achievedAt = LocalDateTime.parse("2024-02-03T10:11:12"),
+                ),
+            ),
+            dto.toProfileBadges(),
+        )
+    }
+
+    @Test
+    fun `profile note mapper maps content only`() {
+        val dto = Fixtures.profileNoteResponseDto(content = "Dobry człowiek")
+
+        assertEquals(
+            Fixtures.profileNote(content = "Dobry człowiek"),
+            dto.toProfileNote(),
         )
     }
 

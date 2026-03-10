@@ -87,6 +87,7 @@ kotlin {
             implementation(libs.androidx.browser)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.compose.ui.tooling)
+            implementation(libs.coil.svg)
         }
 
         commonMain.dependencies {

@@ -179,6 +179,77 @@ class ProfileRepositoryImplTest {
     }
 
     @Test
+    fun `get profile badges maps response and forwards username`() = runBlocking {
+        val profileDataSource = FakeProfileDataSource().apply {
+            getProfileBadgesResult = Result.success(
+                Fixtures.profileBadgesResponseDto(
+                    data = listOf(
+                        Fixtures.profileBadgeDto(
+                            slug = "badge-1",
+                            media = Fixtures.profileBadgeMediaDto(
+                                icon = Fixtures.profileBadgeIconDto(url = "https://example.com/badge-1.png"),
+                            ),
+                        ),
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(profileDataSource)
+
+        val actual = sut.getProfileBadges("alice")
+
+        assertEquals(listOf("alice"), profileDataSource.getProfileBadgesCalls)
+        assertEquals(
+            listOf(
+                Fixtures.profileBadge(
+                    slug = "badge-1",
+                    iconUrl = "https://example.com/badge-1.png",
+                ),
+            ),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `get profile note maps response and forwards username`() = runBlocking {
+        val profileDataSource = FakeProfileDataSource().apply {
+            getProfileNoteResult = Result.success(
+                Fixtures.profileNoteResponseDto(content = "Dobry człowiek"),
+            )
+        }
+        val sut = createSut(profileDataSource)
+
+        val actual = sut.getProfileNote("alice")
+
+        assertEquals(listOf("alice"), profileDataSource.getProfileNoteCalls)
+        assertEquals(
+            Fixtures.profileNote(content = "Dobry człowiek"),
+            actual.getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `update profile note forwards username and content`() = runBlocking {
+        val profileDataSource = FakeProfileDataSource().apply {
+            updateProfileNoteResult = Result.success(Unit)
+        }
+        val sut = createSut(profileDataSource)
+
+        val actual = sut.updateProfileNote(username = "alice", content = "Dobry człowiek")
+
+        assertEquals(
+            listOf(
+                FakeProfileDataSource.UpdateProfileNoteCall(
+                    username = "alice",
+                    content = "Dobry człowiek",
+                ),
+            ),
+            profileDataSource.updateProfileNoteCalls,
+        )
+        assertEquals(Unit, actual.getOrThrow())
+    }
+
+    @Test
     fun `observe user forwards username`() = runBlocking {
         val profileDataSource = FakeProfileDataSource().apply {
             observeUserResult = Result.success(Unit)

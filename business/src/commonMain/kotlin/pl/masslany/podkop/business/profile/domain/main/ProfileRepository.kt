@@ -1,9 +1,11 @@
 package pl.masslany.podkop.business.profile.domain.main
 
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.profile.domain.models.ProfileBadge
 import pl.masslany.podkop.business.profile.domain.models.ObservedTags
 import pl.masslany.podkop.business.profile.domain.models.ObservedUsers
 import pl.masslany.podkop.business.profile.domain.models.Profile
+import pl.masslany.podkop.business.profile.domain.models.ProfileNote
 import pl.masslany.podkop.business.profile.domain.models.ProfileShort
 import pl.masslany.podkop.business.profile.domain.models.UsersAutoComplete
 
@@ -13,6 +15,15 @@ interface ProfileRepository {
     suspend fun getProfile(): Result<Profile>
 
     suspend fun getProfile(name: String): Result<Profile>
+
+    suspend fun getProfileBadges(username: String): Result<List<ProfileBadge>>
+
+    suspend fun getProfileNote(username: String): Result<ProfileNote>
+
+    suspend fun updateProfileNote(
+        username: String,
+        content: String,
+    ): Result<Unit>
 
     suspend fun observeUser(username: String): Result<Unit>
 

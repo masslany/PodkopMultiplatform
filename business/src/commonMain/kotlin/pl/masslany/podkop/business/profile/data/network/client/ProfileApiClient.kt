@@ -4,7 +4,11 @@ import pl.masslany.podkop.business.common.data.network.models.common.ResourceRes
 import pl.masslany.podkop.business.profile.data.network.api.ProfileApi
 import pl.masslany.podkop.business.profile.data.network.models.ObservedTagsResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ObservedUsersResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileBadgesResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileNoteResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileNoteUpdateDataDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileNoteUpdateRequestDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileShortDto
 import pl.masslany.podkop.business.profile.data.network.models.UsersAutoCompleteResponseDto
 import pl.masslany.podkop.common.network.api.ApiClient
@@ -49,6 +53,51 @@ class ProfileApiClient(
 
         return apiClient.request(request).fold(
             onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun getProfileBadges(username: String): Result<ProfileBadgesResponseDto> {
+        val request =
+            Request<ProfileBadgesResponseDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/profile/users/$username/badges",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun getProfileNote(username: String): Result<ProfileNoteResponseDto> {
+        val request =
+            Request<ProfileNoteResponseDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/notes/$username",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun updateProfileNote(
+        username: String,
+        content: String,
+    ): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.PUT,
+                path = "api/v3/notes/$username",
+                body = ProfileNoteUpdateRequestDto(
+                    data = ProfileNoteUpdateDataDto(content = content),
+                ),
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(Unit) },
             onFailure = { Result.failure(it) },
         )
     }

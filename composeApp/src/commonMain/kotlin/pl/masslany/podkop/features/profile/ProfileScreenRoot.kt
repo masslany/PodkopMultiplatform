@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,7 +61,9 @@ import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.profile.components.ObservedTagItem
 import pl.masslany.podkop.features.profile.components.ObservedUserItem
+import pl.masslany.podkop.features.profile.components.ProfileAchievementsSection
 import pl.masslany.podkop.features.profile.components.ProfileHeader
+import pl.masslany.podkop.features.profile.components.ProfileNoteSection
 import pl.masslany.podkop.features.profile.components.ProfileSubActionDropdown
 import pl.masslany.podkop.features.profile.components.ProfileSummary
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
@@ -340,8 +343,30 @@ private fun ProfileLoadedContent(
             state.header?.let {
                 ProfileHeader(
                     state = state.header,
+                    isDetailsExpanded = state.isDetailsExpanded,
+                    onDetailsToggleClicked = actions::onDetailsToggleClicked,
                 )
                 Spacer(modifier = Modifier.size(16.dp))
+            }
+        }
+
+        item(
+            key = "ProfileDetailsSection",
+        ) {
+            if (state.isDetailsExpanded) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    ProfileNoteSection(
+                        state = state.noteState,
+                        onContentChanged = actions::onNoteContentChanged,
+                        onSaveClicked = actions::onNoteSaveClicked,
+                    )
+                    ProfileAchievementsSection(
+                        state = state.achievementsState,
+                    )
+                }
             }
         }
 

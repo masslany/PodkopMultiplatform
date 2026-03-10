@@ -140,6 +140,8 @@
     <string name="accessibility_profile_observe">Obserwuj użytkownika</string>
     <string name="accessibility_profile_send_private_message">Wyślij wiadomość prywatną</string>
     <string name="accessibility_profile_unobserve">Przestań obserwować użytkownika</string>
+    <string name="accessibility_profile_expand_details">Rozwiń szczegóły profilu</string>
+    <string name="accessibility_profile_collapse_details">Zwiń szczegóły profilu</string>
     <string name="accessibility_tag_gallery_open_entry">Otwórz wpis</string>
     <string name="accessibility_tag_enable_notifications">Włącz powiadomienia dla tagu</string>
     <string name="accessibility_tag_disable_notifications">Wyłącz powiadomienia dla tagu</string>
@@ -186,6 +188,17 @@
     <string name="profile_header_whitespace">\u0020</string>
     <string name="profile_no_observed_tags">Brak obserwowanych tagów do wyświetlenia</string>
     <string name="profile_no_observed_users">Brak obserwowanych użytkowników do wyświetlenia</string>
+    <string name="profile_note_title">Notatka o użytkowniku</string>
+    <string name="profile_note_placeholder">Dodaj notatkę</string>
+    <string name="profile_note_save">Zapisz</string>
+    <string name="profile_note_saved">Notatka została zapisana</string>
+    <string name="profile_note_error">Nie udało się pobrać notatki</string>
+    <string name="profile_achievements_title">Osiągnięcia</string>
+    <string name="profile_achievements_empty">Brak osiągnięć do wyświetlenia</string>
+    <string name="profile_achievements_error">Nie udało się pobrać osiągnięć</string>
+    <string name="profile_badge_level">Poziom %1$d</string>
+    <string name="profile_badge_progress">Postęp %1$d%%</string>
+    <string name="profile_badge_achieved_at">Osiągnięto %1$s</string>
 
     <!-- Dropdown menu -->
     <string name="dropdown_menu_label_active">Aktywne</string>

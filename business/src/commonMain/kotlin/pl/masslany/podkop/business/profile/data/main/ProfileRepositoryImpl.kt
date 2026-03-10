@@ -5,6 +5,8 @@ import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.profile.data.api.ProfileDataSource
+import pl.masslany.podkop.business.profile.data.main.mapper.toProfileBadges
+import pl.masslany.podkop.business.profile.data.main.mapper.toProfileNote
 import pl.masslany.podkop.business.profile.data.local.api.ProfileLocalDataSource
 import pl.masslany.podkop.business.profile.data.main.mapper.toObservedTags
 import pl.masslany.podkop.business.profile.data.main.mapper.toObservedUsers
@@ -15,6 +17,8 @@ import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.business.profile.domain.models.ObservedTags
 import pl.masslany.podkop.business.profile.domain.models.ObservedUsers
 import pl.masslany.podkop.business.profile.domain.models.Profile
+import pl.masslany.podkop.business.profile.domain.models.ProfileBadge
+import pl.masslany.podkop.business.profile.domain.models.ProfileNote
 import pl.masslany.podkop.business.profile.domain.models.ProfileShort
 import pl.masslany.podkop.business.profile.domain.models.UsersAutoComplete
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
@@ -53,6 +57,31 @@ class ProfileRepositoryImpl(
             profileDataSource.getProfile(name).mapCatching {
                 it.toProfile()
             }
+        }
+    }
+
+    override suspend fun getProfileBadges(username: String): Result<List<ProfileBadge>> {
+        return withContext(dispatcherProvider.io) {
+            profileDataSource.getProfileBadges(username).mapCatching {
+                it.toProfileBadges()
+            }
+        }
+    }
+
+    override suspend fun getProfileNote(username: String): Result<ProfileNote> {
+        return withContext(dispatcherProvider.io) {
+            profileDataSource.getProfileNote(username).mapCatching {
+                it.toProfileNote()
+            }
+        }
+    }
+
+    override suspend fun updateProfileNote(
+        username: String,
+        content: String,
+    ): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            profileDataSource.updateProfileNote(username, content)
         }
     }
 

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.combine
@@ -20,22 +21,29 @@ import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.pagination.toPage
+import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
+import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.privatemessages.ConversationScreen
+import pl.masslany.podkop.features.profile.models.ProfileAchievementsSectionState
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileListItem
+import pl.masslany.podkop.features.profile.models.ProfileNoteState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionType
 import pl.masslany.podkop.features.profile.models.ProfileSummaryType
 import pl.masslany.podkop.features.profile.models.isObservedTags
 import pl.masslany.podkop.features.profile.models.isObservedUsers
 import pl.masslany.podkop.features.profile.models.isResourceBacked
+import pl.masslany.podkop.features.profile.models.toProfileAchievementItemStates
 import pl.masslany.podkop.features.profile.models.toSubActionItems
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.topbar.TopBarActions
+import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.profile_note_saved
 
 class ProfileViewModel(
     private val username: String,
@@ -147,6 +155,71 @@ class ProfileViewModel(
         }
     }
 
+    override fun onDetailsToggleClicked() {
+        val expanded = !_state.value.isDetailsExpanded
+        _state.update { previousState ->
+            previousState.copy(isDetailsExpanded = expanded)
+        }
+    }
+
+    override fun onNoteContentChanged(content: String) {
+        _state.update { previousState ->
+            previousState.copy(
+                noteState = previousState.noteState.copy(content = content),
+            )
+        }
+    }
+
+    override fun onNoteSaveClicked() {
+        val noteState = _state.value.noteState
+        if (!noteState.canSave) {
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { previousState ->
+                previousState.copy(
+                    noteState = previousState.noteState.copy(
+                        isSaving = true,
+                        isError = false,
+                    ),
+                )
+            }
+
+            profileRepository.updateProfileNote(username = username, content = noteState.content)
+                .onSuccess {
+                    _state.update { previousState ->
+                        previousState.copy(
+                            noteState = previousState.noteState.copy(
+                                savedContent = previousState.noteState.content,
+                                isSaving = false,
+                                isError = false,
+                                hasLoaded = true,
+                            ),
+                        )
+                    }
+                    snackbarManager.tryEmit(
+                        SnackbarEvent(
+                            message = SnackbarMessage.Resource(Res.string.profile_note_saved),
+                            isFinite = true,
+                        ),
+                    )
+                }
+                .onFailure {
+                    logger.error("Failed to save profile note for $username", it)
+                    _state.update { previousState ->
+                        previousState.copy(
+                            noteState = previousState.noteState.copy(
+                                isSaving = false,
+                                isError = true,
+                            ),
+                        )
+                    }
+                    snackbarManager.tryEmitGenericError()
+                }
+        }
+    }
+
     override fun onObserveClicked() {
         val header = state.value.header ?: return
         if (!header.canManageObservation || state.value.isObserveActionLoading) {
@@ -186,7 +259,6 @@ class ProfileViewModel(
     }
 
     override fun onBlacklistClicked() {
-        println("MEOW state = ${state.value}")
         val header = state.value.header ?: return
         if (!header.isLoggedIn || header.isOwnProfile || state.value.isBlacklistActionLoading) {
             return
@@ -324,7 +396,11 @@ class ProfileViewModel(
                 isResourcesLoading = false,
                 isPaginating = false,
                 isObserveActionLoading = false,
+                isBlacklistActionLoading = false,
+                isDetailsExpanded = false,
                 header = null,
+                noteState = ProfileNoteState.initial,
+                achievementsState = ProfileAchievementsSectionState.initial,
                 summary = persistentListOf(),
                 selectedSummaryType = ProfileSummaryType.Actions,
                 subActionState = ProfileSubActionState(
@@ -350,10 +426,14 @@ class ProfileViewModel(
                         isLoading = false,
                         isError = false,
                         isResourcesLoading = false,
+                        isBlacklistActionLoading = false,
+                        isDetailsExpanded = false,
                         header = profile.toProfileHeaderState(
                             isLoggedIn = viewerContext.isLoggedIn,
                             viewerUsername = viewerContext.username,
                         ),
+                        noteState = ProfileNoteState.initial,
+                        achievementsState = ProfileAchievementsSectionState.initial,
                         summary = profile.summary.toSummaryItems(),
                         selectedSummaryType = selectedSummaryType,
                         subActionState = ProfileSubActionState(
@@ -364,6 +444,7 @@ class ProfileViewModel(
                     )
                 }
 
+                loadDetails()
                 loadItemsForSubAction(
                     subActionType = selectedSubAction,
                     forceNetwork = true,
@@ -379,7 +460,11 @@ class ProfileViewModel(
                         isError = true,
                         isResourcesLoading = false,
                         isObserveActionLoading = false,
+                        isBlacklistActionLoading = false,
+                        isDetailsExpanded = false,
                         header = null,
+                        noteState = ProfileNoteState.initial,
+                        achievementsState = ProfileAchievementsSectionState.initial,
                         summary = persistentListOf(),
                         selectedSummaryType = ProfileSummaryType.Actions,
                         subActionState = ProfileSubActionState(
@@ -391,6 +476,96 @@ class ProfileViewModel(
                     )
                 }
                 logger.error("Failed to load profile", it)
+            }
+    }
+
+    private suspend fun loadDetails() {
+        val screenState = _state.value
+
+        coroutineScope {
+            if (!screenState.noteState.hasLoaded && !screenState.noteState.isLoading) {
+                launch { loadProfileNote() }
+            }
+            if (!screenState.achievementsState.hasLoaded && !screenState.achievementsState.isLoading) {
+                launch { loadProfileAchievements() }
+            }
+        }
+    }
+
+    private suspend fun loadProfileNote() {
+        _state.update { previousState ->
+            previousState.copy(
+                noteState = previousState.noteState.copy(
+                    isLoading = true,
+                    isError = false,
+                ),
+            )
+        }
+
+        profileRepository.getProfileNote(username)
+            .onSuccess { note ->
+                _state.update { previousState ->
+                    previousState.copy(
+                        noteState = previousState.noteState.copy(
+                            content = note.content,
+                            savedContent = note.content,
+                            isLoading = false,
+                            isError = false,
+                            isSaving = false,
+                            hasLoaded = true,
+                        ),
+                    )
+                }
+            }
+            .onFailure {
+                logger.error("Failed to load profile note for $username", it)
+                _state.update { previousState ->
+                    previousState.copy(
+                        noteState = previousState.noteState.copy(
+                            isLoading = false,
+                            isError = true,
+                            isSaving = false,
+                            hasLoaded = false,
+                        ),
+                    )
+                }
+            }
+    }
+
+    private suspend fun loadProfileAchievements() {
+        _state.update { previousState ->
+            previousState.copy(
+                achievementsState = previousState.achievementsState.copy(
+                    isLoading = true,
+                    isError = false,
+                ),
+            )
+        }
+
+        profileRepository.getProfileBadges(username)
+            .onSuccess { badges ->
+                _state.update { previousState ->
+                    previousState.copy(
+                        achievementsState = previousState.achievementsState.copy(
+                            isLoading = false,
+                            isError = false,
+                            hasLoaded = true,
+                            items = badges.toProfileAchievementItemStates(),
+                        ),
+                    )
+                }
+            }
+            .onFailure {
+                logger.error("Failed to load profile achievements for $username", it)
+                _state.update { previousState ->
+                    previousState.copy(
+                        achievementsState = previousState.achievementsState.copy(
+                            isLoading = false,
+                            isError = true,
+                            hasLoaded = false,
+                        ),
+                    )
+                }
             }
     }
 

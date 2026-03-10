@@ -14,6 +14,12 @@ interface ProfileActions :
     PaginationActions {
     fun onRetryClicked()
 
+    fun onDetailsToggleClicked()
+
+    fun onNoteContentChanged(content: String)
+
+    fun onNoteSaveClicked()
+
     fun onObserveClicked()
 
     fun onBlacklistClicked()

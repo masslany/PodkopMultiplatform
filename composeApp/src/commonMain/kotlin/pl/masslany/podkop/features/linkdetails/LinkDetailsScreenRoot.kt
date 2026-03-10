@@ -775,7 +775,7 @@ private fun LinkCommentAccentLayout(
             },
     ) {
         Box(
-            modifier = Modifier.padding(start = contentStartPadding)
+            modifier = Modifier.padding(start = contentStartPadding),
         ) {
             content()
         }

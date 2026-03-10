@@ -3,7 +3,9 @@ package pl.masslany.podkop.business.profile.data.api
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ObservedTagsResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ObservedUsersResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileBadgesResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileNoteResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileShortDto
 import pl.masslany.podkop.business.profile.data.network.models.UsersAutoCompleteResponseDto
 
@@ -13,6 +15,15 @@ interface ProfileDataSource {
     suspend fun getProfile(): Result<ProfileDto>
 
     suspend fun getProfile(name: String): Result<ProfileDto>
+
+    suspend fun getProfileBadges(username: String): Result<ProfileBadgesResponseDto>
+
+    suspend fun getProfileNote(username: String): Result<ProfileNoteResponseDto>
+
+    suspend fun updateProfileNote(
+        username: String,
+        content: String,
+    ): Result<Unit>
 
     suspend fun observeUser(username: String): Result<Unit>
 

@@ -55,8 +55,15 @@ import pl.masslany.podkop.business.profile.data.network.models.LinksDetailsDto
 import pl.masslany.podkop.business.profile.data.network.models.ObservedTagDto
 import pl.masslany.podkop.business.profile.data.network.models.ObservedTagsResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ObservedUsersResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileBadgeColorDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileBadgeDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileBadgeIconDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileBadgeMediaDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileBadgesResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileDataDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileNoteDataDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileNoteResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileShortDataDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileShortDto
 import pl.masslany.podkop.business.profile.data.network.models.RankDto as ProfileRankDto
@@ -68,7 +75,9 @@ import pl.masslany.podkop.business.profile.domain.models.ObservedTag
 import pl.masslany.podkop.business.profile.domain.models.ObservedTags
 import pl.masslany.podkop.business.profile.domain.models.ObservedUser
 import pl.masslany.podkop.business.profile.domain.models.ObservedUsers
+import pl.masslany.podkop.business.profile.domain.models.ProfileBadge
 import pl.masslany.podkop.business.profile.domain.models.Profile
+import pl.masslany.podkop.business.profile.domain.models.ProfileNote
 import pl.masslany.podkop.business.profile.domain.models.ProfileShort
 import pl.masslany.podkop.business.profile.domain.models.Summary
 import pl.masslany.podkop.business.profile.domain.models.UserAutoCompleteItem
@@ -983,6 +992,62 @@ object BusinessFixtures {
         data = data,
     )
 
+    fun profileBadgeIconDto(
+        url: String = "https://example.com/badge.png",
+        mimeType: String = "image/png",
+    ): ProfileBadgeIconDto = ProfileBadgeIconDto(
+        url = url,
+        mimeType = mimeType,
+    )
+
+    fun profileBadgeMediaDto(
+        icon: ProfileBadgeIconDto? = profileBadgeIconDto(),
+    ): ProfileBadgeMediaDto = ProfileBadgeMediaDto(
+        icon = icon,
+    )
+
+    fun profileBadgeColorDto(
+        hex: String = "000000",
+        hexDark: String = "ffffff",
+    ): ProfileBadgeColorDto = ProfileBadgeColorDto(
+        hex = hex,
+        hexDark = hexDark,
+    )
+
+    fun profileBadgeDto(
+        label: String = "Wykopowicz",
+        slug: String = "wykopowicz-1",
+        description: String = "Za zdobytą ilość linków na stronie głównej",
+        media: ProfileBadgeMediaDto? = profileBadgeMediaDto(),
+        color: ProfileBadgeColorDto? = profileBadgeColorDto(),
+        level: Int? = 1,
+        progress: Int? = 50,
+        achievedAt: LocalDateTime? = dateTime,
+    ): ProfileBadgeDto = ProfileBadgeDto(
+        label = label,
+        slug = slug,
+        description = description,
+        media = media,
+        color = color,
+        level = level,
+        progress = progress,
+        achievedAt = achievedAt,
+    )
+
+    fun profileBadgesResponseDto(
+        data: List<ProfileBadgeDto> = listOf(profileBadgeDto()),
+        pagination: PaginationDto? = paginationDto(),
+    ): ProfileBadgesResponseDto = ProfileBadgesResponseDto(
+        data = data,
+        pagination = pagination,
+    )
+
+    fun profileNoteResponseDto(
+        content: String = "Dobry człowiek",
+    ): ProfileNoteResponseDto = ProfileNoteResponseDto(
+        data = ProfileNoteDataDto(content = content),
+    )
+
     fun profileShortDataDto(
         avatar: String = "https://example.com/profile-short.png",
         blacklist: Boolean = false,
@@ -1141,6 +1206,36 @@ object BusinessFixtures {
         isObserved = isObserved,
         isBlacklisted = isBlacklisted,
         canManageObservation = canManageObservation,
+    )
+
+    fun profileBadge(
+        label: String = "Wykopowicz",
+        slug: String = "wykopowicz-1",
+        description: String = "Za zdobytą ilość linków na stronie głównej",
+        iconUrl: String = "https://example.com/badge.png",
+        iconMimeType: String = "image/png",
+        colorHex: String = "000000",
+        colorHexDark: String = "ffffff",
+        level: Int? = 1,
+        progress: Int? = 50,
+        achievedAt: LocalDateTime? = dateTime,
+    ): ProfileBadge = ProfileBadge(
+        label = label,
+        slug = slug,
+        description = description,
+        iconUrl = iconUrl,
+        iconMimeType = iconMimeType,
+        colorHex = colorHex,
+        colorHexDark = colorHexDark,
+        level = level,
+        progress = progress,
+        achievedAt = achievedAt,
+    )
+
+    fun profileNote(
+        content: String = "Dobry człowiek",
+    ): ProfileNote = ProfileNote(
+        content = content,
     )
 
     fun profileShort(

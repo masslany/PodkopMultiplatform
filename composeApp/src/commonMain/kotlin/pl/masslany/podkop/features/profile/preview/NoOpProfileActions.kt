@@ -17,6 +17,9 @@ object NoOpProfileActions :
     TopBarActions by NoOpTopBarActions {
 
     override fun onRetryClicked() = Unit
+    override fun onDetailsToggleClicked() = Unit
+    override fun onNoteContentChanged(content: String) = Unit
+    override fun onNoteSaveClicked() = Unit
     override fun onObserveClicked() = Unit
     override fun onBlacklistClicked() = Unit
     override fun onPrivateMessageClicked() = Unit

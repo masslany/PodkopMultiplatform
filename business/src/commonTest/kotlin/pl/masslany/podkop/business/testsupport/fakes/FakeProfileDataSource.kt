@@ -4,7 +4,9 @@ import pl.masslany.podkop.business.common.data.network.models.common.ResourceRes
 import pl.masslany.podkop.business.profile.data.api.ProfileDataSource
 import pl.masslany.podkop.business.profile.data.network.models.ObservedTagsResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ObservedUsersResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileBadgesResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileNoteResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileShortDto
 import pl.masslany.podkop.business.profile.data.network.models.UsersAutoCompleteResponseDto
 
@@ -33,9 +35,20 @@ class FakeProfileDataSource : ProfileDataSource {
         val page: Int,
     )
 
+    data class UpdateProfileNoteCall(
+        val username: String,
+        val content: String,
+    )
+
     var getProfileShortResult: Result<ProfileShortDto> = unstubbedResult("ProfileDataSource.getProfileShort")
     var getProfileResult: Result<ProfileDto> = unstubbedResult("ProfileDataSource.getProfile")
     var getProfileByNameResult: Result<ProfileDto> = unstubbedResult("ProfileDataSource.getProfile(name)")
+    var getProfileBadgesResult: Result<ProfileBadgesResponseDto> =
+        unstubbedResult("ProfileDataSource.getProfileBadges")
+    var getProfileNoteResult: Result<ProfileNoteResponseDto> =
+        unstubbedResult("ProfileDataSource.getProfileNote")
+    var updateProfileNoteResult: Result<Unit> =
+        unstubbedResult("ProfileDataSource.updateProfileNote")
     var observeUserResult: Result<Unit> = unstubbedResult("ProfileDataSource.observeUser")
     var unobserveUserResult: Result<Unit> = unstubbedResult("ProfileDataSource.unobserveUser")
     var getUsersAutoCompleteResult: Result<UsersAutoCompleteResponseDto> =
@@ -50,6 +63,9 @@ class FakeProfileDataSource : ProfileDataSource {
     var getProfileShortCalls = 0
     var getProfileCalls = 0
     val getProfileByNameCalls = mutableListOf<String>()
+    val getProfileBadgesCalls = mutableListOf<String>()
+    val getProfileNoteCalls = mutableListOf<String>()
+    val updateProfileNoteCalls = mutableListOf<UpdateProfileNoteCall>()
     val observeUserCalls = mutableListOf<String>()
     val unobserveUserCalls = mutableListOf<String>()
     val getUsersAutoCompleteCalls = mutableListOf<String>()
@@ -71,6 +87,24 @@ class FakeProfileDataSource : ProfileDataSource {
     override suspend fun getProfile(name: String): Result<ProfileDto> {
         getProfileByNameCalls += name
         return getProfileByNameResult
+    }
+
+    override suspend fun getProfileBadges(username: String): Result<ProfileBadgesResponseDto> {
+        getProfileBadgesCalls += username
+        return getProfileBadgesResult
+    }
+
+    override suspend fun getProfileNote(username: String): Result<ProfileNoteResponseDto> {
+        getProfileNoteCalls += username
+        return getProfileNoteResult
+    }
+
+    override suspend fun updateProfileNote(
+        username: String,
+        content: String,
+    ): Result<Unit> {
+        updateProfileNoteCalls += UpdateProfileNoteCall(username = username, content = content)
+        return updateProfileNoteResult
     }
 
     override suspend fun observeUser(username: String): Result<Unit> {

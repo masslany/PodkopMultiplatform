@@ -6,8 +6,11 @@ import pl.masslany.podkop.common.models.NameColorType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.features.profile.ProfileScreenState
 import pl.masslany.podkop.features.profile.models.MemberSinceState
+import pl.masslany.podkop.features.profile.models.ProfileAchievementItemState
+import pl.masslany.podkop.features.profile.models.ProfileAchievementsSectionState
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
+import pl.masslany.podkop.features.profile.models.ProfileNoteState
 import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
 import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionState
@@ -18,6 +21,45 @@ import pl.masslany.podkop.features.resources.preview.ResourceItemStateProvider
 
 class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> {
     private val resources = ResourceItemStateProvider().values.toList()
+    private val achievementsState = ProfileAchievementsSectionState(
+        isLoading = false,
+        isError = false,
+        hasLoaded = true,
+        items = persistentListOf(
+            ProfileAchievementItemState(
+                label = "Wykopowicz",
+                slug = "wykopowicz-1",
+                description = "Za zdobytą ilość linków na stronie głównej",
+                iconUrl = "https://picsum.photos/seed/badge-1/120/80",
+                iconMimeType = "image/png",
+                colorHex = "111111",
+                colorHexDark = "f5f5f5",
+                level = 1,
+                progress = 50,
+                achievedAt = "2021-01-01 20:00:00",
+            ),
+            ProfileAchievementItemState(
+                label = "Komentator",
+                slug = "komentator-2",
+                description = "Za aktywność w komentarzach",
+                iconUrl = "https://picsum.photos/seed/badge-2/120/80",
+                iconMimeType = "image/png",
+                colorHex = "8b0000",
+                colorHexDark = "ffd7d7",
+                level = 2,
+                progress = 90,
+                achievedAt = "2022-06-12 09:30:00",
+            ),
+        ),
+    )
+    private val noteState = ProfileNoteState(
+        content = "Dobry człowiek",
+        savedContent = "Dobry człowiek",
+        isLoading = false,
+        isError = false,
+        isSaving = false,
+        hasLoaded = true,
+    )
 
     override val values: Sequence<ProfileScreenState> = sequenceOf(
         ProfileScreenState.initial.copy(username = "patryk"),
@@ -29,6 +71,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             isPaginating = true,
             isObserveActionLoading = false,
             isBlacklistActionLoading = false,
+            isDetailsExpanded = true,
             header = ProfileHeaderState(
                 username = "patryk",
                 avatarUrl = "https://picsum.photos/seed/profile-avatar/160/160",
@@ -43,6 +86,8 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
                 canManageObservation = true,
                 canSendPrivateMessage = true,
             ),
+            noteState = noteState,
+            achievementsState = achievementsState,
             summary = persistentListOf(
                 ProfileSummaryItem.Links(128),
                 ProfileSummaryItem.Entries(42),
@@ -71,6 +116,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             isPaginating = false,
             isObserveActionLoading = false,
             isBlacklistActionLoading = false,
+            isDetailsExpanded = false,
             header = ProfileHeaderState(
                 username = "maria_dev",
                 avatarUrl = "https://picsum.photos/seed/profile-avatar2/160/160",
@@ -85,6 +131,8 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
                 canManageObservation = true,
                 canSendPrivateMessage = true,
             ),
+            noteState = ProfileNoteState.initial,
+            achievementsState = ProfileAchievementsSectionState.initial,
             summary = persistentListOf(
                 ProfileSummaryItem.Following(12),
                 ProfileSummaryItem.Followers(4),
@@ -128,6 +176,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             isPaginating = false,
             isObserveActionLoading = false,
             isBlacklistActionLoading = false,
+            isDetailsExpanded = false,
             header = ProfileHeaderState(
                 username = "maria_dev",
                 avatarUrl = "https://picsum.photos/seed/profile-avatar2/160/160",
@@ -142,6 +191,8 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
                 canManageObservation = false,
                 canSendPrivateMessage = false,
             ),
+            noteState = ProfileNoteState.initial,
+            achievementsState = ProfileAchievementsSectionState.initial,
             summary = persistentListOf(ProfileSummaryItem.Following(12)),
             selectedSummaryType = ProfileSummaryType.Following,
             subActionState = ProfileSubActionState(
@@ -165,7 +216,10 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             isPaginating = false,
             isObserveActionLoading = false,
             isBlacklistActionLoading = false,
+            isDetailsExpanded = false,
             header = null,
+            noteState = ProfileNoteState.initial,
+            achievementsState = ProfileAchievementsSectionState.initial,
             summary = persistentListOf(),
             selectedSummaryType = ProfileSummaryType.Actions,
             subActionState = ProfileSubActionState(

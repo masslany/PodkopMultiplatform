@@ -59,7 +59,6 @@ val DarkVoteNegative = Color(color = 0xFFE7625A)
 val DarkAuthorComment = Color(color = 0xFFE5E5E5)
 val DarkLinkAuthor = Color(color = 0xFF3D83CC)
 
-
 val LightColorsPalette = ColorsPalette(
     nameOrange = LightNameOrange,
     nameBurgundy = LightNameBurgundy,

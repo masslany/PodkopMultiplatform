@@ -2,6 +2,7 @@ package pl.masslany.podkop.features.profile.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
@@ -19,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +34,7 @@ import coil3.request.crossfade
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 import pl.masslany.podkop.common.components.GenderIndicator
 import pl.masslany.podkop.common.components.toComposeColor
 import pl.masslany.podkop.common.models.NameColorType
@@ -38,6 +43,9 @@ import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.profile.models.MemberSinceState
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import podkop.composeapp.generated.resources.Res
+import podkop.composeapp.generated.resources.accessibility_profile_collapse_details
+import podkop.composeapp.generated.resources.accessibility_profile_expand_details
+import podkop.composeapp.generated.resources.ic_chevron_forward
 import podkop.composeapp.generated.resources.ic_profile
 import podkop.composeapp.generated.resources.profile_header_ago
 import podkop.composeapp.generated.resources.profile_header_days_since
@@ -48,6 +56,8 @@ import podkop.composeapp.generated.resources.profile_header_years_since
 @Composable
 fun ProfileHeader(
     state: ProfileHeaderState,
+    isDetailsExpanded: Boolean,
+    onDetailsToggleClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -80,6 +90,7 @@ fun ProfileHeader(
 
             Row(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(
                         start = 16.dp,
                         end = 16.dp,
@@ -129,17 +140,41 @@ fun ProfileHeader(
 
                 Spacer(modifier = Modifier.size(16.dp))
 
-                Column {
-                    Text(
-                        text = state.username,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = state.nameColorType.toComposeColor(),
-                    )
-                    memberSinceLabel(memberSinceState = state.memberSinceState)?.let {
-                        Spacer(modifier = Modifier.size(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top,
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                    ) {
                         Text(
-                            text = it,
-                            style = MaterialTheme.typography.labelSmall,
+                            text = state.username,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = state.nameColorType.toComposeColor(),
+                        )
+                        memberSinceLabel(memberSinceState = state.memberSinceState)?.let {
+                            Spacer(modifier = Modifier.size(4.dp))
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        }
+                    }
+
+                    IconButton(onClick = onDetailsToggleClicked) {
+                        Icon(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .rotate(if (isDetailsExpanded) 270f else 90f),
+                            imageVector = vectorResource(resource = Res.drawable.ic_chevron_forward),
+                            contentDescription = stringResource(
+                                resource = if (isDetailsExpanded) {
+                                    Res.string.accessibility_profile_collapse_details
+                                } else {
+                                    Res.string.accessibility_profile_expand_details
+                                },
+                            ),
                         )
                     }
                 }
@@ -222,6 +257,8 @@ private fun ProfileHeaderPreview() {
                 canManageObservation = true,
                 canSendPrivateMessage = true,
             ),
+            isDetailsExpanded = false,
+            onDetailsToggleClicked = {},
         )
     }
 }

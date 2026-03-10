@@ -5,7 +5,9 @@ import pl.masslany.podkop.business.profile.data.api.ProfileDataSource
 import pl.masslany.podkop.business.profile.data.network.api.ProfileApi
 import pl.masslany.podkop.business.profile.data.network.models.ObservedTagsResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ObservedUsersResponseDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileBadgesResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileDto
+import pl.masslany.podkop.business.profile.data.network.models.ProfileNoteResponseDto
 import pl.masslany.podkop.business.profile.data.network.models.ProfileShortDto
 import pl.masslany.podkop.business.profile.data.network.models.UsersAutoCompleteResponseDto
 
@@ -22,6 +24,21 @@ class ProfileDataSourceImpl(
 
     override suspend fun getProfile(name: String): Result<ProfileDto> {
         return profileApi.getProfile(name)
+    }
+
+    override suspend fun getProfileBadges(username: String): Result<ProfileBadgesResponseDto> {
+        return profileApi.getProfileBadges(username)
+    }
+
+    override suspend fun getProfileNote(username: String): Result<ProfileNoteResponseDto> {
+        return profileApi.getProfileNote(username)
+    }
+
+    override suspend fun updateProfileNote(
+        username: String,
+        content: String,
+    ): Result<Unit> {
+        return profileApi.updateProfileNote(username, content)
     }
 
     override suspend fun observeUser(username: String): Result<Unit> {
