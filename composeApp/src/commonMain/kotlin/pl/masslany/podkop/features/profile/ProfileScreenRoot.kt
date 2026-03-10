@@ -358,11 +358,13 @@ private fun ProfileLoadedContent(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    ProfileNoteSection(
-                        state = state.noteState,
-                        onContentChanged = actions::onNoteContentChanged,
-                        onSaveClicked = actions::onNoteSaveClicked,
-                    )
+                    if (state.header?.isLoggedIn == true) {
+                        ProfileNoteSection(
+                            state = state.noteState,
+                            onContentChanged = actions::onNoteContentChanged,
+                            onSaveClicked = actions::onNoteSaveClicked,
+                        )
+                    }
                     ProfileAchievementsSection(
                         state = state.achievementsState,
                     )

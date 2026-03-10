@@ -483,7 +483,11 @@ class ProfileViewModel(
         val screenState = _state.value
 
         coroutineScope {
-            if (!screenState.noteState.hasLoaded && !screenState.noteState.isLoading) {
+            if (
+                screenState.header?.isLoggedIn == true &&
+                !screenState.noteState.hasLoaded &&
+                !screenState.noteState.isLoading
+            ) {
                 launch { loadProfileNote() }
             }
             if (!screenState.achievementsState.hasLoaded && !screenState.achievementsState.isLoading) {
