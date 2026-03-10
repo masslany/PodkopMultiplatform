@@ -6,6 +6,7 @@ import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 data class ProfileHeaderState(
     val username: String,
     val avatarUrl: String,
+    val rankPosition: Int?,
     val backgroundUrl: String,
     val genderIndicatorType: GenderIndicatorType,
     val nameColorType: NameColorType,

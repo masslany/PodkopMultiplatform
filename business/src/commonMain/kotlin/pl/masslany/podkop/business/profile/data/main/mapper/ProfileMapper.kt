@@ -9,6 +9,7 @@ fun ProfileDto.toProfile(): Profile {
     return Profile(
         name = data.username,
         avatarUrl = data.avatar,
+        rankPosition = data.rank.position,
         gender = data.gender.toGender(),
         color = data.color.toNameColor(),
         backgroundUrl = data.background,

@@ -173,6 +173,7 @@ class MoreViewModel(
                     profileHeader = ProfileHeaderState(
                         username = profile.name,
                         avatarUrl = profile.avatarUrl,
+                        rankPosition = profile.rankPosition,
                         backgroundUrl = profile.backgroundUrl,
                         genderIndicatorType = profile.gender.toGenderIndicatorType(),
                         nameColorType = profile.color.toNameColorType(),

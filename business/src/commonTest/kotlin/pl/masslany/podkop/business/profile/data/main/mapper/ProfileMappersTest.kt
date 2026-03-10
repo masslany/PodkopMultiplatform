@@ -140,6 +140,7 @@ class ProfileMappersTest {
             username = "handle",
             name = "Display Name",
             avatar = "avatar-url",
+            rank = Fixtures.profileRankDto(position = 176, trend = 0),
             background = "bg-url",
             blacklist = true,
             follow = false,
@@ -155,6 +156,7 @@ class ProfileMappersTest {
             Fixtures.profile(
                 name = "handle",
                 avatarUrl = "avatar-url",
+                rankPosition = 176,
                 gender = Gender.Unspecified,
                 color = NameColor.Burgundy,
                 backgroundUrl = "bg-url",

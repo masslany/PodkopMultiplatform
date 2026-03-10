@@ -23,8 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -40,6 +42,7 @@ import pl.masslany.podkop.common.components.toComposeColor
 import pl.masslany.podkop.common.models.NameColorType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.theme.colorsPalette
 import pl.masslany.podkop.features.profile.models.MemberSinceState
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import podkop.composeapp.generated.resources.Res
@@ -99,32 +102,44 @@ fun ProfileHeader(
                 verticalAlignment = Alignment.Bottom,
             ) {
                 Column {
-                    if (state.avatarUrl.isNotBlank()) {
-                        AsyncImage(
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clip(MaterialTheme.shapes.small),
-                            model = Builder(LocalPlatformContext.current)
-                                .data(state.avatarUrl)
-                                .crossfade(true)
-                                .build(),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            error = painterResource(resource = Res.drawable.ic_profile),
-                            placeholder = painterResource(resource = Res.drawable.ic_profile),
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clip(MaterialTheme.shapes.small)
-                                .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
-                        ) {
-                            Image(
-                                modifier = Modifier.fillMaxSize(),
-                                painter = painterResource(resource = Res.drawable.ic_profile),
+                    Box(
+                        modifier = Modifier.size(100.dp),
+                    ) {
+                        if (state.avatarUrl.isNotBlank()) {
+                            AsyncImage(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(MaterialTheme.shapes.small),
+                                model = Builder(LocalPlatformContext.current)
+                                    .data(state.avatarUrl)
+                                    .crossfade(true)
+                                    .build(),
                                 contentDescription = null,
-                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                                contentScale = ContentScale.Crop,
+                                error = painterResource(resource = Res.drawable.ic_profile),
+                                placeholder = painterResource(resource = Res.drawable.ic_profile),
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(MaterialTheme.shapes.small)
+                                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
+                            ) {
+                                Image(
+                                    modifier = Modifier.fillMaxSize(),
+                                    painter = painterResource(resource = Res.drawable.ic_profile),
+                                    contentDescription = null,
+                                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                                )
+                            }
+                        }
+
+                        state.rankPosition?.let { rankPosition ->
+                            RankBadge(
+                                rankPosition = rankPosition,
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd),
                             )
                         }
                     }
@@ -180,6 +195,26 @@ fun ProfileHeader(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun RankBadge(
+    rankPosition: Int,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorsPalette.hotOrange)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+    ) {
+        Text(
+            text = "#$rankPosition",
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+        )
     }
 }
 
@@ -246,6 +281,7 @@ private fun ProfileHeaderPreview() {
             state = ProfileHeaderState(
                 username = "patryk",
                 avatarUrl = "https://picsum.photos/seed/profile-avatar/160/160",
+                rankPosition = 176,
                 backgroundUrl = "",
                 genderIndicatorType = GenderIndicatorType.Male,
                 nameColorType = NameColorType.Orange,

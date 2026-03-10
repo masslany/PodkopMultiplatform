@@ -33,6 +33,7 @@ internal fun Profile.toProfileHeaderState(
     return ProfileHeaderState(
         username = name,
         avatarUrl = avatarUrl,
+        rankPosition = rankPosition,
         backgroundUrl = backgroundUrl,
         genderIndicatorType = gender.toGenderIndicatorType(),
         nameColorType = color.toNameColorType(),

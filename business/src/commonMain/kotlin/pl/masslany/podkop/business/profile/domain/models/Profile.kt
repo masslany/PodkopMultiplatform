@@ -7,6 +7,7 @@ import pl.masslany.podkop.business.common.domain.models.common.NameColor
 data class Profile(
     val name: String,
     val avatarUrl: String,
+    val rankPosition: Int?,
     val gender: Gender,
     val color: NameColor,
     val backgroundUrl: String,

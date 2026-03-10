@@ -75,6 +75,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             header = ProfileHeaderState(
                 username = "patryk",
                 avatarUrl = "https://picsum.photos/seed/profile-avatar/160/160",
+                rankPosition = 176,
                 backgroundUrl = "https://picsum.photos/seed/profile-bg/1200/600",
                 genderIndicatorType = GenderIndicatorType.Male,
                 nameColorType = NameColorType.Orange,
@@ -120,6 +121,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             header = ProfileHeaderState(
                 username = "maria_dev",
                 avatarUrl = "https://picsum.photos/seed/profile-avatar2/160/160",
+                rankPosition = 24,
                 backgroundUrl = "https://picsum.photos/seed/profile-bg2/1200/600",
                 genderIndicatorType = GenderIndicatorType.Female,
                 nameColorType = NameColorType.Green,
@@ -180,6 +182,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             header = ProfileHeaderState(
                 username = "maria_dev",
                 avatarUrl = "https://picsum.photos/seed/profile-avatar2/160/160",
+                rankPosition = null,
                 backgroundUrl = "https://picsum.photos/seed/profile-bg2/1200/600",
                 genderIndicatorType = GenderIndicatorType.Female,
                 nameColorType = NameColorType.Green,

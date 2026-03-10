@@ -50,6 +50,7 @@ fun MoreHeader(
         val fallbackHeaderState = ProfileHeaderState(
             username = stringResource(resource = Res.string.more_profile_preview_unavailable),
             avatarUrl = "",
+            rankPosition = null,
             backgroundUrl = "",
             genderIndicatorType = GenderIndicatorType.Unspecified,
             nameColorType = NameColorType.Orange,
@@ -169,6 +170,7 @@ private fun MoreHeaderLoggedInPreview() {
                 profileHeader = ProfileHeaderState(
                     username = "patryk",
                     avatarUrl = "",
+                    rankPosition = 176,
                     backgroundUrl = "",
                     genderIndicatorType = GenderIndicatorType.Unspecified,
                     nameColorType = NameColorType.Orange,

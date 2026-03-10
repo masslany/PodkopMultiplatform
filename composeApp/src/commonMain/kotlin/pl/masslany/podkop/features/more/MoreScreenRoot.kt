@@ -150,6 +150,7 @@ private fun MoreScreenContentLoggedInPreview() {
                 profileHeader = ProfileHeaderState(
                     username = "patryk",
                     avatarUrl = "https://picsum.photos/seed/profile-avatar/160/160",
+                    rankPosition = 176,
                     backgroundUrl = "https://picsum.photos/seed/profile-bg/1200/600",
                     genderIndicatorType = GenderIndicatorType.Male,
                     nameColorType = NameColorType.Orange,

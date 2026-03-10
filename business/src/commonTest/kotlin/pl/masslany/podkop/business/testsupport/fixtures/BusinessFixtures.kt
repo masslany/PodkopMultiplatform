@@ -1187,6 +1187,7 @@ object BusinessFixtures {
     fun profile(
         name: String = "profile-user",
         avatarUrl: String = "https://example.com/profile.png",
+        rankPosition: Int? = null,
         gender: Gender = Gender.Female,
         color: NameColor = NameColor.Green,
         backgroundUrl: String = "https://example.com/bg.png",
@@ -1198,6 +1199,7 @@ object BusinessFixtures {
     ): Profile = Profile(
         name = name,
         avatarUrl = avatarUrl,
+        rankPosition = rankPosition,
         gender = gender,
         color = color,
         backgroundUrl = backgroundUrl,
