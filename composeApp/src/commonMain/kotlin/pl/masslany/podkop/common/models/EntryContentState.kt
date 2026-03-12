@@ -13,6 +13,8 @@ sealed class EntryContentState {
     data object DeletedByModerator : EntryContentState()
 
     data object DeletedByAuthor : EntryContentState()
+
+    data object DeletedByEntryAuthor : EntryContentState()
 }
 
 fun String.toHighlightedTagProfileMarkdown(): String = this

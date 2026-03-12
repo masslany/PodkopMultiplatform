@@ -49,7 +49,12 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
 
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
+
         Deleted.Moderator -> EntryContentState.DeletedByModerator
+
+        Deleted.Host -> this.content.toEntryContentState(isDownVoted = false)
+
+        // Should not happen for the entry itself
         Deleted.None -> this.content.toEntryContentState(isDownVoted = false) // Entry cannot be downvoted
     }
     val embedUrl = this.media?.photo?.url
@@ -121,6 +126,7 @@ private fun Comment.toEntryCommentItemState(parentId: Int? = null): EntryComment
 
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
+        Deleted.Host -> EntryContentState.DeletedByEntryAuthor
         Deleted.Moderator -> EntryContentState.DeletedByModerator
         Deleted.None -> this.content.toEntryContentState(isDownVoted = false) // Entry cannot be downvoted
     }

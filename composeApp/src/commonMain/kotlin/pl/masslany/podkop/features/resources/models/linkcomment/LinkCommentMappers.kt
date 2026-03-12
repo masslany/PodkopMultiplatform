@@ -54,6 +54,7 @@ internal fun ResourceItem.toLinkCommentItemState(
 
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
+        Deleted.Host -> EntryContentState.DeletedByEntryAuthor
         Deleted.Moderator -> EntryContentState.DeletedByModerator
         Deleted.None -> this.content.toEntryContentState(isDownVoted = isDownVoted)
     }
@@ -137,6 +138,7 @@ internal fun Comment.toLinkCommentItemState(
 
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
+        Deleted.Host -> EntryContentState.DeletedByAuthor
         Deleted.Moderator -> EntryContentState.DeletedByModerator
         Deleted.None -> this.content.toEntryContentState(isDownVoted = isDownVoted)
     }

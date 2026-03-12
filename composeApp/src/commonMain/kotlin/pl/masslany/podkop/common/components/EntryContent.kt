@@ -50,6 +50,7 @@ import pl.masslany.podkop.common.theme.colorsPalette
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.comment_button_show_spoiler
 import podkop.composeapp.generated.resources.comment_label_removed_by_author
+import podkop.composeapp.generated.resources.comment_label_removed_by_entry_author
 import podkop.composeapp.generated.resources.comment_label_removed_by_moderator
 
 @Composable
@@ -130,6 +131,14 @@ fun EntryContent(
         EntryContentState.DeletedByModerator -> {
             Text(
                 text = stringResource(resource = Res.string.comment_label_removed_by_moderator),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+            )
+        }
+
+        EntryContentState.DeletedByEntryAuthor -> {
+            Text(
+                text = stringResource(resource = Res.string.comment_label_removed_by_entry_author),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
             )

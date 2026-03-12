@@ -87,6 +87,7 @@ class CommonValueMappersTest {
     fun `deleted mapper maps known and fallback values`() {
         assertEquals(Deleted.Moderator, "moderator".toDeleted())
         assertEquals(Deleted.Author, "author".toDeleted())
+        assertEquals(Deleted.Host, "host".toDeleted())
         assertEquals(Deleted.None, "unknown".toDeleted())
         assertEquals(Deleted.None, null.toDeleted())
     }

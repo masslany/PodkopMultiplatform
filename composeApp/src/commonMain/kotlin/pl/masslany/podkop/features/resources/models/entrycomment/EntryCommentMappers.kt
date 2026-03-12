@@ -45,6 +45,7 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
 
     val entryContentState = when (this.deleted) {
         Deleted.Author -> EntryContentState.DeletedByAuthor
+        Deleted.Host -> EntryContentState.DeletedByEntryAuthor
         Deleted.Moderator -> EntryContentState.DeletedByModerator
         Deleted.None -> this.content.toEntryContentState(isDownVoted = false) // Entry cannot be downvoted
     }

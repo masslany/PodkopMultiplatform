@@ -1,12 +1,16 @@
 package pl.masslany.podkop.features.linkdetails
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import pl.masslany.podkop.common.models.AuthorState
 import pl.masslany.podkop.common.models.NameColorType
 import pl.masslany.podkop.common.models.PublishedTimeType
+import pl.masslany.podkop.common.models.avatar.AvatarState
+import pl.masslany.podkop.common.models.avatar.AvatarType
+import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentType
 import pl.masslany.podkop.common.models.embed.TwitterEmbedState
@@ -15,10 +19,6 @@ import pl.masslany.podkop.common.models.vote.VoteButtonState
 import pl.masslany.podkop.common.models.vote.VoteButtonType
 import pl.masslany.podkop.common.models.vote.VoteState
 import pl.masslany.podkop.common.models.vote.VoteValueType
-import pl.masslany.podkop.common.models.AuthorState
-import pl.masslany.podkop.common.models.avatar.AvatarState
-import pl.masslany.podkop.common.models.avatar.AvatarType
-import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.features.resources.models.ResourceType
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 

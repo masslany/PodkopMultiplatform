@@ -7,6 +7,7 @@ fun String?.toDeleted(): Deleted {
     return when (this) {
         "moderator" -> Deleted.Moderator
         "author" -> Deleted.Author
+        "host" -> Deleted.Host
         else -> Deleted.None
     }
 }

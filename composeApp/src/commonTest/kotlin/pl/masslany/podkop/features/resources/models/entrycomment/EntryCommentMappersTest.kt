@@ -60,6 +60,16 @@ class EntryCommentMappersTest {
         assertEquals(true, state.isBlacklisted)
         assertIs<EntryContentState.Content>(state.entryContentState)
     }
+
+    @Test
+    fun `entry comment mapper shows deleted by entry author state for host deleted comments`() {
+        val state = entryCommentResource(
+            deleted = Deleted.Host,
+            content = "should not be visible",
+        ).toEntryCommentItemState()
+
+        assertEquals(EntryContentState.DeletedByEntryAuthor, state.entryContentState)
+    }
 }
 
 private fun entryCommentResource(
@@ -70,6 +80,7 @@ private fun entryCommentResource(
     actions: Actions = actions(),
     media: Media = media(),
     author: Author = author(),
+    deleted: Deleted = Deleted.None,
 ): ResourceItem = ResourceItem(
     actions = actions,
     adult = adult,
@@ -78,7 +89,7 @@ private fun entryCommentResource(
     comments = null,
     content = content,
     createdAt = null,
-    deleted = Deleted.None,
+    deleted = deleted,
     deletable = false,
     description = "",
     editable = editable,

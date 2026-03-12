@@ -5,5 +5,7 @@ sealed class Deleted {
 
     data object Author : Deleted()
 
+    data object Host : Deleted()
+
     data object None : Deleted()
 }
