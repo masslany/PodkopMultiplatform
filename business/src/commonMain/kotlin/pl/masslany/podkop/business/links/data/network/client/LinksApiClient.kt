@@ -5,7 +5,18 @@ import pl.masslany.podkop.business.common.data.network.models.common.SingleResou
 import pl.masslany.podkop.business.links.data.network.api.LinksApi
 import pl.masslany.podkop.business.links.data.network.models.LinkCommentCreateDataDto
 import pl.masslany.podkop.business.links.data.network.models.LinkCommentCreateRequestDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftCreateDataDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftCreateRequestDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftsResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftPublishDataDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftPublishRequestDto
 import pl.masslany.podkop.business.links.data.network.models.LinkUpvotesResponseDto
+import pl.masslany.podkop.business.links.domain.models.request.PublishLinkDraft
+import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftUpdateDataDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftUpdateRequestDto
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
@@ -112,6 +123,103 @@ class LinksApiClient(
             )
 
         return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun createLinkDraft(url: String): Result<LinkDraftCheckResponseDto> {
+        val request = Request<LinkDraftCheckResponseDto>(
+            method = Request.HttpMethod.POST,
+            path = "api/v3/links/draft",
+            body = LinkDraftCreateRequestDto(
+                data = LinkDraftCreateDataDto(url = url),
+            ),
+        )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun getLinkDrafts(): Result<LinkDraftsResponseDto> {
+        val request = Request<LinkDraftsResponseDto>(
+            method = Request.HttpMethod.GET,
+            path = "api/v3/links/draft",
+        )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun getLinkDraft(key: String): Result<LinkDraftResponseDto> {
+        val request = Request<LinkDraftResponseDto>(
+            method = Request.HttpMethod.GET,
+            path = "api/v3/links/draft/$key",
+        )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun updateLinkDraft(key: String, request: UpdateLinkDraft): Result<Unit> {
+        val body = LinkDraftUpdateRequestDto(
+            data = LinkDraftUpdateDataDto(
+                title = request.title,
+                description = request.description,
+                tags = request.tags,
+                photo = request.photoKey,
+                adult = request.adult,
+                selectedImage = request.selectedImageIndex,
+            ),
+        )
+        val apiRequest = Request<Unit>(
+            method = Request.HttpMethod.PUT,
+            path = "api/v3/links/draft/$key",
+            body = body,
+        )
+
+        return apiClient.request(apiRequest).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun deleteLinkDraft(key: String): Result<Unit> {
+        val request = Request<Unit>(
+            method = Request.HttpMethod.DELETE,
+            path = "api/v3/links/draft/$key",
+        )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun publishLinkDraft(key: String, request: PublishLinkDraft): Result<Unit> {
+        val body = LinkDraftPublishRequestDto(
+            data = LinkDraftPublishDataDto(
+                title = request.title,
+                description = request.description,
+                tags = request.tags,
+                photo = request.photoKey,
+                adult = request.adult,
+                selectedImage = request.selectedImageIndex,
+            ),
+        )
+        val apiRequest = Request<Unit>(
+            method = Request.HttpMethod.POST,
+            path = "api/v3/links/draft/$key",
+            body = body,
+        )
+
+        return apiClient.request(apiRequest).fold(
             onSuccess = { Result.success(it.content) },
             onFailure = { Result.failure(it) },
         )

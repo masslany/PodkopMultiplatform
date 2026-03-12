@@ -2,12 +2,9 @@ package pl.masslany.podkop.common.navigation
 
 import kotlinx.serialization.PolymorphicSerializer
 import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
-import kotlinx.serialization.modules.subclass
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreen
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalScreen
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogScreen
@@ -21,6 +18,8 @@ import pl.masslany.podkop.features.hits.HitsScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.links.LinksScreen
+import pl.masslany.podkop.features.linksubmission.AddLinkScreen
+import pl.masslany.podkop.features.linksubmission.LinkDraftScreen
 import pl.masslany.podkop.features.more.MoreScreen
 import pl.masslany.podkop.features.notifications.NotificationsScreen
 import pl.masslany.podkop.features.privatemessages.ConversationScreen
@@ -46,6 +45,8 @@ internal object NavigationBackstackSerializer {
             polymorphic(NavTarget::class) {
                 subclass(HomeScreen::class, HomeScreen.serializer())
                 subclass(GenericDialog::class, GenericDialog.serializer())
+                subclass(AddLinkScreen::class, AddLinkScreen.serializer())
+                subclass(LinkDraftScreen::class, LinkDraftScreen.serializer())
                 subclass(LinksScreen::class, LinksScreen.serializer())
                 subclass(UpcomingScreen::class, UpcomingScreen.serializer())
                 subclass(EntriesScreen::class, EntriesScreen.serializer())

@@ -65,6 +65,8 @@ import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
+import podkop.composeapp.generated.resources.accessibility_topbar_add
+import podkop.composeapp.generated.resources.ic_add
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.topbar_label_homepage
 import podkop.composeapp.generated.resources.topbar_label_upcoming
@@ -155,6 +157,19 @@ fun LinksScreenContent(
         ) {
             TopAppBar(
                 title = { Text(text = getTopBarTitle(state.isUpcoming)) },
+                actions = {
+                    if (state.isUpcoming && state.isLoggedIn) {
+                        IconButton(onClick = actions::onTopBarAddLinkClicked) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = vectorResource(resource = Res.drawable.ic_add),
+                                contentDescription = stringResource(
+                                    resource = Res.string.accessibility_topbar_add,
+                                ),
+                            )
+                        }
+                    }
+                },
                 scrollBehavior = scrollBehavior,
                 windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
             )

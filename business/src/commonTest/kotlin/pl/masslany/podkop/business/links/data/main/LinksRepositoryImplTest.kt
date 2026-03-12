@@ -5,11 +5,21 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import pl.masslany.podkop.business.common.data.network.models.common.MediaDto
+import pl.masslany.podkop.business.common.data.network.models.common.PhotoDto
 import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.Voted
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckDataDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftImageDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftsResponseDto
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksType
+import pl.masslany.podkop.business.links.domain.models.request.PublishLinkDraft
+import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeLinksDataSource
 import pl.masslany.podkop.business.testsupport.fixtures.BusinessFixtures as Fixtures
@@ -186,6 +196,243 @@ class LinksRepositoryImplTest {
                 ),
             ),
             actual.getOrThrow(),
+        )
+    }
+
+    @Test
+    fun `create link draft forwards url and maps response`() = runBlocking {
+        val linksDataSource = FakeLinksDataSource().apply {
+            createLinkDraftResult = Result.success(
+                LinkDraftCheckResponseDto(
+                    data = LinkDraftCheckDataDto(
+                        key = "draft-key-123",
+                        similar = listOf(
+                            Fixtures.resourceItemDto(
+                                id = 91,
+                                resource = "link",
+                                title = "Existing similar link",
+                            ),
+                        ),
+                        duplicate = true,
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(linksDataSource)
+
+        val actual = sut.createLinkDraft(url = "https://example.com/article")
+
+        assertEquals(
+            listOf(FakeLinksDataSource.CreateLinkDraftCall(url = "https://example.com/article")),
+            linksDataSource.createLinkDraftCalls,
+        )
+        assertEquals("draft-key-123", actual.getOrThrow().key)
+        assertEquals(true, actual.getOrThrow().duplicate)
+        assertEquals(
+            listOf(
+                Fixtures.resourceItem(
+                    id = 91,
+                    resource = Resource.Link,
+                    title = "Existing similar link",
+                ),
+            ),
+            actual.getOrThrow().similar,
+        )
+    }
+
+    @Test
+    fun `publish link draft forwards request`() = runBlocking {
+        val linksDataSource = FakeLinksDataSource().apply {
+            publishLinkDraftResult = Result.success(Unit)
+        }
+        val sut = createSut(linksDataSource)
+        val request = PublishLinkDraft(
+            title = "Fresh link",
+            description = "Optional body",
+            tags = listOf("news", "tech"),
+            photoKey = "photo-key-77",
+            adult = false,
+            selectedImageIndex = 2,
+        )
+
+        val actual = sut.publishLinkDraft(
+            key = "draft-key-123",
+            request = request,
+        )
+
+        assertTrue(actual.isSuccess)
+        assertEquals(
+            listOf(
+                FakeLinksDataSource.PublishLinkDraftCall(
+                    key = "draft-key-123",
+                    request = request,
+                ),
+            ),
+            linksDataSource.publishLinkDraftCalls,
+        )
+    }
+
+    @Test
+    fun `get link draft forwards key and maps prefilled fields`() = runBlocking {
+        val linksDataSource = FakeLinksDataSource().apply {
+            getLinkDraftResult = Result.success(
+                LinkDraftResponseDto(
+                    data = LinkDraftDto(
+                        key = "draft-key-123",
+                        url = "https://example.com/article",
+                        title = "Prefilled website title",
+                        description = "Prefilled website description",
+                        tags = listOf("news", "tech"),
+                        adult = true,
+                        images = listOf(
+                            LinkDraftImageDto(
+                                url = "https://example.com/server-image-1.jpg",
+                                selected = false,
+                            ),
+                            LinkDraftImageDto(
+                                url = "https://example.com/server-image-2.jpg",
+                                selected = true,
+                            ),
+                        ),
+                        media = MediaDto(
+                            embed = null,
+                            photo = PhotoDto(
+                                key = "photo-key-1",
+                                label = "draft-photo",
+                                mimeType = "image/jpeg",
+                                url = "https://example.com/photo.jpg",
+                                size = 1024,
+                                width = 640,
+                                height = 480,
+                            ),
+                            survey = null,
+                        ),
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(linksDataSource)
+
+        val actual = sut.getLinkDraft(key = "draft-key-123")
+
+        assertEquals(
+            listOf(FakeLinksDataSource.GetLinkDraftCall(key = "draft-key-123")),
+            linksDataSource.getLinkDraftCalls,
+        )
+        assertEquals("draft-key-123", actual.getOrThrow().key)
+        assertEquals("https://example.com/article", actual.getOrThrow().url)
+        assertEquals("Prefilled website title", actual.getOrThrow().title)
+        assertEquals("Prefilled website description", actual.getOrThrow().description)
+        assertEquals(listOf("news", "tech"), actual.getOrThrow().tags)
+        assertEquals(true, actual.getOrThrow().adult)
+        assertEquals("photo-key-1", actual.getOrThrow().photoKey)
+        assertEquals("https://example.com/photo.jpg", actual.getOrThrow().photoUrl)
+        assertEquals(
+            listOf(
+                "https://example.com/server-image-1.jpg",
+                "https://example.com/server-image-2.jpg",
+            ),
+            actual.getOrThrow().suggestedImages,
+        )
+        assertEquals(1, actual.getOrThrow().selectedImageIndex)
+    }
+
+    @Test
+    fun `get link drafts maps list response`() = runBlocking {
+        val linksDataSource = FakeLinksDataSource().apply {
+            getLinkDraftsResult = Result.success(
+                LinkDraftsResponseDto(
+                    data = listOf(
+                        LinkDraftDto(
+                            key = "draft-key-123",
+                            url = "https://example.com/article",
+                            title = "Draft title",
+                            description = "Draft description",
+                            tags = listOf("a", "b"),
+                            adult = false,
+                            images = listOf(
+                                LinkDraftImageDto(
+                                    url = "https://example.com/server-image-3.png",
+                                    selected = true,
+                                ),
+                            ),
+                            media = MediaDto(
+                                embed = null,
+                                photo = PhotoDto(
+                                    key = "photo-key-2",
+                                    label = "draft-list-photo",
+                                    mimeType = "image/png",
+                                    url = "https://example.com/photo-2.png",
+                                    size = 2048,
+                                    width = 800,
+                                    height = 600,
+                                ),
+                                survey = null,
+                            ),
+                        ),
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(linksDataSource)
+
+        val actual = sut.getLinkDrafts()
+
+        assertEquals(listOf(Unit), linksDataSource.getLinkDraftsCalls)
+        assertEquals(1, actual.getOrThrow().size)
+        assertEquals("draft-key-123", actual.getOrThrow().single().key)
+        assertEquals("Draft title", actual.getOrThrow().single().title)
+        assertEquals(listOf("a", "b"), actual.getOrThrow().single().tags)
+        assertEquals("photo-key-2", actual.getOrThrow().single().photoKey)
+        assertEquals(listOf("https://example.com/server-image-3.png"), actual.getOrThrow().single().suggestedImages)
+        assertEquals(0, actual.getOrThrow().single().selectedImageIndex)
+    }
+
+    @Test
+    fun `update link draft forwards request`() = runBlocking {
+        val linksDataSource = FakeLinksDataSource().apply {
+            updateLinkDraftResult = Result.success(Unit)
+        }
+        val sut = createSut(linksDataSource)
+        val request = UpdateLinkDraft(
+            title = "Fresh link",
+            description = "Optional body",
+            tags = listOf("news", "tech"),
+            photoKey = "photo-key-77",
+            adult = false,
+            selectedImageIndex = 2,
+        )
+
+        val actual = sut.updateLinkDraft(
+            key = "draft-key-123",
+            request = request,
+        )
+
+        assertTrue(actual.isSuccess)
+        assertEquals(
+            listOf(
+                FakeLinksDataSource.UpdateLinkDraftCall(
+                    key = "draft-key-123",
+                    request = request,
+                ),
+            ),
+            linksDataSource.updateLinkDraftCalls,
+        )
+    }
+
+    @Test
+    fun `delete link draft forwards key`() = runBlocking {
+        val linksDataSource = FakeLinksDataSource().apply {
+            deleteLinkDraftResult = Result.success(Unit)
+        }
+        val sut = createSut(linksDataSource)
+
+        val actual = sut.deleteLinkDraft(key = "draft-key-123")
+
+        assertTrue(actual.isSuccess)
+        assertEquals(
+            listOf(FakeLinksDataSource.DeleteLinkDraftCall(key = "draft-key-123")),
+            linksDataSource.deleteLinkDraftCalls,
         )
     }
 

@@ -7,6 +7,8 @@ import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
 import pl.masslany.podkop.features.composer.ComposerPrefill
 import pl.masslany.podkop.features.composer.ComposerRequest
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
+import pl.masslany.podkop.features.linksubmission.AddLinkScreen
+import pl.masslany.podkop.features.linksubmission.LinkDraftScreen
 
 class NavigationBackstackSerializerTest {
 
@@ -14,6 +16,8 @@ class NavigationBackstackSerializerTest {
     fun `serialize and deserialize preserve the backstack`() {
         val backStack = listOf(
             HomeScreen,
+            AddLinkScreen,
+            LinkDraftScreen(draftKey = "draft-key"),
             EntryDetailsScreen.forEntryCommentReply(
                 entryId = 44,
                 entryCommentId = 7,

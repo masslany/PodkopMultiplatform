@@ -2,7 +2,12 @@ package pl.masslany.podkop.business.links.data.api
 
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftsResponseDto
 import pl.masslany.podkop.business.links.data.network.models.LinkUpvotesResponseDto
+import pl.masslany.podkop.business.links.domain.models.request.PublishLinkDraft
+import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 
 interface LinksDataSource {
     @Suppress("LongParameterList")
@@ -33,6 +38,18 @@ interface LinksDataSource {
     ): Result<ResourceResponseDto>
 
     suspend fun getRelatedLinks(linkId: Int): Result<ResourceResponseDto>
+
+    suspend fun createLinkDraft(url: String): Result<LinkDraftCheckResponseDto>
+
+    suspend fun getLinkDrafts(): Result<LinkDraftsResponseDto>
+
+    suspend fun getLinkDraft(key: String): Result<LinkDraftResponseDto>
+
+    suspend fun updateLinkDraft(key: String, request: UpdateLinkDraft): Result<Unit>
+
+    suspend fun deleteLinkDraft(key: String): Result<Unit>
+
+    suspend fun publishLinkDraft(key: String, request: PublishLinkDraft): Result<Unit>
 
     suspend fun createLinkComment(
         linkId: Int,

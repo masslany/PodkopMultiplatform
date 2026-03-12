@@ -14,6 +14,7 @@ val linksModule = module {
             linksRepository = get(),
             hitsRepository = get(),
             linksResourceItemStateHolder = get(),
+            appNavigator = get(),
             logger = get(),
             snackbarManager = get(),
             topBarActions = get(),

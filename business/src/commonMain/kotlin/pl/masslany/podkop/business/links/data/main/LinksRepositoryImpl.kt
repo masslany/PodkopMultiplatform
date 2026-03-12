@@ -1,6 +1,7 @@
 package pl.masslany.podkop.business.links.data.main
 
 import kotlinx.coroutines.withContext
+import pl.masslany.podkop.business.common.data.main.mapper.common.toMedia
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResourceItemList
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
 import pl.masslany.podkop.business.common.domain.models.common.Resource
@@ -11,10 +12,15 @@ import pl.masslany.podkop.business.common.domain.models.links.Link
 import pl.masslany.podkop.business.common.domain.models.common.Voters
 import pl.masslany.podkop.business.links.data.main.mapper.toVoters
 import pl.masslany.podkop.business.links.data.api.LinksDataSource
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftImageDto
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
+import pl.masslany.podkop.business.links.domain.models.LinkDraftCheck
+import pl.masslany.podkop.business.links.domain.models.LinkDraftDetails
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksType
+import pl.masslany.podkop.business.links.domain.models.request.PublishLinkDraft
+import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 
 class LinksRepositoryImpl(
@@ -99,6 +105,52 @@ class LinksRepositoryImpl(
             linksDataSource.getRelatedLinks(linkId).mapCatching {
                 it.toResources(defaultResource = Resource.Link)
             }
+        }
+    }
+
+    override suspend fun createLinkDraft(url: String): Result<LinkDraftCheck> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.createLinkDraft(url).mapCatching {
+                LinkDraftCheck(
+                    key = it.data.key,
+                    similar = it.data.similar.toResourceItemList(),
+                    duplicate = it.data.duplicate,
+                )
+            }
+        }
+    }
+
+    override suspend fun getLinkDrafts(): Result<List<LinkDraftDetails>> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.getLinkDrafts().mapCatching { response ->
+                response.data.map { it.toLinkDraftDetails() }
+            }
+        }
+    }
+
+    override suspend fun getLinkDraft(key: String): Result<LinkDraftDetails> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.getLinkDraft(key).mapCatching {
+                it.data.toLinkDraftDetails()
+            }
+        }
+    }
+
+    override suspend fun updateLinkDraft(key: String, request: UpdateLinkDraft): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.updateLinkDraft(key = key, request = request)
+        }
+    }
+
+    override suspend fun deleteLinkDraft(key: String): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.deleteLinkDraft(key)
+        }
+    }
+
+    override suspend fun publishLinkDraft(key: String, request: PublishLinkDraft): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.publishLinkDraft(key = key, request = request)
         }
     }
 
@@ -215,4 +267,22 @@ class LinksRepositoryImpl(
             linksDataSource.removeVoteOnLinkComment(linkId, commentId)
         }
     }
+}
+
+private fun pl.masslany.podkop.business.links.data.network.models.LinkDraftDto.toLinkDraftDetails(): LinkDraftDetails {
+    val media = media?.toMedia()
+    return LinkDraftDetails(
+        key = key,
+        url = url,
+        title = title,
+        description = description,
+        tags = tags,
+        adult = adult,
+        photoKey = media?.photo?.key,
+        photoUrl = media?.photo?.url,
+        suggestedImages = images.map(LinkDraftImageDto::url),
+        selectedImageIndex = images.indexOfFirst(LinkDraftImageDto::selected)
+            .takeIf { it >= 0 }
+            ?: images.indices.firstOrNull(),
+    )
 }

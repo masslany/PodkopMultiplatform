@@ -22,11 +22,13 @@ import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.models.toDropdownMenuItemType
 import pl.masslany.podkop.common.models.toLinksSortType
+import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.linksubmission.AddLinkScreen
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 @OptIn(ExperimentalUuidApi::class)
@@ -36,6 +38,7 @@ class LinksViewModel(
     private val linksRepository: LinksRepository,
     private val hitsRepository: HitsRepository,
     private val linksResourceItemStateHolder: LinksResourceItemStateHolder,
+    private val appNavigator: AppNavigator,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
@@ -108,33 +111,15 @@ class LinksViewModel(
         }
 
         viewModelScope.launch {
-            linksRepository.getLinks(
-                page = resolveFirstPageParam(),
-                limit = null,
-                linksSortType = selectedLinksSortType,
-                linksType = linksType,
-                category = null,
-                bucket = null,
+            val isLoggedIn = authRepository.isLoggedIn()
+            _state.update { previousState ->
+                previousState.copy(isLoggedIn = isLoggedIn)
+            }
+            loadLinks(
+                page = resolveFirstPageParam(isLoggedIn),
+                showErrorScreenOnFailure = true,
+                logMessage = "Failed to load links",
             )
-                .onSuccess {
-                    linksResourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
-                    _state.update { previousState ->
-                        previousState
-                            .updateLoading(false)
-                            .updateError(false)
-                            .updateRefreshing(false)
-                    }
-                }
-                .onFailure {
-                    logger.error("Failed to load links", it)
-                    _state.update { previousState ->
-                        previousState
-                            .updateLoading(false)
-                            .updateError(true)
-                            .updateRefreshing(false)
-                    }
-                }
 
             if (!isUpcoming) {
                 hitsRepository.getLinkHits(
@@ -162,35 +147,11 @@ class LinksViewModel(
                 .updateRefreshing(true)
         }
         viewModelScope.launch {
-            linksRepository.getLinks(
+            loadLinks(
                 page = resolveFirstPageParam(),
-                limit = null,
-                linksSortType = selectedLinksSortType,
-                linksType = linksType,
-                category = null,
-                bucket = null,
+                showErrorScreenOnFailure = state.value.links.isEmpty(),
+                logMessage = "Failed to load links for sort type $sortType",
             )
-                .onSuccess {
-                    linksResourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
-                    _state.update { previousState ->
-                        previousState
-                            .updateLoading(false)
-                            .updateError(false)
-                            .updateRefreshing(false)
-                    }
-                }
-                .onFailure {
-                    logger.error("Failed to load links for sort type $sortType", it)
-                    val shouldShowErrorScreen = state.value.links.isEmpty()
-                    _state.update { previousState ->
-                        previousState
-                            .updateLoading(false)
-                            .updateRefreshing(false)
-                            .updateError(shouldShowErrorScreen)
-                    }
-                    snackbarManager.tryEmitGenericError()
-                }
         }
     }
 
@@ -215,36 +176,19 @@ class LinksViewModel(
                 .updateRefreshing(true)
         }
         viewModelScope.launch {
-            linksRepository.getLinks(
+            loadLinks(
                 page = resolveFirstPageParam(),
-                limit = null,
-                linksSortType = selectedLinksSortType,
-                linksType = linksType,
-                category = null,
-                bucket = null,
+                showErrorScreenOnFailure = state.value.links.isEmpty(),
+                logMessage = "Failed to refresh links for sort type $sortType",
             )
-                .onSuccess {
-                    linksResourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
-                    _state.update { previousState ->
-                        previousState
-                            .updateLoading(false)
-                            .updateError(false)
-                            .updateRefreshing(false)
-                    }
-                }
-                .onFailure {
-                    logger.error("Failed to refresh links for sort type $sortType", it)
-                    val shouldShowErrorScreen = state.value.links.isEmpty()
-                    _state.update { previousState ->
-                        previousState
-                            .updateLoading(false)
-                            .updateRefreshing(false)
-                            .updateError(shouldShowErrorScreen)
-                    }
-                    snackbarManager.tryEmitGenericError()
-                }
         }
+    }
+
+    override fun onTopBarAddLinkClicked() {
+        if (!isUpcoming || !state.value.isLoggedIn) {
+            return
+        }
+        appNavigator.navigateTo(AddLinkScreen)
     }
 
     override fun shouldPaginate(
@@ -256,9 +200,44 @@ class LinksViewModel(
         paginator.paginate()
     }
 
-    private suspend fun resolveFirstPageParam(): Any? = if (authRepository.isLoggedIn()) {
+    private suspend fun resolveFirstPageParam(): Any? = resolveFirstPageParam(authRepository.isLoggedIn())
+
+    private fun resolveFirstPageParam(isLoggedIn: Boolean): Any? = if (isLoggedIn) {
         null
     } else {
         1
+    }
+
+    private suspend fun loadLinks(
+        page: Any?,
+        showErrorScreenOnFailure: Boolean,
+        logMessage: String,
+    ) {
+        linksRepository.getLinks(
+            page = page,
+            limit = null,
+            linksSortType = selectedLinksSortType,
+            linksType = linksType,
+            category = null,
+            bucket = null,
+        ).onSuccess {
+            linksResourceItemStateHolder.updateData(it.data)
+            paginator.setup(it.pagination, it.data.size)
+            _state.update { previousState ->
+                previousState
+                    .updateLoading(false)
+                    .updateError(false)
+                    .updateRefreshing(false)
+            }
+        }.onFailure {
+            logger.error(logMessage, it)
+            _state.update { previousState ->
+                previousState
+                    .updateLoading(false)
+                    .updateRefreshing(false)
+                    .updateError(showErrorScreenOnFailure)
+            }
+            snackbarManager.tryEmitGenericError()
+        }
     }
 }

@@ -60,6 +60,10 @@ import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreenRoot
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenRoot
+import pl.masslany.podkop.features.linksubmission.AddLinkScreen
+import pl.masslany.podkop.features.linksubmission.LinkDraftScreen
+import pl.masslany.podkop.features.linksubmission.addlink.AddLinkScreenRoot
+import pl.masslany.podkop.features.linksubmission.linkdraft.LinkDraftScreenRoot
 import pl.masslany.podkop.features.notifications.NotificationsScreen
 import pl.masslany.podkop.features.notifications.NotificationsScreenRoot
 import pl.masslany.podkop.features.privatemessages.ConversationScreen
@@ -172,6 +176,14 @@ fun App() {
                             username = it.username,
                             paddingValues = WindowInsets.systemBars.asPaddingValues(),
                         )
+                    }
+
+                    entry<AddLinkScreen> {
+                        AddLinkScreenRoot()
+                    }
+
+                    entry<LinkDraftScreen> {
+                        LinkDraftScreenRoot(screen = it)
                     }
 
                     entry<SettingsScreen> {

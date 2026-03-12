@@ -25,6 +25,7 @@ import pl.masslany.podkop.features.home.di.homeModule
 import pl.masslany.podkop.features.imageviewer.di.imageViewerModule
 import pl.masslany.podkop.features.linkdetails.di.linkDetailsModule
 import pl.masslany.podkop.features.links.di.linksModule
+import pl.masslany.podkop.features.linksubmission.di.addLinkModule
 import pl.masslany.podkop.features.more.di.moreModule
 import pl.masslany.podkop.features.notifications.di.notificationsModule
 import pl.masslany.podkop.features.privatemessages.di.privateMessagesModule
@@ -45,6 +46,7 @@ val composeAppModule = module {
     includes(
         navigationModule,
         deepLinkModule,
+        addLinkModule,
         aboutAppModule,
         homeModule,
         hitsModule,

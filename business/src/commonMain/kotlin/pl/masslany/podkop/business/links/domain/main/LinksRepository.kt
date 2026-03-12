@@ -4,9 +4,13 @@ import pl.masslany.podkop.business.common.domain.models.links.Link
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.common.domain.models.common.Voters
+import pl.masslany.podkop.business.links.domain.models.LinkDraftCheck
+import pl.masslany.podkop.business.links.domain.models.LinkDraftDetails
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksType
+import pl.masslany.podkop.business.links.domain.models.request.PublishLinkDraft
+import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 
 
 interface LinksRepository {
@@ -42,6 +46,18 @@ interface LinksRepository {
     ): Result<Resources>
 
     suspend fun getRelatedLinks(linkId: Int): Result<Resources>
+
+    suspend fun createLinkDraft(url: String): Result<LinkDraftCheck>
+
+    suspend fun getLinkDrafts(): Result<List<LinkDraftDetails>>
+
+    suspend fun getLinkDraft(key: String): Result<LinkDraftDetails>
+
+    suspend fun updateLinkDraft(key: String, request: UpdateLinkDraft): Result<Unit>
+
+    suspend fun deleteLinkDraft(key: String): Result<Unit>
+
+    suspend fun publishLinkDraft(key: String, request: PublishLinkDraft): Result<Unit>
 
     suspend fun createLinkComment(
         linkId: Int,

@@ -7,4 +7,6 @@ interface TopBarActions {
     fun onTopBarBackClicked()
 
     fun onTopBarAddEntryClicked() = Unit
+
+    fun onTopBarAddLinkClicked() = Unit
 }

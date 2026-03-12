@@ -3,7 +3,12 @@ package pl.masslany.podkop.business.testsupport.fakes
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.links.data.api.LinksDataSource
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftResponseDto
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftsResponseDto
 import pl.masslany.podkop.business.links.data.network.models.LinkUpvotesResponseDto
+import pl.masslany.podkop.business.links.domain.models.request.PublishLinkDraft
+import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 
 class FakeLinksDataSource : LinksDataSource {
     data class GetLinksCall(
@@ -46,6 +51,28 @@ class FakeLinksDataSource : LinksDataSource {
         val photoKey: String?,
     )
 
+    data class CreateLinkDraftCall(
+        val url: String,
+    )
+
+    data class PublishLinkDraftCall(
+        val key: String,
+        val request: PublishLinkDraft,
+    )
+
+    data class GetLinkDraftCall(
+        val key: String,
+    )
+
+    data class UpdateLinkDraftCall(
+        val key: String,
+        val request: UpdateLinkDraft,
+    )
+
+    data class DeleteLinkDraftCall(
+        val key: String,
+    )
+
     data class CreateLinkCommentReplyCall(
         val linkId: Int,
         val commentId: Int,
@@ -73,6 +100,12 @@ class FakeLinksDataSource : LinksDataSource {
     var getCommentsResult: Result<ResourceResponseDto> = unstubbedResult("LinksDataSource.getComments")
     var getSubCommentsResult: Result<ResourceResponseDto> = unstubbedResult("LinksDataSource.getSubComments")
     var getRelatedLinksResult: Result<ResourceResponseDto> = unstubbedResult("LinksDataSource.getRelatedLinks")
+    var createLinkDraftResult: Result<LinkDraftCheckResponseDto> = unstubbedResult("LinksDataSource.createLinkDraft")
+    var getLinkDraftsResult: Result<LinkDraftsResponseDto> = unstubbedResult("LinksDataSource.getLinkDrafts")
+    var getLinkDraftResult: Result<LinkDraftResponseDto> = unstubbedResult("LinksDataSource.getLinkDraft")
+    var updateLinkDraftResult: Result<Unit> = unstubbedResult("LinksDataSource.updateLinkDraft")
+    var deleteLinkDraftResult: Result<Unit> = unstubbedResult("LinksDataSource.deleteLinkDraft")
+    var publishLinkDraftResult: Result<Unit> = unstubbedResult("LinksDataSource.publishLinkDraft")
     var createLinkCommentResult: Result<SingleResourceResponseDto> =
         unstubbedResult("LinksDataSource.createLinkComment")
     var createLinkCommentReplyResult: Result<SingleResourceResponseDto> =
@@ -94,6 +127,12 @@ class FakeLinksDataSource : LinksDataSource {
     val getCommentsCalls = mutableListOf<GetCommentsCall>()
     val getSubCommentsCalls = mutableListOf<GetSubCommentsCall>()
     val getRelatedLinksCalls = mutableListOf<Int>()
+    val createLinkDraftCalls = mutableListOf<CreateLinkDraftCall>()
+    val getLinkDraftsCalls = mutableListOf<Unit>()
+    val getLinkDraftCalls = mutableListOf<GetLinkDraftCall>()
+    val updateLinkDraftCalls = mutableListOf<UpdateLinkDraftCall>()
+    val deleteLinkDraftCalls = mutableListOf<DeleteLinkDraftCall>()
+    val publishLinkDraftCalls = mutableListOf<PublishLinkDraftCall>()
     val createLinkCommentCalls = mutableListOf<CreateLinkCommentCall>()
     val createLinkCommentReplyCalls = mutableListOf<CreateLinkCommentReplyCall>()
     val updateLinkCommentCalls = mutableListOf<UpdateLinkCommentCall>()
@@ -147,6 +186,36 @@ class FakeLinksDataSource : LinksDataSource {
     override suspend fun getRelatedLinks(linkId: Int): Result<ResourceResponseDto> {
         getRelatedLinksCalls += linkId
         return getRelatedLinksResult
+    }
+
+    override suspend fun createLinkDraft(url: String): Result<LinkDraftCheckResponseDto> {
+        createLinkDraftCalls += CreateLinkDraftCall(url = url)
+        return createLinkDraftResult
+    }
+
+    override suspend fun getLinkDrafts(): Result<LinkDraftsResponseDto> {
+        getLinkDraftsCalls += Unit
+        return getLinkDraftsResult
+    }
+
+    override suspend fun getLinkDraft(key: String): Result<LinkDraftResponseDto> {
+        getLinkDraftCalls += GetLinkDraftCall(key = key)
+        return getLinkDraftResult
+    }
+
+    override suspend fun updateLinkDraft(key: String, request: UpdateLinkDraft): Result<Unit> {
+        updateLinkDraftCalls += UpdateLinkDraftCall(key = key, request = request)
+        return updateLinkDraftResult
+    }
+
+    override suspend fun deleteLinkDraft(key: String): Result<Unit> {
+        deleteLinkDraftCalls += DeleteLinkDraftCall(key = key)
+        return deleteLinkDraftResult
+    }
+
+    override suspend fun publishLinkDraft(key: String, request: PublishLinkDraft): Result<Unit> {
+        publishLinkDraftCalls += PublishLinkDraftCall(key = key, request = request)
+        return publishLinkDraftResult
     }
 
     override suspend fun createLinkComment(
