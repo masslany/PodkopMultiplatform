@@ -769,7 +769,7 @@ open class BaseResourceItemStateHolder(
     }
 }
 
-private fun EmbedContentState?.updateTwitterEmbedStateIfMatches(
+internal fun EmbedContentState?.updateTwitterEmbedStateIfMatches(
     embedKey: String,
     newState: TwitterEmbedState,
 ): EmbedContentState? {

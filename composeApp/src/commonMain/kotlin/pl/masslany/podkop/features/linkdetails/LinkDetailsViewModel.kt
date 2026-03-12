@@ -17,12 +17,17 @@ import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
+import pl.masslany.podkop.common.models.embed.EmbedContentState
+import pl.masslany.podkop.common.models.embed.EmbedContentType
+import pl.masslany.podkop.common.models.embed.TwitterEmbedState
+import pl.masslany.podkop.common.models.embed.toTwitterEmbedPreviewState
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
@@ -46,6 +51,7 @@ import pl.masslany.podkop.features.resources.models.link.toLinkItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.toLinkCommentItemState
 import pl.masslany.podkop.features.resources.models.related.toRelatedItemState
+import pl.masslany.podkop.features.resources.updateTwitterEmbedStateIfMatches
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 class LinkDetailsViewModel(
@@ -54,6 +60,7 @@ class LinkDetailsViewModel(
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
+    private val twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
     private val appNavigator: AppNavigator,
     private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
     private val resourceActionUpdatesStore: ResourceActionUpdatesStore,
@@ -229,6 +236,61 @@ class LinkDetailsViewModel(
                     ),
                 )
             }
+        }
+    }
+
+    override fun onEmbedPreviewClicked(itemId: Int, state: EmbedContentState) {
+        if (!hasLoadedReplyWithId(itemId)) {
+            resourceItemStateHolder.onEmbedPreviewClicked(itemId, state)
+            return
+        }
+
+        when (state.type) {
+            EmbedContentType.Twitter -> {
+                when (state.twitterState) {
+                    TwitterEmbedState.Preview -> {
+                        viewModelScope.launch {
+                            updateReplyTwitterEmbedState(
+                                itemId = itemId,
+                                embedKey = state.key,
+                                newState = TwitterEmbedState.Loading,
+                            )
+
+                            twitterEmbedPreviewRepository.getTweet(state.url)
+                                .onSuccess { tweet ->
+                                    updateReplyTwitterEmbedState(
+                                        itemId = itemId,
+                                        embedKey = state.key,
+                                        newState = TwitterEmbedState.Loaded(
+                                            tweet.toTwitterEmbedPreviewState(),
+                                        ),
+                                    )
+                                }
+                                .onFailure { error ->
+                                    logger.error(
+                                        message = "Twitter embed preview fetch failed for reply itemId=$itemId " +
+                                            "url=${state.url}",
+                                        throwable = error,
+                                    )
+                                    updateReplyTwitterEmbedState(
+                                        itemId = itemId,
+                                        embedKey = state.key,
+                                        newState = TwitterEmbedState.Error,
+                                    )
+                                }
+                        }
+                    }
+
+                    TwitterEmbedState.Loading -> Unit
+
+                    null,
+                    is TwitterEmbedState.Loaded,
+                    TwitterEmbedState.Error,
+                    -> resourceItemStateHolder.onEmbedPreviewClicked(itemId, state)
+                }
+            }
+
+            else -> resourceItemStateHolder.onEmbedPreviewClicked(itemId, state)
         }
     }
 
@@ -831,6 +893,29 @@ class LinkDetailsViewModel(
         }
     }
 
+    private fun updateReplyTwitterEmbedState(
+        itemId: Int,
+        embedKey: String,
+        newState: TwitterEmbedState,
+    ) {
+        commentRepliesStateById.update { previousState ->
+            previousState.mapValues { (_, repliesState) ->
+                repliesState.copy(
+                    replies = repliesState.replies.applyTwitterEmbedStateById(
+                        commentId = itemId,
+                        embedKey = embedKey,
+                        newState = newState,
+                    ),
+                )
+            }
+        }
+    }
+
+    private fun hasLoadedReplyWithId(commentId: Int): Boolean =
+        commentRepliesStateById.value.values.any { repliesState ->
+            repliesState.replies.containsCommentWithId(commentId)
+        }
+
     private fun initialState(): LinkDetailsScreenState = LinkDetailsScreenState.initial.copy(
         commentsState = LinkDetailsCommentsState.Loading(
             sortMenuState = DropdownMenuState(
@@ -1030,6 +1115,48 @@ private fun LinkCommentItemState.applyFavouriteById(
         ),
     )
 }
+
+internal fun ImmutableList<LinkCommentItemState>.applyTwitterEmbedStateById(
+    commentId: Int,
+    embedKey: String,
+    newState: TwitterEmbedState,
+): ImmutableList<LinkCommentItemState> = this.map { comment ->
+    comment.applyTwitterEmbedStateById(
+        commentId = commentId,
+        embedKey = embedKey,
+        newState = newState,
+    )
+}.toImmutableList()
+
+private fun LinkCommentItemState.applyTwitterEmbedStateById(
+    commentId: Int,
+    embedKey: String,
+    newState: TwitterEmbedState,
+): LinkCommentItemState {
+    val updated = if (id == commentId) {
+        copy(
+            embedContentState = embedContentState.updateTwitterEmbedStateIfMatches(
+                embedKey = embedKey,
+                newState = newState,
+            ),
+        )
+    } else {
+        this
+    }
+
+    return updated.copy(
+        replies = updated.replies.applyTwitterEmbedStateById(
+            commentId = commentId,
+            embedKey = embedKey,
+            newState = newState,
+        ),
+    )
+}
+
+private fun ImmutableList<LinkCommentItemState>.containsCommentWithId(commentId: Int): Boolean =
+    any { comment ->
+        comment.id == commentId || comment.replies.containsCommentWithId(commentId)
+    }
 
 private enum class LinkCommentVoteDirection {
     Up,

@@ -13,6 +13,7 @@ val linkDetailsModule = module {
             authRepository = get(),
             profileRepository = get(),
             resourceItemStateHolder = get<ResourceItemStateHolder>(),
+            twitterEmbedPreviewRepository = get(),
             appNavigator = get(),
             screenshotShareDraftStore = get(),
             resourceActionUpdatesStore = get(),
