@@ -81,4 +81,8 @@ class DebugViewModel(
             }
         }
     }
+
+    override fun onSendSnackbarClicked() {
+        snackbarManager.tryEmitGenericError()
+    }
 }

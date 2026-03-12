@@ -154,6 +154,7 @@
     <string name="debug_link_validation_error">Niepoprawne ID znaleziska</string>
     <string name="debug_pm_notification_title">Prywatne wiadomości</string>
     <string name="debug_pm_notification_button_send">Wyślij testowe powiadomienie</string>
+    <string name="debug_snackbar_button_send">Wyślij testowy snackbar</string>
 
     <!-- Accessibility -->
     <string name="accessibility_topbar_add">Dodaj</string>

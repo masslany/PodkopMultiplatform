@@ -46,6 +46,7 @@ import podkop.composeapp.generated.resources.debug_link_title
 import podkop.composeapp.generated.resources.debug_link_validation_error
 import podkop.composeapp.generated.resources.debug_pm_notification_button_send
 import podkop.composeapp.generated.resources.debug_pm_notification_title
+import podkop.composeapp.generated.resources.debug_snackbar_button_send
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.topbar_label_debug
 
@@ -176,6 +177,12 @@ fun DebugScreenContent(
                 onClick = actions::onSendPrivateMessagesNotificationClicked,
             ) {
                 Text(text = stringResource(resource = Res.string.debug_pm_notification_button_send))
+            }
+
+            Button(
+                onClick = actions::onSendSnackbarClicked,
+            ) {
+                Text(text = stringResource(resource = Res.string.debug_snackbar_button_send))
             }
         }
     }

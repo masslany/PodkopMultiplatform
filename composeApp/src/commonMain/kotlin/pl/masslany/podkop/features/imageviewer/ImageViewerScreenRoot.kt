@@ -16,8 +16,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -46,7 +44,6 @@ import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.preview.PodkopPreview
-import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.imageviewer.preview.ImageViewerScreenStateProvider
 import pl.masslany.podkop.features.imageviewer.preview.NoOpImageViewerActions
 import podkop.composeapp.generated.resources.Res
@@ -68,14 +65,12 @@ internal fun ImageViewerScreenRoot(
     val viewModel = koinViewModel<ImageViewerViewModel>(
         parameters = { parametersOf(imageUrl) },
     )
-    val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ImageViewerScreenContent(
         paddingValues = paddingValues,
         state = state,
         actions = viewModel,
-        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -85,7 +80,6 @@ fun ImageViewerScreenContent(
     paddingValues: PaddingValues,
     state: ImageViewerScreenState,
     actions: ImageViewerActions,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -121,9 +115,6 @@ fun ImageViewerScreenContent(
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
                 ),
             )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = Color.Black,
@@ -262,7 +253,6 @@ private fun ImageViewerScreenContentPreview(
             paddingValues = PaddingValues(),
             state = state,
             actions = NoOpImageViewerActions,
-            snackbarHostState = remember { SnackbarHostState() },
         )
     }
 }

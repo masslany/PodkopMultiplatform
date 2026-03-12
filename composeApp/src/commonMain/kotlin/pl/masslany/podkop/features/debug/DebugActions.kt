@@ -14,4 +14,6 @@ interface DebugActions : TopBarActions {
     fun onOpenLinkClicked()
 
     fun onSendPrivateMessagesNotificationClicked()
+
+    fun onSendSnackbarClicked()
 }

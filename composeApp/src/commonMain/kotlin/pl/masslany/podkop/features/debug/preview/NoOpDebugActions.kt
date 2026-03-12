@@ -10,4 +10,5 @@ object NoOpDebugActions : DebugActions, TopBarActions by NoOpTopBarActions {
     override fun onLinkIdChanged(value: String) = Unit
     override fun onOpenLinkClicked() = Unit
     override fun onSendPrivateMessagesNotificationClicked() = Unit
+    override fun onSendSnackbarClicked() = Unit
 }

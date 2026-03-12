@@ -29,8 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -58,7 +56,6 @@ import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicato
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
-import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.profile.components.ObservedTagItem
 import pl.masslany.podkop.features.profile.components.ObservedUserItem
 import pl.masslany.podkop.features.profile.components.ProfileAchievementsSection
@@ -104,7 +101,6 @@ internal fun ProfileScreenRoot(
     val viewModel = koinViewModel<ProfileViewModel>(
         parameters = { parametersOf(username) },
     )
-    val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListPaginator(
         shouldPaginate = { lastVisibleIndex, totalItems ->
@@ -120,7 +116,6 @@ internal fun ProfileScreenRoot(
         state = state,
         actions = viewModel,
         lazyListState = lazyListState,
-        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -131,7 +126,6 @@ fun ProfileScreenContent(
     state: ProfileScreenState,
     actions: ProfileActions,
     lazyListState: LazyListState,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -245,9 +239,6 @@ fun ProfileScreenContent(
                 },
                 scrollBehavior = scrollBehavior,
             )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
         },
         floatingActionButton = {
             AnimatedVisibility(
@@ -558,7 +549,6 @@ private fun ProfileScreenContentPreview(
             state = state,
             actions = NoOpProfileActions,
             lazyListState = rememberLazyListState(),
-            snackbarHostState = remember { SnackbarHostState() },
         )
     }
 }

@@ -35,8 +35,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -74,7 +72,6 @@ import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavi
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
-import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.common.theme.colorsPalette
 import pl.masslany.podkop.features.linkdetails.components.LinkDetailsHeader
 import pl.masslany.podkop.features.linkdetails.components.RelatedItem
@@ -115,7 +112,6 @@ internal fun LinkDetailsScreenRoot(
         parameters = { parametersOf(id) },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = LocalAppSnackbarHostState.current
     val lazyListState = rememberLazyListPaginator(
         shouldPaginate = { lastVisibleIndex, totalItems ->
             viewModel.shouldPaginate(lastVisibleIndex, totalItems)
@@ -130,7 +126,6 @@ internal fun LinkDetailsScreenRoot(
         state = state,
         actions = viewModel,
         lazyListState = lazyListState,
-        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -142,7 +137,6 @@ fun LinkDetailsScreenContent(
     state: LinkDetailsScreenState,
     actions: LinkDetailsActions,
     lazyListState: LazyListState,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -205,9 +199,6 @@ fun LinkDetailsScreenContent(
                     windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
                 )
             }
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
         },
         floatingActionButton = {
             AnimatedVisibility(
@@ -816,7 +807,6 @@ private fun LinkDetailsScreenContentPreview(
             state = state,
             actions = NoOpLinkDetailsActions,
             lazyListState = rememberLazyListState(),
-            snackbarHostState = remember { SnackbarHostState() },
         )
     }
 }

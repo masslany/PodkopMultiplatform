@@ -35,8 +35,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -69,7 +67,6 @@ import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.pagination.rememberLazyStaggeredGridPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
-import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import pl.masslany.podkop.features.tag.components.TagBanner
@@ -100,8 +97,6 @@ internal fun TagScreenRoot(
 ) {
     val viewModel = koinViewModel<TagViewModel>(parameters = { parametersOf(tag) })
     val state by viewModel.state.collectAsStateWithLifecycle()
-
-    val snackbarHostState = LocalAppSnackbarHostState.current
     val lazyListState = rememberLazyListPaginator(
         resetStateKey = state.screenInstanceId,
         shouldPaginate = { lastVisibleIndex, totalItems ->
@@ -132,7 +127,6 @@ internal fun TagScreenRoot(
         actions = viewModel,
         lazyListState = lazyListState,
         lazyStaggeredGridState = lazyStaggeredGridState,
-        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -144,7 +138,6 @@ internal fun TagScreenContent(
     actions: TagActions,
     lazyListState: LazyListState,
     lazyStaggeredGridState: LazyStaggeredGridState,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -264,9 +257,6 @@ internal fun TagScreenContent(
                 scrollBehavior = scrollBehavior,
                 windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
             )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
         },
         floatingActionButton = {
             AnimatedVisibility(
@@ -618,7 +608,6 @@ private fun TagScreenContentPreview(
             actions = NoOpTagActions,
             lazyListState = rememberLazyListState(),
             lazyStaggeredGridState = rememberLazyStaggeredGridState(),
-            snackbarHostState = remember { SnackbarHostState() },
         )
     }
 }

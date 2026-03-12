@@ -23,16 +23,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,12 +42,10 @@ import androidx.compose.ui.unit.toIntSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.features.resources.components.EntryCommentItem
 import pl.masslany.podkop.features.resources.components.EntryItem
 import pl.masslany.podkop.features.resources.components.LinkCommentItem
@@ -75,23 +69,10 @@ fun ResourceScreenshotPreviewDialogScreenRoot(
         parameters = { parametersOf(screen.draftId) },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(viewModel) {
-        viewModel.snackbarEvents.collect { event ->
-            snackbarHostState.showSnackbar(
-                message = event.message.resolveDialogSnackbarMessage(),
-                actionLabel = event.actionLabel?.resolveDialogSnackbarMessage(),
-                withDismissAction = event.withDismissAction,
-                duration = if (event.isFinite) SnackbarDuration.Short else SnackbarDuration.Indefinite,
-            )
-        }
-    }
 
     ResourceScreenshotPreviewDialogContent(
         state = state,
         actions = viewModel,
-        snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
 }
@@ -100,7 +81,6 @@ fun ResourceScreenshotPreviewDialogScreenRoot(
 private fun ResourceScreenshotPreviewDialogContent(
     state: ResourceScreenshotPreviewDialogState,
     actions: ResourceScreenshotPreviewDialogActions,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val draft = state.draft ?: return
@@ -278,15 +258,6 @@ private fun ResourceScreenshotPreviewDialogContent(
                 }
             }
         }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .widthIn(max = 640.dp)
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-        )
     }
 }
 
@@ -434,9 +405,4 @@ private fun ResourceScreenshotPreviewContent(
             }
         }
     }
-}
-
-private suspend fun SnackbarMessage.resolveDialogSnackbarMessage(): String = when (this) {
-    is SnackbarMessage.Raw -> value
-    is SnackbarMessage.Resource -> getString(resource = resource, *args.toTypedArray())
 }

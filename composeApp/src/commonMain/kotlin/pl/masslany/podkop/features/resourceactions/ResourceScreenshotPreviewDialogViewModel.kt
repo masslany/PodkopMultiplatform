@@ -3,10 +3,7 @@ package pl.masslany.podkop.features.resourceactions
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,12 +28,6 @@ class ResourceScreenshotPreviewDialogViewModel(
 
     private val _state = MutableStateFlow(ResourceScreenshotPreviewDialogState.initial)
     val state = _state.asStateFlow()
-    private val _snackbarEvents = MutableSharedFlow<SnackbarEvent>(
-        replay = 0,
-        extraBufferCapacity = 4,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
-    )
-    val snackbarEvents = _snackbarEvents.asSharedFlow()
 
     init {
         val draft = draftStore.get(draftId)
@@ -101,7 +92,7 @@ class ResourceScreenshotPreviewDialogViewModel(
 
             when {
                 !isSuccess -> {
-                    _snackbarEvents.tryEmit(
+                    snackbarManager.tryEmit(
                         SnackbarEvent(
                             message = SnackbarMessage.Resource(Res.string.snackbar_generic_error),
                         ),
@@ -109,7 +100,7 @@ class ResourceScreenshotPreviewDialogViewModel(
                 }
 
                 action == ResourceScreenshotExportAction.Copy -> {
-                    _snackbarEvents.tryEmit(
+                    snackbarManager.tryEmit(
                         SnackbarEvent(
                             message = SnackbarMessage.Resource(Res.string.snackbar_screenshot_copied),
                         ),
@@ -117,7 +108,7 @@ class ResourceScreenshotPreviewDialogViewModel(
                 }
 
                 action == ResourceScreenshotExportAction.Save -> {
-                    _snackbarEvents.tryEmit(
+                    snackbarManager.tryEmit(
                         SnackbarEvent(
                             message = SnackbarMessage.Resource(Res.string.snackbar_image_saved),
                         ),

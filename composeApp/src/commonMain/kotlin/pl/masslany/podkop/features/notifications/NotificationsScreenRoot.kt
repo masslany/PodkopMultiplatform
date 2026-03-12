@@ -17,8 +17,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -39,7 +37,6 @@ import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
-import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.notifications.components.NotificationsList
 import pl.masslany.podkop.features.notifications.components.NotificationsScreenHeader
 import pl.masslany.podkop.features.notifications.preview.NoOpNotificationsActions
@@ -56,7 +53,6 @@ internal fun NotificationsScreenRoot(
 ) {
     val viewModel = koinViewModel<NotificationsViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = LocalAppSnackbarHostState.current
     val lazyListState = rememberLazyListPaginator(
         resetStateKey = state.selectedGroup.name,
         shouldPaginate = { lastVisibleIndex, totalItems ->
@@ -72,7 +68,6 @@ internal fun NotificationsScreenRoot(
         state = state,
         actions = viewModel,
         lazyListState = lazyListState,
-        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -83,7 +78,6 @@ fun NotificationsScreenContent(
     state: NotificationsScreenState,
     actions: NotificationsActions,
     lazyListState: LazyListState,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -115,9 +109,6 @@ fun NotificationsScreenContent(
                 scrollBehavior = scrollBehavior,
                 windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
             )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
         },
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -185,7 +176,6 @@ private fun NotificationsScreenContentPreview(
             state = state,
             actions = NoOpNotificationsActions,
             lazyListState = LazyListState(),
-            snackbarHostState = SnackbarHostState(),
         )
     }
 }

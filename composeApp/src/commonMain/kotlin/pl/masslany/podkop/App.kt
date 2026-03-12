@@ -2,18 +2,25 @@ package pl.masslany.podkop
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -87,6 +94,8 @@ import pl.masslany.podkop.features.settings.SettingsScreenRoot
 import pl.masslany.podkop.features.tag.TagScreen
 import pl.masslany.podkop.features.tag.TagScreenRoot
 
+private val GlobalSnackbarTopOffset = 80.dp
+
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun App() {
@@ -142,211 +151,224 @@ fun App() {
             LocalAppSnackbarHostState provides snackbarHostState,
             LocalAppSettings provides appSettings,
         ) {
-            NavigationContent(
-                state = state,
-                onBack = viewModel::onBack,
-                entryProvider = entryProvider {
-                    entry<HomeScreen> {
-                        HomeScreenRoot()
-                    }
+            Box(modifier = Modifier.fillMaxSize()) {
+                NavigationContent(
+                    state = state,
+                    onBack = viewModel::onBack,
+                    entryProvider = entryProvider {
+                        entry<HomeScreen> {
+                            HomeScreenRoot()
+                        }
 
-                    entry<EntryDetailsScreen> {
-                        EntryDetailsScreenRoot(
-                            screen = it,
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<EntryDetailsScreen> {
+                            EntryDetailsScreenRoot(
+                                screen = it,
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<LinkDetailsScreen> {
-                        LinkDetailsScreenRoot(
-                            id = it.id,
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<LinkDetailsScreen> {
+                            LinkDetailsScreenRoot(
+                                id = it.id,
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<ImageViewerScreen> {
-                        ImageViewerScreenRoot(
-                            imageUrl = it.imageUrl,
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<ImageViewerScreen> {
+                            ImageViewerScreenRoot(
+                                imageUrl = it.imageUrl,
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<ProfileScreen> {
-                        ProfileScreenRoot(
-                            username = it.username,
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<ProfileScreen> {
+                            ProfileScreenRoot(
+                                username = it.username,
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<AddLinkScreen> {
-                        AddLinkScreenRoot()
-                    }
+                        entry<AddLinkScreen> {
+                            AddLinkScreenRoot()
+                        }
 
-                    entry<LinkDraftScreen> {
-                        LinkDraftScreenRoot(screen = it)
-                    }
+                        entry<LinkDraftScreen> {
+                            LinkDraftScreenRoot(screen = it)
+                        }
 
-                    entry<SettingsScreen> {
-                        SettingsScreenRoot(
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<SettingsScreen> {
+                            SettingsScreenRoot(
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<AboutAppScreen>(
-                        metadata = DialogSceneStrategy.dialog(
-                            DialogProperties(
-                                usePlatformDefaultWidth = false,
+                        entry<AboutAppScreen>(
+                            metadata = DialogSceneStrategy.dialog(
+                                DialogProperties(
+                                    usePlatformDefaultWidth = false,
+                                ),
                             ),
-                        ),
-                    ) {
-                        AboutAppScreenRoot()
-                    }
+                        ) {
+                            AboutAppScreenRoot()
+                        }
 
-                    entry<HitsScreen> {
-                        HitsScreenRoot(
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<HitsScreen> {
+                            HitsScreenRoot(
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<FavoritesScreen> {
-                        FavoritesScreenRoot(
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<FavoritesScreen> {
+                            FavoritesScreenRoot(
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<SearchScreen> {
-                        SearchScreenRoot(
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<SearchScreen> {
+                            SearchScreenRoot(
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<NotificationsScreen> {
-                        NotificationsScreenRoot(
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<NotificationsScreen> {
+                            NotificationsScreenRoot(
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<PrivateMessagesScreen> {
-                        PrivateMessagesScreenRoot(
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<PrivateMessagesScreen> {
+                            PrivateMessagesScreenRoot(
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<NewConversationScreen> {
-                        NewConversationScreenRoot(
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<NewConversationScreen> {
+                            NewConversationScreenRoot(
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<ConversationScreen> {
-                        ConversationScreenRoot(
-                            screen = it,
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<ConversationScreen> {
+                            ConversationScreenRoot(
+                                screen = it,
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<DebugScreen> {
-                        DebugScreenRoot(
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<DebugScreen> {
+                            DebugScreenRoot(
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<TagScreen> {
-                        TagScreenRoot(
-                            tag = it.tag,
-                            paddingValues = WindowInsets.systemBars.asPaddingValues(),
-                        )
-                    }
+                        entry<TagScreen> {
+                            TagScreenRoot(
+                                tag = it.tag,
+                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                            )
+                        }
 
-                    entry<ResourceActionsBottomSheetScreen>(
-                        metadata = BottomSheetSceneStrategy.bottomSheet(),
-                    ) {
-                        ResourceActionsBottomSheetScreenRoot(
-                            screen = it,
-                        )
-                    }
+                        entry<ResourceActionsBottomSheetScreen>(
+                            metadata = BottomSheetSceneStrategy.bottomSheet(),
+                        ) {
+                            ResourceActionsBottomSheetScreenRoot(
+                                screen = it,
+                            )
+                        }
 
-                    entry<ComposerBottomSheetScreen>(
-                        metadata = BottomSheetSceneStrategy.bottomSheet(
-                            modalBottomSheetProperties = ModalBottomSheetProperties(
-                                shouldDismissOnClickOutside = false,
+                        entry<ComposerBottomSheetScreen>(
+                            metadata = BottomSheetSceneStrategy.bottomSheet(
+                                modalBottomSheetProperties = ModalBottomSheetProperties(
+                                    shouldDismissOnClickOutside = false,
+                                ),
+                                sheetGesturesEnabled = false,
+                                hideDragHandle = true,
                             ),
-                            sheetGesturesEnabled = false,
-                            hideDragHandle = true,
-                        ),
-                    ) {
-                        ComposerBottomSheetScreenRoot(
-                            screen = it,
-                        )
-                    }
+                        ) {
+                            ComposerBottomSheetScreenRoot(
+                                screen = it,
+                            )
+                        }
 
-                    entry<ResourceVotesBottomSheetScreen>(
-                        metadata = BottomSheetSceneStrategy.bottomSheet(),
-                    ) {
-                        ResourceVotesBottomSheetScreenRoot(
-                            screen = it,
-                        )
-                    }
+                        entry<ResourceVotesBottomSheetScreen>(
+                            metadata = BottomSheetSceneStrategy.bottomSheet(),
+                        ) {
+                            ResourceVotesBottomSheetScreenRoot(
+                                screen = it,
+                            )
+                        }
 
-                    entry<ResourceScreenshotPreviewDialogScreen>(
-                        metadata = DialogSceneStrategy.dialog(
-                            DialogProperties(
-                                usePlatformDefaultWidth = false,
+                        entry<ResourceScreenshotPreviewDialogScreen>(
+                            metadata = DialogSceneStrategy.dialog(
+                                DialogProperties(
+                                    usePlatformDefaultWidth = false,
+                                ),
                             ),
-                        ),
-                    ) {
-                        ResourceScreenshotPreviewDialogScreenRoot(
-                            screen = it,
-                        )
-                    }
+                        ) {
+                            ResourceScreenshotPreviewDialogScreenRoot(
+                                screen = it,
+                            )
+                        }
 
-                    entry<ComposerMediaAttachBottomSheetScreen>(
-                        metadata = BottomSheetSceneStrategy.bottomSheet(),
-                    ) {
-                        ComposerMediaAttachBottomSheetScreenRoot(
-                            screen = it,
-                            appNavigator = appNavigator,
-                        )
-                    }
+                        entry<ComposerMediaAttachBottomSheetScreen>(
+                            metadata = BottomSheetSceneStrategy.bottomSheet(),
+                        ) {
+                            ComposerMediaAttachBottomSheetScreenRoot(
+                                screen = it,
+                                appNavigator = appNavigator,
+                            )
+                        }
 
-                    entry<ComposerMediaUrlDialogScreen>(
-                        metadata = DialogSceneStrategy.dialog(
-                            DialogProperties(
-                                usePlatformDefaultWidth = false,
+                        entry<ComposerMediaUrlDialogScreen>(
+                            metadata = DialogSceneStrategy.dialog(
+                                DialogProperties(
+                                    usePlatformDefaultWidth = false,
+                                ),
                             ),
-                        ),
-                    ) {
-                        ComposerMediaUrlDialogScreenRoot(
-                            screen = it,
-                            appNavigator = appNavigator,
-                        )
-                    }
+                        ) {
+                            ComposerMediaUrlDialogScreenRoot(
+                                screen = it,
+                                appNavigator = appNavigator,
+                            )
+                        }
 
-                    entry<ComposerMediaPickLocalScreen>(
-                        metadata = DialogSceneStrategy.dialog(
-                            DialogProperties(
-                                usePlatformDefaultWidth = false,
+                        entry<ComposerMediaPickLocalScreen>(
+                            metadata = DialogSceneStrategy.dialog(
+                                DialogProperties(
+                                    usePlatformDefaultWidth = false,
+                                ),
                             ),
-                        ),
-                    ) {
-                        ComposerMediaPickLocalScreenRoot(
-                            screen = it,
-                            appNavigator = appNavigator,
-                        )
-                    }
+                        ) {
+                            ComposerMediaPickLocalScreenRoot(
+                                screen = it,
+                                appNavigator = appNavigator,
+                            )
+                        }
 
-                    entry<GenericDialog>(
-                        metadata = DialogSceneStrategy.dialog(
-                            DialogProperties(),
+                        entry<GenericDialog>(
+                            metadata = DialogSceneStrategy.dialog(
+                                DialogProperties(),
+                            ),
+                        ) {
+                            DefaultGenericDialog(
+                                dialog = it,
+                                navigator = appNavigator,
+                            )
+                        }
+                    },
+                )
+
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(horizontal = 16.dp)
+                        .padding(
+                            top = WindowInsets.systemBars.asPaddingValues()
+                                .calculateBottomPadding() + GlobalSnackbarTopOffset,
                         ),
-                    ) {
-                        DefaultGenericDialog(
-                            dialog = it,
-                            navigator = appNavigator,
-                        )
-                    }
-                },
-            )
+                )
+            }
         }
     }
 }

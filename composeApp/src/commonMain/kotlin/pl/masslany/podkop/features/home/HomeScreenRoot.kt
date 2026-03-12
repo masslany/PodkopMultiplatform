@@ -18,8 +18,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
@@ -55,7 +53,6 @@ import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.common.navigation.bottombar.BottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.preview.PodkopPreview
-import pl.masslany.podkop.common.snackbar.LocalAppSnackbarHostState
 import pl.masslany.podkop.features.bottombar.BottomBarDestinationState
 import pl.masslany.podkop.features.bottombar.BottomBarRoot
 import pl.masslany.podkop.features.bottombar.SideBarRoot
@@ -100,12 +97,10 @@ internal fun HomeScreenRoot(
     modifier: Modifier = Modifier,
 ) {
     val viewModel = koinViewModel<HomeViewModel>()
-    val snackbarHostState = LocalAppSnackbarHostState.current
     val state by viewModel.state.collectAsStateWithLifecycle()
     HomeScreenContent(
         modifier = modifier,
         state = state,
-        snackbarHostState = snackbarHostState,
         onTabChanged = viewModel::onTabChanged,
         onBack = viewModel::onBackPressedInHome,
         onInlineDetailsModeChanged = viewModel::onInlineDetailsModeChanged,
@@ -120,7 +115,6 @@ internal fun HomeScreenRoot(
 fun HomeScreenContent(
     modifier: Modifier = Modifier,
     state: HomeScreenState,
-    snackbarHostState: SnackbarHostState,
     onTabChanged: (NavTarget) -> Unit,
     onBack: () -> Unit,
     onInlineDetailsModeChanged: (Boolean) -> Unit,
@@ -188,9 +182,6 @@ fun HomeScreenContent(
     CompositionLocalProvider(LocalBottomBarScrollBehavior provides bottomBarBehavior) {
         Scaffold(
             modifier = modifier.fillMaxSize(),
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState)
-            },
             bottomBar = {
                 if (useBottomBar && state.destinations.isNotEmpty()) {
                     BottomBarRoot(
@@ -456,7 +447,6 @@ private fun HomeLinkDetailsPlaceholder(
 @Preview
 @Composable
 private fun HomeScreenContentPreviewLinksTab() {
-    val snackbarHostState = remember { SnackbarHostState() }
     val state = remember {
         HomeScreenState(
             destinations = persistentListOf(
@@ -496,7 +486,6 @@ private fun HomeScreenContentPreviewLinksTab() {
     PodkopPreview(darkTheme = false) {
         HomeScreenContent(
             state = state,
-            snackbarHostState = snackbarHostState,
             onTabChanged = {},
             onBack = {},
             onInlineDetailsModeChanged = {},
@@ -519,7 +508,6 @@ private fun HomeScreenContentPreviewLinksTab() {
 @Preview
 @Composable
 private fun HomeScreenContentPreviewEntriesTab() {
-    val snackbarHostState = remember { SnackbarHostState() }
     val state = remember {
         HomeScreenState(
             destinations = persistentListOf(
@@ -559,7 +547,6 @@ private fun HomeScreenContentPreviewEntriesTab() {
     PodkopPreview(darkTheme = false) {
         HomeScreenContent(
             state = state,
-            snackbarHostState = snackbarHostState,
             onTabChanged = {},
             onBack = {},
             onInlineDetailsModeChanged = {},
