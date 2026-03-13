@@ -28,10 +28,12 @@ import podkop.composeapp.generated.resources.ic_add
 import podkop.composeapp.generated.resources.ic_arrow_down
 import podkop.composeapp.generated.resources.ic_arrow_up
 import podkop.composeapp.generated.resources.ic_copy
+import podkop.composeapp.generated.resources.ic_copy_all
 import podkop.composeapp.generated.resources.ic_delete
 import podkop.composeapp.generated.resources.ic_edit
 import podkop.composeapp.generated.resources.ic_share
 import podkop.composeapp.generated.resources.resource_actions_copy_as_link
+import podkop.composeapp.generated.resources.resource_actions_copy_text
 import podkop.composeapp.generated.resources.resource_actions_delete_entry
 import podkop.composeapp.generated.resources.resource_actions_delete_entry_comment
 import podkop.composeapp.generated.resources.resource_actions_edit_comment
@@ -43,6 +45,7 @@ import podkop.composeapp.generated.resources.resource_actions_show_voters
 import podkop.composeapp.generated.resources.snackbar_entry_comment_deleted
 import podkop.composeapp.generated.resources.snackbar_entry_deleted
 import podkop.composeapp.generated.resources.snackbar_link_copied
+import podkop.composeapp.generated.resources.snackbar_text_copied
 
 class ResourceActionsBottomSheetViewModel(
     private val params: ResourceActionsParams,
@@ -62,6 +65,15 @@ class ResourceActionsBottomSheetViewModel(
 
     override fun onActionClicked(actionId: ResourceActionId) {
         when (actionId) {
+            ResourceActionId.CopyText -> {
+                snackbarManager.tryEmit(
+                    SnackbarEvent(
+                        message = SnackbarMessage.Resource(Res.string.snackbar_text_copied),
+                    ),
+                )
+                appNavigator.back()
+            }
+
             ResourceActionId.CopyAsLink -> {
                 snackbarManager.tryEmit(
                     SnackbarEvent(
@@ -337,6 +349,16 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
             ),
         ),
     )
+    val copyTextAction = params.copyContent
+        ?.takeIf(String::isNotBlank)
+        ?.let { copyContent ->
+            ResourceActionItemState(
+                id = ResourceActionId.CopyText,
+                title = Res.string.resource_actions_copy_text,
+                icon = Res.drawable.ic_copy_all,
+                localAction = ResourceActionLocalAction.CopyToClipboard(copyContent),
+            )
+        }
     val screenshotAction = params.screenshotDraftId?.let {
         ResourceActionItemState(
             id = ResourceActionId.ShareAsScreenshot,
@@ -415,6 +437,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
                 showVotersAction,
                 screenshotAction,
                 copyLinkAction,
+                copyTextAction,
                 editEntryAction,
                 deleteEntryAction,
             ).toPersistentList()
@@ -424,6 +447,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
                 showVotersAction,
                 screenshotAction,
                 copyLinkAction,
+                copyTextAction,
                 editEntryCommentAction,
                 deleteEntryCommentAction,
             ).toPersistentList()
@@ -432,6 +456,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
             -> listOfNotNull(
                 screenshotAction,
                 copyLinkAction,
+                copyTextAction,
                 editLinkCommentAction,
             ).toPersistentList()
         },

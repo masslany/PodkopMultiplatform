@@ -92,6 +92,49 @@ class ResourceActionsBottomSheetViewModelTest {
     }
 
     @Test
+    fun `buildState includes copy text action when copyable content is provided`() {
+        val state = buildState(
+            ResourceActionsParams(
+                resourceType = ResourceActionsType.EntryComment,
+                rootId = 123,
+                childId = 456,
+                copyContent = "original comment body",
+            ),
+        )
+
+        val copyTextAction = state.actions.firstOrNull { it.id == ResourceActionId.CopyText }
+        val localAction = assertIs<ResourceActionLocalAction.CopyToClipboard>(copyTextAction?.localAction)
+        assertEquals("original comment body", localAction.value)
+    }
+
+    @Test
+    fun `buildState omits copy text action when copyable content is missing`() {
+        val state = buildState(
+            ResourceActionsParams(
+                resourceType = ResourceActionsType.Entry,
+                rootId = 123,
+                copyContent = null,
+            ),
+        )
+
+        assertFalse(state.actions.any { it.id == ResourceActionId.CopyText })
+    }
+
+    @Test
+    fun `buildState omits copy text action for links even if copyable content is provided`() {
+        val state = buildState(
+            ResourceActionsParams(
+                resourceType = ResourceActionsType.Link,
+                rootId = 42,
+                rootSlug = "slug",
+                copyContent = "should not be shown",
+            ),
+        )
+
+        assertFalse(state.actions.any { it.id == ResourceActionId.CopyText })
+    }
+
+    @Test
     fun `buildState includes edit entry comment action when entry comment is editable`() {
         val state = buildState(
             ResourceActionsParams(

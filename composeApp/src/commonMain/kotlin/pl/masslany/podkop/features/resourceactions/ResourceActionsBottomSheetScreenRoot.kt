@@ -43,6 +43,7 @@ fun ResourceActionsBottomSheetScreenRoot(
                     canDelete = screen.canDelete,
                     canEdit = screen.canEdit,
                     content = screen.content,
+                    copyContent = screen.copyContent,
                     adult = screen.adult,
                     photoKey = screen.photoKey,
                     photoUrl = screen.photoUrl,

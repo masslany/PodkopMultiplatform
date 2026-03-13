@@ -20,6 +20,7 @@ data class ResourceActionItemState(
 )
 
 enum class ResourceActionId {
+    CopyText,
     CopyAsLink,
     ShareAsScreenshot,
     ShowVoters,
@@ -46,6 +47,7 @@ data class ResourceActionsParams(
     val canDelete: Boolean = false,
     val canEdit: Boolean = false,
     val content: String = "",
+    val copyContent: String? = null,
     val adult: Boolean = false,
     val photoKey: String? = null,
     val photoUrl: String? = null,

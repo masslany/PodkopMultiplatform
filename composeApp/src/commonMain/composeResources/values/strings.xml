@@ -342,6 +342,7 @@
     <string name="snackbar_image_saved">Zapisano</string>
     <string name="snackbar_generic_error">Wystąpił problem</string>
     <string name="snackbar_link_copied">Skopiowano link</string>
+    <string name="snackbar_text_copied">Skopiowano treść</string>
     <string name="snackbar_add_link_success">Dodano znalezisko</string>
     <string name="snackbar_add_link_draft_deleted">Usunięto wersję roboczą</string>
     <string name="snackbar_screenshot_copied">Skopiowano obraz</string>
@@ -350,6 +351,7 @@
 
     <!-- Resource actions -->
     <string name="resource_actions_copy_as_link">Kopiuj link</string>
+    <string name="resource_actions_copy_text">Kopiuj treść</string>
     <string name="resource_actions_share_as_screenshot">Udostępnij jako zrzut ekranu</string>
     <string name="resource_actions_show_voters">Pokaż plusujących</string>
     <string name="resource_actions_show_link_upvoters">Pokaż wykopujących</string>

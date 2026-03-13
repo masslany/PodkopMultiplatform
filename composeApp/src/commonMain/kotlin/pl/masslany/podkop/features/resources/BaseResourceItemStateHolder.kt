@@ -19,6 +19,7 @@ import pl.masslany.podkop.business.favourites.domain.models.FavouriteType
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.logging.api.AppLogger
+import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentType
 import pl.masslany.podkop.common.models.embed.TwitterEmbedState
@@ -295,6 +296,10 @@ open class BaseResourceItemStateHolder(
                 canDelete = canDelete,
                 canEdit = entry?.isEditEnabled == true,
                 content = entry?.rawContent.orEmpty(),
+                copyContent = entry
+                    ?.takeIf { it.entryContentState is EntryContentState.Content && !it.isBlacklisted }
+                    ?.rawContent
+                    ?.takeIf(String::isNotBlank),
                 adult = entry?.adult == true,
                 photoKey = entry?.photoKey,
                 photoUrl = entry?.photoUrl,
@@ -375,6 +380,10 @@ open class BaseResourceItemStateHolder(
                 canDelete = canDelete,
                 canEdit = comment?.isEditEnabled == true,
                 content = comment?.rawContent.orEmpty(),
+                copyContent = comment
+                    ?.takeIf { it.entryContentState is EntryContentState.Content && !it.isBlacklisted }
+                    ?.rawContent
+                    ?.takeIf(String::isNotBlank),
                 adult = comment?.adult == true,
                 photoKey = comment?.embedImageState?.key,
                 photoUrl = comment?.embedImageState?.url,
@@ -401,6 +410,10 @@ open class BaseResourceItemStateHolder(
                 screenshotDraftId = draftId,
                 canEdit = comment?.isEditEnabled == true,
                 content = comment?.rawContent.orEmpty(),
+                copyContent = comment
+                    ?.takeIf { it.entryContentState is EntryContentState.Content && !it.isBlacklisted }
+                    ?.rawContent
+                    ?.takeIf(String::isNotBlank),
                 adult = comment?.adult == true,
                 photoKey = comment?.embedImageState?.key,
                 photoUrl = comment?.embedImageState?.url,

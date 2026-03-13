@@ -24,6 +24,7 @@ import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
+import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentType
 import pl.masslany.podkop.common.models.embed.TwitterEmbedState
@@ -319,6 +320,10 @@ class LinkDetailsViewModel(
                 screenshotDraftId = draftId,
                 canEdit = targetComment?.isEditEnabled == true,
                 content = targetComment?.rawContent.orEmpty(),
+                copyContent = targetComment
+                    ?.takeIf { it.entryContentState is EntryContentState.Content && !it.isBlacklisted }
+                    ?.rawContent
+                    ?.takeIf(String::isNotBlank),
                 adult = targetComment?.adult == true,
                 photoKey = targetComment?.embedImageState?.key,
                 photoUrl = targetComment?.embedImageState?.url,
