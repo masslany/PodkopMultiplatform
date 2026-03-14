@@ -28,6 +28,7 @@ import pl.masslany.podkop.features.privatemessages.PrivateMessagesScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogScreen
+import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogScreen
 import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetScreen
 import pl.masslany.podkop.features.search.SearchScreen
 import pl.masslany.podkop.features.settings.SettingsScreen
@@ -59,6 +60,7 @@ internal object NavigationBackstackSerializer {
                 subclass(FavoritesScreen::class, FavoritesScreen.serializer())
                 subclass(NotificationsScreen::class, NotificationsScreen.serializer())
                 subclass(ResourceScreenshotPreviewDialogScreen::class, ResourceScreenshotPreviewDialogScreen.serializer())
+                subclass(ResourceTextSelectionDialogScreen::class, ResourceTextSelectionDialogScreen.serializer())
                 subclass(ResourceActionsBottomSheetScreen::class, ResourceActionsBottomSheetScreen.serializer())
                 subclass(AboutAppScreen::class, AboutAppScreen.serializer())
                 subclass(ResourceVotesBottomSheetScreen::class, ResourceVotesBottomSheetScreen.serializer())

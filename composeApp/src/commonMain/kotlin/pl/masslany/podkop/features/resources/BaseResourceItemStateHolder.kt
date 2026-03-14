@@ -34,6 +34,7 @@ import pl.masslany.podkop.features.resourceactions.ResourceActionUpdatesStore
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraft
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
+import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogScreen
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.entry.EntryVoteAction
@@ -274,6 +275,22 @@ open class BaseResourceItemStateHolder(
         appNavigator.navigateTo(EntryDetailsScreen.forEntry(id))
     }
 
+    override fun onEntryLongClicked(id: Int) {
+        val entry = _items.value
+            .filterIsInstance<EntryItemState>()
+            .firstOrNull { it.id == id }
+            ?: return
+        val copyContent = entry.copyableContent ?: return
+        val draftId = createEntryScreenshotDraftId(id)
+
+        appNavigator.navigateTo(
+            ResourceTextSelectionDialogScreen(
+                content = copyContent,
+                previewDraftId = draftId,
+            ),
+        )
+    }
+
     override fun onEntryReplyClicked(entryId: Int, author: String?) {
         appNavigator.navigateTo(
             EntryDetailsScreen.forEntryReply(
@@ -299,7 +316,7 @@ open class BaseResourceItemStateHolder(
                 copyContent = entry
                     ?.takeIf { it.entryContentState is EntryContentState.Content && !it.isBlacklisted }
                     ?.rawContent
-                    ?.takeIf(String::isNotBlank),
+                    ?.takeIf { it.isNotBlank() },
                 adult = entry?.adult == true,
                 photoKey = entry?.photoKey,
                 photoUrl = entry?.photoUrl,
@@ -354,6 +371,32 @@ open class BaseResourceItemStateHolder(
         )
     }
 
+    override fun onEntryCommentLongClicked(entryId: Int, entryCommentId: Int) {
+        val comment = _items.value
+            .asSequence()
+            .filterIsInstance<EntryCommentItemState>()
+            .firstOrNull { it.id == entryCommentId }
+            ?: _items.value
+                .asSequence()
+                .filterIsInstance<EntryItemState>()
+                .firstOrNull { it.id == entryId }
+                ?.comments
+                ?.firstOrNull { it.id == entryCommentId }
+            ?: return
+        val copyContent = comment.copyableContent ?: return
+        val draftId = createEntryCommentScreenshotDraftId(
+            entryId = entryId,
+            entryCommentId = entryCommentId,
+        )
+
+        appNavigator.navigateTo(
+            ResourceTextSelectionDialogScreen(
+                content = copyContent,
+                previewDraftId = draftId,
+            ),
+        )
+    }
+
     override fun onEntryCommentMoreClicked(entryId: Int, entryCommentId: Int) {
         val comment = _items.value
             .asSequence()
@@ -383,7 +426,7 @@ open class BaseResourceItemStateHolder(
                 copyContent = comment
                     ?.takeIf { it.entryContentState is EntryContentState.Content && !it.isBlacklisted }
                     ?.rawContent
-                    ?.takeIf(String::isNotBlank),
+                    ?.takeIf { it.isNotBlank() },
                 adult = comment?.adult == true,
                 photoKey = comment?.embedImageState?.key,
                 photoUrl = comment?.embedImageState?.url,
@@ -413,10 +456,26 @@ open class BaseResourceItemStateHolder(
                 copyContent = comment
                     ?.takeIf { it.entryContentState is EntryContentState.Content && !it.isBlacklisted }
                     ?.rawContent
-                    ?.takeIf(String::isNotBlank),
+                    ?.takeIf { it.isNotBlank() },
                 adult = comment?.adult == true,
                 photoKey = comment?.embedImageState?.key,
                 photoUrl = comment?.embedImageState?.url,
+            ),
+        )
+    }
+
+    override fun onLinkCommentLongClicked(linkId: Int, commentId: Int) {
+        val comment = _items.value
+            .filterIsInstance<LinkCommentItemState>()
+            .firstOrNull { it.id == commentId }
+            ?: return
+        val copyContent = comment.copyableContent ?: return
+        val draftId = createTopLevelLinkCommentScreenshotDraftId(commentId)
+
+        appNavigator.navigateTo(
+            ResourceTextSelectionDialogScreen(
+                content = copyContent,
+                previewDraftId = draftId,
             ),
         )
     }
@@ -781,6 +840,27 @@ open class BaseResourceItemStateHolder(
         RemoveVoteUp,
     }
 }
+
+private val EntryItemState.copyableContent: String?
+    get() = rawContent.takeIf {
+        entryContentState is EntryContentState.Content &&
+            !isBlacklisted &&
+            it.isNotBlank()
+    }
+
+private val EntryCommentItemState.copyableContent: String?
+    get() = rawContent.takeIf {
+        entryContentState is EntryContentState.Content &&
+            !isBlacklisted &&
+            it.isNotBlank()
+    }
+
+private val LinkCommentItemState.copyableContent: String?
+    get() = rawContent.takeIf {
+        entryContentState is EntryContentState.Content &&
+            !isBlacklisted &&
+            it.isNotBlank()
+    }
 
 internal fun EmbedContentState?.updateTwitterEmbedStateIfMatches(
     embedKey: String,

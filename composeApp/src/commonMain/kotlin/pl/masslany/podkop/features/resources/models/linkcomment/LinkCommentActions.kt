@@ -5,6 +5,7 @@ interface LinkCommentActions {
     fun onLinkCommentVoteDownClick(linkId: Int, commentId: Int, voted: Boolean)
     fun onLinkCommentFavouriteClicked(linkId: Int, commentId: Int, favourited: Boolean)
     fun onLinkCommentReplyClicked(linkId: Int, commentId: Int, author: String?)
+    fun onLinkCommentLongClicked(linkId: Int, commentId: Int)
     fun onLinkCommentMoreClicked(
         linkId: Int,
         commentId: Int,

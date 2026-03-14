@@ -108,6 +108,20 @@ class ResourceActionsBottomSheetViewModelTest {
     }
 
     @Test
+    fun `buildState includes select text action when copyable content is provided`() {
+        val state = buildState(
+            ResourceActionsParams(
+                resourceType = ResourceActionsType.EntryComment,
+                rootId = 123,
+                childId = 456,
+                copyContent = "original comment body",
+            ),
+        )
+
+        assertTrue(state.actions.any { it.id == ResourceActionId.SelectText })
+    }
+
+    @Test
     fun `buildState omits copy text action when copyable content is missing`() {
         val state = buildState(
             ResourceActionsParams(
@@ -118,6 +132,7 @@ class ResourceActionsBottomSheetViewModelTest {
         )
 
         assertFalse(state.actions.any { it.id == ResourceActionId.CopyText })
+        assertFalse(state.actions.any { it.id == ResourceActionId.SelectText })
     }
 
     @Test
@@ -132,6 +147,7 @@ class ResourceActionsBottomSheetViewModelTest {
         )
 
         assertFalse(state.actions.any { it.id == ResourceActionId.CopyText })
+        assertFalse(state.actions.any { it.id == ResourceActionId.SelectText })
     }
 
     @Test

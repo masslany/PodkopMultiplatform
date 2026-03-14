@@ -78,7 +78,9 @@ import pl.masslany.podkop.features.linkdetails.components.RelatedItem
 import pl.masslany.podkop.features.linkdetails.models.LinkDetailsCommentItemState
 import pl.masslany.podkop.features.linkdetails.preview.LinkDetailsScreenStateProvider
 import pl.masslany.podkop.features.linkdetails.preview.NoOpLinkDetailsActions
+import pl.masslany.podkop.features.resourceactions.resourceTextSelectionGesture
 import pl.masslany.podkop.features.resources.components.LinkCommentItem
+import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
@@ -584,7 +586,11 @@ private fun LinkDetailsCommentItem(
                 ),
             ) {
                 LinkCommentItem(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .resourceTextSelectionGesture(
+                            onLongClick = state.comment.textSelectionLongClick(actions),
+                        ),
                     state = state.comment,
                     isReplyEnabled = isReplyEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
@@ -650,7 +656,11 @@ private fun LinkDetailsCommentItem(
                     ),
                 ) {
                     LinkCommentItem(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .resourceTextSelectionGesture(
+                                onLongClick = reply.textSelectionLongClick(actions),
+                            ),
                         state = reply,
                         isReplyEnabled = isReplyEnabled,
                         onProfileClick = { actions.onProfileClicked(it) },
@@ -732,6 +742,16 @@ private fun LinkDetailsCommentItem(
         }
     }
 }
+
+private fun LinkCommentItemState.textSelectionLongClick(actions: LinkDetailsActions): (() -> Unit)? =
+    if (entryContentState is pl.masslany.podkop.common.models.EntryContentState.Content &&
+        !isBlacklisted &&
+        rawContent.isNotBlank()
+    ) {
+        { actions.onLinkCommentLongClicked(linkId, id) }
+    } else {
+        null
+    }
 
 @Composable
 private fun LinkCommentAccentLayout(

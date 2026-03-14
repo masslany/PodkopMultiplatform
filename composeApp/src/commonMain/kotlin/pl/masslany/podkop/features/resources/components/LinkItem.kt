@@ -42,6 +42,7 @@ import pl.masslany.podkop.common.components.Title
 import pl.masslany.podkop.common.components.embed.EmbedContent
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.features.resourceactions.resourceTextSelectionGesture
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.preview.LinkItemStateProvider
 
@@ -62,6 +63,7 @@ fun LinkItem(
     onLinkCommentVoteUpClick: (linkId: Int, commentId: Int, voted: Boolean) -> Unit,
     onLinkCommentVoteDownClick: (linkId: Int, commentId: Int, voted: Boolean) -> Unit,
     onLinkCommentFavouriteClick: (linkId: Int, commentId: Int, favourited: Boolean) -> Unit,
+    onLinkCommentLongClick: (linkId: Int, commentId: Int) -> Unit,
     onLinkCommentMoreClick: (
         linkId: Int,
         commentId: Int,
@@ -204,7 +206,20 @@ fun LinkItem(
                         )
                         Spacer(Modifier.size(8.dp))
                         LinkCommentItem(
-                            modifier = Modifier.padding(start = 12.dp),
+                            modifier = Modifier
+                                .padding(start = 12.dp)
+                                .resourceTextSelectionGesture(
+                                    onClick = onLinkClick,
+                                    onLongClick = if (
+                                        comment.entryContentState is pl.masslany.podkop.common.models.EntryContentState.Content &&
+                                        !comment.isBlacklisted &&
+                                        comment.rawContent.isNotBlank()
+                                    ) {
+                                        { onLinkCommentLongClick(comment.linkId, comment.id) }
+                                    } else {
+                                        null
+                                    },
+                                ),
                             state = comment,
                             isReplyEnabled = isReplyEnabled,
                             onProfileClick = { onProfileClicked(it) },
@@ -284,6 +299,7 @@ private fun LinkItemPreview(
             onLinkCommentVoteUpClick = { _, _, _ -> },
             onLinkCommentVoteDownClick = { _, _, _ -> },
             onLinkCommentFavouriteClick = { _, _, _ -> },
+            onLinkCommentLongClick = { _, _ -> },
             onLinkCommentMoreClick = { _, _, _, _ -> },
         )
     }

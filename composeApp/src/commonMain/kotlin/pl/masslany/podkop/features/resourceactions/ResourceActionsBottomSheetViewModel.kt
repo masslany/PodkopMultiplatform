@@ -31,6 +31,7 @@ import podkop.composeapp.generated.resources.ic_copy
 import podkop.composeapp.generated.resources.ic_copy_all
 import podkop.composeapp.generated.resources.ic_delete
 import podkop.composeapp.generated.resources.ic_edit
+import podkop.composeapp.generated.resources.ic_link
 import podkop.composeapp.generated.resources.ic_share
 import podkop.composeapp.generated.resources.resource_actions_copy_as_link
 import podkop.composeapp.generated.resources.resource_actions_copy_text
@@ -38,6 +39,7 @@ import podkop.composeapp.generated.resources.resource_actions_delete_entry
 import podkop.composeapp.generated.resources.resource_actions_delete_entry_comment
 import podkop.composeapp.generated.resources.resource_actions_edit_comment
 import podkop.composeapp.generated.resources.resource_actions_edit_entry
+import podkop.composeapp.generated.resources.resource_actions_select_text
 import podkop.composeapp.generated.resources.resource_actions_share_as_screenshot
 import podkop.composeapp.generated.resources.resource_actions_show_link_downvoters
 import podkop.composeapp.generated.resources.resource_actions_show_link_upvoters
@@ -72,6 +74,22 @@ class ResourceActionsBottomSheetViewModel(
                     ),
                 )
                 appNavigator.back()
+            }
+
+            ResourceActionId.SelectText -> {
+                val copyContent = params.copyContent ?: return
+                if (copyContent.isBlank()) return
+
+                val previewDraftId = params.screenshotDraftId?.let { draftId ->
+                    screenshotShareDraftStore.duplicate(draftId)
+                }
+                appNavigator.back()
+                appNavigator.navigateTo(
+                    ResourceTextSelectionDialogScreen(
+                        content = copyContent,
+                        previewDraftId = previewDraftId,
+                    ),
+                )
             }
 
             ResourceActionId.CopyAsLink -> {
@@ -135,7 +153,9 @@ class ResourceActionsBottomSheetViewModel(
     }
 
     override fun onCleared() {
-        params.screenshotDraftId?.let(screenshotShareDraftStore::remove)
+        params.screenshotDraftId?.let { draftId ->
+            screenshotShareDraftStore.remove(draftId)
+        }
         super.onCleared()
     }
 
@@ -342,7 +362,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
     val copyLinkAction = ResourceActionItemState(
         id = ResourceActionId.CopyAsLink,
         title = Res.string.resource_actions_copy_as_link,
-        icon = Res.drawable.ic_copy,
+        icon = Res.drawable.ic_link,
         localAction = ResourceActionLocalAction.CopyToClipboard(
             value = buildResourceLink(
                 params = params,
@@ -350,13 +370,22 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
         ),
     )
     val copyTextAction = params.copyContent
-        ?.takeIf(String::isNotBlank)
+        ?.takeIf { it.isNotBlank() }
         ?.let { copyContent ->
             ResourceActionItemState(
                 id = ResourceActionId.CopyText,
                 title = Res.string.resource_actions_copy_text,
-                icon = Res.drawable.ic_copy_all,
+                icon = Res.drawable.ic_copy,
                 localAction = ResourceActionLocalAction.CopyToClipboard(copyContent),
+            )
+        }
+    val selectTextAction = params.copyContent
+        ?.takeIf { it.isNotBlank() }
+        ?.let {
+            ResourceActionItemState(
+                id = ResourceActionId.SelectText,
+                title = Res.string.resource_actions_select_text,
+                icon = Res.drawable.ic_copy_all,
             )
         }
     val screenshotAction = params.screenshotDraftId?.let {
@@ -438,6 +467,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
                 screenshotAction,
                 copyLinkAction,
                 copyTextAction,
+                selectTextAction,
                 editEntryAction,
                 deleteEntryAction,
             ).toPersistentList()
@@ -448,6 +478,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
                 screenshotAction,
                 copyLinkAction,
                 copyTextAction,
+                selectTextAction,
                 editEntryCommentAction,
                 deleteEntryCommentAction,
             ).toPersistentList()
@@ -457,6 +488,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
                 screenshotAction,
                 copyLinkAction,
                 copyTextAction,
+                selectTextAction,
                 editLinkCommentAction,
             ).toPersistentList()
         },

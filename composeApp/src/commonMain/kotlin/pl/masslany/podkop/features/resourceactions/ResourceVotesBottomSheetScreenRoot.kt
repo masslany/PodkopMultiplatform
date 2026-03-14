@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -25,6 +26,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
@@ -35,7 +38,11 @@ import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
+import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.profile.components.ObservedUserItem
+import pl.masslany.podkop.features.resourceactions.preview.NoOpResourceVotesBottomSheetActions
+import pl.masslany.podkop.features.resourceactions.preview.ResourceVotesBottomSheetPreviewState
+import pl.masslany.podkop.features.resourceactions.preview.ResourceVotesBottomSheetStateProvider
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.resource_link_downvotes_empty
 import podkop.composeapp.generated.resources.resource_link_upvotes_empty
@@ -214,3 +221,18 @@ internal fun ResourceVotesBottomSheetContent(
 private fun LazyListState.isAtBottom(): Boolean = canScrollBackward && !canScrollForward
 
 private val ResourceVotesBottomSheetMinHeight = 220.dp
+
+@Preview
+@Composable
+private fun ResourceVotesBottomSheetContentPreview(
+    @PreviewParameter(ResourceVotesBottomSheetStateProvider::class) previewState: ResourceVotesBottomSheetPreviewState,
+) {
+    PodkopPreview(darkTheme = false) {
+        ResourceVotesBottomSheetContent(
+            state = previewState.state,
+            actions = NoOpResourceVotesBottomSheetActions,
+            lazyListState = rememberLazyListState(),
+            resourceType = previewState.resourceType,
+        )
+    }
+}

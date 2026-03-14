@@ -15,6 +15,11 @@ class ResourceScreenshotShareDraftStore {
 
     fun get(id: String): ResourceScreenshotShareDraft? = drafts[id]
 
+    fun duplicate(id: String): String? {
+        val draft = drafts[id] ?: return null
+        return put(draft)
+    }
+
     fun remove(id: String) {
         drafts.remove(id)
     }

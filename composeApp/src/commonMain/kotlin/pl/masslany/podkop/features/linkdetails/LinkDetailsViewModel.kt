@@ -45,6 +45,7 @@ import pl.masslany.podkop.features.resourceactions.ResourceActionUpdatesStore
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraft
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
+import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogScreen
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
@@ -181,6 +182,33 @@ class LinkDetailsViewModel(
         openLinkCommentComposer(
             author = author,
             parentCommentId = replyParentCommentId,
+        )
+    }
+
+    override fun onLinkCommentLongClicked(linkId: Int, commentId: Int) {
+        if (linkId != id) return
+
+        val commentsState = state.value.commentsState as? LinkDetailsCommentsState.Content ?: return
+        val topLevelComment = commentsState.comments.firstOrNull { it.id == commentId }?.comment
+        val replyComment = commentsState.comments.firstNotNullOfOrNull { item ->
+            item.replies.firstOrNull {
+                it.id ==
+                    commentId
+            }
+        }
+        val comment = topLevelComment ?: replyComment ?: return
+        val copyContent = comment.rawContent.takeIf {
+            comment.entryContentState is EntryContentState.Content &&
+                !comment.isBlacklisted &&
+                it.isNotBlank()
+        } ?: return
+        val draftId = buildLinkCommentScreenshotDraftId(commentId)
+
+        appNavigator.navigateTo(
+            ResourceTextSelectionDialogScreen(
+                content = copyContent,
+                previewDraftId = draftId,
+            ),
         )
     }
 
@@ -323,7 +351,7 @@ class LinkDetailsViewModel(
                 copyContent = targetComment
                     ?.takeIf { it.entryContentState is EntryContentState.Content && !it.isBlacklisted }
                     ?.rawContent
-                    ?.takeIf(String::isNotBlank),
+                    ?.takeIf { it.isNotBlank() },
                 adult = targetComment?.adult == true,
                 photoKey = targetComment?.embedImageState?.key,
                 photoUrl = targetComment?.embedImageState?.url,

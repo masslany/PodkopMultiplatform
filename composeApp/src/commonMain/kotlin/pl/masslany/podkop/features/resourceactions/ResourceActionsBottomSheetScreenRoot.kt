@@ -16,6 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -24,6 +26,9 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.platform.rememberPlatformClipboard
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.features.resourceactions.preview.NoOpResourceActionsBottomSheetActions
+import pl.masslany.podkop.features.resourceactions.preview.ResourceActionsBottomSheetStateProvider
 
 @Composable
 fun ResourceActionsBottomSheetScreenRoot(
@@ -117,5 +122,18 @@ internal fun ResourceActionsBottomSheetContent(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ResourceActionsBottomSheetContentPreview(
+    @PreviewParameter(ResourceActionsBottomSheetStateProvider::class) state: ResourceActionsBottomSheetState,
+) {
+    PodkopPreview(darkTheme = false) {
+        ResourceActionsBottomSheetContent(
+            state = state,
+            actions = NoOpResourceActionsBottomSheetActions,
+        )
     }
 }

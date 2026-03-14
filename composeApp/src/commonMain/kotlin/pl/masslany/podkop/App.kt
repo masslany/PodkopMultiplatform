@@ -42,6 +42,7 @@ import pl.masslany.podkop.common.navigation.BottomSheetSceneStrategy
 import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.navigation.HomeScreen
 import pl.masslany.podkop.common.navigation.NavigationContent
+import pl.masslany.podkop.common.navigation.SetDialogDestinationToEdgeToEdge
 import pl.masslany.podkop.common.settings.AppSettings
 import pl.masslany.podkop.common.settings.LocalAppSettings
 import pl.masslany.podkop.common.settings.ThemeOverride
@@ -85,6 +86,8 @@ import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScr
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogScreen
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogScreenRoot
+import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogScreen
+import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetScreenRoot
 import pl.masslany.podkop.features.search.SearchScreen
@@ -305,7 +308,21 @@ fun App() {
                                 ),
                             ),
                         ) {
+                            SetDialogDestinationToEdgeToEdge()
                             ResourceScreenshotPreviewDialogScreenRoot(
+                                screen = it,
+                            )
+                        }
+
+                        entry<ResourceTextSelectionDialogScreen>(
+                            metadata = DialogSceneStrategy.dialog(
+                                DialogProperties(
+                                    usePlatformDefaultWidth = false,
+                                ),
+                            ),
+                        ) {
+                            SetDialogDestinationToEdgeToEdge()
+                            ResourceTextSelectionDialogScreenRoot(
                                 screen = it,
                             )
                         }

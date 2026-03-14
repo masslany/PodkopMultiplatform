@@ -21,6 +21,7 @@ data class ResourceActionItemState(
 
 enum class ResourceActionId {
     CopyText,
+    SelectText,
     CopyAsLink,
     ShareAsScreenshot,
     ShowVoters,

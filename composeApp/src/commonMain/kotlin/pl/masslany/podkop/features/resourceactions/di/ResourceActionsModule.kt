@@ -7,6 +7,8 @@ import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetVie
 import pl.masslany.podkop.features.resourceactions.ResourceActionsParams
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogViewModel
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
+import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogParams
+import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogViewModel
 import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetViewModel
 import pl.masslany.podkop.features.resourceactions.ResourceVotesParams
 
@@ -20,6 +22,17 @@ val resourceActionsModule = module {
             draftStore = get(),
             appNavigator = get(),
             screenshotExporter = get(),
+            snackbarManager = get(),
+        )
+    }
+
+    viewModel { params ->
+        val dialogParams = params.get<ResourceTextSelectionDialogParams>()
+        ResourceTextSelectionDialogViewModel(
+            content = dialogParams.content,
+            previewDraftId = dialogParams.previewDraftId,
+            draftStore = get(),
+            appNavigator = get(),
             snackbarManager = get(),
         )
     }

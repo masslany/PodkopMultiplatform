@@ -23,10 +23,12 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.preview.NoOpResourceItemActions
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.links.hits.HitItem
 import pl.masslany.podkop.features.links.hits.models.HitItemState
+import pl.masslany.podkop.features.resourceactions.resourceTextSelectionGesture
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
 import pl.masslany.podkop.features.resources.models.ResourceItemState
@@ -71,10 +73,13 @@ private fun EntryItemRenderer(
             ),
         ) {
             Column(
-                modifier = Modifier
-                    .padding(16.dp),
+                modifier = Modifier.padding(16.dp),
             ) {
                 EntryItem(
+                    modifier = Modifier.resourceTextSelectionGesture(
+                        onClick = { actions.onEntryClicked(state.id) },
+                        onLongClick = state.textSelectionLongClick(actions),
+                    ),
                     state = state,
                     showInlineActions = config.showEntryInlineActions,
                     isReplyEnabled = config.isReplyActionEnabled,
@@ -116,8 +121,10 @@ private fun EntryItemRenderer(
                     Spacer(Modifier.size(12.dp))
                     EntryCommentItem(
                         modifier = Modifier
-                            .padding(
-                                start = 16.dp,
+                            .padding(start = 16.dp)
+                            .resourceTextSelectionGesture(
+                                onClick = { actions.onEntryClicked(state.id) },
+                                onLongClick = comment.textSelectionLongClick(actions),
                             ),
                         state = comment,
                         showInlineActions = config.showEntryInlineActions,
@@ -181,8 +188,10 @@ private fun EntryItemRenderer(
         }
     } else {
         EntryItem(
-            modifier = modifier
-                .clickable { actions.onEntryClicked(state.id) },
+            modifier = modifier.resourceTextSelectionGesture(
+                onClick = { actions.onEntryClicked(state.id) },
+                onLongClick = state.textSelectionLongClick(actions),
+            ),
             state = state,
             showInlineActions = config.showEntryInlineActions,
             isReplyEnabled = config.isReplyActionEnabled,
@@ -260,6 +269,12 @@ private fun LinkItemRenderer(
                     favourited = favourited,
                 )
             },
+            onLinkCommentLongClick = { linkId, commentId ->
+                actions.onLinkCommentLongClicked(
+                    linkId = linkId,
+                    commentId = commentId,
+                )
+            },
             onLinkCommentMoreClick = { linkId, commentId, linkSlug, parentCommentId ->
                 actions.onLinkCommentMoreClicked(
                     linkId = linkId,
@@ -301,11 +316,13 @@ private fun EntryCommentItemRenderer(
             ),
         ) {
             Column(
-                modifier = Modifier
-                    .padding(vertical = 16.dp),
+                modifier = Modifier.padding(vertical = 16.dp),
             ) {
                 EntryCommentItem(
-                    modifier = modifier,
+                    modifier = Modifier.resourceTextSelectionGesture(
+                        onClick = { actions.onEntryClicked(state.parentId) },
+                        onLongClick = state.textSelectionLongClick(actions),
+                    ),
                     state = state,
                     isReplyEnabled = config.isReplyActionEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
@@ -348,7 +365,9 @@ private fun EntryCommentItemRenderer(
         }
     } else {
         EntryCommentItem(
-            modifier = modifier,
+            modifier = modifier.resourceTextSelectionGesture(
+                onLongClick = state.textSelectionLongClick(actions),
+            ),
             state = state,
             isReplyEnabled = config.isReplyActionEnabled,
             onProfileClick = { actions.onProfileClicked(it) },
@@ -421,11 +440,13 @@ private fun LinkCommentItemRenderer(
             ),
         ) {
             Column(
-                modifier = Modifier
-                    .padding(vertical = 16.dp),
+                modifier = Modifier.padding(vertical = 16.dp),
             ) {
                 LinkCommentItem(
-                    modifier = modifier,
+                    modifier = Modifier.resourceTextSelectionGesture(
+                        onClick = { actions.onLinkClicked(state.linkId) },
+                        onLongClick = state.textSelectionLongClick(actions),
+                    ),
                     state = state,
                     isReplyEnabled = config.isReplyActionEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
@@ -478,7 +499,9 @@ private fun LinkCommentItemRenderer(
         }
     } else {
         LinkCommentItem(
-            modifier = modifier,
+            modifier = modifier.resourceTextSelectionGesture(
+                onLongClick = state.textSelectionLongClick(actions),
+            ),
             state = state,
             isReplyEnabled = config.isReplyActionEnabled,
             onProfileClick = { actions.onProfileClicked(it) },
@@ -529,6 +552,27 @@ private fun LinkCommentItemRenderer(
         )
     }
 }
+
+private fun EntryItemState.textSelectionLongClick(actions: ResourceItemActions): (() -> Unit)? =
+    if (entryContentState is EntryContentState.Content && !isBlacklisted && rawContent.isNotBlank()) {
+        { actions.onEntryLongClicked(id) }
+    } else {
+        null
+    }
+
+private fun EntryCommentItemState.textSelectionLongClick(actions: ResourceItemActions): (() -> Unit)? =
+    if (entryContentState is EntryContentState.Content && !isBlacklisted && rawContent.isNotBlank()) {
+        { actions.onEntryCommentLongClicked(parentId, id) }
+    } else {
+        null
+    }
+
+private fun LinkCommentItemState.textSelectionLongClick(actions: ResourceItemActions): (() -> Unit)? =
+    if (entryContentState is EntryContentState.Content && !isBlacklisted && rawContent.isNotBlank()) {
+        { actions.onLinkCommentLongClicked(linkId, id) }
+    } else {
+        null
+    }
 
 @Preview
 @Composable

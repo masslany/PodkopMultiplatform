@@ -30,13 +30,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,6 +47,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.navigation.SetDialogDestinationToEdgeToEdge
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.features.resourceactions.preview.NoOpResourceScreenshotPreviewDialogActions
+import pl.masslany.podkop.features.resourceactions.preview.ResourceScreenshotPreviewDialogStateProvider
 import pl.masslany.podkop.features.resources.components.EntryCommentItem
 import pl.masslany.podkop.features.resources.components.EntryItem
 import pl.masslany.podkop.features.resources.components.LinkCommentItem
@@ -65,6 +70,8 @@ fun ResourceScreenshotPreviewDialogScreenRoot(
     screen: ResourceScreenshotPreviewDialogScreen,
     modifier: Modifier = Modifier,
 ) {
+    SetDialogDestinationToEdgeToEdge()
+
     val viewModel = koinViewModel<ResourceScreenshotPreviewDialogViewModel>(
         parameters = { parametersOf(screen.draftId) },
     )
@@ -404,5 +411,18 @@ private fun ResourceScreenshotPreviewContent(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun ResourceScreenshotPreviewDialogContentPreview(
+    @PreviewParameter(ResourceScreenshotPreviewDialogStateProvider::class) state: ResourceScreenshotPreviewDialogState,
+) {
+    PodkopPreview(darkTheme = false) {
+        ResourceScreenshotPreviewDialogContent(
+            state = state,
+            actions = NoOpResourceScreenshotPreviewDialogActions,
+        )
     }
 }
