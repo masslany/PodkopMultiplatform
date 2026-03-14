@@ -319,10 +319,12 @@ private fun EntryCommentItemRenderer(
                 modifier = Modifier.padding(vertical = 16.dp),
             ) {
                 EntryCommentItem(
-                    modifier = Modifier.resourceTextSelectionGesture(
-                        onClick = { actions.onEntryClicked(state.parentId) },
-                        onLongClick = state.textSelectionLongClick(actions),
-                    ),
+                    modifier = Modifier
+                        .resourceTextSelectionGesture(
+                            onClick = { actions.onEntryClicked(state.parentId) },
+                            onLongClick = state.textSelectionLongClick(actions),
+                        )
+                        .then(modifier),
                     state = state,
                     isReplyEnabled = config.isReplyActionEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
@@ -443,10 +445,12 @@ private fun LinkCommentItemRenderer(
                 modifier = Modifier.padding(vertical = 16.dp),
             ) {
                 LinkCommentItem(
-                    modifier = Modifier.resourceTextSelectionGesture(
-                        onClick = { actions.onLinkClicked(state.linkId) },
-                        onLongClick = state.textSelectionLongClick(actions),
-                    ),
+                    modifier = Modifier
+                        .resourceTextSelectionGesture(
+                            onClick = { actions.onLinkClicked(state.linkId) },
+                            onLongClick = state.textSelectionLongClick(actions),
+                        )
+                        .then(modifier),
                     state = state,
                     isReplyEnabled = config.isReplyActionEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
