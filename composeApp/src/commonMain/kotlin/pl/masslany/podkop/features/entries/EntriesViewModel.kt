@@ -162,7 +162,7 @@ class EntriesViewModel(
                             .updateRefreshing(false)
                     }
                 }
-             hasBeenInitialized = true
+            hasBeenInitialized = true
         }
     }
 

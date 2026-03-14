@@ -6,6 +6,9 @@ xcuserdata
 !src/**/build/
 local.properties
 apikeys.properties
+google-services.json
+google-services-debug.json
+**/google-services.json
 .idea
 .DS_Store
 captures

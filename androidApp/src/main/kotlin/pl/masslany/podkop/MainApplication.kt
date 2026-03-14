@@ -13,6 +13,7 @@ import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.deeplink.AuthSessionEvents
 import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesBackgroundNotificationsController
+import timber.log.Timber
 
 class MainApplication : Application() {
 
@@ -28,6 +29,7 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        plantLoggingTrees()
         registerActivityLifecycleCallbacks(AppVisibilityTracker)
 
         initKoin {
@@ -66,5 +68,12 @@ class MainApplication : Application() {
                     )
                 }
         }
+    }
+
+    private fun plantLoggingTrees() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
+        Timber.plant(CrashlyticsTree())
     }
 }

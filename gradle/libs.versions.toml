@@ -44,6 +44,9 @@ multiplatformMarkdownRenderer = "0.39.2"
 
 kotlinter = "5.4.2"
 timber = "5.0.1"
+firebase-bom = "34.10.0"
+google-services = "4.4.4"
+firebase-crashlytics-plugin = "3.0.6"
 
 [libraries]
 adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "jetbrainsAdaptive" }
@@ -110,6 +113,9 @@ multiplatform-markdown-renderer = { module = "com.mikepenz:multiplatform-markdow
 multiplatform-markdown-renderer-m3 = { module = "com.mikepenz:multiplatform-markdown-renderer-m3", version.ref = "multiplatformMarkdownRenderer" }
 org-jetbrains-compose-material3-adaptive-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "jetbrainsAdaptive" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 
 [bundles]
 
@@ -132,3 +138,5 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMul
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
+googleServices = { id = "com.google.gms.google-services", version.ref = "google-services" }
+firebaseCrashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }

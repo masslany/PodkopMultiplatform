@@ -65,4 +65,3 @@ fun StaleRefreshPillPreview() {
         }
     }
 }
-

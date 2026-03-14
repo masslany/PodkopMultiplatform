@@ -5,6 +5,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.googleServices)
+    alias(libs.plugins.firebaseCrashlytics)
 }
 
 val apikeyPropertiesFile: File = rootProject.file("apikeys.properties")
@@ -54,12 +56,16 @@ dependencies {
     implementation(projects.composeApp)
     implementation(projects.business)
     implementation(projects.common)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
 
     implementation(libs.koin.core)
     implementation(libs.koin.compose)
     implementation(libs.koin.android)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.timber)
 
     implementation(libs.androidx.activity.compose)
 }
