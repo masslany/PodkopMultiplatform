@@ -22,4 +22,5 @@ object NoOpEntriesActions :
     override fun onHotSortExpandedChanged(expanded: Boolean) = Unit
     override fun onHotSortDismissed() = Unit
     override fun onRefresh(sortType: DropdownMenuItemType) = Unit
+    override fun onRefreshPromptDismissed() = Unit
 }

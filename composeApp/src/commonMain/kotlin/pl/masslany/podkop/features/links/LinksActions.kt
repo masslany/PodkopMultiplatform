@@ -19,4 +19,6 @@ interface LinksActions :
     fun onSortDismissed()
 
     fun onRefresh(sortType: DropdownMenuItemType)
+
+    fun onRefreshPromptDismissed()
 }

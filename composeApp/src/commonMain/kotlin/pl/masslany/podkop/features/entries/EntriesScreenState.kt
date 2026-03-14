@@ -11,18 +11,26 @@ data class EntriesScreenState(
     val isLoading: Boolean,
     val isError: Boolean,
     val isRefreshing: Boolean,
+    val isRefreshPromptVisible: Boolean,
     val entries: ImmutableList<ResourceItemState>,
     val sortMenuState: DropdownMenuState,
     val hotSortMenuState: DropdownMenuState?,
     val isPaginating: Boolean,
     val isLoggedIn: Boolean,
 ) {
+    val shouldShowRefreshPrompt: Boolean
+        get() = isRefreshPromptVisible &&
+            !isLoading &&
+            !isRefreshing &&
+            !isError
+
     companion object {
         val initial = EntriesScreenState(
             screenInstanceId = "",
             isLoading = true,
             isError = false,
             isRefreshing = false,
+            isRefreshPromptVisible = false,
             entries = persistentListOf(),
             sortMenuState = DropdownMenuState.initial,
             hotSortMenuState = null,
@@ -85,5 +93,9 @@ data class EntriesScreenState(
 
     fun updateRefreshing(isRefreshing: Boolean) = this.copy(
         isRefreshing = isRefreshing,
+    )
+
+    fun updateRefreshPromptVisible(isVisible: Boolean) = this.copy(
+        isRefreshPromptVisible = isVisible,
     )
 }

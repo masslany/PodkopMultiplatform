@@ -55,5 +55,25 @@ class LinksScreenStateProvider : PreviewParameterProvider<LinksScreenState> {
             ),
             isPaginating = true,
         ),
+        LinksScreenState.initial.copy(
+            screenInstanceId = "preview-stale-refresh",
+            isLoading = false,
+            isError = false,
+            isRefreshing = false,
+            isRefreshPromptVisible = true,
+            isUpcoming = false,
+            hits = persistentListOf(items.last()),
+            links = persistentListOf(items[0], items[1], items[0]),
+            sortMenuState = DropdownMenuState(
+                items = persistentListOf(
+                    DropdownMenuItemType.Active,
+                    DropdownMenuItemType.Newest,
+                    DropdownMenuItemType.Digged,
+                ),
+                selected = DropdownMenuItemType.Active,
+                expanded = false,
+            ),
+            isPaginating = false,
+        ),
     )
 }

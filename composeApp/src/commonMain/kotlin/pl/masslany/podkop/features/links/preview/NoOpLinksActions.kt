@@ -19,4 +19,5 @@ object NoOpLinksActions :
     override fun onSortExpandedChanged(expanded: Boolean) = Unit
     override fun onSortDismissed() = Unit
     override fun onRefresh(sortType: DropdownMenuItemType) = Unit
+    override fun onRefreshPromptDismissed() = Unit
 }

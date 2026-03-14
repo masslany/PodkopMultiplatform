@@ -2,8 +2,6 @@ package pl.masslany.podkop.features.entries
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +33,11 @@ import pl.masslany.podkop.features.composer.ComposerRequest
 import pl.masslany.podkop.features.composer.ComposerResult
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class EntriesViewModel(
@@ -53,6 +56,8 @@ class EntriesViewModel(
     private var currentEntriesSortType: EntriesSortType = EntriesSortType.Hot
     private var currentHotSortType: HotSortType = HotSortType.TwelveHours
     private val screenInstanceId = Uuid.random().toString()
+    private var lastOpenedAt: Instant? = null
+    private var hasBeenInitialized = false
 
     private val paginator = Paginator(
         scope = viewModelScope,
@@ -157,6 +162,7 @@ class EntriesViewModel(
                             .updateRefreshing(false)
                     }
                 }
+             hasBeenInitialized = true
         }
     }
 
@@ -169,6 +175,7 @@ class EntriesViewModel(
                 .updateSortMenuSelected(sortType, hotSortTypes)
                 .updateError(false)
                 .updateRefreshing(true)
+                .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
             entriesRepository.getEntries(
@@ -224,6 +231,7 @@ class EntriesViewModel(
                 .updateHotSortMenuSelected(sortType)
                 .updateError(false)
                 .updateRefreshing(true)
+                .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
             entriesRepository.getEntries(
@@ -275,13 +283,14 @@ class EntriesViewModel(
             previousState
                 .updateError(false)
                 .updateRefreshing(true)
+                .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
             entriesRepository.getEntries(
                 page = resolveFirstPageParam(),
                 limit = null,
-                entriesSortType = sortType.toEntriesSortType(),
-                hotSortType = HotSortType.TwelveHours,
+                entriesSortType = currentEntriesSortType,
+                hotSortType = currentHotSortType,
                 category = null,
                 bucket = null,
             )
@@ -306,6 +315,13 @@ class EntriesViewModel(
                     }
                     snackbarManager.tryEmitGenericError()
                 }
+            hasBeenInitialized = true
+        }
+    }
+
+    override fun onRefreshPromptDismissed() {
+        updateState { previousState ->
+            previousState.updateRefreshPromptVisible(false)
         }
     }
 
@@ -339,6 +355,20 @@ class EntriesViewModel(
         paginator.paginate()
     }
 
+    fun onScreenOpened() {
+        val previousOpenedAt = lastOpenedAt
+        val now = Clock.System.now()
+        lastOpenedAt = now
+
+        val shouldShowRefreshPrompt = hasBeenInitialized &&
+            previousOpenedAt != null &&
+            now - previousOpenedAt > STALE_REFRESH_THRESHOLD
+
+        updateState { previousState ->
+            previousState.updateRefreshPromptVisible(shouldShowRefreshPrompt)
+        }
+    }
+
     private suspend fun resolveFirstPageParam(): Any? = if (authRepository.isLoggedIn()) {
         null
     } else {
@@ -354,4 +384,8 @@ class EntriesViewModel(
     private fun initialState(): EntriesScreenState = EntriesScreenState.initial.copy(
         screenInstanceId = screenInstanceId,
     )
+
+    private companion object {
+        val STALE_REFRESH_THRESHOLD = 3.hours
+    }
 }

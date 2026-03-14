@@ -52,5 +52,30 @@ class EntriesScreenStateProvider : PreviewParameterProvider<EntriesScreenState> 
             hotSortMenuState = null,
             isPaginating = true,
         ),
+        EntriesScreenState.initial.copy(
+            screenInstanceId = "preview-stale-refresh",
+            isLoading = false,
+            isRefreshPromptVisible = true,
+            entries = persistentListOf(items[1], items[1], items[1]),
+            sortMenuState = DropdownMenuState(
+                items = persistentListOf(
+                    DropdownMenuItemType.Active,
+                    DropdownMenuItemType.Newest,
+                    DropdownMenuItemType.Hot,
+                ),
+                selected = DropdownMenuItemType.Hot,
+                expanded = false,
+            ),
+            hotSortMenuState = DropdownMenuState(
+                items = persistentListOf(
+                    DropdownMenuItemType.TwoHours,
+                    DropdownMenuItemType.SixHours,
+                    DropdownMenuItemType.TwelveHours,
+                ),
+                selected = DropdownMenuItemType.SixHours,
+                expanded = false,
+            ),
+            isPaginating = false,
+        ),
     )
 }

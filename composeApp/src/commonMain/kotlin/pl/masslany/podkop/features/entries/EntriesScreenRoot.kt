@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -46,13 +47,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.StaleRefreshPill
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
@@ -82,6 +87,14 @@ internal fun EntriesScreenRoot(
 ) {
     val viewModel = koinViewModel<EntriesViewModel>()
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LifecycleStartEffect(viewModel) {
+        viewModel.onScreenOpened()
+        onStopOrDispose {
+            // no-op
+        }
+    }
+
     LaunchedEffect(viewModel, onEntryClicked) {
         viewModel.entryCreatedNavigation.collect { entryId ->
             val navigationOverride = onEntryClicked
@@ -173,6 +186,20 @@ fun EntriesScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(state.shouldShowRefreshPrompt) {
+        if (state.shouldShowRefreshPrompt) {
+            delay(5.seconds)
+            actions.onRefreshPromptDismissed()
+        }
+    }
+
+    val scrollToTop: suspend () -> Unit = {
+        scrollBehavior.state.heightOffset = 0f
+        scrollBehavior.state.contentOffset = 0f
+        lazyListState.animateScrollToItem(0)
+    }
+
     Box(
         modifier = modifier
             .padding(
@@ -237,6 +264,26 @@ fun EntriesScreenContent(
             }
         }
 
+        StaleRefreshPill(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(
+                    top = paddingValues.calculateTopPadding() + TopAppBarDefaults.TopAppBarExpandedHeight + 8.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                )
+                .graphicsLayer {
+                    translationY = scrollBehavior.state.heightOffset
+                },
+            visible = state.shouldShowRefreshPrompt,
+            onClick = {
+                coroutineScope.launch {
+                    scrollToTop()
+                    actions.onRefresh(state.sortMenuState.selected)
+                }
+            },
+        )
+
         AnimatedVisibility(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -251,9 +298,7 @@ fun EntriesScreenContent(
             FloatingActionButton(
                 onClick = {
                     coroutineScope.launch {
-                        scrollBehavior.state.heightOffset = 0f
-                        scrollBehavior.state.contentOffset = 0f
-                        lazyListState.animateScrollToItem(0)
+                        scrollToTop()
                     }
                 },
             ) {

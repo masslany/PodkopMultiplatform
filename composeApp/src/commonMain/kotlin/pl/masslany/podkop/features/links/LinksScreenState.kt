@@ -11,6 +11,7 @@ data class LinksScreenState(
     val isLoading: Boolean,
     val isError: Boolean,
     val isRefreshing: Boolean,
+    val isRefreshPromptVisible: Boolean,
     val isLoggedIn: Boolean,
     val isUpcoming: Boolean,
     val links: ImmutableList<ResourceItemState>,
@@ -18,12 +19,19 @@ data class LinksScreenState(
     val sortMenuState: DropdownMenuState,
     val isPaginating: Boolean,
 ) {
+    val shouldShowRefreshPrompt: Boolean
+        get() = isRefreshPromptVisible &&
+            !isLoading &&
+            !isRefreshing &&
+            !isError
+
     companion object {
         val initial = LinksScreenState(
             screenInstanceId = "",
             isLoading = true,
             isError = false,
             isRefreshing = false,
+            isRefreshPromptVisible = false,
             isLoggedIn = false,
             isUpcoming = false,
             links = persistentListOf(),
@@ -56,5 +64,9 @@ data class LinksScreenState(
 
     fun updateRefreshing(isRefreshing: Boolean) = this.copy(
         isRefreshing = isRefreshing,
+    )
+
+    fun updateRefreshPromptVisible(isVisible: Boolean) = this.copy(
+        isRefreshPromptVisible = isVisible,
     )
 }

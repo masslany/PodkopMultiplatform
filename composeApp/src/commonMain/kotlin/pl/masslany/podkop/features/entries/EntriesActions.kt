@@ -25,4 +25,6 @@ interface EntriesActions :
     fun onHotSortDismissed()
 
     fun onRefresh(sortType: DropdownMenuItemType)
+
+    fun onRefreshPromptDismissed()
 }

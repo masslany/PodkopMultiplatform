@@ -31,12 +31,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -44,7 +46,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
@@ -52,6 +56,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.StaleRefreshPill
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
@@ -70,6 +75,7 @@ import podkop.composeapp.generated.resources.ic_add
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.topbar_label_homepage
 import podkop.composeapp.generated.resources.topbar_label_upcoming
+import kotlin.time.Duration.Companion.seconds
 
 private const val FAB_ITEMS_OFFSET = 10
 
@@ -84,6 +90,14 @@ internal fun LinksScreenRoot(
         parameters = { parametersOf(isUpcoming) },
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LifecycleStartEffect(viewModel) {
+        viewModel.onScreenOpened()
+        onStopOrDispose {
+            // no-op
+        }
+    }
+
     val actions = remember(viewModel, onLinkClicked) {
         object : LinksActions by viewModel {
             override fun onLinkClicked(id: Int) {
@@ -141,6 +155,19 @@ fun LinksScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(state.shouldShowRefreshPrompt) {
+        if (state.shouldShowRefreshPrompt) {
+            delay(5.seconds)
+            actions.onRefreshPromptDismissed()
+        }
+    }
+
+    val scrollToTop: suspend () -> Unit = {
+        scrollBehavior.state.heightOffset = 0f
+        scrollBehavior.state.contentOffset = 0f
+        lazyListState.animateScrollToItem(0)
+    }
 
     Box(
         modifier = modifier
@@ -206,6 +233,26 @@ fun LinksScreenContent(
             }
         }
 
+        StaleRefreshPill(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(
+                    top = paddingValues.calculateTopPadding() + TopAppBarDefaults.TopAppBarExpandedHeight + 8.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                )
+                .graphicsLayer {
+                    translationY = scrollBehavior.state.heightOffset
+                },
+            visible = state.shouldShowRefreshPrompt,
+            onClick = {
+                coroutineScope.launch {
+                    scrollToTop()
+                    actions.onRefresh(state.sortMenuState.selected)
+                }
+            },
+        )
+
         AnimatedVisibility(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -220,9 +267,7 @@ fun LinksScreenContent(
             FloatingActionButton(
                 onClick = {
                     coroutineScope.launch {
-                        scrollBehavior.state.heightOffset = 0f
-                        scrollBehavior.state.contentOffset = 0f
-                        lazyListState.animateScrollToItem(0)
+                        scrollToTop()
                     }
                 },
             ) {

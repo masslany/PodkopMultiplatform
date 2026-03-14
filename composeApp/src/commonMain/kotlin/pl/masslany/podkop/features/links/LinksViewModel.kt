@@ -2,8 +2,6 @@ package pl.masslany.podkop.features.links
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -30,6 +28,11 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.linksubmission.AddLinkScreen
 import pl.masslany.podkop.features.topbar.TopBarActions
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
 class LinksViewModel(
@@ -50,6 +53,8 @@ class LinksViewModel(
     val linksType = if (isUpcoming) LinksType.UPCOMING else LinksType.HOMEPAGE
     var selectedLinksSortType = if (isUpcoming) LinksSortType.Active else LinksSortType.Newest
     private val screenInstanceId = Uuid.random().toString()
+    private var lastOpenedAt: Instant? = null
+    private var hasBeenInitialized = false
 
     private val paginator = Paginator(
         scope = viewModelScope,
@@ -145,6 +150,7 @@ class LinksViewModel(
                 .updateSortMenuSelected(sortType)
                 .updateError(false)
                 .updateRefreshing(true)
+                .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
             loadLinks(
@@ -174,6 +180,7 @@ class LinksViewModel(
             previousState
                 .updateError(false)
                 .updateRefreshing(true)
+                .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
             loadLinks(
@@ -181,6 +188,12 @@ class LinksViewModel(
                 showErrorScreenOnFailure = state.value.links.isEmpty(),
                 logMessage = "Failed to refresh links for sort type $sortType",
             )
+        }
+    }
+
+    override fun onRefreshPromptDismissed() {
+        _state.update { previousState ->
+            previousState.updateRefreshPromptVisible(false)
         }
     }
 
@@ -198,6 +211,20 @@ class LinksViewModel(
 
     override fun paginate() {
         paginator.paginate()
+    }
+
+    fun onScreenOpened() {
+        val previousOpenedAt = lastOpenedAt
+        val now = Clock.System.now()
+        lastOpenedAt = now
+
+        val shouldShowRefreshPrompt = hasBeenInitialized &&
+            previousOpenedAt != null &&
+            now - previousOpenedAt > STALE_REFRESH_THRESHOLD
+
+        _state.update { previousState ->
+            previousState.updateRefreshPromptVisible(shouldShowRefreshPrompt)
+        }
     }
 
     private suspend fun resolveFirstPageParam(): Any? = resolveFirstPageParam(authRepository.isLoggedIn())
@@ -239,5 +266,10 @@ class LinksViewModel(
             }
             snackbarManager.tryEmitGenericError()
         }
+        hasBeenInitialized = true
+    }
+
+    private companion object {
+        val STALE_REFRESH_THRESHOLD = 3.hours
     }
 }
