@@ -2,7 +2,7 @@
 
 Podkop is a Kotlin Multiplatform (KMP) client for Wykop.pl, built with modern Android development practices and Compose Multiplatform.
 
-## 🏗 Project Structure
+## Project Structure
 
 The project is divided into several modules to ensure a clean separation of concerns and maximize code sharing:
 
@@ -12,7 +12,7 @@ The project is divided into several modules to ensure a clean separation of conc
 - **`:androidApp`**: The Android-specific entry point and configuration.
 - **`:iosApp`**: The iOS-specific entry point (SwiftUI wrapper).
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **UI**: [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)
 - **Dependency Injection**: [Koin](https://insert-koin.io/)
@@ -22,9 +22,9 @@ The project is divided into several modules to ensure a clean separation of conc
 - **Data Collections**: Kotlinx Immutable Collections
 - **Architecture**: MVVM with a focus on Unidirectional Data Flow (UDF)
 
-## 🔑 Configuration & API Keys
+## Configuration & API Keys
 
-The app interacts with the Wykop API and requires API keys to function.
+The app interacts with the Wykop API and uses Firebase on Android. Some local configuration files are intentionally not stored in the repository and must be provided before the app can run.
 
 ### Android
 1. Create a file named `apikeys.properties` in the root directory of the project.
@@ -33,6 +33,10 @@ The app interacts with the Wykop API and requires API keys to function.
    WYKOP_KEY=your_api_key_here
    WYKOP_SECRET=your_api_secret_here
    ```
+3. Add Firebase config files for the Android app:
+   - `androidApp/src/debug/google-services.json`
+   - `androidApp/src/release/google-services.json`
+4. These files are gitignored, so you need to obtain them from the Firebase project and place them locally.
 
 ### iOS
 1. Create a file named `ApiKeys.xcconfig` in the `iosApp/Configuration` directory.
@@ -41,8 +45,16 @@ The app interacts with the Wykop API and requires API keys to function.
    WYKOP_KEY=your_api_key_here
    WYKOP_SECRET=your_api_secret_here
    ```
+3. This file is gitignored and must be created locally.
 
-## 🛠 Building the Project
+### Summary of local-only files
+
+- `apikeys.properties`
+- `iosApp/Configuration/ApiKeys.xcconfig`
+- `androidApp/src/debug/google-services.json`
+- `androidApp/src/release/google-services.json`
+
+## Building the Project
 
 ### Prerequisites
 - Android Studio (latest stable or Bumblebee+) or IntelliJ IDEA.
@@ -56,7 +68,9 @@ To build and run the Android app:
 ```
 Or simply use the `androidApp` run configuration in Android Studio.
 
+If Firebase config files are missing, the Android build will fail during Google Services processing.
+
 ### iOS
-1. Open the `iosApp/iosApp.xcworkspace` in Xcode.
+1. Open the `iosApp/iosApp.xcodeproj` in Xcode.
 2. Select your target device/simulator and click Run.
 Note: You can also run the iOS app directly from Android Studio if you have the [Kotlin Multiplatform plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile) installed.
