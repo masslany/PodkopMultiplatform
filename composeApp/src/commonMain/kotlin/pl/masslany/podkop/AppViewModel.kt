@@ -8,6 +8,7 @@ import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
+import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.deeplink.AuthSessionEvent
 import pl.masslany.podkop.common.deeplink.AuthSessionEvents
 import pl.masslany.podkop.common.navigation.AppNavigator
@@ -19,6 +20,7 @@ class AppViewModel(
     private val authRepository: AuthRepository,
     private val authSessionEvents: AuthSessionEvents,
     private val notificationsRepository: NotificationsRepository,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
     val startupState: StateFlow<AppState> = startupManager.state
     val navigationState: StateFlow<NavigationState> = appNavigator.state
@@ -37,6 +39,12 @@ class AppViewModel(
 
     fun onAppBackgrounded() {
         notificationsRepository.stopPolling()
+    }
+
+    fun onStartupRetryClicked() {
+        viewModelScope.launch(dispatcherProvider.io) {
+            startupManager.retry()
+        }
     }
 
     private fun observeAuthSessionChanges() {

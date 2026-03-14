@@ -3,11 +3,14 @@ package pl.masslany.podkop
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SnackbarDuration
@@ -30,6 +33,7 @@ import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.business.startup.models.AppState
+import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.dialog.DefaultGenericDialog
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreen
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreenRoot
@@ -129,6 +133,10 @@ fun App() {
         }
 
         if (startupState !is AppState.Ready) {
+            StartupStateScreen(
+                startupState = startupState,
+                onRetryClicked = viewModel::onStartupRetryClicked,
+            )
             return@PodkopTheme
         }
 
@@ -386,6 +394,40 @@ fun App() {
                         ),
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun StartupStateScreen(
+    startupState: AppState,
+    onRetryClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        when (startupState) {
+            AppState.Initializing -> {
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = 320.dp)
+                        .padding(horizontal = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            AppState.Error -> {
+                GenericErrorScreen(
+                    onRefreshClicked = onRetryClicked,
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            }
+
+            AppState.Ready -> Unit
         }
     }
 }

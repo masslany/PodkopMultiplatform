@@ -73,6 +73,28 @@ class StartupManagerImplTest {
             logger.errors,
         )
     }
+
+    @Test
+    fun `retry uses stored credentials and becomes ready`() = runBlocking {
+        val configStorage = FakeConfigStorage(
+            apiKey = "stored-key",
+            apiSecret = "stored-secret",
+        )
+        val authRepository = FakeAuthRepository(
+            shouldUpdateTokensValue = false,
+        )
+        val sut = StartupManagerImpl(
+            configStorage = configStorage,
+            authRepository = authRepository,
+            logger = RecordingLogger(),
+        )
+
+        sut.retry()
+
+        assertEquals(AppState.Ready, sut.state.value)
+        assertEquals(1, authRepository.shouldUpdateTokensCalls)
+        assertEquals(0, authRepository.updateTokensCalls)
+    }
 }
 
 private class FakeAuthRepository(

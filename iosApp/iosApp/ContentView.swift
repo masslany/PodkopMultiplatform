@@ -33,6 +33,7 @@ final class IOSStartupViewModel: ObservableObject {
     }
 
     func retry() {
+        startupState = .initializing
         helper.start(key: key, secret: secret)
     }
 
@@ -63,28 +64,27 @@ struct ComposeView: UIViewControllerRepresentable {
 struct ContentView: View {
     @StateObject private var startupViewModel = IOSStartupViewModel()
 
-    private var key: String {
-        Bundle.main.object(forInfoDictionaryKey: "WYKOP_KEY") as? String ?? ""
-    }
-
-    private var secret: String {
-        Bundle.main.object(forInfoDictionaryKey: "WYKOP_SECRET") as? String ?? ""
-    }
+    private let credentials = IOSAppCredentials()
 
     var body: some View {
         Group {
-            switch startupViewModel.startupState {
-            case .ready:
-                ComposeView(viewControllerHolder: startupViewModel.viewControllerHolder)
-                    .ignoresSafeArea()
-            case .error:
-                VStack(spacing: 16) {}
-            default:
-                VStack(spacing: 16) {}
+            if let credentials {
+                switch startupViewModel.startupState {
+                case .ready:
+                    ComposeView(viewControllerHolder: startupViewModel.viewControllerHolder)
+                        .ignoresSafeArea()
+                case .error:
+                    StartupErrorView(
+                        onRetry: startupViewModel.retry
+                    )
+                default:
+                    StartupLoadingView()
+                }
             }
         }
         .onAppear {
-            startupViewModel.startIfNeeded(key: key, secret: secret)
+            guard let credentials else { return }
+            startupViewModel.startIfNeeded(key: credentials.key, secret: credentials.secret)
         }
         .onOpenURL { url in
             startupViewModel.handleIncomingUrl(url)
@@ -93,5 +93,64 @@ struct ContentView: View {
             guard let url = userActivity.webpageURL else { return }
             startupViewModel.handleIncomingUrl(url)
         }
+    }
+}
+
+private struct IOSAppCredentials {
+    let key: String
+    let secret: String
+
+    init?(bundle: Bundle = .main) {
+        guard
+            let key = Self.readValue(for: "WYKOP_KEY", from: bundle),
+            let secret = Self.readValue(for: "WYKOP_SECRET", from: bundle)
+        else {
+            return nil
+        }
+
+        self.key = key
+        self.secret = secret
+    }
+
+    private static func readValue(for key: String, from bundle: Bundle) -> String? {
+        let rawValue = bundle.object(forInfoDictionaryKey: key) as? String
+        let trimmedValue = rawValue?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !trimmedValue.isEmpty, trimmedValue != "$(\(key))" else {
+            return nil
+        }
+        return trimmedValue
+    }
+}
+
+private struct StartupLoadingView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .controlSize(.large)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, 24)
+    }
+}
+
+private struct StartupErrorView: View {
+    let onRetry: () -> Void
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("Wystąpił problem podczas uruchamiania aplikacji")
+                .font(.headline)
+                .multilineTextAlignment(.center)
+
+            Text("Upewnij się, że masz połączenie z internetem i spróbuj jeszcze raz.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+
+            Button("Spróbuj ponownie", action: onRetry)
+                .buttonStyle(.borderedProminent)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, 24)
     }
 }

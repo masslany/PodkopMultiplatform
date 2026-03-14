@@ -33,6 +33,7 @@ kotlin {
         }
 
         androidMain.dependencies {
+            implementation(libs.androidx.core.ktx)
             api(libs.ktor.client.okhttp)
             implementation(libs.timber)
         }

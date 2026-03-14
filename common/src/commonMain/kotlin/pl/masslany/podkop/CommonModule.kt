@@ -6,6 +6,7 @@ import pl.masslany.podkop.common.configstorage.infrastructure.di.configStorageMo
 import pl.masslany.podkop.common.coroutines.infrastructure.di.coroutinesModule
 import pl.masslany.podkop.common.network.infrastructure.di.networkModule
 import pl.masslany.podkop.common.persistence.infrastructure.di.persistenceModule
+import pl.masslany.podkop.common.securestorage.infrastructure.di.secureStorageModule
 
 val commonModule = module {
     includes(
@@ -13,6 +14,7 @@ val commonModule = module {
         coroutinesModule,
         networkModule,
         persistenceModule,
+        secureStorageModule,
         configStorageModule,
     )
 }

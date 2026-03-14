@@ -1,30 +1,59 @@
 package pl.masslany.podkop.common.configstorage.infrastructure.main
 
 import pl.masslany.podkop.common.configstorage.api.ConfigStorage
-import pl.masslany.podkop.common.persistence.api.KeyValueStorage
+import pl.masslany.podkop.common.securestorage.api.SecureKeyValueStorage
 
 internal class BuildConfigStorage(
-    private val keyValueStorage: KeyValueStorage
+    private val secureKeyValueStorage: SecureKeyValueStorage,
 ) : ConfigStorage {
-    override suspend fun getApiKey(): String = keyValueStorage.getString(KEY).orEmpty()
-    override suspend fun getApiSecret(): String = keyValueStorage.getString(SECRET).orEmpty()
-    override suspend fun getBearerToken(): String = keyValueStorage.getString(TOKEN).orEmpty()
-    override suspend fun getRefreshToken(): String = keyValueStorage.getString(REFRESH_TOKEN).orEmpty()
+    private val inMemoryValues = mutableMapOf<String, String>()
+
+    override suspend fun getApiKey(): String = getValue(KEY)
+
+    override suspend fun getApiSecret(): String = getValue(SECRET)
+
+    override suspend fun getBearerToken(): String = getValue(TOKEN)
+
+    override suspend fun getRefreshToken(): String = getValue(REFRESH_TOKEN)
 
     override suspend fun storeApiKey(key: String) {
-        keyValueStorage.putString(KEY, key)
+        storeValue(KEY, key)
     }
 
     override suspend fun storeApiSecret(secret: String) {
-        keyValueStorage.putString(SECRET, secret)
+        storeValue(SECRET, secret)
     }
 
     override suspend fun storeBearerToken(token: String) {
-        keyValueStorage.putString(TOKEN, token)
+        storeValue(TOKEN, token)
     }
 
     override suspend fun storeRefreshToken(refreshToken: String) {
-        keyValueStorage.putString(REFRESH_TOKEN, refreshToken)
+        storeValue(REFRESH_TOKEN, refreshToken)
+    }
+
+    private suspend fun getValue(key: String): String {
+        inMemoryValues[key]?.let { return it }
+
+        return secureKeyValueStorage.getString(key)
+            .orEmpty()
+            .also { restoredValue ->
+                if (restoredValue.isNotEmpty()) {
+                    inMemoryValues[key] = restoredValue
+                }
+            }
+    }
+
+    private suspend fun storeValue(
+        key: String,
+        value: String,
+    ) {
+        if (value.isEmpty()) {
+            inMemoryValues.remove(key)
+        } else {
+            inMemoryValues[key] = value
+        }
+        secureKeyValueStorage.putString(key, value)
     }
 
     private companion object {

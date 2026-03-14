@@ -10,4 +10,6 @@ interface StartupManager {
         key: String,
         secret: String,
     )
+
+    suspend fun retry()
 }
