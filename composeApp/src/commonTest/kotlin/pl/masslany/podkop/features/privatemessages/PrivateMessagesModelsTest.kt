@@ -15,7 +15,7 @@ import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessageS
 import pl.masslany.podkop.common.models.PublishedTimeType
 import pl.masslany.podkop.features.privatemessages.models.mergePrivateConversationMessages
 import pl.masslany.podkop.features.privatemessages.models.normalizePrivateMessageUsername
-import pl.masslany.podkop.features.privatemessages.models.toConversationMessageItemStates
+import pl.masslany.podkop.features.privatemessages.models.toConversationMessages
 import pl.masslany.podkop.features.privatemessages.models.toInboxConversationItemStates
 
 class PrivateMessagesModelsTest {
@@ -77,7 +77,7 @@ class PrivateMessagesModelsTest {
                 type = 1,
                 sender = null,
             ),
-        ).toConversationMessageItemStates()
+        ).toConversationMessages()
 
         assertTrue(items[0].isIncoming)
         assertFalse(items[1].isIncoming)
@@ -103,7 +103,7 @@ class PrivateMessagesModelsTest {
                     width = 1200,
                 ),
             ),
-        ).toConversationMessageItemStates().single()
+        ).toConversationMessages().single()
 
         assertEquals("https://example.com/photo.jpg", item.embedImageState?.url)
         assertEquals("photo-key", item.embedImageState?.key)

@@ -14,6 +14,10 @@ val settingsModule = module {
             logger = get(),
             snackbarManager = get(),
             buildInfo = get(),
+            privateMessagesBackgroundNotificationsController = get(),
+            telemetrySettingsController = get(),
+            appMaintenanceController = get(),
+            textClipboardController = get(),
             topBarActions = get(),
         )
     }

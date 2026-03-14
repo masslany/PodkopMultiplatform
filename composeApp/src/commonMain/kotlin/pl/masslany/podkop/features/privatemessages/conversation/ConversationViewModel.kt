@@ -32,7 +32,7 @@ import pl.masslany.podkop.features.privatemessages.ConversationScreen
 import pl.masslany.podkop.features.privatemessages.PrivateMessageComposerController
 import pl.masslany.podkop.features.privatemessages.models.ConversationScreenState
 import pl.masslany.podkop.features.privatemessages.models.mergePrivateConversationMessages
-import pl.masslany.podkop.features.privatemessages.models.toConversationMessageItemStates
+import pl.masslany.podkop.features.privatemessages.models.toConversationMessages
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.tag.TagScreen
 
@@ -92,7 +92,7 @@ class ConversationViewModel(
         paginator.state,
     ) { currentState, messages, composer, paginatorState ->
         currentState.copy(
-            messages = messages.toConversationMessageItemStates().toPersistentList(),
+            messages = messages.toConversationMessages().toPersistentList(),
             composer = composer,
             isPaginating = paginatorState is PaginatorState.Loading,
         )

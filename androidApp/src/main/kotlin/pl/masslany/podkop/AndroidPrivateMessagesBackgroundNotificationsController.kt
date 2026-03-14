@@ -19,6 +19,9 @@ import androidx.work.ListenableWorker
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
@@ -37,6 +40,13 @@ class AndroidPrivateMessagesBackgroundNotificationsController(
         WorkManager.getInstance(application)
     }
 
+    override val supportsSettings: Boolean = true
+
+    override val backgroundNotificationsEnabled: Flow<Boolean> =
+        keyValueStorage.observeBoolean(BACKGROUND_NOTIFICATIONS_ENABLED_KEY)
+            .map { it ?: false }
+            .distinctUntilChanged()
+
     override fun areSystemNotificationsEnabled(): Boolean {
         val runtimePermissionGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
@@ -51,7 +61,18 @@ class AndroidPrivateMessagesBackgroundNotificationsController(
     }
 
     override suspend fun onNotificationPermissionGranted() {
-        keyValueStorage.putBoolean(BACKGROUND_NOTIFICATIONS_ENABLED_KEY, true)
+        setBackgroundNotificationsEnabled(enabled = true)
+    }
+
+    override suspend fun setBackgroundNotificationsEnabled(enabled: Boolean) {
+        keyValueStorage.putBoolean(BACKGROUND_NOTIFICATIONS_ENABLED_KEY, enabled)
+
+        if (!enabled) {
+            cancelPolling()
+            clearObservedUnreadCount()
+            return
+        }
+
         if (!initializeObservedUnreadCount(force = true)) {
             logger.warn("Failed to seed PM unread count after enabling background notifications")
         }

@@ -2,6 +2,7 @@ package pl.masslany.podkop.features.more
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -72,46 +73,47 @@ fun MoreScreenContent(
             CircularProgressIndicator()
         }
     } else {
-        LazyColumn(
+        Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(
                     start = paddingValues.calculateStartPadding(layoutDirection),
                     end = paddingValues.calculateEndPadding(layoutDirection),
                 ),
-            contentPadding = PaddingValues(
-                top = paddingValues.calculateTopPadding() + 12.dp,
-                bottom = paddingValues.calculateBottomPadding() + 16.dp,
-            ),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item(key = "more_header") {
-                MoreHeader(
-                    state = state,
-                    onProfileClicked = actions::onProfileClicked,
-                    onLoginClicked = actions::onLoginClicked,
-                )
-            }
-
-            items(
-                items = state.sections,
-                key = { section -> section.type.name },
-            ) { section ->
-                MoreSectionCard(
-                    modifier = Modifier
-                        .padding(
-                            start = 16.dp,
-                            end = 16.dp,
-                        ),
-                    section = section,
-                    actions = actions,
-                )
+            MoreHeader(
+                state = state,
+                onProfileClicked = actions::onProfileClicked,
+                onLoginClicked = actions::onLoginClicked,
+            )
+            LazyColumn(
+                modifier = modifier
+                    .padding(top = 16.dp),
+                contentPadding = PaddingValues(
+                    bottom = paddingValues.calculateBottomPadding() + 16.dp,
+                ),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(
+                    items = state.sections,
+                    key = { section -> section.type.name },
+                ) { section ->
+                    MoreSectionCard(
+                        modifier = Modifier
+                            .padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                            ),
+                        section = section,
+                        actions = actions,
+                    )
+                }
             }
         }
     }
 }
 
-@Preview(name = "More Logged Out", widthDp = 390, heightDp = 844)
+@Preview
 @Composable
 private fun MoreScreenContentLoggedOutPreview() {
     PodkopPreview(darkTheme = false) {
@@ -138,7 +140,7 @@ private fun MoreScreenContentLoggedOutPreview() {
     }
 }
 
-@Preview(name = "More Logged In", widthDp = 390, heightDp = 844)
+@Preview
 @Composable
 private fun MoreScreenContentLoggedInPreview() {
     PodkopPreview(darkTheme = false) {

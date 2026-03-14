@@ -16,9 +16,15 @@ import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.deeplink.AppDeepLinkHandler
 import pl.masslany.podkop.common.navigation.ExternalBrowser
+import pl.masslany.podkop.common.platform.AppMaintenanceController
 import pl.masslany.podkop.common.platform.BuildInfo
+import pl.masslany.podkop.common.platform.IOSAppMaintenanceController
+import pl.masslany.podkop.common.platform.IOSTextClipboardController
 import pl.masslany.podkop.common.platform.ImageDownloader
 import pl.masslany.podkop.common.platform.ScreenshotExporter
+import pl.masslany.podkop.common.platform.TextClipboardController
+import pl.masslany.podkop.common.settings.NoOpTelemetrySettingsController
+import pl.masslany.podkop.common.settings.TelemetrySettingsController
 import pl.masslany.podkop.features.privatemessages.inbox.NoOpPrivateMessagesBackgroundNotificationsController
 import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesBackgroundNotificationsController
 import pl.masslany.podkop.initKoin
@@ -36,8 +42,12 @@ val iOSModule = module {
         BuildInfo(
             isDebugBuild = isIosDebugBinary(),
             appVersionName = iosAppVersionName(),
+            platformName = "iOS",
         )
     }
+    single<TelemetrySettingsController> { NoOpTelemetrySettingsController() }
+    single<AppMaintenanceController> { IOSAppMaintenanceController() }
+    single<TextClipboardController> { IOSTextClipboardController() }
     single {
         ExternalBrowser(
             viewControllerProvider = get<IOSViewControllerHolder>().provider,

@@ -110,8 +110,8 @@ private fun MoreLoggedOutHeader(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        horizontal = 12.dp,
-                        vertical = 10.dp,
+                        horizontal = 16.dp,
+                        vertical = 14.dp,
                     ),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
