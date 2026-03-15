@@ -2,6 +2,7 @@ package pl.masslany.podkop.business.links.data.network.main
 
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.links.data.api.LinksDataSource
 import pl.masslany.podkop.business.links.data.network.api.LinksApi
 import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckResponseDto
@@ -127,6 +128,10 @@ class LinksDataSourceImpl(
 
     override suspend fun voteOnLink(linkId: Int): Result<Unit> {
         return linksApi.voteOnLink(linkId)
+    }
+
+    override suspend fun voteDownOnLink(linkId: Int, reason: VoteReason): Result<Unit> {
+        return linksApi.voteDownOnLink(linkId, reason)
     }
 
     override suspend fun removeVoteOnLink(linkId: Int): Result<Unit> {

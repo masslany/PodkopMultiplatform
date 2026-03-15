@@ -55,6 +55,7 @@ import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.models.UserItemState
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.profile.components.ObservedTagItem
@@ -66,7 +67,6 @@ import pl.masslany.podkop.features.profile.components.ProfileSubActionDropdown
 import pl.masslany.podkop.features.profile.components.ProfileSummary
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
-import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
 import pl.masslany.podkop.features.profile.preview.NoOpProfileActions
 import pl.masslany.podkop.features.profile.preview.ProfileScreenStateProvider
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
@@ -472,7 +472,7 @@ private fun LazyListScope.renderResources(
 }
 
 private fun LazyListScope.renderObservedUsers(
-    users: ImmutableList<ProfileObservedUserItemState>,
+    users: ImmutableList<UserItemState>,
     actions: ProfileActions,
 ) {
     if (users.isEmpty()) {

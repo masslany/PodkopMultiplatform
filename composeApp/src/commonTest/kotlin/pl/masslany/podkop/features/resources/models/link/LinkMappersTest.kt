@@ -2,7 +2,9 @@ package pl.masslany.podkop.features.resources.models.link
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import pl.masslany.podkop.business.common.domain.models.common.Actions
 import pl.masslany.podkop.business.common.domain.models.common.Author
 import pl.masslany.podkop.business.common.domain.models.common.Comment
@@ -75,14 +77,44 @@ class LinkMappersTest {
         assertEquals(0, state.comments.size)
         assertEquals(0, state.commentCount)
     }
+
+    @Test
+    fun `link mapper exposes downvote availability and selected state for negative votes`() {
+        val state = linkResource(
+            id = 42,
+            slug = "link",
+            comments = null,
+            actions = actions(voteDown = false, undoVote = true),
+            voted = Voted.Negative,
+        ).toLinkItemState(isUpcoming = false)
+
+        assertTrue(state.canVoteDown)
+        assertTrue(state.isDownVoted)
+        assertTrue(state.countState.canVote)
+        assertTrue(state.countState.isVoted)
+    }
+
+    @Test
+    fun `link mapper keeps downvote button hidden when negative vote is unavailable`() {
+        val state = linkResource(
+            id = 42,
+            slug = "link",
+            comments = null,
+            actions = actions(voteDown = false, undoVote = false),
+        ).toLinkItemState(isUpcoming = false)
+
+        assertFalse(state.canVoteDown)
+    }
 }
 
 private fun linkResource(
     id: Int,
     slug: String,
     comments: Comments?,
+    actions: Actions = actions(),
+    voted: Voted = Voted.None,
 ): ResourceItem = ResourceItem(
-    actions = actions(),
+    actions = actions,
     adult = false,
     archive = false,
     author = null,
@@ -106,7 +138,7 @@ private fun linkResource(
     source = null,
     tags = emptyList(),
     title = "title",
-    voted = Voted.None,
+    voted = voted,
     votes = Votes(count = 0, down = 0, up = 0),
     favourite = false,
 )
@@ -172,7 +204,11 @@ private fun votes(): Votes = Votes(
     up = 0,
 )
 
-private fun actions(): Actions = Actions(
+private fun actions(
+    undoVote: Boolean = false,
+    voteDown: Boolean = false,
+    voteUp: Boolean = false,
+): Actions = Actions(
     create = false,
     createFavourite = false,
     delete = false,
@@ -180,8 +216,8 @@ private fun actions(): Actions = Actions(
     finishAma = false,
     report = false,
     startAma = false,
-    undoVote = false,
+    undoVote = undoVote,
     update = false,
-    voteDown = false,
-    voteUp = false,
+    voteDown = voteDown,
+    voteUp = voteUp,
 )

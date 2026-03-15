@@ -17,6 +17,7 @@ import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
@@ -29,6 +30,7 @@ import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentType
 import pl.masslany.podkop.common.models.embed.TwitterEmbedState
 import pl.masslany.podkop.common.models.embed.toTwitterEmbedPreviewState
+import pl.masslany.podkop.common.models.vote.VoteReasonType
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
@@ -166,6 +168,46 @@ class LinkDetailsViewModel(
 
     override fun onRefresh() {
         loadContent(isRefreshing = true)
+    }
+
+    override fun onLinkDownvoteClicked(linkId: Int, isDownVoted: Boolean) {
+        if (linkId != id || !state.value.isLoggedIn) return
+
+        if (isDownVoted) {
+            updateLinkVote(
+                linkId = linkId,
+                removeVote = true,
+                downvoteReason = null,
+            )
+        } else {
+            updateState { previousState ->
+                previousState.copy(
+                    downvoteMenuState = previousState.downvoteMenuState.copy(
+                        expanded = true,
+                    ),
+                )
+            }
+        }
+    }
+
+    override fun onLinkDownvoteReasonSelected(linkId: Int, reason: VoteReasonType) {
+        if (linkId != id || !state.value.isLoggedIn) return
+
+        updateLinkVote(
+            linkId = linkId,
+            removeVote = false,
+            downvoteReason = reason.toVoteReason(),
+        )
+    }
+
+    override fun onLinkDownvoteDismissed() {
+        updateState { previousState ->
+            previousState.copy(
+                downvoteMenuState = previousState.downvoteMenuState.copy(
+                    expanded = false,
+                ),
+            )
+        }
     }
 
     override fun onLinkReplyClicked(linkId: Int, author: String?) {
@@ -485,17 +527,11 @@ class LinkDetailsViewModel(
     }
 
     override fun onLinkVoteClicked(id: Int, voted: Boolean) {
-        viewModelScope.launch {
-            val voteResult = if (voted) {
-                linksRepository.removeVoteOnLink(linkId = id)
-            } else {
-                linksRepository.voteOnLink(linkId = id)
-            }
-
-            voteResult.onSuccess {
-                refreshLink(id)
-            }
-        }
+        updateLinkVote(
+            linkId = id,
+            removeVote = voted,
+            downvoteReason = null,
+        )
     }
 
     private fun loadContent(isRefreshing: Boolean) {
@@ -536,7 +572,7 @@ class LinkDetailsViewModel(
                         updateState { previousState ->
                             previousState.copy(
                                 link = link.data.toLinkItemState(isUpcoming = false),
-                            )
+                            ).syncDownvoteVisibility()
                         }
                     }
                     .onFailure {
@@ -549,7 +585,7 @@ class LinkDetailsViewModel(
                         previousState.copy(
                             isLoggedIn = viewerContext.isLoggedIn,
                             currentUsername = viewerContext.username,
-                        )
+                        ).syncDownvoteVisibility()
                     }
                 }
 
@@ -582,7 +618,7 @@ class LinkDetailsViewModel(
                 updateState { previousState ->
                     previousState.copy(
                         isError = !isLinkLoaded,
-                    )
+                    ).syncDownvoteVisibility()
                 }
             }
 
@@ -590,7 +626,7 @@ class LinkDetailsViewModel(
                 previousState.copy(
                     isLoading = false,
                     isRefreshing = false,
-                )
+                ).syncDownvoteVisibility()
             }
         }
     }
@@ -617,6 +653,55 @@ class LinkDetailsViewModel(
                     "Failed to update related vote for link id=$id, relatedId=$relatedId, direction=$direction, remove=$voted",
                     it,
                 )
+                snackbarManager.tryEmitGenericError()
+            }
+        }
+    }
+
+    private fun updateLinkVote(
+        linkId: Int,
+        removeVote: Boolean,
+        downvoteReason: VoteReason?,
+    ) {
+        if (linkId != id) return
+        if (downvoteReason != null && state.value.downvoteMenuState.isSubmitting) return
+
+        viewModelScope.launch {
+            if (downvoteReason != null) {
+                updateState { previousState ->
+                    previousState.copy(
+                        downvoteMenuState = previousState.downvoteMenuState.copy(
+                            isSubmitting = true,
+                        ),
+                    )
+                }
+            }
+
+            val voteResult = when {
+                removeVote -> linksRepository.removeVoteOnLink(linkId = linkId)
+                downvoteReason != null -> linksRepository.voteDownOnLink(linkId = linkId, reason = downvoteReason)
+                else -> linksRepository.voteOnLink(linkId = linkId)
+            }
+
+            voteResult.onSuccess {
+                updateState { previousState ->
+                    previousState.copy(
+                        downvoteMenuState = LinkDownvoteMenuState.initial,
+                    )
+                }
+                refreshLink(linkId)
+            }.onFailure {
+                logger.error(
+                    "Failed to update link vote for id=$linkId removeVote=$removeVote downvoteReason=$downvoteReason",
+                    it,
+                )
+                updateState { previousState ->
+                    previousState.copy(
+                        downvoteMenuState = previousState.downvoteMenuState.copy(
+                            isSubmitting = false,
+                        ),
+                    )
+                }
                 snackbarManager.tryEmitGenericError()
             }
         }
@@ -688,6 +773,8 @@ class LinkDetailsViewModel(
     private suspend fun refreshLink(linkId: Int) {
         linksRepository.getLink(linkId)
             .onSuccess { link ->
+                linkResource = link.data
+                resourceItemStateHolder.notifyItemUpdated(link.data)
                 val updatedState = link.data.toLinkItemState(isUpcoming = false)
                 val updatedRelatedState = link.data.toRelatedItemState()
                 updateState { previousState ->
@@ -697,6 +784,7 @@ class LinkDetailsViewModel(
                         } else {
                             previousState.link
                         },
+                        downvoteMenuState = LinkDownvoteMenuState.initial,
                         relatedState = when (val relatedState = previousState.relatedState) {
                             is LinkDetailsRelatedState.Content -> {
                                 relatedState.copy(
@@ -712,7 +800,7 @@ class LinkDetailsViewModel(
 
                             else -> relatedState
                         },
-                    )
+                    ).syncDownvoteVisibility()
                 }
             }
     }
@@ -1043,6 +1131,12 @@ private fun Resources.toRelatedState(): LinkDetailsRelatedState = if (data.isEmp
     )
 }
 
+private fun LinkDetailsScreenState.syncDownvoteVisibility(): LinkDetailsScreenState = copy(
+    downvoteMenuState = downvoteMenuState.copy(
+        isVisible = isLoggedIn && link?.canVoteDown == true,
+    ),
+)
+
 private fun LinkCommentItemState.applyVoteUp(isRemovingVote: Boolean): LinkCommentItemState = copy(
     voteState = if (isRemovingVote) {
         voteState.removeVoteUp()
@@ -1199,4 +1293,12 @@ private enum class LinkCommentVoteDirection {
 private enum class RelatedLinkVoteDirection {
     Up,
     Down,
+}
+
+private fun VoteReasonType.toVoteReason(): VoteReason = when (this) {
+    VoteReasonType.Duplicate -> VoteReason.Duplicate
+    VoteReasonType.Spam -> VoteReason.Spam
+    VoteReasonType.Fake -> VoteReason.Fake
+    VoteReasonType.Wrong -> VoteReason.Wrong
+    VoteReasonType.Invalid -> VoteReason.Invalid
 }

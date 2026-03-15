@@ -2,13 +2,13 @@ package pl.masslany.podkop.features.resourceactions
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
+import pl.masslany.podkop.common.models.UserItemState
 
 data class ResourceVotesBottomSheetState(
     val isLoading: Boolean = true,
     val isError: Boolean = false,
     val isPaginating: Boolean = false,
-    val items: ImmutableList<ProfileObservedUserItemState> = persistentListOf(),
+    val items: ImmutableList<UserItemState> = persistentListOf(),
 ) {
     companion object {
         val initial = ResourceVotesBottomSheetState()

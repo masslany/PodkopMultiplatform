@@ -12,13 +12,13 @@ import pl.masslany.podkop.business.profile.domain.models.ObservedUsers
 import pl.masslany.podkop.business.profile.domain.models.Profile
 import pl.masslany.podkop.business.profile.domain.models.Summary
 import pl.masslany.podkop.common.extensions.toMemberSinceState
+import pl.masslany.podkop.common.models.UserItemState
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import pl.masslany.podkop.features.profile.models.ProfileListItem
 import pl.masslany.podkop.features.profile.models.ProfileListItemsPage
 import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
-import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionType
 import pl.masslany.podkop.features.profile.models.ProfileSummaryItem
 
@@ -117,7 +117,7 @@ internal fun ObservedTags.toProfileListItemsPage(): ProfileListItemsPage = Profi
     pagination = pagination,
 )
 
-internal fun ObservedUser.toItemState(): ProfileObservedUserItemState = ProfileObservedUserItemState(
+internal fun ObservedUser.toItemState(): UserItemState = UserItemState(
     username = username,
     avatarUrl = avatar,
     genderIndicatorType = gender.toGenderIndicatorType(),

@@ -2,6 +2,7 @@ package pl.masslany.podkop.business.links.data.network.client
 
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.links.data.network.api.LinksApi
 import pl.masslany.podkop.business.links.data.network.models.LinkCommentCreateDataDto
 import pl.masslany.podkop.business.links.data.network.models.LinkCommentCreateRequestDto
@@ -334,6 +335,19 @@ class LinksApiClient(
         )
     }
 
+    override suspend fun voteDownOnLink(linkId: Int, reason: VoteReason): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/links/$linkId/votes/down/${reason.toApiValue()}",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
     override suspend fun removeVoteOnLink(linkId: Int): Result<Unit> {
         val request =
             Request<Unit>(
@@ -422,4 +436,12 @@ class LinksApiClient(
             onFailure = { Result.failure(it) },
         )
     }
+}
+
+private fun VoteReason.toApiValue(): Int = when (this) {
+    VoteReason.Duplicate -> 1
+    VoteReason.Spam -> 2
+    VoteReason.Fake -> 3
+    VoteReason.Wrong -> 4
+    VoteReason.Invalid -> 5
 }

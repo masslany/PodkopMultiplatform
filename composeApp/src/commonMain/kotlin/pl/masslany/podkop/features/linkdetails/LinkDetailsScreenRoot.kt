@@ -291,8 +291,22 @@ private fun LinkDetailsScreenList(
                 LinkDetailsHeader(
                     state = link,
                     isReplyEnabled = state.isLoggedIn,
+                    downvoteMenuState = state.downvoteMenuState,
                     onLinkClick = { actions.onLinkUrlClicked(link.sourceUrl) },
                     onVoteClick = { actions.onLinkVoteClicked(link.id, link.countState.isVoted) },
+                    onDownvoteClick = {
+                        actions.onLinkDownvoteClicked(
+                            linkId = link.id,
+                            isDownVoted = link.isDownVoted,
+                        )
+                    },
+                    onDownvoteReasonSelected = { reason ->
+                        actions.onLinkDownvoteReasonSelected(
+                            linkId = link.id,
+                            reason = reason,
+                        )
+                    },
+                    onDownvoteDismissed = actions::onLinkDownvoteDismissed,
                     onFavouriteClick = {
                         actions.onLinkFavouriteClicked(
                             linkId = link.id,

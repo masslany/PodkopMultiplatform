@@ -18,16 +18,16 @@ import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.components.Avatar
 import pl.masslany.podkop.common.components.toComposeColor
 import pl.masslany.podkop.common.models.NameColorType
+import pl.masslany.podkop.common.models.UserItemState
 import pl.masslany.podkop.common.models.avatar.AvatarState
 import pl.masslany.podkop.common.models.avatar.AvatarType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.preview.PodkopPreview
-import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
 
 @Composable
 fun ObservedUserItem(
     modifier: Modifier = Modifier,
-    user: ProfileObservedUserItemState,
+    user: UserItemState,
     onClick: () -> Unit,
 ) {
     Card(
@@ -87,7 +87,7 @@ fun ObservedUserItem(
 private fun ObservedUserItemPreview() {
     PodkopPreview(darkTheme = false) {
         ObservedUserItem(
-            user = ProfileObservedUserItemState(
+            user = UserItemState(
                 username = "alice",
                 avatarUrl = "https://picsum.photos/seed/alice/96/96",
                 genderIndicatorType = GenderIndicatorType.Female,

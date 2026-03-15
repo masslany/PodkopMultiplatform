@@ -8,6 +8,7 @@ import pl.masslany.podkop.common.preview.PreviewFixtures
 import pl.masslany.podkop.features.linkdetails.LinkDetailsCommentsState
 import pl.masslany.podkop.features.linkdetails.LinkDetailsRelatedState
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenState
+import pl.masslany.podkop.features.linkdetails.LinkDownvoteMenuState
 import pl.masslany.podkop.features.linkdetails.models.LinkDetailsCommentItemState
 import pl.masslany.podkop.features.resources.models.related.RelatedItemState
 import pl.masslany.podkop.features.resources.preview.LinkCommentItemStateProvider
@@ -47,6 +48,7 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
             isLoggedIn = true,
             currentUsername = "patryk",
             link = link,
+            downvoteMenuState = LinkDownvoteMenuState.initial,
             commentsState = LinkDetailsCommentsState.Content(
                 sortMenuState = DropdownMenuState(
                     items = persistentListOf(
@@ -107,6 +109,7 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
             isLoggedIn = false,
             currentUsername = null,
             link = link,
+            downvoteMenuState = LinkDownvoteMenuState.initial,
             commentsState = LinkDetailsCommentsState.Empty(
                 sortMenuState = DropdownMenuState.initial,
             ),

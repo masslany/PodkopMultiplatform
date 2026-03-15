@@ -31,8 +31,9 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
 
     val votes = this.votes
     val countState = if (votes != null) {
-        val canVote = this.actions?.voteUp ?: false ||
-            this.actions?.voteDown ?: false
+        val canVote = this.actions?.voteUp == true ||
+            this.actions?.voteDown == true ||
+            (this.voted != Voted.None && this.actions?.undoVote == true)
 
         CountState(
             count = votes.up.toString(),
@@ -95,6 +96,9 @@ internal fun ResourceItem.toLinkItemState(isUpcoming: Boolean): LinkItemState {
         tags = tags,
         comments = comments,
         commentCount = commentCount,
+        canVoteDown = this.actions?.voteDown == true ||
+            (this.voted == Voted.Negative && this.actions?.undoVote == true),
+        isDownVoted = this.voted == Voted.Negative,
         publishedTimeType = publishedTimeType,
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,

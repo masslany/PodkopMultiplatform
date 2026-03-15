@@ -395,6 +395,8 @@
     <string name="resource_votes_empty">Brak plusujących</string>
     <string name="resource_link_upvotes_empty">Brak wykopujących</string>
     <string name="resource_link_downvotes_empty">Brak zakopujących</string>
+    <string name="link_details_downvote_label">zakop</string>
+    <string name="link_details_downvote_undo_label">cofnij</string>
 
     <!-- Vote reasons -->
     <string name="vote_reason_duplicate">duplikat</string>

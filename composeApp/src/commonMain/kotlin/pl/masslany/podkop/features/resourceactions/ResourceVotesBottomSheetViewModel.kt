@@ -9,14 +9,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.StringResource
 import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.common.domain.models.common.Voter
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
+import pl.masslany.podkop.common.models.UserItemState
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
 import pl.masslany.podkop.common.models.toNameColorType
+import pl.masslany.podkop.common.models.vote.VoteReasonType
+import pl.masslany.podkop.common.models.vote.toStringResource
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
@@ -24,13 +26,6 @@ import pl.masslany.podkop.common.pagination.toPage
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.profile.ProfileScreen
-import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
-import podkop.composeapp.generated.resources.Res
-import podkop.composeapp.generated.resources.vote_reason_duplicate
-import podkop.composeapp.generated.resources.vote_reason_fake
-import podkop.composeapp.generated.resources.vote_reason_invalid
-import podkop.composeapp.generated.resources.vote_reason_spam
-import podkop.composeapp.generated.resources.vote_reason_wrong
 
 class ResourceVotesBottomSheetViewModel(
     private val params: ResourceVotesParams,
@@ -50,7 +45,7 @@ class ResourceVotesBottomSheetViewModel(
             _state.update { previous ->
                 previous.copy(
                     items = previous.items
-                        .appendDistinctByUsername(newItems.map { it.toItemState() })
+                        .appendDistinctByUsername(newItems.map { it.toUserItemState() })
                         .toImmutableList(),
                 )
             }
@@ -108,7 +103,7 @@ class ResourceVotesBottomSheetViewModel(
                 it.copy(
                     isLoading = true,
                     isError = false,
-                    items = emptyList<ProfileObservedUserItemState>().toImmutableList(),
+                    items = emptyList<UserItemState>().toImmutableList(),
                 )
             }
             paginator.setup(pagination = null, initialItemCount = 0)
@@ -120,7 +115,7 @@ class ResourceVotesBottomSheetViewModel(
                             isLoading = false,
                             isError = false,
                             items = response.data
-                                .map { voter -> voter.toItemState() }
+                                .map { voter -> voter.toUserItemState() }
                                 .distinctBy { user -> user.username }
                                 .toImmutableList(),
                         )
@@ -133,7 +128,7 @@ class ResourceVotesBottomSheetViewModel(
                         it.copy(
                             isLoading = false,
                             isError = true,
-                            items = emptyList<ProfileObservedUserItemState>().toImmutableList(),
+                            items = emptyList<UserItemState>().toImmutableList(),
                         )
                     }
                 }
@@ -166,7 +161,7 @@ class ResourceVotesBottomSheetViewModel(
     }
 }
 
-private fun Voter.toItemState(): ProfileObservedUserItemState = ProfileObservedUserItemState(
+private fun Voter.toUserItemState(): UserItemState = UserItemState(
     username = username,
     avatarUrl = avatar,
     genderIndicatorType = gender.toGenderIndicatorType(),
@@ -175,20 +170,20 @@ private fun Voter.toItemState(): ProfileObservedUserItemState = ProfileObservedU
     company = company,
     verified = verified,
     status = status,
-    voteReason = reason?.toStringResource(),
+    voteReason = reason?.toVoteReasonType()?.toStringResource(),
 )
 
-private fun VoteReason.toStringResource(): StringResource = when (this) {
-    VoteReason.Duplicate -> Res.string.vote_reason_duplicate
-    VoteReason.Spam -> Res.string.vote_reason_spam
-    VoteReason.Fake -> Res.string.vote_reason_fake
-    VoteReason.Wrong -> Res.string.vote_reason_wrong
-    VoteReason.Invalid -> Res.string.vote_reason_invalid
+private fun VoteReason.toVoteReasonType(): VoteReasonType = when (this) {
+    VoteReason.Duplicate -> VoteReasonType.Duplicate
+    VoteReason.Spam -> VoteReasonType.Spam
+    VoteReason.Fake -> VoteReasonType.Fake
+    VoteReason.Wrong -> VoteReasonType.Wrong
+    VoteReason.Invalid -> VoteReasonType.Invalid
 }
 
-private fun List<ProfileObservedUserItemState>.appendDistinctByUsername(
-    incoming: List<ProfileObservedUserItemState>,
-): List<ProfileObservedUserItemState> {
+private fun List<UserItemState>.appendDistinctByUsername(
+    incoming: List<UserItemState>,
+): List<UserItemState> {
     val known = mapTo(mutableSetOf()) { it.username }
     val newItems = incoming.filter { known.add(it.username) }
     return this + newItems

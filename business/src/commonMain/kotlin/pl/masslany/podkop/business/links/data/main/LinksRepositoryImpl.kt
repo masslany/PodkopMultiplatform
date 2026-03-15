@@ -8,6 +8,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.data.main.mapper.links.toLink
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.common.domain.models.links.Link
 import pl.masslany.podkop.business.common.domain.models.common.Voters
 import pl.masslany.podkop.business.links.data.main.mapper.toVoters
@@ -223,6 +224,12 @@ class LinksRepositoryImpl(
     override suspend fun voteOnLink(linkId: Int): Result<Unit> {
         return withContext(dispatcherProvider.io) {
             linksDataSource.voteOnLink(linkId)
+        }
+    }
+
+    override suspend fun voteDownOnLink(linkId: Int, reason: VoteReason): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            linksDataSource.voteDownOnLink(linkId, reason)
         }
     }
 

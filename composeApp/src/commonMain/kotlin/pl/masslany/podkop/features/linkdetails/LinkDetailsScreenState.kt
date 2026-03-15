@@ -10,6 +10,7 @@ data class LinkDetailsScreenState(
     val isLoggedIn: Boolean,
     val currentUsername: String?,
     val link: LinkItemState?,
+    val downvoteMenuState: LinkDownvoteMenuState,
     val commentsState: LinkDetailsCommentsState,
     val relatedState: LinkDetailsRelatedState,
 ) {
@@ -21,6 +22,7 @@ data class LinkDetailsScreenState(
             isLoggedIn = false,
             currentUsername = null,
             link = null,
+            downvoteMenuState = LinkDownvoteMenuState.initial,
             commentsState = LinkDetailsCommentsState.Loading(
                 sortMenuState = DropdownMenuState.initial,
             ),

@@ -3,6 +3,7 @@ package pl.masslany.podkop.business.links.domain.main
 import pl.masslany.podkop.business.common.domain.models.links.Link
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.common.domain.models.common.Voters
 import pl.masslany.podkop.business.links.domain.models.LinkDraftCheck
 import pl.masslany.podkop.business.links.domain.models.LinkDraftDetails
@@ -85,6 +86,8 @@ interface LinksRepository {
     suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<Voters>
 
     suspend fun voteOnLink(linkId: Int): Result<Unit>
+
+    suspend fun voteDownOnLink(linkId: Int, reason: VoteReason): Result<Unit>
 
     suspend fun removeVoteOnLink(linkId: Int): Result<Unit>
 

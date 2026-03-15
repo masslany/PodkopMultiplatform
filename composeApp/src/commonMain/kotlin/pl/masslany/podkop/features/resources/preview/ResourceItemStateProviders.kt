@@ -98,6 +98,8 @@ class LinkItemStateProvider : PreviewParameterProvider<LinkItemState> {
             imageUrl = "https://picsum.photos/seed/link/400/400",
             tags = PreviewFixtures.tags3(),
             comments = persistentListOf(),
+            canVoteDown = true,
+            isDownVoted = false,
             embedContentState = null,
         ),
         LinkItemState(
@@ -106,7 +108,7 @@ class LinkItemStateProvider : PreviewParameterProvider<LinkItemState> {
             slug = "slug-preview-43",
             titleState = PreviewFixtures.titleState(title = PreviewFixtures.LONG_TITLE, maxLines = 2),
             descriptionState = null,
-            countState = PreviewFixtures.countState(count = "12"),
+            countState = PreviewFixtures.countState(count = "12", isVoted = true),
             authorState = PreviewFixtures.authorState(name = PreviewFixtures.USERNAME_ALT),
             source = "github.com",
             sourceUrl = "https://github.com",
@@ -122,6 +124,8 @@ class LinkItemStateProvider : PreviewParameterProvider<LinkItemState> {
                     vote = PreviewFixtures.voteState(value = VoteValueType.Positive("9")),
                 ),
             ),
+            canVoteDown = true,
+            isDownVoted = true,
             embedContentState = PreviewFixtures.embedStateTwitterLoaded(),
         ),
     )

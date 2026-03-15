@@ -2,6 +2,7 @@ package pl.masslany.podkop.business.testsupport.fakes
 
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.links.data.api.LinksDataSource
 import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckResponseDto
 import pl.masslany.podkop.business.links.data.network.models.LinkDraftResponseDto
@@ -42,6 +43,11 @@ class FakeLinksDataSource : LinksDataSource {
     data class RelatedLinkVoteCall(
         val linkId: Int,
         val relatedId: Int,
+    )
+
+    data class LinkVoteDownCall(
+        val linkId: Int,
+        val reason: VoteReason,
     )
 
     data class CreateLinkCommentCall(
@@ -114,6 +120,7 @@ class FakeLinksDataSource : LinksDataSource {
         unstubbedResult("LinksDataSource.updateLinkComment")
     var getLinkUpvotesResult: Result<LinkUpvotesResponseDto> = unstubbedResult("LinksDataSource.getLinkUpvotes")
     var voteOnLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.voteOnLink")
+    var voteDownOnLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.voteDownOnLink")
     var removeVoteOnLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.removeVoteOnLink")
     var voteUpOnRelatedLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.voteUpOnRelatedLink")
     var voteDownOnRelatedLinkResult: Result<Unit> = unstubbedResult("LinksDataSource.voteDownOnRelatedLink")
@@ -138,6 +145,7 @@ class FakeLinksDataSource : LinksDataSource {
     val updateLinkCommentCalls = mutableListOf<UpdateLinkCommentCall>()
     val getLinkUpvotesCalls = mutableListOf<GetLinkUpvotesCall>()
     val voteOnLinkCalls = mutableListOf<Int>()
+    val voteDownOnLinkCalls = mutableListOf<LinkVoteDownCall>()
     val removeVoteOnLinkCalls = mutableListOf<Int>()
     val voteUpOnRelatedLinkCalls = mutableListOf<RelatedLinkVoteCall>()
     val voteDownOnRelatedLinkCalls = mutableListOf<RelatedLinkVoteCall>()
@@ -258,6 +266,11 @@ class FakeLinksDataSource : LinksDataSource {
     override suspend fun voteOnLink(linkId: Int): Result<Unit> {
         voteOnLinkCalls += linkId
         return voteOnLinkResult
+    }
+
+    override suspend fun voteDownOnLink(linkId: Int, reason: VoteReason): Result<Unit> {
+        voteDownOnLinkCalls += LinkVoteDownCall(linkId, reason)
+        return voteDownOnLinkResult
     }
 
     override suspend fun removeVoteOnLink(linkId: Int): Result<Unit> {

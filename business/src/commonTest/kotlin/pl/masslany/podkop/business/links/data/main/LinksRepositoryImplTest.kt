@@ -8,6 +8,7 @@ import kotlin.test.assertTrue
 import pl.masslany.podkop.business.common.data.network.models.common.MediaDto
 import pl.masslany.podkop.business.common.data.network.models.common.PhotoDto
 import pl.masslany.podkop.business.common.domain.models.common.Resource
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.common.domain.models.common.Voted
 import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckDataDto
 import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckResponseDto
@@ -573,6 +574,7 @@ class LinksRepositoryImplTest {
     fun `vote operations delegate to data source`() = runBlocking {
         val linksDataSource = FakeLinksDataSource().apply {
             voteOnLinkResult = Result.success(Unit)
+            voteDownOnLinkResult = Result.success(Unit)
             removeVoteOnLinkResult = Result.success(Unit)
             voteUpOnRelatedLinkResult = Result.success(Unit)
             voteDownOnRelatedLinkResult = Result.success(Unit)
@@ -584,15 +586,17 @@ class LinksRepositoryImplTest {
         val sut = createSut(linksDataSource)
 
         val voteLink = sut.voteOnLink(1)
-        val removeVoteLink = sut.removeVoteOnLink(2)
+        val voteDownLink = sut.voteDownOnLink(2, VoteReason.Spam)
+        val removeVoteLink = sut.removeVoteOnLink(3)
         val voteUpRelated = sut.voteUpOnRelatedLink(linkId = 10, relatedId = 11)
         val voteDownRelated = sut.voteDownOnRelatedLink(linkId = 12, relatedId = 13)
         val removeVoteRelated = sut.removeVoteOnRelatedLink(linkId = 14, relatedId = 15)
-        val voteComment = sut.voteOnLinkComment(linkId = 3, commentId = 4)
-        val voteDownComment = sut.voteDownOnLinkComment(linkId = 5, commentId = 6)
-        val removeVoteComment = sut.removeVoteOnLinkComment(linkId = 7, commentId = 8)
+        val voteComment = sut.voteOnLinkComment(linkId = 4, commentId = 5)
+        val voteDownComment = sut.voteDownOnLinkComment(linkId = 6, commentId = 7)
+        val removeVoteComment = sut.removeVoteOnLinkComment(linkId = 8, commentId = 9)
 
         assertTrue(voteLink.isSuccess)
+        assertTrue(voteDownLink.isSuccess)
         assertTrue(removeVoteLink.isSuccess)
         assertTrue(voteUpRelated.isSuccess)
         assertTrue(voteDownRelated.isSuccess)
@@ -601,7 +605,11 @@ class LinksRepositoryImplTest {
         assertTrue(voteDownComment.isSuccess)
         assertTrue(removeVoteComment.isSuccess)
         assertEquals(listOf(1), linksDataSource.voteOnLinkCalls)
-        assertEquals(listOf(2), linksDataSource.removeVoteOnLinkCalls)
+        assertEquals(
+            listOf(FakeLinksDataSource.LinkVoteDownCall(linkId = 2, reason = VoteReason.Spam)),
+            linksDataSource.voteDownOnLinkCalls,
+        )
+        assertEquals(listOf(3), linksDataSource.removeVoteOnLinkCalls)
         assertEquals(
             listOf(FakeLinksDataSource.RelatedLinkVoteCall(linkId = 10, relatedId = 11)),
             linksDataSource.voteUpOnRelatedLinkCalls,
@@ -615,15 +623,15 @@ class LinksRepositoryImplTest {
             linksDataSource.removeVoteOnRelatedLinkCalls,
         )
         assertEquals(
-            listOf(FakeLinksDataSource.LinkCommentVoteCall(linkId = 3, commentId = 4)),
+            listOf(FakeLinksDataSource.LinkCommentVoteCall(linkId = 4, commentId = 5)),
             linksDataSource.voteOnLinkCommentCalls,
         )
         assertEquals(
-            listOf(FakeLinksDataSource.LinkCommentVoteCall(linkId = 5, commentId = 6)),
+            listOf(FakeLinksDataSource.LinkCommentVoteCall(linkId = 6, commentId = 7)),
             linksDataSource.voteDownOnLinkCommentCalls,
         )
         assertEquals(
-            listOf(FakeLinksDataSource.LinkCommentVoteCall(linkId = 7, commentId = 8)),
+            listOf(FakeLinksDataSource.LinkCommentVoteCall(linkId = 8, commentId = 9)),
             linksDataSource.removeVoteOnLinkCommentCalls,
         )
     }

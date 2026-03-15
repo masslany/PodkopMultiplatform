@@ -2,6 +2,7 @@ package pl.masslany.podkop.business.links.data.network.api
 
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.links.data.network.models.LinkDraftCheckResponseDto
 import pl.masslany.podkop.business.links.data.network.models.LinkDraftResponseDto
 import pl.masslany.podkop.business.links.data.network.models.LinkDraftsResponseDto
@@ -76,6 +77,8 @@ interface LinksApi {
     suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto>
 
     suspend fun voteOnLink(linkId: Int): Result<Unit>
+
+    suspend fun voteDownOnLink(linkId: Int, reason: VoteReason): Result<Unit>
 
     suspend fun removeVoteOnLink(linkId: Int): Result<Unit>
 

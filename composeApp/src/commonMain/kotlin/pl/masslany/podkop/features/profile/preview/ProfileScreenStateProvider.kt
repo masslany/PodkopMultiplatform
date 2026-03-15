@@ -3,6 +3,7 @@ package pl.masslany.podkop.features.profile.preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.collections.immutable.persistentListOf
 import pl.masslany.podkop.common.models.NameColorType
+import pl.masslany.podkop.common.models.UserItemState
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.features.profile.ProfileScreenState
 import pl.masslany.podkop.features.profile.models.MemberSinceState
@@ -12,7 +13,6 @@ import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileNoteState
 import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
-import pl.masslany.podkop.features.profile.models.ProfileObservedUserItemState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionType
 import pl.masslany.podkop.features.profile.models.ProfileSummaryItem
@@ -147,7 +147,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
             ),
             listContent = ProfileListContentState.ObservedUsers(
                 items = persistentListOf(
-                    ProfileObservedUserItemState(
+                    UserItemState(
                         username = "alice",
                         avatarUrl = "https://picsum.photos/seed/alice/96/96",
                         genderIndicatorType = GenderIndicatorType.Female,
@@ -157,7 +157,7 @@ class ProfileScreenStateProvider : PreviewParameterProvider<ProfileScreenState> 
                         verified = true,
                         status = "",
                     ),
-                    ProfileObservedUserItemState(
+                    UserItemState(
                         username = "bob",
                         avatarUrl = "https://picsum.photos/seed/bob/96/96",
                         genderIndicatorType = GenderIndicatorType.Male,
