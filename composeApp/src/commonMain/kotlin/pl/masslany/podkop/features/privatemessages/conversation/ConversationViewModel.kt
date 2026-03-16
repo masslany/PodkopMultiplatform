@@ -45,7 +45,8 @@ class ConversationViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
-) : ViewModel() {
+) : ViewModel(),
+    ConversationActions {
     private val rawMessages = MutableStateFlow(persistentListOf<PrivateMessage>())
     private val composerController = PrivateMessageComposerController(
         scope = viewModelScope,
@@ -122,15 +123,15 @@ class ConversationViewModel(
         stopPolling()
     }
 
-    fun onTopBarBackClicked() {
+    override fun onTopBarBackClicked() {
         requestClose()
     }
 
-    fun onRetryClicked() {
+    override fun onRetryClicked() {
         loadThread(showLoading = true, showRefreshing = false, scrollToLatest = true)
     }
 
-    fun onRefresh() {
+    override fun onRefresh() {
         loadThread(
             showLoading = false,
             showRefreshing = true,
@@ -138,23 +139,23 @@ class ConversationViewModel(
         )
     }
 
-    fun onComposerTextChanged(content: TextFieldValue) {
+    override fun onComposerTextChanged(content: TextFieldValue) {
         composerController.onTextChanged(content)
     }
 
-    fun onComposerAdultChanged(adult: Boolean) {
+    override fun onComposerAdultChanged(adult: Boolean) {
         composerController.onAdultChanged(adult)
     }
 
-    fun onComposerPhotoAttachClicked() {
+    override fun onComposerPhotoAttachClicked() {
         composerController.onPhotoAttachClicked()
     }
 
-    fun onComposerPhotoRemoved() {
+    override fun onComposerPhotoRemoved() {
         composerController.onPhotoRemoved()
     }
 
-    fun onComposerSubmit() {
+    override fun onComposerSubmit() {
         composerController.submit(
             submitAction = { payload ->
                 privateMessagesRepository.openConversation(
@@ -176,19 +177,19 @@ class ConversationViewModel(
         )
     }
 
-    fun onProfileClicked(username: String) {
+    override fun onProfileClicked(username: String) {
         appNavigator.navigateTo(ProfileScreen(username = username))
     }
 
-    fun onTagClicked(tag: String) {
+    override fun onTagClicked(tag: String) {
         appNavigator.navigateTo(TagScreen(tag = tag))
     }
 
-    fun onUrlClicked(url: String) {
+    override fun onUrlClicked(url: String) {
         appNavigator.openExternalLink(url)
     }
 
-    fun onImageClicked(url: String) {
+    override fun onImageClicked(url: String) {
         appNavigator.navigateTo(ImageViewerScreen(imageUrl = url))
     }
 

@@ -59,17 +59,6 @@ internal fun ConversationScreenRoot(
         state = state,
         paddingValues = paddingValues,
         lazyListState = lazyListState,
-        onTopBarBackClicked = viewModel::onTopBarBackClicked,
-        onRefresh = viewModel::onRefresh,
-        onRetryClicked = viewModel::onRetryClicked,
-        onComposerTextChanged = viewModel::onComposerTextChanged,
-        onComposerAdultChanged = viewModel::onComposerAdultChanged,
-        onComposerPhotoAttachClicked = viewModel::onComposerPhotoAttachClicked,
-        onComposerPhotoRemoved = viewModel::onComposerPhotoRemoved,
-        onComposerSubmit = viewModel::onComposerSubmit,
-        onProfileClicked = viewModel::onProfileClicked,
-        onTagClicked = viewModel::onTagClicked,
-        onUrlClicked = viewModel::onUrlClicked,
-        onImageClicked = viewModel::onImageClicked,
+        actions = viewModel,
     )
 }

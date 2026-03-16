@@ -83,6 +83,8 @@ fun Composer(
     autoFocus: Boolean,
     submitEnabled: Boolean,
     showDismissButton: Boolean,
+    applyBottomInsetsPadding: Boolean = true,
+    actionsTrailingContent: (@Composable () -> Unit)? = null,
     onContentChanged: (TextFieldValue) -> Unit,
     onAdultChanged: (Boolean) -> Unit,
     onPhotoAttachClicked: () -> Unit,
@@ -103,13 +105,22 @@ fun Composer(
         }
     }
 
+    val cardModifier = modifier
+        .fillMaxWidth()
+        .padding(horizontal = 12.dp)
+        .then(
+            if (applyBottomInsetsPadding) {
+                Modifier
+                    .imePadding()
+                    .navigationBarsPadding()
+            } else {
+                Modifier
+            },
+        )
+        .padding(bottom = 8.dp)
+
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .imePadding()
-            .navigationBarsPadding()
-            .padding(bottom = 8.dp),
+        modifier = cardModifier,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
@@ -147,93 +158,107 @@ fun Composer(
                 )
             }
 
-            FlowRow(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                itemVerticalAlignment = Alignment.CenterVertically,
-                verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                val boldPlaceholder = stringResource(resource = Res.string.composer_bold_placeholder)
-                MarkdownActionButton(
-                    iconRes = Res.drawable.ic_format_bold,
-                    enabled = !state.isSubmitting,
-                    onClick = {
-                        val updated = state.content.insertMarkdown(
-                            prefix = "**",
-                            placeholder = boldPlaceholder,
-                            suffix = "**",
-                            highlightPlaceholder = true,
-                        )
-                        onContentChanged(updated)
-                    },
-                )
-                val italicPlaceholder = stringResource(resource = Res.string.composer_italic_placeholder)
-                MarkdownActionButton(
-                    iconRes = Res.drawable.ic_format_italic,
-                    enabled = !state.isSubmitting,
-                    onClick = {
-                        val updated = state.content.insertMarkdown(
-                            prefix = "__",
-                            placeholder = italicPlaceholder,
-                            suffix = "__",
-                            highlightPlaceholder = true,
-                        )
-                        onContentChanged(updated)
-                    },
-                )
-                val linkDescriptionPlaceholder =
-                    stringResource(resource = Res.string.composer_link_description_placeholder)
-                val linkUrlPlaceholder = stringResource(resource = Res.string.composer_link_url_placeholder)
-                MarkdownActionButton(
-                    iconRes = Res.drawable.ic_link,
-                    enabled = !state.isSubmitting,
-                    onClick = {
-                        val updated = state.content.insertMarkdown(
-                            prefix = "[$linkDescriptionPlaceholder]($linkUrlPlaceholder)",
-                            placeholder = "",
-                            suffix = "",
-                            highlightPlaceholder = false,
-                        )
-                        onContentChanged(updated)
-                    },
-                )
-                val quotePlaceholder = stringResource(resource = Res.string.composer_quote_placeholder)
-                MarkdownActionButton(
-                    iconRes = Res.drawable.ic_format_quote,
-                    enabled = !state.isSubmitting,
-                    onClick = {
-                        val updated = state.content.insertMarkdown(
-                            prefix = ">",
-                            placeholder = quotePlaceholder,
-                            suffix = "",
-                            highlightPlaceholder = true,
-                        )
-                        onContentChanged(updated)
-                    },
-                )
-                val codePlaceholder = stringResource(resource = Res.string.composer_code_placeholder)
-                MarkdownActionButton(
-                    iconRes = Res.drawable.ic_code,
-                    enabled = !state.isSubmitting,
-                    onClick = {
-                        val updated = state.content.insertMarkdown(
-                            prefix = "`",
-                            placeholder = codePlaceholder,
-                            suffix = "`",
-                            highlightPlaceholder = true,
-                        )
-                        onContentChanged(updated)
-                    },
-                )
-                MarkdownActionButton(
-                    iconRes = Res.drawable.ic_exclamation,
-                    enabled = !state.isSubmitting,
-                    onClick = {
-                        val updated = state.content.addSpoilerAtLineStart()
-                        onContentChanged(updated)
-                    },
-                )
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = if (actionsTrailingContent != null) 42.dp else 0.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    itemVerticalAlignment = Alignment.CenterVertically,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    val boldPlaceholder = stringResource(resource = Res.string.composer_bold_placeholder)
+                    MarkdownActionButton(
+                        iconRes = Res.drawable.ic_format_bold,
+                        enabled = !state.isSubmitting,
+                        onClick = {
+                            val updated = state.content.insertMarkdown(
+                                prefix = "**",
+                                placeholder = boldPlaceholder,
+                                suffix = "**",
+                                highlightPlaceholder = true,
+                            )
+                            onContentChanged(updated)
+                        },
+                    )
+                    val italicPlaceholder = stringResource(resource = Res.string.composer_italic_placeholder)
+                    MarkdownActionButton(
+                        iconRes = Res.drawable.ic_format_italic,
+                        enabled = !state.isSubmitting,
+                        onClick = {
+                            val updated = state.content.insertMarkdown(
+                                prefix = "__",
+                                placeholder = italicPlaceholder,
+                                suffix = "__",
+                                highlightPlaceholder = true,
+                            )
+                            onContentChanged(updated)
+                        },
+                    )
+                    val linkDescriptionPlaceholder =
+                        stringResource(resource = Res.string.composer_link_description_placeholder)
+                    val linkUrlPlaceholder = stringResource(resource = Res.string.composer_link_url_placeholder)
+                    MarkdownActionButton(
+                        iconRes = Res.drawable.ic_link,
+                        enabled = !state.isSubmitting,
+                        onClick = {
+                            val updated = state.content.insertMarkdown(
+                                prefix = "[$linkDescriptionPlaceholder]($linkUrlPlaceholder)",
+                                placeholder = "",
+                                suffix = "",
+                                highlightPlaceholder = false,
+                            )
+                            onContentChanged(updated)
+                        },
+                    )
+                    val quotePlaceholder = stringResource(resource = Res.string.composer_quote_placeholder)
+                    MarkdownActionButton(
+                        iconRes = Res.drawable.ic_format_quote,
+                        enabled = !state.isSubmitting,
+                        onClick = {
+                            val updated = state.content.insertMarkdown(
+                                prefix = ">",
+                                placeholder = quotePlaceholder,
+                                suffix = "",
+                                highlightPlaceholder = true,
+                            )
+                            onContentChanged(updated)
+                        },
+                    )
+                    val codePlaceholder = stringResource(resource = Res.string.composer_code_placeholder)
+                    MarkdownActionButton(
+                        iconRes = Res.drawable.ic_code,
+                        enabled = !state.isSubmitting,
+                        onClick = {
+                            val updated = state.content.insertMarkdown(
+                                prefix = "`",
+                                placeholder = codePlaceholder,
+                                suffix = "`",
+                                highlightPlaceholder = true,
+                            )
+                            onContentChanged(updated)
+                        },
+                    )
+                    MarkdownActionButton(
+                        iconRes = Res.drawable.ic_exclamation,
+                        enabled = !state.isSubmitting,
+                        onClick = {
+                            val updated = state.content.addSpoilerAtLineStart()
+                            onContentChanged(updated)
+                        },
+                    )
+                }
+
+                actionsTrailingContent?.let { trailingContent ->
+                    Box(
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                    ) {
+                        trailingContent()
+                    }
+                }
             }
 
             OutlinedTextField(
