@@ -5,9 +5,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,7 +29,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.IntSize
@@ -43,6 +39,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.imageviewer.preview.ImageViewerScreenStateProvider
 import pl.masslany.podkop.features.imageviewer.preview.NoOpImageViewerActions
@@ -82,13 +79,11 @@ fun ImageViewerScreenContent(
     actions: ImageViewerActions,
     modifier: Modifier = Modifier,
 ) {
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false)
+
     Scaffold(
-        modifier = modifier
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            )
-            .fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { },
@@ -110,18 +105,18 @@ fun ImageViewerScreenContent(
                         )
                     }
                 },
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                windowInsets = topBarInsets,
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
                 ),
             )
         },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = contentInsets,
         containerColor = Color.Black,
     ) { innerPaddingValues ->
         ZoomableImage(
             modifier = Modifier
-                .padding(top = innerPaddingValues.calculateTopPadding())
+                .padding(innerPaddingValues)
                 .fillMaxSize(),
             imageUrl = state.imageUrl,
         )

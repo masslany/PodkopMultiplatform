@@ -3,7 +3,7 @@ package pl.masslany.podkop.features.linksubmission.linkdraft
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,7 +52,7 @@ internal fun LinkDraftScreenRoot(
                         )
                     }
                 },
-                windowInsets = WindowInsets.systemBars,
+                windowInsets = WindowInsets.safeDrawing,
             )
         },
         bottomBar = {
@@ -65,6 +65,7 @@ internal fun LinkDraftScreenRoot(
                 isCancelEnabled = !state.isPublishing && !state.isMediaUploading,
             )
         },
+        contentWindowInsets = WindowInsets.safeDrawing,
         containerColor = MaterialTheme.colorScheme.surface,
     ) { innerPadding ->
         LinkDraftScreenContent(

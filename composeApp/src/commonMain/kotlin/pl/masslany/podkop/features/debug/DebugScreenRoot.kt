@@ -3,9 +3,6 @@ package pl.masslany.podkop.features.debug
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,7 +20,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -31,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.debug.preview.DebugScreenStateProvider
 import pl.masslany.podkop.features.debug.preview.NoOpDebugActions
@@ -73,13 +70,11 @@ fun DebugScreenContent(
     actions: DebugActions,
     modifier: Modifier = Modifier,
 ) {
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false)
+
     Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            ),
+        modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
@@ -97,10 +92,11 @@ fun DebugScreenContent(
                     }
                 },
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                windowInsets = topBarInsets,
             )
         },
         containerColor = MaterialTheme.colorScheme.surface,
+        contentWindowInsets = contentInsets,
     ) { innerPaddingValues ->
         Column(
             modifier = Modifier

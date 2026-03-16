@@ -9,16 +9,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -53,7 +48,6 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -68,6 +62,7 @@ import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -155,11 +150,9 @@ fun LinkDetailsScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false)
     val scaffoldModifier = modifier
-        .padding(
-            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-        )
         .fillMaxSize()
         .let { baseModifier ->
             if (showTopBar) {
@@ -198,7 +191,7 @@ fun LinkDetailsScreenContent(
                         }
                     },
                     scrollBehavior = scrollBehavior,
-                    windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                    windowInsets = topBarInsets,
                 )
             }
         },
@@ -228,11 +221,12 @@ fun LinkDetailsScreenContent(
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
+        contentWindowInsets = contentInsets,
     ) { innerPaddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPaddingValues.calculateTopPadding()),
+                .padding(innerPaddingValues),
         ) {
             PullToRefreshBox(
                 isRefreshing = state.isRefreshing,
@@ -278,10 +272,7 @@ private fun LinkDetailsScreenList(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(
-            bottom = WindowInsets
-                .systemBars
-                .asPaddingValues()
-                .calculateBottomPadding() + 16.dp,
+            bottom = 16.dp,
         ),
     ) {
         state.link?.let { link ->

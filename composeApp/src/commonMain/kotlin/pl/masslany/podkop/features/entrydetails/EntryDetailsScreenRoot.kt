@@ -10,15 +10,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -60,6 +56,7 @@ import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -127,12 +124,9 @@ fun EntryDetailsScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = !showTopBar)
     val scaffoldModifier = modifier
-        .padding(
-            top = if (!showTopBar) paddingValues.calculateTopPadding() else 0.dp,
-            start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-            end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-        )
         .fillMaxSize()
         .let { baseModifier ->
             if (showTopBar) {
@@ -167,7 +161,7 @@ fun EntryDetailsScreenContent(
                         }
                     },
                     scrollBehavior = scrollBehavior,
-                    windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                    windowInsets = topBarInsets,
                 )
             }
         },
@@ -197,12 +191,12 @@ fun EntryDetailsScreenContent(
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = contentInsets,
     ) { innerPaddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPaddingValues.calculateTopPadding()),
+                .padding(innerPaddingValues),
         ) {
             PullToRefreshBox(
                 isRefreshing = state.isRefreshing,
@@ -247,10 +241,7 @@ private fun EntryDetailsScreenList(
         modifier = modifier,
         state = lazyListState,
         contentPadding = PaddingValues(
-            bottom = WindowInsets
-                .systemBars
-                .asPaddingValues()
-                .calculateBottomPadding() + 16.dp,
+            bottom = 16.dp,
         ),
     ) {
         val replyActionsConfig = ResourceItemConfig(

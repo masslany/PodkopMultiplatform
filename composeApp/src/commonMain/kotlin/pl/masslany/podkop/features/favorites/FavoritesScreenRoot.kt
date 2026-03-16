@@ -7,13 +7,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,7 +34,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -52,6 +46,7 @@ import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -115,15 +110,13 @@ fun FavoritesScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false)
 
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            ),
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = {
@@ -141,7 +134,7 @@ fun FavoritesScreenContent(
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                windowInsets = topBarInsets,
             )
         },
         floatingActionButton = {
@@ -170,12 +163,12 @@ fun FavoritesScreenContent(
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = contentInsets,
     ) { innerPaddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPaddingValues.calculateTopPadding()),
+                .padding(innerPaddingValues),
         ) {
             PullToRefreshBox(
                 isRefreshing = state.isRefreshing,
@@ -225,7 +218,7 @@ private fun FavoritesScreenList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
         contentPadding = PaddingValues(
-            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 16.dp,
+            bottom = 16.dp,
         ),
     ) {
         item(key = "DropdownMenuRow") {

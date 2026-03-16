@@ -9,15 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -55,6 +52,7 @@ import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.models.UserItemState
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -142,14 +140,14 @@ fun ProfileScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false, includeBottom = false)
+    val layoutDirection = LocalLayoutDirection.current
+    val bottomInsetPadding = paddingValues.calculateBottomPadding()
 
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            )
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
@@ -243,6 +241,7 @@ fun ProfileScreenContent(
                     }
                 },
                 scrollBehavior = scrollBehavior,
+                windowInsets = topBarInsets,
             )
         },
         floatingActionButton = {
@@ -271,11 +270,20 @@ fun ProfileScreenContent(
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = contentInsets,
     ) { innerPaddingValues ->
+        val bodyPadding = PaddingValues(
+            start = innerPaddingValues.calculateStartPadding(layoutDirection),
+            top = innerPaddingValues.calculateTopPadding(),
+            end = innerPaddingValues.calculateEndPadding(layoutDirection),
+        )
 
         if (state.isLoading) {
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bodyPadding),
+            ) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
                 )
@@ -283,15 +291,19 @@ fun ProfileScreenContent(
         } else if (state.isError) {
             GenericErrorScreen(
                 onRefreshClicked = actions::onRetryClicked,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bodyPadding),
             )
         } else {
             ProfileScreenBody(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues = innerPaddingValues),
+                    .padding(bodyPadding),
                 state = state,
                 actions = actions,
                 lazyListState = lazyListState,
+                bottomContentPadding = bottomInsetPadding + 16.dp,
             )
         }
     }
@@ -303,6 +315,7 @@ private fun ProfileScreenBody(
     state: ProfileScreenState,
     actions: ProfileActions,
     lazyListState: LazyListState,
+    bottomContentPadding: androidx.compose.ui.unit.Dp,
 ) {
     Box(
         modifier = modifier,
@@ -312,6 +325,7 @@ private fun ProfileScreenBody(
             state = state,
             actions = actions,
             lazyListState = lazyListState,
+            bottomContentPadding = bottomContentPadding,
         )
     }
 }
@@ -321,16 +335,14 @@ private fun ProfileLoadedContent(
     state: ProfileScreenState,
     actions: ProfileActions,
     lazyListState: LazyListState,
+    bottomContentPadding: androidx.compose.ui.unit.Dp,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(
-            bottom = WindowInsets
-                .systemBars
-                .asPaddingValues()
-                .calculateBottomPadding() + 16.dp,
+            bottom = bottomContentPadding,
         ),
     ) {
         item(

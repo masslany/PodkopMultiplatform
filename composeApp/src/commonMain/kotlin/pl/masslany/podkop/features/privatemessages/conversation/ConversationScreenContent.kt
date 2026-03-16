@@ -2,9 +2,7 @@ package pl.masslany.podkop.features.privatemessages.conversation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,7 +19,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,6 +27,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.composer.Composer
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.privatemessages.components.ConversationMessagesList
 import pl.masslany.podkop.features.privatemessages.models.ConversationScreenState
@@ -60,13 +58,11 @@ internal fun ConversationScreenContent(
     onUrlClicked: (String) -> Unit,
     onImageClicked: (String) -> Unit,
 ) {
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false)
+
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            ),
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
@@ -86,7 +82,7 @@ internal fun ConversationScreenContent(
                     }
                 },
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                windowInsets = topBarInsets,
             )
         },
         bottomBar = {
@@ -103,17 +99,18 @@ internal fun ConversationScreenContent(
                 onPhotoRemoved = onComposerPhotoRemoved,
                 onDismiss = onTopBarBackClicked,
                 onSubmit = onComposerSubmit,
+                modifier = Modifier.padding(contentInsets.asPaddingValues()),
             )
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = contentInsets,
     ) { innerPadding ->
         PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding()),
+                .padding(innerPadding),
         ) {
             when {
                 state.isLoading -> {

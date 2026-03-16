@@ -60,6 +60,7 @@ import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.StaleRefreshPill
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -186,6 +187,7 @@ fun EntriesScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
 
     LaunchedEffect(state.shouldShowRefreshPrompt) {
         if (state.shouldShowRefreshPrompt) {
@@ -229,7 +231,7 @@ fun EntriesScreenContent(
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                windowInsets = topBarInsets,
             )
 
             PullToRefreshBox(

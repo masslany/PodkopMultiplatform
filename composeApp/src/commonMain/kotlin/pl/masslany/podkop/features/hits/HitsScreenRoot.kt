@@ -7,13 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -53,6 +50,7 @@ import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -120,15 +118,15 @@ fun HitsScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false, includeBottom = false)
+    val layoutDirection = LocalLayoutDirection.current
+    val bottomInsetPadding = paddingValues.calculateBottomPadding()
 
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            ),
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
                 title = {
@@ -146,7 +144,7 @@ fun HitsScreenContent(
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                windowInsets = topBarInsets,
             )
         },
         floatingActionButton = {
@@ -174,13 +172,18 @@ fun HitsScreenContent(
                 }
             }
         },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = contentInsets,
         containerColor = MaterialTheme.colorScheme.surface,
     ) { innerPaddingValues ->
+        val bodyPadding = PaddingValues(
+            start = innerPaddingValues.calculateStartPadding(layoutDirection),
+            top = innerPaddingValues.calculateTopPadding(),
+            end = innerPaddingValues.calculateEndPadding(layoutDirection),
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPaddingValues.calculateTopPadding()),
+                .padding(bodyPadding),
         ) {
             PullToRefreshBox(
                 isRefreshing = state.isRefreshing,
@@ -210,6 +213,7 @@ fun HitsScreenContent(
                             state = state,
                             actions = actions,
                             lazyListState = lazyListState,
+                            bottomContentPadding = bottomInsetPadding + 16.dp,
                         )
                     }
                 }
@@ -234,6 +238,7 @@ private fun HitsScreenList(
     state: HitsScreenState,
     actions: HitsActions,
     lazyListState: LazyListState,
+    bottomContentPadding: androidx.compose.ui.unit.Dp,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -241,7 +246,7 @@ private fun HitsScreenList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
         contentPadding = PaddingValues(
-            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 16.dp,
+            bottom = bottomContentPadding,
         ),
     ) {
         item(key = "filters") {

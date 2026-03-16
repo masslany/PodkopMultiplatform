@@ -9,9 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -182,6 +187,7 @@ fun HomeScreenContent(
     CompositionLocalProvider(LocalBottomBarScrollBehavior provides bottomBarBehavior) {
         Scaffold(
             modifier = modifier.fillMaxSize(),
+            contentWindowInsets = WindowInsets.safeDrawing,
             bottomBar = {
                 if (useBottomBar && state.destinations.isNotEmpty()) {
                     BottomBarRoot(
@@ -198,7 +204,17 @@ fun HomeScreenContent(
                 }
             },
         ) { contentPadding ->
-            val contentPaddingState = rememberUpdatedState(newValue = contentPadding)
+            val layoutDirection = LocalLayoutDirection.current
+            val contentPaddingState = rememberUpdatedState(
+                newValue = if (useBottomBar || state.destinations.isEmpty()) {
+                    contentPadding
+                } else {
+                    PaddingValues(
+                        top = contentPadding.calculateTopPadding(),
+                        bottom = contentPadding.calculateBottomPadding(),
+                    )
+                },
+            )
             val homeNavContent = remember(holder) {
                 movableContentOf {
                     holder.SaveableStateProvider(currentTabKeyState.value) {
@@ -239,15 +255,14 @@ fun HomeScreenContent(
                         destinations = state.destinations,
                         onScreenChanged = onTabChanged,
                         modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(
-                                top = contentPadding.calculateTopPadding(),
-                                bottom = contentPadding.calculateBottomPadding(),
-                            ),
+                            .fillMaxHeight(),
                     )
                     Box(
                         modifier = Modifier
                             .weight(1f)
+                            .padding(
+                                end = contentPadding.calculateEndPadding(layoutDirection),
+                            )
                             .fillMaxHeight(),
                     ) {
                         homeNavContent()

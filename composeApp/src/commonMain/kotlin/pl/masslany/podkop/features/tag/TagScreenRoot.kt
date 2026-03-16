@@ -8,14 +8,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -50,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -64,6 +58,7 @@ import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.pagination.rememberLazyStaggeredGridPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -172,6 +167,8 @@ internal fun TagScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false)
     var pendingToggleAnchorResourceIndex by remember(state.screenInstanceId) {
         mutableStateOf<Int?>(null)
     }
@@ -201,10 +198,6 @@ internal fun TagScreenContent(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            )
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
@@ -255,7 +248,7 @@ internal fun TagScreenContent(
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                windowInsets = topBarInsets,
             )
         },
         floatingActionButton = {
@@ -288,14 +281,14 @@ internal fun TagScreenContent(
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = contentInsets,
     ) { innerPaddingValues ->
         PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = actions::onRefresh,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPaddingValues.calculateTopPadding()),
+                .padding(innerPaddingValues),
         ) {
             if (state.isLoading) {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -339,17 +332,12 @@ private fun TagScreenList(
     actions: TagActions,
     lazyListState: LazyListState,
 ) {
-    val systemBottomPadding = WindowInsets
-        .systemBars
-        .asPaddingValues()
-        .calculateBottomPadding()
-
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
         contentPadding = PaddingValues(
-            bottom = systemBottomPadding + 16.dp,
+            bottom = 16.dp,
         ),
     ) {
         screenHeader(state = state, actions = actions)
@@ -389,11 +377,6 @@ private fun TagScreenGallery(
     actions: TagActions,
     lazyStaggeredGridState: LazyStaggeredGridState,
 ) {
-    val systemBottomPadding = WindowInsets
-        .systemBars
-        .asPaddingValues()
-        .calculateBottomPadding()
-
     LazyVerticalStaggeredGrid(
         modifier = modifier,
         state = lazyStaggeredGridState,
@@ -403,7 +386,7 @@ private fun TagScreenGallery(
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,
-            bottom = systemBottomPadding + 16.dp,
+            bottom = 16.dp,
         ),
     ) {
         screenHeader(state = state, actions = actions)

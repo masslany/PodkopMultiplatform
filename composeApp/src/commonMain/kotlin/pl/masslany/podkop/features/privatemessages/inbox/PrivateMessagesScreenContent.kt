@@ -2,9 +2,6 @@ package pl.masslany.podkop.features.privatemessages.inbox
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,12 +21,12 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.privatemessages.components.PrivateMessagesInboxList
 import pl.masslany.podkop.features.privatemessages.models.PrivateMessagesScreenState
@@ -53,13 +50,11 @@ internal fun PrivateMessagesScreenContent(
     onRefresh: () -> Unit,
     onConversationClicked: (String) -> Unit,
 ) {
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false)
+
     Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(
-                start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
-                end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-            ),
+        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {
@@ -75,7 +70,7 @@ internal fun PrivateMessagesScreenContent(
                     }
                 },
                 scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                windowInsets = topBarInsets,
             )
         },
         floatingActionButton = {
@@ -92,14 +87,14 @@ internal fun PrivateMessagesScreenContent(
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        contentWindowInsets = contentInsets,
     ) { innerPadding ->
         PullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding()),
+                .padding(innerPadding),
         ) {
             when {
                 state.isLoading -> {
@@ -135,7 +130,7 @@ internal fun PrivateMessagesScreenContent(
                     PrivateMessagesInboxList(
                         state = state,
                         lazyListState = lazyListState,
-                        bottomPadding = paddingValues.calculateBottomPadding(),
+                        bottomPadding = 0.dp,
                         onConversationClicked = onConversationClicked,
                     )
                 }

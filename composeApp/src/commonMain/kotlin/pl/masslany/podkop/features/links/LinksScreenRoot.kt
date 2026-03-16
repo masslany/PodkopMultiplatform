@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -60,6 +59,7 @@ import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.StaleRefreshPill
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -76,6 +76,7 @@ import podkop.composeapp.generated.resources.ic_add
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.topbar_label_homepage
 import podkop.composeapp.generated.resources.topbar_label_upcoming
+import kotlin.time.Duration.Companion.seconds
 
 private const val FAB_ITEMS_OFFSET = 10
 
@@ -155,6 +156,7 @@ fun LinksScreenContent(
         }
     }
     val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
 
     LaunchedEffect(state.shouldShowRefreshPrompt) {
         if (state.shouldShowRefreshPrompt) {
@@ -198,7 +200,7 @@ fun LinksScreenContent(
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                windowInsets = WindowInsets(top = paddingValues.calculateTopPadding()),
+                windowInsets = topBarInsets,
             )
 
             PullToRefreshBox(

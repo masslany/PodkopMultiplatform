@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -162,6 +162,8 @@ fun App() {
             LocalAppSnackbarHostState provides snackbarHostState,
             LocalAppSettings provides appSettings,
         ) {
+            val safeDrawingPaddingValues = WindowInsets.safeDrawing.asPaddingValues()
+
             Box(modifier = Modifier.fillMaxSize()) {
                 NavigationContent(
                     state = state,
@@ -174,28 +176,28 @@ fun App() {
                         entry<EntryDetailsScreen> {
                             EntryDetailsScreenRoot(
                                 screen = it,
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<LinkDetailsScreen> {
                             LinkDetailsScreenRoot(
                                 id = it.id,
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<ImageViewerScreen> {
                             ImageViewerScreenRoot(
                                 imageUrl = it.imageUrl,
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<ProfileScreen> {
                             ProfileScreenRoot(
                                 username = it.username,
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
@@ -209,7 +211,7 @@ fun App() {
 
                         entry<SettingsScreen> {
                             SettingsScreenRoot(
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
@@ -225,57 +227,57 @@ fun App() {
 
                         entry<HitsScreen> {
                             HitsScreenRoot(
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<FavoritesScreen> {
                             FavoritesScreenRoot(
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<SearchScreen> {
                             SearchScreenRoot(
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<NotificationsScreen> {
                             NotificationsScreenRoot(
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<PrivateMessagesScreen> {
                             PrivateMessagesScreenRoot(
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<NewConversationScreen> {
                             NewConversationScreenRoot(
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<ConversationScreen> {
                             ConversationScreenRoot(
                                 screen = it,
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<DebugScreen> {
                             DebugScreenRoot(
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
                         entry<TagScreen> {
                             TagScreenRoot(
                                 tag = it.tag,
-                                paddingValues = WindowInsets.systemBars.asPaddingValues(),
+                                paddingValues = safeDrawingPaddingValues,
                             )
                         }
 
@@ -292,6 +294,7 @@ fun App() {
                                 modalBottomSheetProperties = ModalBottomSheetProperties(
                                     shouldDismissOnClickOutside = false,
                                 ),
+                                skipPartiallyExpanded = true,
                                 sheetGesturesEnabled = false,
                                 hideDragHandle = true,
                             ),
@@ -389,8 +392,7 @@ fun App() {
                         .align(Alignment.TopCenter)
                         .padding(horizontal = 16.dp)
                         .padding(
-                            top = WindowInsets.systemBars.asPaddingValues()
-                                .calculateBottomPadding() + GlobalSnackbarTopOffset,
+                            top = safeDrawingPaddingValues.calculateTopPadding() + GlobalSnackbarTopOffset,
                         ),
                 )
             }

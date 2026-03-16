@@ -3,10 +3,7 @@ package pl.masslany.podkop.features.notifications.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -34,7 +31,6 @@ fun NotificationsList(
     state: NotificationsScreenState,
     actions: NotificationsActions,
     lazyListState: LazyListState,
-    bottomPadding: androidx.compose.ui.unit.Dp,
     modifier: Modifier = Modifier,
 ) {
     if (state.items.isEmpty()) {
@@ -57,7 +53,7 @@ fun NotificationsList(
                 start = 16.dp,
                 end = 16.dp,
                 top = 12.dp,
-                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + bottomPadding + 16.dp,
+                bottom = 16.dp,
             ),
         ) {
             items(
@@ -89,7 +85,6 @@ private fun NotificationsListPreview() {
             state = NotificationsPreviewFixtures.contentState(),
             actions = NoOpNotificationsActions,
             lazyListState = rememberLazyListState(),
-            bottomPadding = 0.dp,
         )
     }
 }
