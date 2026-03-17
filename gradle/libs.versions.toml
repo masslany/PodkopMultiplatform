@@ -47,6 +47,7 @@ timber = "5.0.1"
 firebase-bom = "34.10.0"
 google-services = "4.4.4"
 firebase-crashlytics-plugin = "3.0.6"
+leakcanary = "2.14"
 
 [libraries]
 adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "jetbrainsAdaptive" }
@@ -116,6 +117,7 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 
 [bundles]
 

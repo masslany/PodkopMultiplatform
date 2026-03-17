@@ -68,4 +68,5 @@ dependencies {
     implementation(libs.timber)
 
     implementation(libs.androidx.activity.compose)
+    debugImplementation(libs.leakcanary.android)
 }
