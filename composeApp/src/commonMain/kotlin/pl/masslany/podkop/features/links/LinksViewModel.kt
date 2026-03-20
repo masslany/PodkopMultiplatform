@@ -126,19 +126,7 @@ class LinksViewModel(
                 logMessage = "Failed to load links",
             )
 
-            if (!isUpcoming) {
-                hitsRepository.getLinkHits(
-                    hitsSortType = HitsSortType.Day,
-                    year = null,
-                    month = null,
-                )
-                    .onSuccess {
-                        linksResourceItemStateHolder.updateHits(it.data)
-                    }
-                    .onFailure {
-                        logger.error("Failed to load hits", it)
-                    }
-            }
+            refreshHomepageHits()
         }
     }
 
@@ -188,6 +176,7 @@ class LinksViewModel(
                 showErrorScreenOnFailure = state.value.links.isEmpty(),
                 logMessage = "Failed to refresh links for sort type $sortType",
             )
+            refreshHomepageHits()
         }
     }
 
@@ -267,6 +256,24 @@ class LinksViewModel(
             snackbarManager.tryEmitGenericError()
         }
         hasBeenInitialized = true
+    }
+
+    private suspend fun refreshHomepageHits() {
+        if (isUpcoming) {
+            return
+        }
+
+        hitsRepository.getLinkHits(
+            hitsSortType = HitsSortType.Day,
+            year = null,
+            month = null,
+        )
+            .onSuccess {
+                linksResourceItemStateHolder.updateHits(it.data)
+            }
+            .onFailure {
+                logger.error("Failed to load hits", it)
+            }
     }
 
     private companion object {
