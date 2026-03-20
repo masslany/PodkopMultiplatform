@@ -530,7 +530,6 @@ private fun LinkDetailsScreenList(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         state = comment,
                         actions = actions,
-                        isReplyEnabled = state.isLoggedIn,
                         currentUsername = state.currentUsername,
                         linkAuthorName = state.link?.authorState?.name,
                     )
@@ -561,7 +560,6 @@ private fun LinkDetailsCommentItem(
     modifier: Modifier = Modifier,
     state: LinkDetailsCommentItemState,
     actions: LinkDetailsActions,
-    isReplyEnabled: Boolean,
     currentUsername: String?,
     linkAuthorName: String?,
 ) {
@@ -597,7 +595,6 @@ private fun LinkDetailsCommentItem(
                             onLongClick = state.comment.textSelectionLongClick(actions),
                         ),
                     state = state.comment,
-                    isReplyEnabled = isReplyEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
                     onTagClick = { actions.onTagClicked(it) },
                     onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -667,7 +664,6 @@ private fun LinkDetailsCommentItem(
                                 onLongClick = reply.textSelectionLongClick(actions),
                             ),
                         state = reply,
-                        isReplyEnabled = isReplyEnabled,
                         onProfileClick = { actions.onProfileClicked(it) },
                         onTagClick = { actions.onTagClicked(it) },
                         onUrlClick = { actions.onLinkUrlClicked(it) },

@@ -99,6 +99,23 @@ class EntryMappersTest {
         assertEquals("comment-photo-key", comment.embedImageState?.key)
         assertEquals("https://cdn.example/comment.jpg", comment.embedImageState?.url)
     }
+
+    @Test
+    fun `entry mapper derives reply capability from create action`() {
+        val state = entryResource(
+            actions = actions(create = true),
+            comments = Comments(
+                count = 1,
+                hot = false,
+                items = listOf(
+                    entryComment(actions = actions(create = true)),
+                ),
+            ),
+        ).toEntryItemState()
+
+        assertEquals(true, state.isReplyEnabled)
+        assertEquals(true, state.comments.single().isReplyEnabled)
+    }
 }
 
 private fun entryResource(
@@ -210,8 +227,11 @@ private fun votes(): Votes = Votes(
     up = 0,
 )
 
-private fun actions(update: Boolean = false): Actions = Actions(
-    create = false,
+private fun actions(
+    create: Boolean = false,
+    update: Boolean = false,
+): Actions = Actions(
+    create = create,
     createFavourite = false,
     delete = false,
     deleteFavourite = false,
@@ -222,4 +242,5 @@ private fun actions(update: Boolean = false): Actions = Actions(
     update = update,
     voteDown = true,
     voteUp = true,
+    vote = false,
 )

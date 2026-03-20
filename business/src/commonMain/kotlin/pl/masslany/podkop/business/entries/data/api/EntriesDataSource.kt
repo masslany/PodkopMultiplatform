@@ -64,6 +64,11 @@ interface EntriesDataSource {
 
     suspend fun voteUp(entryId: Int): Result<Unit>
 
+    suspend fun voteSurvey(
+        entryId: Int,
+        optionNumber: Int,
+    ): Result<Unit>
+
     suspend fun removeVoteUp(entryId: Int): Result<Unit>
 
     suspend fun deleteEntry(entryId: Int): Result<Unit>

@@ -24,6 +24,7 @@ import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentType
 import pl.masslany.podkop.common.models.embed.TwitterEmbedState
 import pl.masslany.podkop.common.models.embed.toTwitterEmbedPreviewState
+import pl.masslany.podkop.common.models.survey.registerVote
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
@@ -256,6 +257,30 @@ open class BaseResourceItemStateHolder(
                     } else {
                         EntryVoteAction.VoteUp
                     },
+                )
+            }
+        }
+    }
+
+    override fun onEntrySurveyVoteClicked(entryId: Int, optionNumber: Int) {
+        scope?.launch {
+            val canVote = _items.value
+                .filterIsInstance<EntryItemState>()
+                .firstOrNull { it.id == entryId }
+                ?.surveyState
+                ?.isVoteActionEnabled == true
+
+            if (!canVote) return@launch
+
+            val result = entriesRepository.voteSurvey(
+                entryId = entryId,
+                optionNumber = optionNumber,
+            )
+
+            result.onSuccess {
+                updateEntrySurveyVote(
+                    entryId = entryId,
+                    optionNumber = optionNumber,
                 )
             }
         }
@@ -583,6 +608,18 @@ open class BaseResourceItemStateHolder(
             }
 
             entry.copy(voteState = newVoteState)
+        }
+    }
+
+    private fun updateEntrySurveyVote(
+        entryId: Int,
+        optionNumber: Int,
+    ) {
+        updateItem(entryId) { item ->
+            val entry = item as? EntryItemState ?: return@updateItem item
+            val surveyState = entry.surveyState ?: return@updateItem entry
+
+            entry.copy(surveyState = surveyState.registerVote(optionNumber))
         }
     }
 

@@ -263,7 +263,6 @@ private fun FavoritesScreenList(
                 actions = actions,
                 config = ResourceItemConfig(
                     showReplyAction = true,
-                    isReplyActionEnabled = true,
                     showLinkCommentReplyAction = false,
                     renderCommentAsCard = true,
                 ),

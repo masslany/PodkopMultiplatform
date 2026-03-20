@@ -7,6 +7,8 @@ import pl.masslany.podkop.business.entries.data.network.models.EntryCommentCreat
 import pl.masslany.podkop.business.entries.data.network.models.EntryCommentCreateRequestDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryCreateDataDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryCreateRequestDto
+import pl.masslany.podkop.business.entries.data.network.models.EntrySurveyVoteDataDto
+import pl.masslany.podkop.business.entries.data.network.models.EntrySurveyVoteRequestDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
@@ -227,6 +229,25 @@ class EntriesApiClient(
             Request<Unit>(
                 method = Request.HttpMethod.POST,
                 path = "api/v3/entries/$entryId/votes",
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun voteSurvey(
+        entryId: Int,
+        optionNumber: Int,
+    ): Result<Unit> {
+        val request =
+            Request<Unit>(
+                method = Request.HttpMethod.POST,
+                path = "api/v3/entries/$entryId/survey/votes",
+                body = EntrySurveyVoteRequestDto(
+                    data = EntrySurveyVoteDataDto(vote = optionNumber),
+                ),
             )
 
         return apiClient.request(request).fold(

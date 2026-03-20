@@ -28,7 +28,6 @@ fun LinkCommentItem(
     modifier: Modifier = Modifier,
     showInlineActions: Boolean = true,
     onReplyClick: (() -> Unit)? = null,
-    isReplyEnabled: Boolean = false,
     onProfileClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
@@ -103,7 +102,7 @@ fun LinkCommentItem(
             ResourceInlineActionsRow(
                 onMoreClick = onMoreClick,
                 onReplyClick = onReplyClick,
-                isReplyEnabled = isReplyEnabled,
+                isReplyEnabled = state.isReplyEnabled,
                 onFavouriteClick = onFavouriteClick,
                 isFavourite = state.isFavourite,
                 isFavouriteEnabled = state.isFavouriteEnabled,

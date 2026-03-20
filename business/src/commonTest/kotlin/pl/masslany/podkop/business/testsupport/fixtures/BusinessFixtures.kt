@@ -136,6 +136,7 @@ object BusinessFixtures {
         update: Boolean? = true,
         voteDown: Boolean? = false,
         voteUp: Boolean? = true,
+        vote: Boolean? = false,
     ): CommonActionsDto = CommonActionsDto(
         create = create,
         createFavourite = createFavourite,
@@ -148,6 +149,7 @@ object BusinessFixtures {
         update = update,
         voteDown = voteDown,
         voteUp = voteUp,
+        vote = vote,
     )
 
     fun commonRankDto(
@@ -536,6 +538,7 @@ object BusinessFixtures {
         update: Boolean = true,
         voteDown: Boolean = false,
         voteUp: Boolean = true,
+        vote: Boolean = false,
     ): Actions = Actions(
         create = create,
         createFavourite = createFavourite,
@@ -548,6 +551,7 @@ object BusinessFixtures {
         update = update,
         voteDown = voteDown,
         voteUp = voteUp,
+        vote = vote,
     )
 
     fun rank(

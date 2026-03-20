@@ -20,6 +20,7 @@ data class EntryCommentItemState(
     val entryContentState: EntryContentState,
     val publishedTimeType: PublishedTimeType?,
     val voteState: VoteState,
+    val isReplyEnabled: Boolean = false,
     val isFavourite: Boolean = false,
     val isFavouriteEnabled: Boolean = false,
     val isDeleteEnabled: Boolean = false,

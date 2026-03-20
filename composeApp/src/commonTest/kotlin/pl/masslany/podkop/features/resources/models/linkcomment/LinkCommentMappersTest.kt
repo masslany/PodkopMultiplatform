@@ -269,6 +269,30 @@ class LinkCommentMappersTest {
         assertEquals("emulator-x86-napisany-w-czystym-css", state.linkSlug)
         assertEquals(135726609, state.parentCommentIdOrNull)
     }
+
+    @Test
+    fun `link comment mapper derives reply capability from create action`() {
+        val resourceState = resourceLinkComment(
+            id = 135740393,
+            slug = "comment-slug",
+            parent = Parent(id = 7896627),
+            parentId = 7896627,
+            actions = actions(create = true),
+        ).toLinkCommentItemState()
+
+        val replyState = commentLinkReply(
+            id = 135740683,
+            parentId = 135740393,
+            slug = "komentarz",
+            actions = actions(create = true),
+        ).toLinkCommentItemState(
+            linkId = 7896627,
+            linkSlug = "emulator-x86-css-bez-javascriptu",
+        )
+
+        assertEquals(true, resourceState.isReplyEnabled)
+        assertEquals(true, replyState.isReplyEnabled)
+    }
 }
 
 private fun resourceLinkComment(
@@ -397,8 +421,11 @@ private fun votes(): Votes = Votes(
     up = 0,
 )
 
-private fun actions(update: Boolean = false): Actions = Actions(
-    create = false,
+private fun actions(
+    create: Boolean = false,
+    update: Boolean = false,
+): Actions = Actions(
+    create = create,
     createFavourite = false,
     delete = false,
     deleteFavourite = false,

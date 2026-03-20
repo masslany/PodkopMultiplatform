@@ -17,5 +17,6 @@ fun ActionsDto.toActions(): Actions {
         update = this.update ?: false,
         voteDown = this.voteDown ?: false,
         voteUp = this.voteUp ?: false,
+        vote = this.vote ?: false,
     )
 }

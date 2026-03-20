@@ -468,6 +468,22 @@ class EntriesRepositoryImplTest {
     }
 
     @Test
+    fun `survey vote delegates to data source`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            voteSurveyResult = Result.success(Unit)
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.voteSurvey(entryId = 7, optionNumber = 4)
+
+        assertTrue(actual.isSuccess)
+        assertEquals(
+            listOf(FakeEntriesDataSource.VoteSurveyCall(entryId = 7, optionNumber = 4)),
+            entriesDataSource.voteSurveyCalls,
+        )
+    }
+
+    @Test
     fun `remove vote up delegates to data source`() = runBlocking {
         val entriesDataSource = FakeEntriesDataSource().apply {
             removeVoteUpResult = Result.success(Unit)

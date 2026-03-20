@@ -246,7 +246,6 @@ private fun EntryDetailsScreenList(
     ) {
         val replyActionsConfig = ResourceItemConfig(
             showReplyAction = true,
-            isReplyActionEnabled = state.isLoggedIn,
             renderEntryAsCard = true,
         )
 

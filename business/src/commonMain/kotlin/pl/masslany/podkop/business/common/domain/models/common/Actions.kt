@@ -12,4 +12,5 @@ data class Actions(
     val update: Boolean,
     val voteDown: Boolean,
     val voteUp: Boolean,
+    val vote: Boolean,
 )

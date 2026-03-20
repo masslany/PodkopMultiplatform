@@ -173,6 +173,15 @@ class EntriesRepositoryImpl(
         }
     }
 
+    override suspend fun voteSurvey(
+        entryId: Int,
+        optionNumber: Int,
+    ): Result<Unit> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.voteSurvey(entryId, optionNumber)
+        }
+    }
+
     override suspend fun removeVoteUp(entryId: Int): Result<Unit> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.removeVoteUp(entryId)

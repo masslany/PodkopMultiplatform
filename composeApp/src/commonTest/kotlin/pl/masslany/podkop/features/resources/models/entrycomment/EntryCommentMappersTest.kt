@@ -70,6 +70,15 @@ class EntryCommentMappersTest {
 
         assertEquals(EntryContentState.DeletedByEntryAuthor, state.entryContentState)
     }
+
+    @Test
+    fun `entry comment mapper derives reply capability from create action`() {
+        val state = entryCommentResource(
+            actions = actions(create = true),
+        ).toEntryCommentItemState()
+
+        assertEquals(true, state.isReplyEnabled)
+    }
 }
 
 private fun entryCommentResource(
@@ -151,8 +160,11 @@ private fun votes(): Votes = Votes(
     up = 0,
 )
 
-private fun actions(update: Boolean = false): Actions = Actions(
-    create = false,
+private fun actions(
+    create: Boolean = false,
+    update: Boolean = false,
+): Actions = Actions(
+    create = create,
     createFavourite = false,
     delete = false,
     deleteFavourite = false,

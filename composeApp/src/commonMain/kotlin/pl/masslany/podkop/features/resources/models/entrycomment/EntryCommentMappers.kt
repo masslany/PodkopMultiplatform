@@ -83,6 +83,7 @@ internal fun ResourceItem.toEntryCommentItemState(): EntryCommentItemState {
         isBlacklisted = author?.blacklist == true,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
+        isReplyEnabled = this.actions?.create == true,
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
         isDeleteEnabled = this.actions?.delete == true || this.deletable,

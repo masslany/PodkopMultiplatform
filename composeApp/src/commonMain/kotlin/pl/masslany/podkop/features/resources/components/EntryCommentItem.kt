@@ -27,7 +27,6 @@ fun EntryCommentItem(
     state: EntryCommentItemState,
     modifier: Modifier = Modifier,
     showInlineActions: Boolean = true,
-    isReplyEnabled: Boolean = false,
     onProfileClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
@@ -102,7 +101,7 @@ fun EntryCommentItem(
             ResourceInlineActionsRow(
                 onMoreClick = onMoreClick,
                 onReplyClick = onReplyClick,
-                isReplyEnabled = isReplyEnabled,
+                isReplyEnabled = state.isReplyEnabled,
                 onFavouriteClick = onFavouriteClick,
                 isFavourite = state.isFavourite,
                 isFavouriteEnabled = state.isFavouriteEnabled,
@@ -128,7 +127,6 @@ private fun EntryCommentItemPreview(
             onVoteUpClick = {},
             onFavouriteClick = {},
             onReplyClick = {},
-            isReplyEnabled = true,
             onMoreClick = {},
         )
     }

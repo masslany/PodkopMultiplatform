@@ -27,4 +27,6 @@ data class ActionsDto(
     val voteDown: Boolean? = null,
     @SerialName("vote_up")
     val voteUp: Boolean? = null,
+    @SerialName("vote")
+    val vote: Boolean? = null,
 )

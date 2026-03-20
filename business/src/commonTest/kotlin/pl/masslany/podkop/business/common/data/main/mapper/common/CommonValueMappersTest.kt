@@ -22,6 +22,7 @@ class CommonValueMappersTest {
             update = false,
             voteDown = true,
             voteUp = false,
+            vote = true,
         )
 
         assertEquals(
@@ -37,6 +38,7 @@ class CommonValueMappersTest {
                 update = false,
                 voteDown = true,
                 voteUp = false,
+                vote = true,
             ),
             dto.toActions(),
         )
@@ -56,6 +58,7 @@ class CommonValueMappersTest {
             update = null,
             voteDown = null,
             voteUp = null,
+            vote = null,
         )
 
         assertEquals(
@@ -71,6 +74,7 @@ class CommonValueMappersTest {
                 update = false,
                 voteDown = false,
                 voteUp = false,
+                vote = false,
             ),
             dto.toActions(),
         )

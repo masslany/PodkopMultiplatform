@@ -59,6 +59,11 @@ class FakeEntriesDataSource : EntriesDataSource {
         val photoKey: String?,
     )
 
+    data class VoteSurveyCall(
+        val entryId: Int,
+        val optionNumber: Int,
+    )
+
     var getEntriesResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntries")
     var getEntryResult: Result<SingleResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntry")
     var getEntryCommentsResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntryComments")
@@ -74,6 +79,7 @@ class FakeEntriesDataSource : EntriesDataSource {
     var updateEntryCommentResult: Result<SingleResourceResponseDto> =
         unstubbedResult("EntriesDataSource.updateEntryComment")
     var voteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.voteUp")
+    var voteSurveyResult: Result<Unit> = unstubbedResult("EntriesDataSource.voteSurvey")
     var removeVoteUpResult: Result<Unit> = unstubbedResult("EntriesDataSource.removeVoteUp")
     var deleteEntryResult: Result<Unit> = unstubbedResult("EntriesDataSource.deleteEntry")
     var deleteEntryCommentResult: Result<Unit> = unstubbedResult("EntriesDataSource.deleteEntryComment")
@@ -90,6 +96,7 @@ class FakeEntriesDataSource : EntriesDataSource {
     val updateEntryCalls = mutableListOf<UpdateEntryCall>()
     val updateEntryCommentCalls = mutableListOf<UpdateEntryCommentCall>()
     val voteUpCalls = mutableListOf<Int>()
+    val voteSurveyCalls = mutableListOf<VoteSurveyCall>()
     val removeVoteUpCalls = mutableListOf<Int>()
     val deleteEntryCalls = mutableListOf<Int>()
     val deleteEntryCommentCalls = mutableListOf<Pair<Int, Int>>()
@@ -201,6 +208,14 @@ class FakeEntriesDataSource : EntriesDataSource {
     override suspend fun voteUp(entryId: Int): Result<Unit> {
         voteUpCalls += entryId
         return voteUpResult
+    }
+
+    override suspend fun voteSurvey(
+        entryId: Int,
+        optionNumber: Int,
+    ): Result<Unit> {
+        voteSurveyCalls += VoteSurveyCall(entryId = entryId, optionNumber = optionNumber)
+        return voteSurveyResult
     }
 
     override suspend fun removeVoteUp(entryId: Int): Result<Unit> {

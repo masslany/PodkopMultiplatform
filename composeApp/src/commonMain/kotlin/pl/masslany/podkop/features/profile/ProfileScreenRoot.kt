@@ -476,7 +476,6 @@ private fun LazyListScope.renderResources(
                 actions = actions,
                 config = ResourceItemConfig(
                     showReplyAction = true,
-                    isReplyActionEnabled = true,
                 ),
             )
         }

@@ -82,7 +82,6 @@ private fun EntryItemRenderer(
                     ),
                     state = state,
                     showInlineActions = config.showEntryInlineActions,
-                    isReplyEnabled = config.isReplyActionEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
                     onTagClick = { actions.onTagClicked(it) },
                     onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -92,6 +91,12 @@ private fun EntryItemRenderer(
                         actions.onEntryVoteUpClicked(
                             entryId = state.id,
                             voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+                        )
+                    },
+                    onSurveyVoteClick = { optionNumber ->
+                        actions.onEntrySurveyVoteClicked(
+                            entryId = state.id,
+                            optionNumber = optionNumber,
                         )
                     },
                     onFavouriteClick = {
@@ -128,7 +133,6 @@ private fun EntryItemRenderer(
                             ),
                         state = comment,
                         showInlineActions = config.showEntryInlineActions,
-                        isReplyEnabled = config.isReplyActionEnabled,
                         onProfileClick = { actions.onProfileClicked(it) },
                         onTagClick = { actions.onTagClicked(it) },
                         onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -194,7 +198,6 @@ private fun EntryItemRenderer(
             ),
             state = state,
             showInlineActions = config.showEntryInlineActions,
-            isReplyEnabled = config.isReplyActionEnabled,
             onProfileClick = { actions.onProfileClicked(it) },
             onTagClick = { actions.onTagClicked(it) },
             onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -204,6 +207,12 @@ private fun EntryItemRenderer(
                 actions.onEntryVoteUpClicked(
                     entryId = state.id,
                     voted = state.voteState.positiveVoteButtonState?.isVoted ?: false,
+                )
+            },
+            onSurveyVoteClick = { optionNumber ->
+                actions.onEntrySurveyVoteClicked(
+                    entryId = state.id,
+                    optionNumber = optionNumber,
                 )
             },
             onFavouriteClick = {
@@ -294,7 +303,6 @@ private fun LinkItemRenderer(
             } else {
                 null
             },
-            isReplyEnabled = config.isReplyActionEnabled,
         )
     }
 }
@@ -326,7 +334,6 @@ private fun EntryCommentItemRenderer(
                         )
                         .then(modifier),
                     state = state,
-                    isReplyEnabled = config.isReplyActionEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
                     onTagClick = { actions.onTagClicked(it) },
                     onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -371,7 +378,6 @@ private fun EntryCommentItemRenderer(
                 onLongClick = state.textSelectionLongClick(actions),
             ),
             state = state,
-            isReplyEnabled = config.isReplyActionEnabled,
             onProfileClick = { actions.onProfileClicked(it) },
             onTagClick = { actions.onTagClicked(it) },
             onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -452,7 +458,6 @@ private fun LinkCommentItemRenderer(
                         )
                         .then(modifier),
                     state = state,
-                    isReplyEnabled = config.isReplyActionEnabled,
                     onProfileClick = { actions.onProfileClicked(it) },
                     onTagClick = { actions.onTagClicked(it) },
                     onUrlClick = { actions.onLinkUrlClicked(it) },
@@ -507,7 +512,6 @@ private fun LinkCommentItemRenderer(
                 onLongClick = state.textSelectionLongClick(actions),
             ),
             state = state,
-            isReplyEnabled = config.isReplyActionEnabled,
             onProfileClick = { actions.onProfileClicked(it) },
             onTagClick = { actions.onTagClicked(it) },
             onUrlClick = { actions.onLinkUrlClicked(it) },

@@ -18,6 +18,7 @@ object NoOpResourceItemActions : ResourceItemActions {
     override fun onEntryClicked(id: Int) = Unit
     override fun onEntryLongClicked(id: Int) = Unit
     override fun onEntryVoteUpClicked(entryId: Int, voted: Boolean) = Unit
+    override fun onEntrySurveyVoteClicked(entryId: Int, optionNumber: Int) = Unit
     override fun onEntryFavouriteClicked(entryId: Int, favourited: Boolean) = Unit
     override fun onEntryReplyClicked(entryId: Int, author: String?) = Unit
     override fun onEntryMoreClicked(entryId: Int) = Unit

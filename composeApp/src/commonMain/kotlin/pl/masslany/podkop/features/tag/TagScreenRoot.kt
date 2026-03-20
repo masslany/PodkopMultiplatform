@@ -354,7 +354,6 @@ private fun TagScreenList(
                 actions = actions,
                 config = ResourceItemConfig(
                     showReplyAction = true,
-                    isReplyActionEnabled = state.isLoggedIn,
                 ),
             )
         }

@@ -107,6 +107,13 @@ class EntriesDataSourceImpl(
         return entriesApi.voteUp(entryId)
     }
 
+    override suspend fun voteSurvey(
+        entryId: Int,
+        optionNumber: Int,
+    ): Result<Unit> {
+        return entriesApi.voteSurvey(entryId, optionNumber)
+    }
+
     override suspend fun removeVoteUp(entryId: Int): Result<Unit> {
         return entriesApi.removeVoteUp(entryId)
     }

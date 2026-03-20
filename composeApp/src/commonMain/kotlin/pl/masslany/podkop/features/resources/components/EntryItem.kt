@@ -28,11 +28,11 @@ fun EntryItem(
     state: EntryItemState,
     modifier: Modifier = Modifier,
     showInlineActions: Boolean = true,
-    isReplyEnabled: Boolean = false,
     onProfileClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
     onVoteUpClick: () -> Unit,
+    onSurveyVoteClick: (Int) -> Unit,
     onFavouriteClick: () -> Unit,
     onImageClick: (String) -> Unit,
     onEmbedPreviewClick: (EmbedContentState) -> Unit,
@@ -86,6 +86,7 @@ fun EntryItem(
                 Spacer(Modifier.size(8.dp))
                 Survey(
                     state = it,
+                    onVoteClick = onSurveyVoteClick,
                 )
             }
             state.embedImageState?.let {
@@ -109,7 +110,7 @@ fun EntryItem(
             ResourceInlineActionsRow(
                 onMoreClick = onMoreClick,
                 onReplyClick = onReplyClick,
-                isReplyEnabled = isReplyEnabled,
+                isReplyEnabled = state.isReplyEnabled,
                 onFavouriteClick = onFavouriteClick,
                 isFavourite = state.isFavourite,
                 isFavouriteEnabled = state.isFavouriteEnabled,
@@ -133,9 +134,9 @@ private fun EntryItemPreview(
             onImageClick = {},
             onEmbedPreviewClick = {},
             onVoteUpClick = {},
+            onSurveyVoteClick = {},
             onFavouriteClick = {},
             onReplyClick = {},
-            isReplyEnabled = true,
             onMoreClick = {},
         )
     }

@@ -2,6 +2,7 @@ package pl.masslany.podkop.common.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.surfaceColorAtElevation
@@ -44,8 +45,12 @@ import podkop.composeapp.generated.resources.survey_show_results
 fun Survey(
     modifier: Modifier = Modifier,
     state: SurveyState,
+    onVoteClick: (Int) -> Unit = {},
 ) {
-    var showResults by remember { mutableStateOf(false) }
+    val canVote = state.isVoteActionEnabled
+    var showResults by remember(state.areResultsVisibleByDefault) {
+        mutableStateOf(state.areResultsVisibleByDefault)
+    }
     Column(
         modifier = modifier
             .background(
@@ -66,8 +71,13 @@ fun Survey(
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            state.answers.forEach { answer ->
-                AnswerItem(state = answer, showResults)
+            state.answers.forEachIndexed { index, answer ->
+                AnswerItem(
+                    state = answer,
+                    showResults = showResults,
+                    canVote = canVote,
+                    onClick = { onVoteClick(index + 1) },
+                )
             }
         }
         Row(
@@ -77,6 +87,8 @@ fun Survey(
                 .fillMaxWidth(),
         ) {
             Text(
+                modifier = Modifier
+                    .padding(top = if (!state.isResultsToggleVisible) 8.dp else 0.dp),
                 text = stringResource(
                     resource = Res.string.survey_answers_count,
                     state.count,
@@ -85,16 +97,18 @@ fun Survey(
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
             )
-            TextButton(
-                onClick = { showResults = !showResults },
-                contentPadding = PaddingValues(8.dp),
-            ) {
-                Text(
-                    text = resultsLabel(showResults),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                )
+            if (state.isResultsToggleVisible) {
+                TextButton(
+                    onClick = { showResults = !showResults },
+                    contentPadding = PaddingValues(8.dp),
+                ) {
+                    Text(
+                        text = resultsLabel(showResults),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                    )
+                }
             }
         }
     }
@@ -104,13 +118,25 @@ fun Survey(
 private fun AnswerItem(
     state: AnswerState,
     showResults: Boolean,
+    canVote: Boolean,
+    onClick: () -> Unit,
 ) {
     val widthFraction = backgroundWidthFraction(state, showResults)
+    val backgroundColor = if (state.isSelected) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+    val contentColor = if (state.isSelected) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
     Box {
         Box(
             modifier = Modifier
                 .background(
-                    color = MaterialTheme.colorScheme.surface,
+                    color = backgroundColor,
                     shape = RoundedCornerShape(8.dp),
                 )
                 .animateContentSize()
@@ -120,34 +146,43 @@ private fun AnswerItem(
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
+                .then(
+                    if (canVote) {
+                        Modifier.clickable(onClick = onClick)
+                    } else {
+                        Modifier
+                    },
+                )
                 .fillMaxWidth()
                 .height(48.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Spacer(modifier = Modifier.width(16.dp))
             Text(
                 modifier = Modifier
-                    .then(
-                        if (showResults) {
-                            Modifier.weight(1f)
-                        } else {
-                            Modifier
-                        },
-                    ),
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
                 text = state.text,
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = contentColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            if (canVote && !showResults) {
+                RadioButton(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    selected = false,
+                    onClick = null,
+                )
+            }
             if (showResults) {
                 Text(
+                    modifier = Modifier.padding(horizontal = 8.dp),
                     text = "${state.percentage}% (${state.count})",
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = contentColor,
                     maxLines = 1,
                 )
             }
@@ -200,6 +235,7 @@ private fun SurveyPreview() {
                     ),
                 ),
                 count = 200,
+                votedOptionNumber = 1,
             ),
         )
     }

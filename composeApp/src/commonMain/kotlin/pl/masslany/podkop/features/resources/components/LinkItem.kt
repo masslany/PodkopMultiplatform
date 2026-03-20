@@ -71,7 +71,6 @@ fun LinkItem(
         parentCommentId: Int?,
     ) -> Unit,
     onLinkCommentReplyClick: ((linkId: Int, commentId: Int, author: String?) -> Unit)? = null,
-    isReplyEnabled: Boolean = false,
 ) {
     Card(
         modifier = modifier
@@ -221,7 +220,6 @@ fun LinkItem(
                                     },
                                 ),
                             state = comment,
-                            isReplyEnabled = isReplyEnabled,
                             onProfileClick = { onProfileClicked(it) },
                             onTagClick = { onTagClick(it) },
                             onUrlClick = { onUrlClicked(it) },

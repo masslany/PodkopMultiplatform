@@ -391,7 +391,6 @@ private fun EntriesScreenList(
                 actions = actions,
                 config = ResourceItemConfig(
                     showReplyAction = true,
-                    isReplyActionEnabled = state.isLoggedIn,
                 ),
             )
         }

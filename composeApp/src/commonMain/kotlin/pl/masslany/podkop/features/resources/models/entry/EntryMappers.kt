@@ -94,6 +94,7 @@ internal fun ResourceItem.toEntryItemState(): EntryItemState {
             .orEmpty()
             .toImmutableList(),
         voteState = this.toVoteState(),
+        isReplyEnabled = this.actions?.create == true,
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
         isDeleteEnabled = this.actions?.delete == true || this.deletable,
@@ -164,6 +165,7 @@ private fun Comment.toEntryCommentItemState(parentId: Int? = null): EntryComment
         isBlacklisted = this.blacklist || this.author.blacklist,
         publishedTimeType = this.createdAt?.toPublishedTimeType(),
         voteState = this.toVoteState(),
+        isReplyEnabled = this.actions.create,
         isFavourite = this.favourite,
         isFavouriteEnabled = this.actions.createFavourite || this.actions.deleteFavourite,
         isDeleteEnabled = this.actions.delete || this.deletable,
