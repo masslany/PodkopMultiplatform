@@ -96,6 +96,8 @@ import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogSc
 import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceVotesBottomSheetScreenRoot
+import pl.masslany.podkop.features.search.AdvancedSearchScreen
+import pl.masslany.podkop.features.search.AdvancedSearchScreenRoot
 import pl.masslany.podkop.features.search.SearchScreen
 import pl.masslany.podkop.features.search.SearchScreenRoot
 import pl.masslany.podkop.features.settings.SettingsScreen
@@ -241,6 +243,13 @@ fun App() {
 
                         entry<SearchScreen> {
                             SearchScreenRoot(
+                                paddingValues = safeDrawingPaddingValues,
+                            )
+                        }
+
+                        entry<AdvancedSearchScreen> {
+                            AdvancedSearchScreenRoot(
+                                screen = it,
                                 paddingValues = safeDrawingPaddingValues,
                             )
                         }

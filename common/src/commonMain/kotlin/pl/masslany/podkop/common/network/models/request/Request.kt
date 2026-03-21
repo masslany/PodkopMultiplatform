@@ -9,6 +9,7 @@ data class Request<T>(
     val path: String,
     val headers: Map<String, String>? = null,
     val queryParameters: Map<String, String>? = null,
+    val queryParameterPairs: List<Pair<String, String>>? = null,
     @JvmField
     var body: Any? = null,
 ) {

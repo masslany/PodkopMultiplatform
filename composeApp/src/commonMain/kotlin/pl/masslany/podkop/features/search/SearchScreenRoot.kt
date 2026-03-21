@@ -63,6 +63,7 @@ import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_close
 import podkop.composeapp.generated.resources.ic_search
 import podkop.composeapp.generated.resources.refresh_button
+import podkop.composeapp.generated.resources.search_screen_advanced_search_button
 import podkop.composeapp.generated.resources.search_screen_empty_prompt
 import podkop.composeapp.generated.resources.search_screen_min_query_hint
 import podkop.composeapp.generated.resources.search_screen_no_results
@@ -174,9 +175,22 @@ fun SearchScreenContent(
                     onSearch = {
                         focusManager.clearFocus()
                         keyboardController?.hide()
+                        actions.onAdvancedSearchClicked()
                     },
                 ),
             )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .widthIn(max = SearchFieldMaxWidth)
+                    .align(Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                TextButton(onClick = actions::onAdvancedSearchClicked) {
+                    Text(text = stringResource(resource = Res.string.search_screen_advanced_search_button))
+                }
+            }
 
             SearchBody(
                 modifier = Modifier

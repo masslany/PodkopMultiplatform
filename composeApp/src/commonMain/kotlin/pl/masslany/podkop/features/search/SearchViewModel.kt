@@ -62,6 +62,14 @@ class SearchViewModel(
         appNavigator.navigateTo(TagScreen(tag = tag))
     }
 
+    override fun onAdvancedSearchClicked() {
+        appNavigator.navigateTo(
+            AdvancedSearchScreen(
+                initialQuery = state.value.query.trim(),
+            ),
+        )
+    }
+
     override fun onUserClicked(username: String) {
         appNavigator.navigateTo(ProfileScreen(username = username))
     }

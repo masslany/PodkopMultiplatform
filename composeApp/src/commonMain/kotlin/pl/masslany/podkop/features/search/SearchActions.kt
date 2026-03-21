@@ -7,6 +7,8 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 interface SearchActions : TopBarActions {
     fun onQueryChanged(value: String)
 
+    fun onAdvancedSearchClicked()
+
     fun onTagClicked(tag: String)
 
     fun onUserClicked(username: String)

@@ -363,6 +363,7 @@
 
     <!-- Search -->
     <string name="search_screen_text_field_placeholder">Wyszukaj użytkownika, tag...</string>
+    <string name="search_screen_advanced_search_button">Wyszukiwanie zaawansowane</string>
     <string name="search_screen_empty_prompt">Wpisz frazę, aby rozpocząć wyszukiwanie</string>
     <string name="search_screen_min_query_hint">Wpisz co najmniej %1$d znaki</string>
     <string name="search_screen_tags_result_label">Tagi</string>
@@ -371,6 +372,42 @@
     <string name="search_screen_tags_result_failure">Wystąpił błąd podczas wczytywania tagów</string>
     <string name="search_screen_tags_followers">Obserwujący: %1$d</string>
     <string name="search_screen_no_results">Brak wyników</string>
+    <string name="topbar_label_advanced_search">Wyszukiwanie zaawansowane</string>
+    <string name="advanced_search_screen_filters_title">Filtry</string>
+    <string name="advanced_search_screen_query_label">Fraza</string>
+    <string name="advanced_search_screen_query_placeholder">Szukana treść</string>
+    <string name="advanced_search_screen_sort_label">Sortowanie</string>
+    <string name="advanced_search_screen_sort_score">Trafność</string>
+    <string name="advanced_search_screen_sort_popular">Popularność</string>
+    <string name="advanced_search_screen_sort_comments">Liczba komentarzy</string>
+    <string name="advanced_search_screen_sort_newest">Data dodania</string>
+    <string name="advanced_search_screen_votes_label">Liczba głosów / wykopów</string>
+    <string name="advanced_search_screen_votes_all">Wszystko</string>
+    <string name="advanced_search_screen_date_label">Data dodania</string>
+    <string name="advanced_search_screen_date_all">Wszystko</string>
+    <string name="advanced_search_screen_date_24h">24h</string>
+    <string name="advanced_search_screen_date_3d">3 dni</string>
+    <string name="advanced_search_screen_date_7d">Ostatnie 7 dni</string>
+    <string name="advanced_search_screen_date_30d">Ostatnie 30 dni</string>
+    <string name="advanced_search_screen_date_year">Ostatni rok</string>
+    <string name="advanced_search_screen_custom_date">Niestandardowy</string>
+    <string name="advanced_search_screen_date_from_label">Data od</string>
+    <string name="advanced_search_screen_date_to_label">Data do</string>
+    <string name="advanced_search_screen_date_placeholder">yyyy-MM-dd HH:mm:ss</string>
+    <string name="advanced_search_screen_tags_label">Tagi</string>
+    <string name="advanced_search_screen_users_label">Ludzie</string>
+    <string name="advanced_search_screen_domains_label">Domeny</string>
+    <string name="advanced_search_screen_category_label">Kategoria</string>
+    <string name="advanced_search_screen_category_placeholder">np. motoryzacja</string>
+    <string name="advanced_search_screen_multi_value_hint">Oddziel wiele wartości spacją, przecinkiem lub nową linią</string>
+    <string name="advanced_search_screen_search_button">Wyszukaj</string>
+    <string name="advanced_search_screen_idle_message">Ustaw filtry i naciśnij Wyszukaj</string>
+    <string name="advanced_search_screen_empty_results">Brak wyników dla podanych filtrów</string>
+    <string name="advanced_search_screen_error">Wystąpił problem podczas wczytywania wyników wyszukiwania</string>
+    <string name="advanced_search_screen_results_count">Wyniki: %1$d</string>
+    <string name="advanced_search_screen_query_required">Wpisz frazę wyszukiwania</string>
+    <string name="advanced_search_screen_invalid_date_format">Użyj formatu yyyy-MM-dd HH:mm:ss</string>
+    <string name="advanced_search_screen_invalid_date_range">Data od nie może być późniejsza niż data do</string>
 
     <!-- Image viewer screen -->
     <string name="image_viewer_screen_permission_denied">Brak wymaganych uprawnień do zapisu</string>

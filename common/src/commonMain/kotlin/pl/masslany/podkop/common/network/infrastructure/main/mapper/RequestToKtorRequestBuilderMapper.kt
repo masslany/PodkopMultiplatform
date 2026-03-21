@@ -23,8 +23,12 @@ fun <T> Request<T>.toHttpRequestBuilder(): HttpRequestBuilder {
 
         method = param.method.toKtorHttpMethod()
 
-        param.queryParameters?.forEach { param ->
-            parameter(param.key, param.value)
+        param.queryParameters?.forEach { queryParameter ->
+            parameter(queryParameter.key, queryParameter.value)
+        }
+
+        param.queryParameterPairs?.forEach { (key, value) ->
+            parameter(key, value)
         }
 
         param.headers?.forEach { (key, value) ->

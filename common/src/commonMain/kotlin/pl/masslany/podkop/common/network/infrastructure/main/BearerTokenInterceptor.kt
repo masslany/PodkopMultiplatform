@@ -40,9 +40,7 @@ internal val bearerTokenInterceptor =
                 return initialCall
             }
 
-            val refreshed =
-                tokenRefreshCoordinator.refreshTokens(force = true) ||
-                    tokenRefreshCoordinator.refreshTokens(force = true)
+            val refreshed = tokenRefreshCoordinator.refreshTokens(force = true)
             if (!refreshed) {
                 return initialCall
             }

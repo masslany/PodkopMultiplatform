@@ -33,6 +33,22 @@ class PaginatorTest {
     }
 
     @Test
+    fun `reachedEnd returns false when next cursor exists even for short mapped page`() {
+        assertFalse(
+            paginator.reachedEnd(
+                pagination = Pagination(
+                    perPage = 40,
+                    total = 72,
+                    next = "2",
+                    prev = "",
+                ),
+                receivedItemsCount = 38,
+                emittedItemsCount = 38,
+            ),
+        )
+    }
+
+    @Test
     fun `reachedEnd returns true for short final page without next cursor`() {
         assertTrue(
             paginator.reachedEnd(
