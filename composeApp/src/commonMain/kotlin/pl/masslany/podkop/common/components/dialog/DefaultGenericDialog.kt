@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.DialogText
@@ -14,10 +15,12 @@ import podkop.composeapp.generated.resources.allStringResources
 
 @Composable
 internal fun DefaultGenericDialog(
+    modifier: Modifier = Modifier,
     dialog: GenericDialog,
     navigator: AppNavigator,
 ) {
     AlertDialog(
+        modifier = modifier,
         onDismissRequest = { navigator.back() },
         title = { Text(dialog.title.resolve()) },
         text = dialog.description?.let { dialogText ->

@@ -108,6 +108,7 @@ import pl.masslany.podkop.features.tag.TagScreen
 import pl.masslany.podkop.features.tag.TagScreenRoot
 
 private val GlobalSnackbarTopOffset = 80.dp
+private val DefaultDialogMaxWidth = 600.dp
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -228,7 +229,10 @@ fun App() {
                                 ),
                             ),
                         ) {
-                            AboutAppScreenRoot()
+                            AboutAppScreenRoot(
+                                modifier = Modifier
+                                    .widthIn(max = DefaultDialogMaxWidth),
+                            )
                         }
 
                         entry<HitsScreen> {
@@ -346,6 +350,8 @@ fun App() {
                         ) {
                             SetDialogDestinationToEdgeToEdge()
                             ResourceScreenshotPreviewDialogScreenRoot(
+                                modifier = Modifier
+                                    .widthIn(max = DefaultDialogMaxWidth),
                                 screen = it,
                             )
                         }
@@ -359,6 +365,8 @@ fun App() {
                         ) {
                             SetDialogDestinationToEdgeToEdge()
                             ResourceTextSelectionDialogScreenRoot(
+                                modifier = Modifier
+                                    .widthIn(max = DefaultDialogMaxWidth),
                                 screen = it,
                             )
                         }
@@ -380,6 +388,8 @@ fun App() {
                             ),
                         ) {
                             ComposerMediaUrlDialogScreenRoot(
+                                modifier = Modifier
+                                    .widthIn(max = DefaultDialogMaxWidth),
                                 screen = it,
                                 appNavigator = appNavigator,
                             )
@@ -393,6 +403,8 @@ fun App() {
                             ),
                         ) {
                             ComposerMediaPickLocalScreenRoot(
+                                modifier = Modifier
+                                    .widthIn(max = DefaultDialogMaxWidth),
                                 screen = it,
                                 appNavigator = appNavigator,
                             )
@@ -404,6 +416,8 @@ fun App() {
                             ),
                         ) {
                             DefaultGenericDialog(
+                                modifier = Modifier
+                                    .widthIn(max = DefaultDialogMaxWidth),
                                 dialog = it,
                                 navigator = appNavigator,
                             )
