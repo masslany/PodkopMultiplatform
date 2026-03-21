@@ -17,6 +17,8 @@ object NoOpMoreActions : MoreActions {
 
     override fun onSearchClicked() = Unit
 
+    override fun onRankClicked() = Unit
+
     override fun onMyWykopClicked() = Unit
 
     override fun onSettingsClicked() = Unit

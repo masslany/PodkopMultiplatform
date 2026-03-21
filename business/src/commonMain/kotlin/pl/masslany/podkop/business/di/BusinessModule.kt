@@ -25,6 +25,8 @@ import pl.masslany.podkop.business.privatemessages.data.network.di.privateMessag
 import pl.masslany.podkop.business.profile.data.di.profileDataModule
 import pl.masslany.podkop.business.profile.data.local.di.profileLocalModule
 import pl.masslany.podkop.business.profile.data.network.di.profileNetworkModule
+import pl.masslany.podkop.business.rank.data.di.rankDataModule
+import pl.masslany.podkop.business.rank.data.network.di.rankNetworkModule
 import pl.masslany.podkop.business.search.data.di.searchDataModule
 import pl.masslany.podkop.business.search.data.network.di.searchNetworkModule
 import pl.masslany.podkop.business.startup.infrastructure.di.startupModule
@@ -51,6 +53,8 @@ val businessModule = module {
         profileDataModule,
         profileNetworkModule,
         profileLocalModule,
+        rankDataModule,
+        rankNetworkModule,
         privateMessagesDataModule,
         privateMessagesNetworkModule,
         notificationsDataModule,

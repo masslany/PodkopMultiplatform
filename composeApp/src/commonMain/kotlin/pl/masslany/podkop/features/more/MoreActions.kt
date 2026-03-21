@@ -19,6 +19,8 @@ interface MoreActions {
 
     fun onSearchClicked()
 
+    fun onRankClicked()
+
     fun onMyWykopClicked()
 
     fun onSettingsClicked()
@@ -32,6 +34,7 @@ interface MoreActions {
             MoreSectionItemType.Favorites -> onFavoritesClicked()
             MoreSectionItemType.Hits -> onHitsClicked()
             MoreSectionItemType.Search -> onSearchClicked()
+            MoreSectionItemType.Rank -> onRankClicked()
             MoreSectionItemType.MyWykop -> onMyWykopClicked()
             MoreSectionItemType.Settings -> onSettingsClicked()
             MoreSectionItemType.About -> onAboutClicked()

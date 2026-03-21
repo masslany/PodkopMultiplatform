@@ -22,6 +22,7 @@
     <string name="topbar_label_private_messages">Wiadomości prywatne</string>
     <string name="topbar_label_new_conversation">Nowa wiadomość</string>
     <string name="topbar_label_add_link">Dodaj link</string>
+    <string name="topbar_label_rank">Ranking</string>
 
     <!-- More -->
     <string name="more_group_social">Społeczność</string>
@@ -32,6 +33,7 @@
     <string name="more_item_favorites">Ulubione</string>
     <string name="more_item_hits">Hity</string>
     <string name="more_item_search">Wyszukaj</string>
+    <string name="more_item_rank">Ranking</string>
     <string name="more_item_my_wykop">Mój wykop</string>
     <string name="more_item_about">O aplikacji</string>
     <string name="more_profile_preview_unavailable">Twoje konto</string>
@@ -236,6 +238,8 @@
     <string name="profile_header_ago">temu</string>
     <string name="profile_header_joined">Dołączył</string>
     <string name="profile_header_whitespace">\u0020</string>
+    <string name="rank_header_position">Poz.</string>
+    <string name="rank_header_user">Użytkownik</string>
     <string name="profile_no_observed_tags">Brak obserwowanych tagów do wyświetlenia</string>
     <string name="profile_no_observed_users">Brak obserwowanych użytkowników do wyświetlenia</string>
     <string name="profile_note_title">Notatka o użytkowniku</string>

@@ -34,6 +34,7 @@ import pl.masslany.podkop.features.observed.ObservedScreen
 import pl.masslany.podkop.features.privatemessages.PrivateMessagesScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
+import pl.masslany.podkop.features.rank.RankScreen
 import pl.masslany.podkop.features.search.SearchScreen
 import pl.masslany.podkop.features.settings.SettingsScreen
 
@@ -100,6 +101,10 @@ class MoreViewModel(
 
     override fun onSearchClicked() {
         appNavigator.navigateTo(SearchScreen)
+    }
+
+    override fun onRankClicked() {
+        appNavigator.navigateTo(RankScreen)
     }
 
     override fun onMyWykopClicked() {
@@ -267,6 +272,12 @@ internal fun buildMoreContentSectionItems(
     add(
         MoreSectionItemState(
             type = MoreSectionItemType.Hits,
+            badgeCount = null,
+        ),
+    )
+    add(
+        MoreSectionItemState(
+            type = MoreSectionItemType.Rank,
             badgeCount = null,
         ),
     )

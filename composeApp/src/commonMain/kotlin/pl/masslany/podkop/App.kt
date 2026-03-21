@@ -88,6 +88,8 @@ import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesScreenRo
 import pl.masslany.podkop.features.privatemessages.newconversation.NewConversationScreenRoot
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.ProfileScreenRoot
+import pl.masslany.podkop.features.rank.RankScreen
+import pl.masslany.podkop.features.rank.RankScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogScreen
@@ -294,6 +296,12 @@ fun App() {
                         entry<TagScreen> {
                             TagScreenRoot(
                                 tag = it.tag,
+                                paddingValues = safeDrawingPaddingValues,
+                            )
+                        }
+
+                        entry<RankScreen> {
+                            RankScreenRoot(
                                 paddingValues = safeDrawingPaddingValues,
                             )
                         }

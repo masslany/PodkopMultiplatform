@@ -34,11 +34,11 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest.Builder
 import coil3.request.crossfade
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import pl.masslany.podkop.common.components.GenderIndicator
 import pl.masslany.podkop.common.components.toComposeColor
+import pl.masslany.podkop.common.extensions.toMemberSinceLabel
 import pl.masslany.podkop.common.models.NameColorType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -50,11 +50,6 @@ import podkop.composeapp.generated.resources.accessibility_profile_collapse_deta
 import podkop.composeapp.generated.resources.accessibility_profile_expand_details
 import podkop.composeapp.generated.resources.ic_chevron_forward
 import podkop.composeapp.generated.resources.ic_profile
-import podkop.composeapp.generated.resources.profile_header_ago
-import podkop.composeapp.generated.resources.profile_header_days_since
-import podkop.composeapp.generated.resources.profile_header_joined
-import podkop.composeapp.generated.resources.profile_header_months_since
-import podkop.composeapp.generated.resources.profile_header_years_since
 
 @Composable
 fun ProfileHeader(
@@ -169,7 +164,7 @@ fun ProfileHeader(
                             style = MaterialTheme.typography.bodyMedium,
                             color = state.nameColorType.toComposeColor(),
                         )
-                        memberSinceLabel(memberSinceState = state.memberSinceState)?.let {
+                        state.memberSinceState.toMemberSinceLabel()?.let {
                             Spacer(modifier = Modifier.size(4.dp))
                             Text(
                                 text = it,
@@ -217,61 +212,6 @@ private fun RankBadge(
             fontWeight = FontWeight.Bold,
             color = Color.Black,
         )
-    }
-}
-
-@Composable
-private fun memberSinceLabel(memberSinceState: MemberSinceState): String? {
-    val joined = stringResource(resource = Res.string.profile_header_joined)
-    val ago = stringResource(resource = Res.string.profile_header_ago)
-    return when (memberSinceState) {
-        is MemberSinceState.Days -> {
-            "$joined ${
-                pluralStringResource(
-                    resource = Res.plurals.profile_header_days_since,
-                    quantity = memberSinceState.days,
-                    memberSinceState.days,
-                )
-            } $ago"
-        }
-
-        is MemberSinceState.Months -> {
-            "$joined ${
-                pluralStringResource(
-                    resource = Res.plurals.profile_header_months_since,
-                    quantity = memberSinceState.months,
-                    memberSinceState.months,
-                )
-            } $ago"
-        }
-
-        is MemberSinceState.Years -> {
-            "$joined ${
-                pluralStringResource(
-                    resource = Res.plurals.profile_header_years_since,
-                    quantity = memberSinceState.years,
-                    memberSinceState.years,
-                )
-            } $ago"
-        }
-
-        is MemberSinceState.YearsAndMonths -> {
-            "$joined ${
-                pluralStringResource(
-                    resource = Res.plurals.profile_header_years_since,
-                    quantity = memberSinceState.years,
-                    memberSinceState.years,
-                )
-            } ${
-                pluralStringResource(
-                    resource = Res.plurals.profile_header_months_since,
-                    quantity = memberSinceState.months,
-                    memberSinceState.months,
-                )
-            } $ago"
-        }
-
-        MemberSinceState.Unknown -> null
     }
 }
 
