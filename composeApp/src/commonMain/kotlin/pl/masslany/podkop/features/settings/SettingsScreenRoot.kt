@@ -1,6 +1,5 @@
 package pl.masslany.podkop.features.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,8 +19,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -176,22 +177,9 @@ fun SettingsScreenContent(
                 SectionCard(
                     title = stringResource(resource = Res.string.settings_headline_theme),
                 ) {
-                    ThemeOverrideOptionRow(
-                        label = stringResource(resource = Res.string.settings_option_theme_auto),
-                        selected = state.themeOverride == ThemeOverride.AUTO,
-                        onClick = { actions.onThemeOverrideChanged(ThemeOverride.AUTO) },
-                    )
-                    SectionCardDivider()
-                    ThemeOverrideOptionRow(
-                        label = stringResource(resource = Res.string.settings_option_theme_light),
-                        selected = state.themeOverride == ThemeOverride.LIGHT,
-                        onClick = { actions.onThemeOverrideChanged(ThemeOverride.LIGHT) },
-                    )
-                    SectionCardDivider()
-                    ThemeOverrideOptionRow(
-                        label = stringResource(resource = Res.string.settings_option_theme_dark),
-                        selected = state.themeOverride == ThemeOverride.DARK,
-                        onClick = { actions.onThemeOverrideChanged(ThemeOverride.DARK) },
+                    ThemeOverrideSelector(
+                        selectedTheme = state.themeOverride,
+                        onThemeSelected = actions::onThemeOverrideChanged,
                     )
 
                     if (state.supportsDynamicColorsToggle) {
@@ -303,27 +291,36 @@ fun SettingsScreenContent(
 }
 
 @Composable
-private fun ThemeOverrideOptionRow(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
+private fun ThemeOverrideSelector(
+    selectedTheme: ThemeOverride,
+    onThemeSelected: (ThemeOverride) -> Unit,
 ) {
-    Row(
+    val options = listOf(
+        ThemeOverride.AUTO to stringResource(resource = Res.string.settings_option_theme_auto),
+        ThemeOverride.LIGHT to stringResource(resource = Res.string.settings_option_theme_light),
+        ThemeOverride.DARK to stringResource(resource = Res.string.settings_option_theme_dark),
+    )
+
+    SingleChoiceSegmentedButtonRow(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(16.dp),
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        RadioButton(
-            selected = selected,
-            onClick = onClick,
-        )
+        options.forEachIndexed { index, (themeOverride, label) ->
+            SegmentedButton(
+                modifier = Modifier.weight(1f),
+                selected = selectedTheme == themeOverride,
+                onClick = { onThemeSelected(themeOverride) },
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = options.size,
+                ),
+                icon = {},
+                label = {
+                    Text(text = label)
+                },
+            )
+        }
     }
 }
 

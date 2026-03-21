@@ -143,7 +143,7 @@
     <string name="settings_body_analytics">Dane analityczne</string>
     <string name="settings_body_crash_reporting">Raportowanie błędów</string>
     <string name="settings_body_dynamic_colors">Dynamiczne kolory</string>
-    <string name="settings_option_theme_auto">Automatyczny (systemowy)</string>
+    <string name="settings_option_theme_auto">Auto</string>
     <string name="settings_option_theme_light">Jasny</string>
     <string name="settings_option_theme_dark">Ciemny</string>
     <string name="settings_headline_media">Media</string>
