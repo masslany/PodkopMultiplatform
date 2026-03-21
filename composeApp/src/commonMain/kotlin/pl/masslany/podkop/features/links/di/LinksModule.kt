@@ -13,6 +13,7 @@ val linksModule = module {
             authRepository = get(),
             linksRepository = get(),
             hitsRepository = get(),
+            notificationsRepository = get(),
             linksResourceItemStateHolder = get(),
             appNavigator = get(),
             logger = get(),

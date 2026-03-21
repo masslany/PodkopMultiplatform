@@ -48,7 +48,6 @@ class AppConfigProvider(private val notificationsRepository: NotificationsReposi
                     root = MoreScreen,
                     iconRes = Res.drawable.ic_more_horizontal,
                     labelRes = Res.string.navigation_label_more,
-                    badgeCount = notificationsUnreadCount,
                     enabled = true,
                 ),
             )

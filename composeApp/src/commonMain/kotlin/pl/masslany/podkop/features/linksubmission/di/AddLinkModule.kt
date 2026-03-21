@@ -12,6 +12,7 @@ val addLinkModule = module {
             appNavigator = get(),
             logger = get(),
             snackbarManager = get(),
+            topBarActions = get(),
         )
     }
 
@@ -25,6 +26,7 @@ val addLinkModule = module {
             savedStateHandle = get(),
             logger = get(),
             snackbarManager = get(),
+            topBarActions = get(),
         )
     }
 }

@@ -70,6 +70,7 @@ import pl.masslany.podkop.features.links.preview.LinksScreenStateProvider
 import pl.masslany.podkop.features.links.preview.NoOpLinksActions
 import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
 import pl.masslany.podkop.features.resources.models.ResourceItemConfig
+import pl.masslany.podkop.features.topbar.FeedTopBarActions
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_add
@@ -198,6 +199,12 @@ fun LinksScreenContent(
                             )
                         }
                     }
+                    FeedTopBarActions(
+                        isLoggedIn = state.isLoggedIn,
+                        notificationsUnreadCount = state.notificationsUnreadCount,
+                        onSearchClicked = actions::onTopBarSearchClicked,
+                        onNotificationsClicked = actions::onTopBarNotificationsClicked,
+                    )
                 },
                 scrollBehavior = scrollBehavior,
                 windowInsets = topBarInsets,

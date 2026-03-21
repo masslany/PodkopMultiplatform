@@ -175,6 +175,8 @@
     <!-- Accessibility -->
     <string name="accessibility_topbar_add">Dodaj</string>
     <string name="accessibility_topbar_back">Cofnij</string>
+    <string name="accessibility_topbar_notifications">Otwórz powiadomienia</string>
+    <string name="accessibility_topbar_search">Otwórz wyszukiwarkę</string>
     <string name="accessibility_dialog_close">Zamknij okno</string>
     <string name="accessibility_topbar_downloads">Pobierz</string>
     <string name="accessibility_topbar_gallery_view">Widok galerii</string>

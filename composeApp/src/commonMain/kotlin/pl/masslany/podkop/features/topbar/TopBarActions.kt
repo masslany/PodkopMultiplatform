@@ -6,7 +6,11 @@ import androidx.compose.runtime.Stable
 interface TopBarActions {
     fun onTopBarBackClicked()
 
-    fun onTopBarAddEntryClicked() = Unit
+    fun onTopBarSearchClicked()
 
-    fun onTopBarAddLinkClicked() = Unit
+    fun onTopBarNotificationsClicked()
+
+    fun onTopBarAddEntryClicked()
+
+    fun onTopBarAddLinkClicked()
 }

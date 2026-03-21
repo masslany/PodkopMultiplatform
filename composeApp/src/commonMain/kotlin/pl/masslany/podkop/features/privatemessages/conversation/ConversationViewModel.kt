@@ -35,6 +35,7 @@ import pl.masslany.podkop.features.privatemessages.models.mergePrivateConversati
 import pl.masslany.podkop.features.privatemessages.models.toConversationMessages
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.tag.TagScreen
+import pl.masslany.podkop.features.topbar.TopBarActions
 
 class ConversationViewModel(
     private val screen: ConversationScreen,
@@ -45,8 +46,10 @@ class ConversationViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
+    private val topBarActions: TopBarActions,
 ) : ViewModel(),
-    ConversationActions {
+    ConversationActions,
+    TopBarActions by topBarActions {
     private val rawMessages = MutableStateFlow(persistentListOf<PrivateMessage>())
     private val composerController = PrivateMessageComposerController(
         scope = viewModelScope,

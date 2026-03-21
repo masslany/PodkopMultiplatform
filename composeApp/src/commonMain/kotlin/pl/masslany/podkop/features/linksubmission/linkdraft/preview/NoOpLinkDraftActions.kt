@@ -4,6 +4,10 @@ import pl.masslany.podkop.features.linksubmission.linkdraft.LinkDraftActions
 
 object NoOpLinkDraftActions : LinkDraftActions {
     override fun onTopBarBackClicked() = Unit
+    override fun onTopBarSearchClicked() = Unit
+    override fun onTopBarNotificationsClicked() = Unit
+    override fun onTopBarAddEntryClicked() = Unit
+    override fun onTopBarAddLinkClicked() = Unit
     override fun onTitleChanged(value: String) = Unit
     override fun onDescriptionChanged(value: String) = Unit
     override fun onTagInputChanged(value: String) = Unit

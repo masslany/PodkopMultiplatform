@@ -20,6 +20,7 @@ import pl.masslany.podkop.business.hits.domain.models.request.HitsSortType
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksType
+import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
@@ -40,6 +41,7 @@ class LinksViewModel(
     private val authRepository: AuthRepository,
     private val linksRepository: LinksRepository,
     private val hitsRepository: HitsRepository,
+    private val notificationsRepository: NotificationsRepository,
     private val linksResourceItemStateHolder: LinksResourceItemStateHolder,
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
@@ -86,11 +88,13 @@ class LinksViewModel(
         _state,
         linksResourceItemStateHolder.items,
         linksResourceItemStateHolder.hits,
+        notificationsRepository.unreadCount,
         paginator.state,
-    ) { state, links, hits, paginator ->
+    ) { state, links, hits, notificationsUnreadCount, paginator ->
         state.copy(
             links = links,
             hits = hits,
+            notificationsUnreadCount = notificationsUnreadCount,
             isPaginating = paginator is PaginatorState.Loading,
         )
     }.stateIn(

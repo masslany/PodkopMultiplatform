@@ -17,6 +17,7 @@ data class EntriesScreenState(
     val hotSortMenuState: DropdownMenuState?,
     val isPaginating: Boolean,
     val isLoggedIn: Boolean,
+    val notificationsUnreadCount: Int,
 ) {
     val shouldShowRefreshPrompt: Boolean
         get() = isRefreshPromptVisible &&
@@ -36,6 +37,7 @@ data class EntriesScreenState(
             hotSortMenuState = null,
             isPaginating = false,
             isLoggedIn = false,
+            notificationsUnreadCount = 0,
         )
     }
 

@@ -111,10 +111,14 @@ private fun AddLinkScreenContentPreview() {
             ),
             actions = object : AddLinkStartActions {
                 override fun onTopBarBackClicked() = Unit
+                override fun onTopBarSearchClicked() = Unit
+                override fun onTopBarNotificationsClicked() = Unit
                 override fun onUrlChanged(value: String) = Unit
                 override fun onContinueClicked() = Unit
                 override fun onSavedDraftContinueClicked(key: String) = Unit
                 override fun onSavedDraftDeleteClicked(key: String) = Unit
+                override fun onTopBarAddEntryClicked() = Unit
+                override fun onTopBarAddLinkClicked() = Unit
             },
             modifier = Modifier.padding(16.dp),
         )

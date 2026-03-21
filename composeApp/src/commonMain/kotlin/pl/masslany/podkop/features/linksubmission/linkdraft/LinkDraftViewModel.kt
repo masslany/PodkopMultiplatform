@@ -41,6 +41,7 @@ import pl.masslany.podkop.features.linksubmission.LinkDraftScreen
 import pl.masslany.podkop.features.linksubmission.models.AddLinkSnapshot
 import pl.masslany.podkop.features.linksubmission.models.AddLinkSuggestedImageState
 import pl.masslany.podkop.features.linksubmission.models.AddLinkTagSuggestionState
+import pl.masslany.podkop.features.topbar.TopBarActions
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.snackbar_add_link_success
 
@@ -54,8 +55,10 @@ internal class LinkDraftViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
+    private val topBarActions: TopBarActions,
 ) : ViewModel(),
-    LinkDraftActions {
+    LinkDraftActions,
+    TopBarActions by topBarActions {
 
     private val restoredDraft = restoreDraft()
         ?.takeIf { it.state.draftKey == screen.draftKey }

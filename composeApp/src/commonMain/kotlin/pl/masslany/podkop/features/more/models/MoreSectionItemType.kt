@@ -5,9 +5,9 @@ import org.jetbrains.compose.resources.StringResource
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_code
 import podkop.composeapp.generated.resources.ic_comment
-import podkop.composeapp.generated.resources.ic_exclamation
 import podkop.composeapp.generated.resources.ic_favorite
 import podkop.composeapp.generated.resources.ic_fire
+import podkop.composeapp.generated.resources.ic_notifications
 import podkop.composeapp.generated.resources.ic_observed
 import podkop.composeapp.generated.resources.ic_search
 import podkop.composeapp.generated.resources.ic_settings
@@ -23,7 +23,7 @@ import podkop.composeapp.generated.resources.topbar_label_settings
 enum class MoreSectionItemType(val titleRes: StringResource, val iconRes: DrawableResource) {
     Notifications(
         titleRes = Res.string.more_item_notifications,
-        iconRes = Res.drawable.ic_exclamation,
+        iconRes = Res.drawable.ic_notifications,
     ),
     Messages(
         titleRes = Res.string.more_item_messages,

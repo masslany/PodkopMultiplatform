@@ -21,6 +21,7 @@ import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
+import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
@@ -43,6 +44,7 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 class EntriesViewModel(
     private val authRepository: AuthRepository,
     private val entriesRepository: EntriesRepository,
+    private val notificationsRepository: NotificationsRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
@@ -91,10 +93,12 @@ class EntriesViewModel(
     val state = combine(
         _state,
         resourceItemStateHolder.items,
+        notificationsRepository.unreadCount,
         paginator.state,
-    ) { state, entries, paginatorState ->
+    ) { state, entries, notificationsUnreadCount, paginatorState ->
         state.copy(
             entries = entries,
+            notificationsUnreadCount = notificationsUnreadCount,
             isPaginating = paginatorState is PaginatorState.Loading,
         )
     }.stateIn(

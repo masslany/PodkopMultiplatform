@@ -19,6 +19,7 @@ import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.linksubmission.LinkDraftScreen
 import pl.masslany.podkop.features.linksubmission.linkdraft.toAddLinkSimilarItemState
 import pl.masslany.podkop.features.linksubmission.linkdraft.toSavedDraftState
+import pl.masslany.podkop.features.topbar.TopBarActions
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.dialog_button_delete
 import podkop.composeapp.generated.resources.dialog_button_dismiss
@@ -30,8 +31,10 @@ internal class AddLinkStartViewModel(
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
+    private val topBarActions: TopBarActions,
 ) : ViewModel(),
-    AddLinkStartActions {
+    AddLinkStartActions,
+    TopBarActions by topBarActions {
 
     private val _state = MutableStateFlow(AddLinkStartState.initial)
     val state = _state.asStateFlow()

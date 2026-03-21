@@ -38,6 +38,7 @@ val privateMessagesModule = module {
             savedStateHandle = get(),
             logger = get(),
             snackbarManager = get(),
+            topBarActions = get(),
         )
     }
 }
