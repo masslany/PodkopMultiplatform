@@ -17,7 +17,7 @@ internal val bearerTokenInterceptor =
         ::BearerTokenInterceptorPluginConfig,
     ) {
         val configStorage = pluginConfig.configStorage
-        val tokenRefreshCoordinator = pluginConfig.tokenRefreshCoordinator
+        val tokenRefreshHandler = pluginConfig.tokenRefreshCoordinator
 
         suspend fun Send.Sender.proceedWithToken(request: HttpRequestBuilder): HttpClientCall {
             val shouldSkipAuth = request.headers[REQUEST_HEADER_SKIP_AUTH] == "true"
@@ -30,7 +30,7 @@ internal val bearerTokenInterceptor =
                 return proceed(request)
             }
 
-            tokenRefreshCoordinator.refreshIfTokenExpiring()
+            tokenRefreshHandler.refreshIfTokenExpiring()
             configStorage.getBearerToken().takeIf { it.isNotEmpty() }?.let {
                 request.headers[HttpHeaders.Authorization] = "Bearer $it"
             }
@@ -40,7 +40,7 @@ internal val bearerTokenInterceptor =
                 return initialCall
             }
 
-            val refreshed = tokenRefreshCoordinator.refreshTokens(force = true)
+            val refreshed = tokenRefreshHandler.refreshTokens(force = true)
             if (!refreshed) {
                 return initialCall
             }
@@ -58,7 +58,7 @@ internal val bearerTokenInterceptor =
 
 internal class BearerTokenInterceptorPluginConfig {
     lateinit var configStorage: ConfigStorage
-    lateinit var tokenRefreshCoordinator: TokenRefreshCoordinator
+    lateinit var tokenRefreshCoordinator: TokenRefreshHandler
 }
 
 private val SKIPPED_PATH_SEGMENTS = setOf("auth", "refresh-token")

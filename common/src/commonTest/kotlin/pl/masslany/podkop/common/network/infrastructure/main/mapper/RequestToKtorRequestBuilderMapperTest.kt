@@ -1,5 +1,6 @@
 package pl.masslany.podkop.common.network.infrastructure.main.mapper
 
+import io.ktor.http.encodedPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import pl.masslany.podkop.common.network.models.request.Request

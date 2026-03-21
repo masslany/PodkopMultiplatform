@@ -21,15 +21,11 @@ internal class TokenRefreshCoordinator(
     private val configStorage: ConfigStorage,
     private val json: Json,
     private val logger: AppLogger,
-) {
+    private val refreshHttpClient: HttpClient = createRefreshHttpClient(json),
+) : TokenRefreshHandler {
     private val refreshMutex = Mutex()
-    private val refreshHttpClient by lazy {
-        HttpClient(HttpClientEngineProvider.provide()) {
-            install(ContentNegotiation) {
-                json(this@TokenRefreshCoordinator.json)
-            }
-        }
-    }
+
+    override suspend fun refreshIfTokenExpiring(): Boolean = refreshIfTokenExpiring(TOKEN_EXPIRATION_LEEWAY_SECONDS)
 
     suspend fun refreshIfTokenExpiring(leewaySeconds: Long = TOKEN_EXPIRATION_LEEWAY_SECONDS): Boolean {
         val token = configStorage.getBearerToken()
@@ -44,7 +40,7 @@ internal class TokenRefreshCoordinator(
         }
     }
 
-    suspend fun refreshTokens(force: Boolean = true): Boolean {
+    override suspend fun refreshTokens(force: Boolean): Boolean {
         return refreshMutex.withLock {
             if (!force) {
                 val currentToken = configStorage.getBearerToken()
@@ -174,3 +170,11 @@ private data class RefreshDtoData(
     @SerialName("token")
     val token: String,
 )
+
+private fun createRefreshHttpClient(json: Json): HttpClient {
+    return HttpClient(HttpClientEngineProvider.provide()) {
+        install(ContentNegotiation) {
+            json(json)
+        }
+    }
+}
