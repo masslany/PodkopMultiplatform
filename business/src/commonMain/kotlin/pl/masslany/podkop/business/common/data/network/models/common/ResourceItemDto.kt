@@ -4,6 +4,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import pl.masslany.podkop.business.common.data.network.models.DateAsStringSerializer
+import pl.masslany.podkop.business.common.data.network.models.FlexibleDeletedSerializer
 import pl.masslany.podkop.business.common.data.network.models.comments.ParentDto
 
 @Serializable
@@ -28,6 +29,7 @@ data class ResourceItemDto(
     @SerialName("deletable")
     val deletable: Boolean? = null,
     @SerialName("deleted")
+    @Serializable(with = FlexibleDeletedSerializer::class)
     val deleted: String? = null,
     @SerialName("device")
     val device: String? = null,

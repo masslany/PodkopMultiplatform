@@ -9,6 +9,7 @@ import pl.masslany.podkop.features.composer.ComposerRequest
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.linksubmission.AddLinkScreen
 import pl.masslany.podkop.features.linksubmission.LinkDraftScreen
+import pl.masslany.podkop.features.observed.ObservedScreen
 
 class NavigationBackstackSerializerTest {
 
@@ -23,6 +24,7 @@ class NavigationBackstackSerializerTest {
                 entryCommentId = 7,
                 author = "alice",
             ),
+            ObservedScreen,
             ComposerBottomSheetScreen(
                 resultKey = "composer",
                 request = ComposerRequest.CreateEntry(

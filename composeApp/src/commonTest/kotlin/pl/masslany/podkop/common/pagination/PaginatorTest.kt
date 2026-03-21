@@ -49,8 +49,8 @@ class PaginatorTest {
     }
 
     @Test
-    fun `reachedEnd returns false for full page without next cursor when total not reached`() {
-        assertFalse(
+    fun `reachedEnd returns true when api explicitly reports no next page`() {
+        assertTrue(
             paginator.reachedEnd(
                 pagination = Pagination(
                     perPage = 25,
@@ -60,6 +60,22 @@ class PaginatorTest {
                 ),
                 receivedItemsCount = 25,
                 emittedItemsCount = 325,
+            ),
+        )
+    }
+
+    @Test
+    fun `reachedEnd returns true when next is blank even without per page or total`() {
+        assertTrue(
+            paginator.reachedEnd(
+                pagination = Pagination(
+                    perPage = 0,
+                    total = 0,
+                    next = "",
+                    prev = "",
+                ),
+                receivedItemsCount = 9,
+                emittedItemsCount = 9,
             ),
         )
     }

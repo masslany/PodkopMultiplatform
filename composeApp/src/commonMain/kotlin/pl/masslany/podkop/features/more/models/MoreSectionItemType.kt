@@ -8,7 +8,7 @@ import podkop.composeapp.generated.resources.ic_comment
 import podkop.composeapp.generated.resources.ic_exclamation
 import podkop.composeapp.generated.resources.ic_favorite
 import podkop.composeapp.generated.resources.ic_fire
-import podkop.composeapp.generated.resources.ic_nav_shovel
+import podkop.composeapp.generated.resources.ic_observed
 import podkop.composeapp.generated.resources.ic_search
 import podkop.composeapp.generated.resources.ic_settings
 import podkop.composeapp.generated.resources.more_item_about
@@ -43,7 +43,7 @@ enum class MoreSectionItemType(val titleRes: StringResource, val iconRes: Drawab
     ),
     MyWykop(
         titleRes = Res.string.more_item_my_wykop,
-        iconRes = Res.drawable.ic_nav_shovel,
+        iconRes = Res.drawable.ic_observed,
     ),
     Settings(
         titleRes = Res.string.topbar_label_settings,

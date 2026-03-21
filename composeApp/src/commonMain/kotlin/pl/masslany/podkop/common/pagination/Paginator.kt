@@ -104,13 +104,13 @@ class Paginator<T>(
         receivedItemsCount: Int,
         emittedItemsCount: Int,
     ): Boolean {
+        val hasNoNextCursor = pagination != null && pagination.next.isBlank()
+        if (hasNoNextCursor) return true
+
         val knownTotal = pagination?.total?.takeIf { it > 0 } ?: total
         if (knownTotal != null && emittedItemsCount >= knownTotal) return true
 
-        val hasNoNextCursor = pagination != null && pagination.next.isBlank()
-        if (!hasNoNextCursor) return false
-
-        val expectedPageSize = pagination.perPage.takeIf { it > 0 } ?: perPage
+        val expectedPageSize = pagination?.perPage?.takeIf { it > 0 } ?: perPage
         return receivedItemsCount == 0 ||
             (expectedPageSize != null && receivedItemsCount < expectedPageSize)
     }

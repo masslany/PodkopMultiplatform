@@ -14,7 +14,6 @@ val moreModule = module {
             appNavigator = get(),
             logger = get(),
             snackbarManager = get(),
-            buildInfo = get(),
         )
     }
 }

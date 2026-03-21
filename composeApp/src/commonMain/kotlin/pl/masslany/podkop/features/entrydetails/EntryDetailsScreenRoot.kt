@@ -10,9 +10,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -43,7 +45,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -125,7 +126,7 @@ fun EntryDetailsScreenContent(
     }
     val coroutineScope = rememberCoroutineScope()
     val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
-    val contentInsets = paddingValues.toWindowInsets(includeTop = !showTopBar)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = !showTopBar, includeBottom = false)
     val scaffoldModifier = modifier
         .fillMaxSize()
         .let { baseModifier ->
@@ -241,7 +242,11 @@ private fun EntryDetailsScreenList(
         modifier = modifier,
         state = lazyListState,
         contentPadding = PaddingValues(
-            bottom = 16.dp,
+            bottom = 16.dp +
+                WindowInsets
+                    .navigationBars
+                    .asPaddingValues()
+                    .calculateBottomPadding(),
         ),
     ) {
         val replyActionsConfig = ResourceItemConfig(

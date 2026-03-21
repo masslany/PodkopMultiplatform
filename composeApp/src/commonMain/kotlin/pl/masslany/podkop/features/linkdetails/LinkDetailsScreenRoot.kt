@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -151,7 +154,7 @@ fun LinkDetailsScreenContent(
     }
     val coroutineScope = rememberCoroutineScope()
     val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
-    val contentInsets = paddingValues.toWindowInsets(includeTop = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false, includeBottom = false)
     val scaffoldModifier = modifier
         .fillMaxSize()
         .let { baseModifier ->
@@ -272,7 +275,11 @@ private fun LinkDetailsScreenList(
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(
-            bottom = 16.dp,
+            bottom = 16.dp +
+                WindowInsets
+                    .navigationBars
+                    .asPaddingValues()
+                    .calculateBottomPadding(),
         ),
     ) {
         state.link?.let { link ->

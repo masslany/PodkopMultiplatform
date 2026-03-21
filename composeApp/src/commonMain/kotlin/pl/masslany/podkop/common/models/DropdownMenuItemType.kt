@@ -41,6 +41,12 @@ sealed class DropdownMenuItemType {
 
     data object Everything : DropdownMenuItemType()
 
+    data object Profiles : DropdownMenuItemType()
+
+    data object Discussions : DropdownMenuItemType()
+
+    data object Tags : DropdownMenuItemType()
+
     data object LinkComments : DropdownMenuItemType()
 
     data object EntryComments : DropdownMenuItemType()

@@ -20,10 +20,7 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
 import pl.masslany.podkop.common.models.toNameColorType
 import pl.masslany.podkop.common.navigation.AppNavigator
-import pl.masslany.podkop.common.platform.BuildInfo
-import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
-import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.about.AboutAppScreen
 import pl.masslany.podkop.features.favorites.FavoritesScreen
@@ -33,13 +30,12 @@ import pl.masslany.podkop.features.more.models.MoreSectionItemType
 import pl.masslany.podkop.features.more.models.MoreSectionState
 import pl.masslany.podkop.features.more.models.MoreSectionType
 import pl.masslany.podkop.features.notifications.NotificationsScreen
+import pl.masslany.podkop.features.observed.ObservedScreen
 import pl.masslany.podkop.features.privatemessages.PrivateMessagesScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.profile.models.ProfileHeaderState
 import pl.masslany.podkop.features.search.SearchScreen
 import pl.masslany.podkop.features.settings.SettingsScreen
-import podkop.composeapp.generated.resources.Res
-import podkop.composeapp.generated.resources.more_snackbar_coming_soon
 
 class MoreViewModel(
     private val authRepository: AuthRepository,
@@ -49,7 +45,6 @@ class MoreViewModel(
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
-    private val buildInfo: BuildInfo,
 ) : ViewModel(),
     MoreActions {
     private val _state = MutableStateFlow(MoreScreenState.initial)
@@ -108,7 +103,7 @@ class MoreViewModel(
     }
 
     override fun onMyWykopClicked() {
-        emitComingSoon()
+        appNavigator.navigateTo(ObservedScreen)
     }
 
     override fun onSettingsClicked() {
@@ -263,35 +258,30 @@ class MoreViewModel(
     private fun buildContentSectionItems(
         isLoggedIn: Boolean,
 
-    ): ImmutableList<MoreSectionItemState> = buildList {
-        add(
-            MoreSectionItemState(
-                type = MoreSectionItemType.Hits,
-                badgeCount = null,
-            ),
-        )
-        add(
-            MoreSectionItemState(
-                type = MoreSectionItemType.Search,
-                badgeCount = null,
-            ),
-        )
-        if (isLoggedIn && buildInfo.isDebugBuild) {
-            add(
-                MoreSectionItemState(
-                    type = MoreSectionItemType.MyWykop,
-                    badgeCount = null,
-                ),
-            )
-        }
-    }.toPersistentList()
+    ): ImmutableList<MoreSectionItemState> = buildMoreContentSectionItems(isLoggedIn)
+}
 
-    private fun emitComingSoon() {
-        snackbarManager.tryEmit(
-            SnackbarEvent(
-                message = SnackbarMessage.Resource(Res.string.more_snackbar_coming_soon),
-                isFinite = true,
+internal fun buildMoreContentSectionItems(
+    isLoggedIn: Boolean,
+): ImmutableList<MoreSectionItemState> = buildList {
+    add(
+        MoreSectionItemState(
+            type = MoreSectionItemType.Hits,
+            badgeCount = null,
+        ),
+    )
+    add(
+        MoreSectionItemState(
+            type = MoreSectionItemType.Search,
+            badgeCount = null,
+        ),
+    )
+    if (isLoggedIn) {
+        add(
+            MoreSectionItemState(
+                type = MoreSectionItemType.MyWykop,
+                badgeCount = null,
             ),
         )
     }
-}
+}.toPersistentList()

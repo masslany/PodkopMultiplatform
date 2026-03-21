@@ -17,6 +17,7 @@
     <string name="topbar_label_search">Szukaj</string>
     <string name="topbar_label_hits">Hity</string>
     <string name="topbar_label_favorites">Ulubione</string>
+    <string name="topbar_label_observed">Mój wykop</string>
     <string name="topbar_label_notifications">Powiadomienia</string>
     <string name="topbar_label_private_messages">Wiadomości prywatne</string>
     <string name="topbar_label_new_conversation">Nowa wiadomość</string>
@@ -264,10 +265,27 @@
     <string name="dropdown_menu_label_month">Miesiąc</string>
     <string name="dropdown_menu_label_year">Rok</string>
     <string name="dropdown_menu_label_everything">Wszystkie</string>
+    <string name="dropdown_menu_label_profiles">Profile</string>
+    <string name="dropdown_menu_label_discussions">Dyskusje</string>
+    <string name="dropdown_menu_label_tags">Tagi</string>
     <string name="dropdown_menu_label_links">Znaleziska</string>
     <string name="dropdown_menu_label_entries">Wpisy</string>
     <string name="dropdown_menu_label_link_comments">Komentarze znalezisk</string>
     <string name="dropdown_menu_label_entry_comments">Komentarze wpisów</string>
+    <string name="observed_empty_everything">Brak treści w Mój wykop</string>
+    <string name="observed_empty_profiles">Brak treści od obserwowanych profili</string>
+    <string name="observed_empty_discussions">Brak obserwowanych dyskusji</string>
+    <string name="observed_empty_tags">Brak treści z obserwowanych tagów</string>
+    <plurals name="observed_discussion_entry_banner">
+        <item quantity="one">%1$d nowy komentarz do obserwowanego przez Ciebie wpisu</item>
+        <item quantity="few">%1$d nowe komentarze do obserwowanego przez Ciebie wpisu</item>
+        <item quantity="other">%1$d nowych komentarzy do obserwowanego przez Ciebie wpisu</item>
+    </plurals>
+    <plurals name="observed_discussion_link_banner">
+        <item quantity="one">%1$d nowy komentarz do obserwowanego przez Ciebie znaleziska</item>
+        <item quantity="few">%1$d nowe komentarze do obserwowanego przez Ciebie znaleziska</item>
+        <item quantity="other">%1$d nowych komentarzy do obserwowanego przez Ciebie znaleziska</item>
+    </plurals>
 
     <!-- Hits -->
     <string name="hits_archive_button">Archiwum</string>

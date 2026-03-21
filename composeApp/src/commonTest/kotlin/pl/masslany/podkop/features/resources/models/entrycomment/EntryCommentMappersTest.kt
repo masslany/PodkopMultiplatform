@@ -175,4 +175,5 @@ private fun actions(
     update = update,
     voteDown = true,
     voteUp = true,
+    vote = false,
 )

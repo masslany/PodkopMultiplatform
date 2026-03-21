@@ -22,6 +22,7 @@ import pl.masslany.podkop.features.linksubmission.AddLinkScreen
 import pl.masslany.podkop.features.linksubmission.LinkDraftScreen
 import pl.masslany.podkop.features.more.MoreScreen
 import pl.masslany.podkop.features.notifications.NotificationsScreen
+import pl.masslany.podkop.features.observed.ObservedScreen
 import pl.masslany.podkop.features.privatemessages.ConversationScreen
 import pl.masslany.podkop.features.privatemessages.NewConversationScreen
 import pl.masslany.podkop.features.privatemessages.PrivateMessagesScreen
@@ -59,6 +60,7 @@ internal object NavigationBackstackSerializer {
                 subclass(ComposerMediaAttachBottomSheetScreen::class, ComposerMediaAttachBottomSheetScreen.serializer())
                 subclass(FavoritesScreen::class, FavoritesScreen.serializer())
                 subclass(NotificationsScreen::class, NotificationsScreen.serializer())
+                subclass(ObservedScreen::class, ObservedScreen.serializer())
                 subclass(ResourceScreenshotPreviewDialogScreen::class, ResourceScreenshotPreviewDialogScreen.serializer())
                 subclass(ResourceTextSelectionDialogScreen::class, ResourceTextSelectionDialogScreen.serializer())
                 subclass(ResourceActionsBottomSheetScreen::class, ResourceActionsBottomSheetScreen.serializer())

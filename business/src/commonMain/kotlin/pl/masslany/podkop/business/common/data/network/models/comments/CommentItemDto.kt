@@ -9,6 +9,7 @@ import pl.masslany.podkop.business.common.data.network.models.common.CommentsDto
 import pl.masslany.podkop.business.common.data.network.models.common.MediaDto
 import pl.masslany.podkop.business.common.data.network.models.common.VotesDto
 import pl.masslany.podkop.business.common.data.network.models.DateAsStringSerializer
+import pl.masslany.podkop.business.common.data.network.models.FlexibleDeletedSerializer
 
 @Serializable
 data class CommentItemDto(
@@ -32,6 +33,7 @@ data class CommentItemDto(
     @SerialName("deletable")
     val deletable: Boolean,
     @SerialName("deleted")
+    @Serializable(with = FlexibleDeletedSerializer::class)
     val deleted: String?,
     @SerialName("device")
     val device: String,

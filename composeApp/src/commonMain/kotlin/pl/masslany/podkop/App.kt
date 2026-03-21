@@ -78,6 +78,8 @@ import pl.masslany.podkop.features.linksubmission.addlink.AddLinkScreenRoot
 import pl.masslany.podkop.features.linksubmission.linkdraft.LinkDraftScreenRoot
 import pl.masslany.podkop.features.notifications.NotificationsScreen
 import pl.masslany.podkop.features.notifications.NotificationsScreenRoot
+import pl.masslany.podkop.features.observed.ObservedScreen
+import pl.masslany.podkop.features.observed.ObservedScreenRoot
 import pl.masslany.podkop.features.privatemessages.ConversationScreen
 import pl.masslany.podkop.features.privatemessages.NewConversationScreen
 import pl.masslany.podkop.features.privatemessages.PrivateMessagesScreen
@@ -245,6 +247,12 @@ fun App() {
 
                         entry<NotificationsScreen> {
                             NotificationsScreenRoot(
+                                paddingValues = safeDrawingPaddingValues,
+                            )
+                        }
+
+                        entry<ObservedScreen> {
+                            ObservedScreenRoot(
                                 paddingValues = safeDrawingPaddingValues,
                             )
                         }
