@@ -26,11 +26,15 @@ class NotificationsApiClient(
         group: NotificationGroup,
         page: Any?,
     ): Result<NotificationsListDto> {
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
+
         val request =
             Request<NotificationsListDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/notifications/${group.pathSegment}",
-                queryParameters = page?.let { mapOf("page" to it.toString()) },
+                queryParameters = queryParameters,
             )
 
         return execute(request)

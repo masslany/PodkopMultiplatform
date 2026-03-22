@@ -25,21 +25,20 @@ class EntriesApiClient(
         category: String?,
         bucket: String?,
     ): Result<ResourceResponseDto> {
-        val queryParams =
-            mutableMapOf(
-                "sort" to sort,
-                "last_update" to hotSort.toString(),
-            )
-        page?.let { queryParams["page"] = it.toString() }
-        limit?.let { queryParams["limit"] = it.toString() }
-        category?.let { queryParams["category"] = it }
-        bucket?.let { queryParams["bucket"] = it }
+        val queryParameters = buildMap {
+            put("sort", sort)
+            put("last_update", hotSort.toString())
+            page?.let { put("page", it.toString()) }
+            limit?.let { put("limit", it.toString()) }
+            category?.let { put("category", it) }
+            bucket?.let { put("bucket", it) }
+        }
 
         val request =
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/entries",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(
@@ -65,14 +64,15 @@ class EntriesApiClient(
         entryId: Int,
         page: Any?,
     ): Result<ResourceResponseDto> {
-        val queryParams = mutableMapOf<String, String>()
-        page?.let { queryParams["page"] = it.toString() }
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
 
         val request =
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/entries/$entryId/comments",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(
@@ -85,14 +85,15 @@ class EntriesApiClient(
         entryId: Int,
         page: Any?,
     ): Result<EntryVotersResponseDto> {
-        val queryParams = mutableMapOf<String, String>()
-        page?.let { queryParams["page"] = it.toString() }
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
 
         val request =
             Request<EntryVotersResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/entries/$entryId/votes",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(
@@ -106,14 +107,15 @@ class EntriesApiClient(
         commentId: Int,
         page: Any?,
     ): Result<EntryVotersResponseDto> {
-        val queryParams = mutableMapOf<String, String>()
-        page?.let { queryParams["page"] = it.toString() }
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
 
         val request =
             Request<EntryVotersResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/entries/$entryId/comments/$commentId/votes",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(

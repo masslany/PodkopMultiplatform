@@ -10,12 +10,14 @@ class RankApiClient(
     private val apiClient: ApiClient,
 ) : RankApi {
     override suspend fun getRank(page: Int): Result<RankResponseDto> {
+        val queryParameters = buildMap {
+            put("page", page.toString())
+        }
+
         val request = Request<RankResponseDto>(
             method = Request.HttpMethod.GET,
             path = "api/v3/rank",
-            queryParameters = mapOf(
-                "page" to page.toString(),
-            ),
+            queryParameters = queryParameters,
         )
 
         return apiClient.request(request).fold(

@@ -14,13 +14,14 @@ class ObservedApiClient(
         page: Any?,
         type: ObservedType,
     ): Result<ObservedResponseDto> {
-        val queryParams = mutableMapOf<String, String>()
-        page?.let { queryParams["page"] = it.toString() }
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
 
         val request = Request<ObservedResponseDto>(
             method = Request.HttpMethod.GET,
             path = "api/v3/observed/${type.endpointPath}",
-            queryParameters = queryParams,
+            queryParameters = queryParameters,
         )
 
         return apiClient.request(request).fold(

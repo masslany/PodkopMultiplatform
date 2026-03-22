@@ -18,12 +18,14 @@ class BlacklistsApiClient(
     private val apiClient: ApiClient,
 ) : BlacklistsApi {
     override suspend fun getBlacklistedUsers(page: Int): Result<BlacklistedUsersResponseDto> {
+        val queryParameters = buildMap {
+            put("page", page.toString())
+        }
+
         val request = Request<BlacklistedUsersResponseDto>(
             method = Request.HttpMethod.GET,
             path = "api/v3/settings/blacklists/users",
-            queryParameters = mapOf(
-                "page" to page.toString(),
-            ),
+            queryParameters = queryParameters,
         )
 
         return apiClient.request(request).fold(
@@ -33,12 +35,14 @@ class BlacklistsApiClient(
     }
 
     override suspend fun getBlacklistedTags(page: Int): Result<BlacklistedTagsResponseDto> {
+        val queryParameters = buildMap {
+            put("page", page.toString())
+        }
+
         val request = Request<BlacklistedTagsResponseDto>(
             method = Request.HttpMethod.GET,
             path = "api/v3/settings/blacklists/tags",
-            queryParameters = mapOf(
-                "page" to page.toString(),
-            ),
+            queryParameters = queryParameters,
         )
 
         return apiClient.request(request).fold(
@@ -48,12 +52,14 @@ class BlacklistsApiClient(
     }
 
     override suspend fun getBlacklistedDomains(page: Int): Result<BlacklistedDomainsResponseDto> {
+        val queryParameters = buildMap {
+            put("page", page.toString())
+        }
+
         val request = Request<BlacklistedDomainsResponseDto>(
             method = Request.HttpMethod.GET,
             path = "api/v3/settings/blacklists/domains",
-            queryParameters = mapOf(
-                "page" to page.toString(),
-            ),
+            queryParameters = queryParameters,
         )
 
         return apiClient.request(request).fold(

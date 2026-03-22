@@ -83,19 +83,18 @@ class TagsApiClient(
         sort: String,
         type: String,
     ): Result<ResourceResponseDto> {
-        val queryParams =
-            mutableMapOf(
-                "sort" to sort,
-                "type" to type,
-            )
-        page?.let { queryParams["page"] = it.toString() }
-        limit?.let { queryParams["limit"] = it.toString() }
+        val queryParameters = buildMap {
+            put("sort", sort)
+            put("type", type)
+            page?.let { put("page", it.toString()) }
+            limit?.let { put("limit", it.toString()) }
+        }
 
         val request =
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/tags/$tagName/stream",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(
@@ -105,12 +104,14 @@ class TagsApiClient(
     }
 
     override suspend fun getTagsAutoComplete(query: String): Result<TagsAutoCompleteResponseDto> {
-        val queryParams = mutableMapOf("query" to query)
+        val queryParameters = buildMap {
+            put("query", query)
+        }
         val request =
             Request<TagsAutoCompleteResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/tags/autocomplete",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(

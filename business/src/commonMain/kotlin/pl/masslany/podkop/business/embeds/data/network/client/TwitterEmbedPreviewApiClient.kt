@@ -15,16 +15,16 @@ class TwitterEmbedPreviewApiClient(
         tweetId: Long,
         token: String?,
     ): Result<JsonObject> {
-        val queryParams = mutableMapOf(
-            "id" to tweetId.toString(),
-        )
-        token?.let { queryParams["token"] = it }
+        val queryParameters = buildMap {
+            put("id", tweetId.toString())
+            token?.let { put("token", it) }
+        }
 
         val request = Request<JsonObject>(
             method = Request.HttpMethod.GET,
             path = TwitterEmbedEndpointUrl,
             headers = mapOf(REQUEST_HEADER_SKIP_AUTH to "true"),
-            queryParameters = queryParams,
+            queryParameters = queryParameters,
         )
 
         return apiClient.request(request).fold(

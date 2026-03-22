@@ -14,11 +14,15 @@ class PrivateMessagesApiClient(
     private val apiClient: ApiClient,
 ) : PrivateMessagesApi {
     override suspend fun getConversations(page: Any?): Result<PrivateMessagesListDto> {
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
+
         val request =
             Request<PrivateMessagesListDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/pm/conversations",
-                queryParameters = page?.let { mapOf("page" to it.toString()) },
+                queryParameters = queryParameters,
             )
 
         return execute(request)
@@ -28,11 +32,15 @@ class PrivateMessagesApiClient(
         username: String,
         page: Any?,
     ): Result<PrivateMessageThreadDto> {
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
+
         val request =
             Request<PrivateMessageThreadDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/pm/conversations/$username",
-                queryParameters = page?.let { mapOf("page" to it.toString()) },
+                queryParameters = queryParameters,
             )
 
         return execute(request)

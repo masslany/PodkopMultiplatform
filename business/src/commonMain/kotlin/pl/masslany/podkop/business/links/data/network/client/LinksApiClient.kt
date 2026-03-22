@@ -33,21 +33,20 @@ class LinksApiClient(
         category: String?,
         bucket: String?,
     ): Result<ResourceResponseDto> {
-        val queryParams =
-            mutableMapOf(
-                "sort" to sort,
-                "type" to type,
-            )
-        page?.let { queryParams["page"] = it.toString() }
-        limit?.let { queryParams["limit"] = it.toString() }
-        category?.let { queryParams["category"] = it }
-        bucket?.let { queryParams["bucket"] = it }
+        val queryParameters = buildMap {
+            put("sort", sort)
+            put("type", type)
+            page?.let { put("page", it.toString()) }
+            limit?.let { put("limit", it.toString()) }
+            category?.let { put("category", it) }
+            bucket?.let { put("bucket", it) }
+        }
 
         val request =
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/links",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(
@@ -76,17 +75,18 @@ class LinksApiClient(
         sort: String?,
         ama: Boolean?,
     ): Result<ResourceResponseDto> {
-        val queryParams = mutableMapOf<String, String>()
-        page?.let { queryParams["page"] = it.toString() }
-        limit?.let { queryParams["limit"] = it.toString() }
-        sort?.let { queryParams["sort"] = it }
-        ama?.let { queryParams["ama"] = it.toString() }
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+            limit?.let { put("limit", it.toString()) }
+            sort?.let { put("sort", it) }
+            ama?.let { put("ama", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
 
         val request =
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/links/$id/comments",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(
@@ -100,14 +100,15 @@ class LinksApiClient(
         commentId: Int,
         page: Int?,
     ): Result<ResourceResponseDto> {
-        val queryParams = mutableMapOf<String, String>()
-        page?.let { queryParams["page"] = it.toString() }
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
 
         val request =
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/links/$linkId/comments/$commentId/comments",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(
@@ -306,14 +307,15 @@ class LinksApiClient(
     }
 
     override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto> {
-        val queryParams = mutableMapOf<String, String>()
-        page?.let { queryParams["page"] = it.toString() }
+        val queryParameters = buildMap {
+            page?.let { put("page", it.toString()) }
+        }.takeIf { it.isNotEmpty() }
 
         val request =
             Request<LinkUpvotesResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/links/$linkId/upvotes/$type",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(

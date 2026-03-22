@@ -16,21 +16,18 @@ class HitsApiClient(
         year: Int?,
         month: Int?,
     ): Result<ResourceResponseDto> {
-        val queryParams =
-            mutableMapOf(
-                "sort" to sort,
-            )
-                .apply {
-                    page?.let { put("page", it.toString()) }
-                    year?.let { put("year", it.toString()) }
-                    month?.let { put("month", it.toString().padStart(2, '0')) }
-                }
+        val queryParameters = buildMap {
+            put("sort", sort)
+            page?.let { put("page", it.toString()) }
+            year?.let { put("year", it.toString()) }
+            month?.let { put("month", it.toString().padStart(2, '0')) }
+        }
 
         val request =
             Request<ResourceResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/hits/links",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(

@@ -129,15 +129,14 @@ class ProfileApiClient(
     }
 
     override suspend fun getUsersAutoComplete(query: String): Result<UsersAutoCompleteResponseDto> {
-        val queryParams =
-            mutableMapOf(
-                "query" to query,
-            )
+        val queryParameters = buildMap {
+            put("query", query)
+        }
         val request =
             Request<UsersAutoCompleteResponseDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/users/autocomplete",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(
@@ -294,16 +293,15 @@ class ProfileApiClient(
         page: Int,
         endpoint: String,
     ): Result<T> {
-        val queryParams =
-            mutableMapOf(
-                "page" to page.toString(),
-            )
+        val queryParameters = buildMap {
+            put("page", page.toString())
+        }
 
         val request =
             Request<T>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/profile/users/$username/$endpoint",
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(

@@ -38,10 +38,14 @@ class MediaApiClient(
                 )
             },
         )
+        val queryParameters = buildMap {
+            put("type", type)
+        }
+
         val request = Request<MediaPhotoResponseDto>(
             method = Request.HttpMethod.POST,
             path = "api/v3/media/photos/upload",
-            queryParameters = mapOf("type" to type),
+            queryParameters = queryParameters,
             body = body,
         )
 
@@ -52,10 +56,14 @@ class MediaApiClient(
     }
 
     override suspend fun uploadPhotoFromUrl(url: String, type: String): Result<PhotoDto> {
+        val queryParameters = buildMap {
+            put("type", type)
+        }
+
         val request = Request<MediaPhotoResponseDto>(
             method = Request.HttpMethod.POST,
             path = "api/v3/media/photos",
-            queryParameters = mapOf("type" to type),
+            queryParameters = queryParameters,
             body = MediaPhotoFromUrlRequestDto(
                 data = MediaPhotoFromUrlDataDto(
                     url = url,

@@ -17,9 +17,11 @@ class FavouritesApiClient(
         sort: String,
         resource: String?,
     ): Result<ResourceResponseDto> {
-        val queryParams = mutableMapOf("sort" to sort)
-        page?.let { queryParams["page"] = it.toString() }
-        resource?.let { queryParams["resource"] = it }
+        val queryParameters = buildMap {
+            put("sort", sort)
+            page?.let { put("page", it.toString()) }
+            resource?.let { put("resource", it) }
+        }
 
         val request =
             Request<ResourceResponseDto>(
@@ -27,7 +29,7 @@ class FavouritesApiClient(
                 path = buildString {
                     append("api/v3/favourites")
                 },
-                queryParameters = queryParams,
+                queryParameters = queryParameters,
             )
 
         return apiClient.request(request).fold(
