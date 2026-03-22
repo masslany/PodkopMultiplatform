@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -168,7 +171,7 @@ internal fun TagScreenContent(
     }
     val coroutineScope = rememberCoroutineScope()
     val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
-    val contentInsets = paddingValues.toWindowInsets(includeTop = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false, includeBottom = false)
     var pendingToggleAnchorResourceIndex by remember(state.screenInstanceId) {
         mutableStateOf<Int?>(null)
     }
@@ -337,7 +340,10 @@ private fun TagScreenList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
         contentPadding = PaddingValues(
-            bottom = 16.dp,
+            bottom = WindowInsets
+                .navigationBars
+                .asPaddingValues()
+                .calculateBottomPadding() + 16.dp,
         ),
     ) {
         screenHeader(state = state, actions = actions)
@@ -385,7 +391,10 @@ private fun TagScreenGallery(
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,
-            bottom = 16.dp,
+            bottom = WindowInsets
+                .navigationBars
+                .asPaddingValues()
+                .calculateBottomPadding() + 16.dp,
         ),
     ) {
         screenHeader(state = state, actions = actions)
