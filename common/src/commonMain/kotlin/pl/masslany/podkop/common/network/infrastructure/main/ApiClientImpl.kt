@@ -2,15 +2,15 @@ package pl.masslany.podkop.common.network.infrastructure.main
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.statement.bodyAsText
 import io.ktor.client.request.request
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import io.ktor.util.reflect.TypeInfo
-import pl.masslany.podkop.common.network.models.request.Request
-import pl.masslany.podkop.common.network.models.response.ApiResponse
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.infrastructure.main.mapper.toHttpRequestBuilder
+import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.network.models.response.ApiResponse
 import pl.masslany.podkop.common.network.models.response.ResponseTypeInfo
 
 internal class ApiClientImpl(
@@ -49,14 +49,14 @@ internal class ApiClientImpl(
 internal class ApiHttpException(
     val status: HttpStatusCode,
     val responseBody: String?,
-) : IllegalStateException(
+) : Exception(
     buildString {
         append("HTTP ")
         append(status.value)
         append(' ')
         append(status.description)
         responseBody
-            ?.takeIf(String::isNotBlank)
+            ?.takeIf { it.isNotBlank() }
             ?.let {
                 append(": ")
                 append(it.take(MAX_ERROR_BODY_LENGTH))
