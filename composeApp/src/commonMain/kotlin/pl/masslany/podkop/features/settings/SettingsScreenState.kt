@@ -17,7 +17,7 @@ data class SettingsScreenState(
     val supportsTelemetryControls: Boolean,
     val supportsCacheClearing: Boolean,
     val showDebugTools: Boolean,
-    val showLogoutButton: Boolean,
+    val showAccountSection: Boolean,
     val appVersion: String,
 ) {
     companion object {
@@ -36,7 +36,7 @@ data class SettingsScreenState(
             supportsTelemetryControls = false,
             supportsCacheClearing = false,
             showDebugTools = false,
-            showLogoutButton = false,
+            showAccountSection = false,
             appVersion = "",
         )
     }

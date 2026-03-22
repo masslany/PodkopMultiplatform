@@ -22,7 +22,7 @@ class SettingsScreenStateProvider : PreviewParameterProvider<SettingsScreenState
             supportsTelemetryControls = true,
             supportsCacheClearing = true,
             showDebugTools = true,
-            showLogoutButton = true,
+            showAccountSection = true,
             appVersion = "2.0.0-debug",
         ),
         SettingsScreenState(
@@ -40,7 +40,7 @@ class SettingsScreenStateProvider : PreviewParameterProvider<SettingsScreenState
             supportsTelemetryControls = true,
             supportsCacheClearing = true,
             showDebugTools = false,
-            showLogoutButton = true,
+            showAccountSection = true,
             appVersion = "2.0.0",
         ),
     )

@@ -9,6 +9,7 @@ import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBotto
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalScreen
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogScreen
 import pl.masslany.podkop.features.about.AboutAppScreen
+import pl.masslany.podkop.features.blacklists.BlacklistsScreen
 import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
 import pl.masslany.podkop.features.debug.DebugScreen
 import pl.masslany.podkop.features.entries.EntriesScreen
@@ -64,9 +65,18 @@ internal object NavigationBackstackSerializer {
                 subclass(FavoritesScreen::class, FavoritesScreen.serializer())
                 subclass(NotificationsScreen::class, NotificationsScreen.serializer())
                 subclass(ObservedScreen::class, ObservedScreen.serializer())
-                subclass(ResourceScreenshotPreviewDialogScreen::class, ResourceScreenshotPreviewDialogScreen.serializer())
-                subclass(ResourceTextSelectionDialogScreen::class, ResourceTextSelectionDialogScreen.serializer())
-                subclass(ResourceActionsBottomSheetScreen::class, ResourceActionsBottomSheetScreen.serializer())
+                subclass(
+                    ResourceScreenshotPreviewDialogScreen::class,
+                    ResourceScreenshotPreviewDialogScreen.serializer(),
+                )
+                subclass(
+                    ResourceTextSelectionDialogScreen::class,
+                    ResourceTextSelectionDialogScreen.serializer(),
+                )
+                subclass(
+                    ResourceActionsBottomSheetScreen::class,
+                    ResourceActionsBottomSheetScreen.serializer(),
+                )
                 subclass(AboutAppScreen::class, AboutAppScreen.serializer())
                 subclass(ResourceVotesBottomSheetScreen::class, ResourceVotesBottomSheetScreen.serializer())
                 subclass(LinkDetailsScreen::class, LinkDetailsScreen.serializer())
@@ -74,6 +84,7 @@ internal object NavigationBackstackSerializer {
                 subclass(TagScreen::class, TagScreen.serializer())
                 subclass(EntryDetailsScreen::class, EntryDetailsScreen.serializer())
                 subclass(SettingsScreen::class, SettingsScreen.serializer())
+                subclass(BlacklistsScreen::class, BlacklistsScreen.serializer())
                 subclass(HitsScreen::class, HitsScreen.serializer())
                 subclass(SearchScreen::class, SearchScreen.serializer())
                 subclass(AdvancedSearchScreen::class, AdvancedSearchScreen.serializer())

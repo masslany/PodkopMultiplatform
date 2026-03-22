@@ -218,7 +218,6 @@ private fun LazyListScope.rankStickyHeader(
     }
 }
 
-
 @Composable
 fun RankRowContainer(
     content: @Composable () -> Unit,

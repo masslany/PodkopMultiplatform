@@ -16,5 +16,6 @@ object NoOpSettingsActions : SettingsActions, TopBarActions by NoOpTopBarActions
     override fun onClearCacheClicked() = Unit
     override fun onCopyDiagnosticsClicked() = Unit
     override fun onDebugToolsClicked() = Unit
+    override fun onManageBlacklistsClicked() = Unit
     override fun onLogoutClicked() = Unit
 }

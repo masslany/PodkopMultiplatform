@@ -57,6 +57,7 @@ import podkop.composeapp.generated.resources.settings_body_analytics
 import podkop.composeapp.generated.resources.settings_body_crash_reporting
 import podkop.composeapp.generated.resources.settings_body_dynamic_colors
 import podkop.composeapp.generated.resources.settings_body_gif_autoplay
+import podkop.composeapp.generated.resources.settings_body_manage_blacklists
 import podkop.composeapp.generated.resources.settings_body_open_debug
 import podkop.composeapp.generated.resources.settings_body_pm_notifications_disabled
 import podkop.composeapp.generated.resources.settings_body_pm_notifications_enabled
@@ -64,6 +65,7 @@ import podkop.composeapp.generated.resources.settings_body_pm_notifications_togg
 import podkop.composeapp.generated.resources.settings_body_version
 import podkop.composeapp.generated.resources.settings_button_clear
 import podkop.composeapp.generated.resources.settings_button_copy
+import podkop.composeapp.generated.resources.settings_button_open
 import podkop.composeapp.generated.resources.settings_button_open_debug
 import podkop.composeapp.generated.resources.settings_headline_account
 import podkop.composeapp.generated.resources.settings_headline_debug
@@ -253,10 +255,16 @@ fun SettingsScreenContent(
                     }
                 }
 
-                if (state.showLogoutButton) {
+                if (state.showAccountSection) {
                     SectionCard(
                         title = stringResource(resource = Res.string.settings_headline_account),
                     ) {
+                        ActionSettingRow(
+                            label = stringResource(resource = Res.string.settings_body_manage_blacklists),
+                            buttonLabel = stringResource(resource = Res.string.settings_button_open),
+                            onClick = actions::onManageBlacklistsClicked,
+                        )
+                        SectionCardDivider()
                         Button(
                             modifier = Modifier
                                 .fillMaxWidth()

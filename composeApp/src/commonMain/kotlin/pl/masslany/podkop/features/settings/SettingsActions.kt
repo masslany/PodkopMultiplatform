@@ -26,5 +26,7 @@ interface SettingsActions : TopBarActions {
 
     fun onDebugToolsClicked()
 
+    fun onManageBlacklistsClicked()
+
     fun onLogoutClicked()
 }

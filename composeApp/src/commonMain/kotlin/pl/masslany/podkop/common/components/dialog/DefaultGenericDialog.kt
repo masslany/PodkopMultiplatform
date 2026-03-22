@@ -68,5 +68,6 @@ private fun DialogText.resolve(): String =
             resource = requireNotNull(Res.allStringResources[key]) {
                 "Missing string resource for key: $key"
             },
+            *args.toTypedArray(),
         )
     }

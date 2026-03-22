@@ -1,0 +1,602 @@
+package pl.masslany.podkop.features.blacklists
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import pl.masslany.podkop.business.blacklists.domain.main.BlacklistsRepository
+import pl.masslany.podkop.business.blacklists.domain.models.BlacklistedDomain
+import pl.masslany.podkop.business.blacklists.domain.models.BlacklistedDomains
+import pl.masslany.podkop.business.blacklists.domain.models.BlacklistedTag
+import pl.masslany.podkop.business.blacklists.domain.models.BlacklistedTags
+import pl.masslany.podkop.business.blacklists.domain.models.BlacklistedUser
+import pl.masslany.podkop.business.blacklists.domain.models.BlacklistedUsers
+import pl.masslany.podkop.business.common.domain.models.common.Gender
+import pl.masslany.podkop.business.common.domain.models.common.NameColor
+import pl.masslany.podkop.business.common.domain.models.common.Pagination
+import pl.masslany.podkop.business.common.domain.models.common.Resources
+import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
+import pl.masslany.podkop.business.profile.domain.models.ObservedTags
+import pl.masslany.podkop.business.profile.domain.models.ObservedUsers
+import pl.masslany.podkop.business.profile.domain.models.Profile
+import pl.masslany.podkop.business.profile.domain.models.ProfileBadge
+import pl.masslany.podkop.business.profile.domain.models.ProfileNote
+import pl.masslany.podkop.business.profile.domain.models.ProfileShort
+import pl.masslany.podkop.business.profile.domain.models.UsersAutoComplete
+import pl.masslany.podkop.business.tags.domain.main.TagsRepository
+import pl.masslany.podkop.business.tags.domain.models.TagDetails
+import pl.masslany.podkop.business.tags.domain.models.TagsAutoComplete
+import pl.masslany.podkop.business.tags.domain.models.TagsAutoCompleteItem
+import pl.masslany.podkop.business.tags.domain.models.request.TagsSort
+import pl.masslany.podkop.business.tags.domain.models.request.TagsType
+import pl.masslany.podkop.common.logging.api.AppLogger
+import pl.masslany.podkop.common.navigation.AppNavigator
+import pl.masslany.podkop.common.navigation.GenericDialog
+import pl.masslany.podkop.common.preview.NoOpTopBarActions
+import pl.masslany.podkop.common.snackbar.SnackbarEvent
+import pl.masslany.podkop.common.snackbar.SnackbarManager
+import pl.masslany.podkop.features.blacklists.models.BlacklistCategoryState
+import pl.masslany.podkop.features.blacklists.models.BlacklistCategoryType
+import pl.masslany.podkop.features.blacklists.models.BlacklistSuggestionsStatus
+import pl.masslany.podkop.features.blacklists.models.BlacklistedTagItemState
+import pl.masslany.podkop.features.blacklists.models.BlacklistedUserItemState
+import pl.masslany.podkop.features.profile.ProfileScreen
+import pl.masslany.podkop.features.tag.TagScreen
+import pl.masslany.podkop.testsupport.navigation.createTestAppNavigator
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class BlacklistsViewModelTest {
+
+    @Test
+    fun `init loads first page for all categories`() = runBlacklistsViewModelTest {
+        val blacklistsRepository = FakeBlacklistsRepository().apply {
+            getBlacklistedUsersHandler = { page ->
+                Result.success(
+                    blacklistedUsersPage(
+                        page = page,
+                        users = listOf(blacklistedUser(username = "user1")),
+                        total = 1,
+                    ),
+                )
+            }
+            getBlacklistedTagsHandler = { page ->
+                Result.success(
+                    blacklistedTagsPage(
+                        page = page,
+                        tags = listOf(blacklistedTag(name = "heheszki")),
+                        total = 1,
+                    ),
+                )
+            }
+            getBlacklistedDomainsHandler = { page ->
+                Result.success(
+                    blacklistedDomainsPage(
+                        page = page,
+                        domains = listOf(blacklistedDomain(domain = "masslany.pl")),
+                        total = 1,
+                    ),
+                )
+            }
+        }
+
+        val sut = createSut(blacklistsRepository = blacklistsRepository)
+        collectState(sut)
+
+        advanceUntilIdle()
+
+        assertEquals(listOf(1), blacklistsRepository.getBlacklistedUsersCalls)
+        assertEquals(listOf(1), blacklistsRepository.getBlacklistedTagsCalls)
+        assertEquals(listOf(1), blacklistsRepository.getBlacklistedDomainsCalls)
+        assertEquals(
+            listOf("user1"),
+            sut.categoryState(BlacklistCategoryType.Users).items.map {
+                (it as BlacklistedUserItemState).username
+            },
+        )
+        assertEquals(
+            listOf("heheszki"),
+            sut.categoryState(BlacklistCategoryType.Tags).items.map {
+                (it as BlacklistedTagItemState).name
+            },
+        )
+        assertEquals(1, sut.categoryState(BlacklistCategoryType.Domains).totalCount)
+    }
+
+    @Test
+    fun `entry click opens profile and tag destinations`() = runBlacklistsViewModelTest {
+        val appNavigator = createTestAppNavigator(backgroundScope)
+        val sut = createSut(
+            blacklistsRepository = FakeBlacklistsRepository.withEmptyPages(),
+            appNavigator = appNavigator,
+        )
+
+        collectState(sut)
+        advanceUntilIdle()
+
+        sut.onEntryClicked(
+            BlacklistedUserItemState(
+                username = "kobiaszu",
+                avatarState = blacklistedUser(username = "kobiaszu").toItemState().avatarState,
+                nameColorType = blacklistedUser(username = "kobiaszu").toItemState().nameColorType,
+            ),
+        )
+        sut.onEntryClicked(BlacklistedTagItemState(name = "android"))
+
+        assertEquals(ProfileScreen(username = "kobiaszu"), appNavigator.state.value.rootStack[1])
+        assertEquals(TagScreen(tag = "android"), appNavigator.state.value.rootStack[2])
+    }
+
+    @Test
+    fun `confirmed remove deletes loaded tag locally without refreshing`() = runBlacklistsViewModelTest {
+        val blacklistsRepository = FakeBlacklistsRepository().apply {
+            getBlacklistedUsersHandler =
+                { page -> Result.success(blacklistedUsersPage(page = page, users = emptyList())) }
+            getBlacklistedDomainsHandler = { page ->
+                Result.success(blacklistedDomainsPage(page = page, domains = emptyList()))
+            }
+            getBlacklistedTagsHandler = { page ->
+                Result.success(
+                    when (page) {
+                        1 -> blacklistedTagsPage(
+                            page = page,
+                            tags = listOf(
+                                blacklistedTag(name = "java"),
+                                blacklistedTag(name = "kotlin"),
+                            ),
+                            total = 3,
+                            next = "2",
+                        )
+
+                        2 -> blacklistedTagsPage(
+                            page = page,
+                            tags = listOf(blacklistedTag(name = "android")),
+                            total = 3,
+                        )
+
+                        else -> error("Unexpected page $page")
+                    },
+                )
+            }
+            removeBlacklistedTagResult = Result.success(Unit)
+        }
+        val appNavigator = createTestAppNavigator(backgroundScope)
+        val sut = createSut(
+            blacklistsRepository = blacklistsRepository,
+            appNavigator = appNavigator,
+        )
+
+        collectState(sut)
+        advanceUntilIdle()
+
+        sut.onCategorySelected(BlacklistCategoryType.Tags)
+        advanceUntilIdle()
+        sut.paginate()
+        advanceUntilIdle()
+
+        val itemToRemove = sut.categoryState(BlacklistCategoryType.Tags)
+            .items
+            .last() as BlacklistedTagItemState
+
+        sut.onRemoveClicked(itemToRemove)
+        advanceUntilIdle()
+
+        val dialog = appNavigator.state.value.rootStack.last() as GenericDialog
+        appNavigator.publishResult(dialog.key, true)
+        advanceUntilIdle()
+
+        assertEquals(listOf("android"), blacklistsRepository.removeBlacklistedTagCalls)
+        assertEquals(
+            listOf("java", "kotlin"),
+            sut.categoryState(BlacklistCategoryType.Tags).items.map { (it as BlacklistedTagItemState).name },
+        )
+        assertEquals(2, sut.categoryState(BlacklistCategoryType.Tags).totalCount)
+        assertEquals(listOf(1, 2), blacklistsRepository.getBlacklistedTagsCalls)
+    }
+
+    @Test
+    fun `add clicked normalizes domain clears input and refreshes category`() = runBlacklistsViewModelTest {
+        val blacklistsRepository = FakeBlacklistsRepository().apply {
+            getBlacklistedUsersHandler =
+                { page -> Result.success(blacklistedUsersPage(page = page, users = emptyList())) }
+            getBlacklistedTagsHandler = { page -> Result.success(blacklistedTagsPage(page = page, tags = emptyList())) }
+            getBlacklistedDomainsHandler = { page ->
+                Result.success(
+                    if (getBlacklistedDomainsCalls.size <= 1) {
+                        blacklistedDomainsPage(
+                            page = page,
+                            domains = listOf(blacklistedDomain(domain = "onet.pl")),
+                            total = 1,
+                        )
+                    } else {
+                        blacklistedDomainsPage(
+                            page = page,
+                            domains = listOf(
+                                blacklistedDomain(domain = "onet.pl"),
+                                blacklistedDomain(domain = "devkop.pl"),
+                            ),
+                            total = 2,
+                        )
+                    },
+                )
+            }
+            addBlacklistedDomainResult = Result.success(Unit)
+        }
+
+        val sut = createSut(blacklistsRepository = blacklistsRepository)
+        collectState(sut)
+        advanceUntilIdle()
+
+        sut.onCategorySelected(BlacklistCategoryType.Domains)
+        advanceUntilIdle()
+        sut.onAddInputChanged(" DevKOP.pl ")
+        advanceUntilIdle()
+        sut.onAddClicked()
+        advanceUntilIdle()
+
+        assertEquals(listOf("devkop.pl"), blacklistsRepository.addBlacklistedDomainCalls)
+        assertEquals(listOf(1, 1), blacklistsRepository.getBlacklistedDomainsCalls)
+        assertEquals("", sut.categoryState(BlacklistCategoryType.Domains).addInput)
+        assertEquals(
+            listOf("onet.pl", "devkop.pl"),
+            sut.categoryState(BlacklistCategoryType.Domains).items.map { it.displayLabel },
+        )
+    }
+
+    @Test
+    fun `tag suggestions load after debounce and skip already blacklisted entries`() = runBlacklistsViewModelTest {
+        val blacklistsRepository = FakeBlacklistsRepository().apply {
+            getBlacklistedUsersHandler =
+                { page -> Result.success(blacklistedUsersPage(page = page, users = emptyList())) }
+            getBlacklistedDomainsHandler = { page ->
+                Result.success(blacklistedDomainsPage(page = page, domains = emptyList()))
+            }
+            getBlacklistedTagsHandler = { page ->
+                Result.success(
+                    blacklistedTagsPage(
+                        page = page,
+                        tags = listOf(blacklistedTag(name = "java")),
+                        total = 1,
+                    ),
+                )
+            }
+        }
+        val tagsRepository = FakeTagsRepository().apply {
+            getAutoCompleteTagsHandler = { query ->
+                Result.success(
+                    TagsAutoComplete(
+                        tags = listOf(
+                            TagsAutoCompleteItem(name = "java", observedQuantity = 10),
+                            TagsAutoCompleteItem(name = "kotlin", observedQuantity = 20),
+                            TagsAutoCompleteItem(name = "android", observedQuantity = 30),
+                        ),
+                    ),
+                )
+            }
+        }
+
+        val sut = createSut(
+            blacklistsRepository = blacklistsRepository,
+            tagsRepository = tagsRepository,
+        )
+        collectState(sut)
+        advanceUntilIdle()
+
+        sut.onCategorySelected(BlacklistCategoryType.Tags)
+        advanceUntilIdle()
+        sut.onAddInputChanged("#kot")
+        advanceTimeBy(300)
+        advanceUntilIdle()
+
+        val suggestions = sut.categoryState(BlacklistCategoryType.Tags).suggestions
+
+        assertEquals(listOf("kot"), tagsRepository.getAutoCompleteTagsCalls)
+        assertEquals(BlacklistSuggestionsStatus.Content, suggestions.status)
+        assertEquals(listOf("kotlin", "android"), suggestions.items.map { it.key.removePrefix("tag:") })
+    }
+
+    @Test
+    fun `failed initial load shows error state and snackbar`() = runBlacklistsViewModelTest {
+        val blacklistsRepository = FakeBlacklistsRepository().apply {
+            getBlacklistedUsersHandler = { Result.failure(IllegalStateException("boom")) }
+            getBlacklistedTagsHandler = { page -> Result.success(blacklistedTagsPage(page = page, tags = emptyList())) }
+            getBlacklistedDomainsHandler = { page ->
+                Result.success(blacklistedDomainsPage(page = page, domains = emptyList()))
+            }
+        }
+        val snackbarManager = FakeSnackbarManager()
+
+        val sut = createSut(
+            blacklistsRepository = blacklistsRepository,
+            snackbarManager = snackbarManager,
+        )
+        collectState(sut)
+        advanceUntilIdle()
+
+        assertTrue(sut.categoryState(BlacklistCategoryType.Users).isError)
+        assertFalse(sut.categoryState(BlacklistCategoryType.Tags).isError)
+        assertEquals(1, snackbarManager.emittedEvents.size)
+    }
+
+    private fun TestScope.createSut(
+        blacklistsRepository: FakeBlacklistsRepository = FakeBlacklistsRepository.withEmptyPages(),
+        profileRepository: FakeProfileRepository = FakeProfileRepository(),
+        tagsRepository: FakeTagsRepository = FakeTagsRepository(),
+        appNavigator: AppNavigator = createTestAppNavigator(backgroundScope),
+        logger: FakeAppLogger = FakeAppLogger(),
+        snackbarManager: FakeSnackbarManager = FakeSnackbarManager(),
+    ): BlacklistsViewModel = BlacklistsViewModel(
+        blacklistsRepository = blacklistsRepository,
+        profileRepository = profileRepository,
+        tagsRepository = tagsRepository,
+        appNavigator = appNavigator,
+        logger = logger,
+        snackbarManager = snackbarManager,
+        topBarActions = NoOpTopBarActions,
+    )
+
+    private fun TestScope.collectState(sut: BlacklistsViewModel) {
+        backgroundScope.launch {
+            sut.state.collect { /* keep upstream state active */ }
+        }
+    }
+
+    private fun BlacklistsViewModel.categoryState(type: BlacklistCategoryType): BlacklistCategoryState =
+        state.value.categories.first { it.type == type }
+
+    private fun runBlacklistsViewModelTest(block: suspend TestScope.() -> Unit) = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            block()
+        } finally {
+            Dispatchers.resetMain()
+        }
+    }
+}
+
+private class FakeBlacklistsRepository : BlacklistsRepository {
+    var getBlacklistedUsersHandler: suspend (page: Int) -> Result<BlacklistedUsers> =
+        { error("FakeBlacklistsRepository.getBlacklistedUsers not stubbed") }
+    var getBlacklistedTagsHandler: suspend (page: Int) -> Result<BlacklistedTags> =
+        { error("FakeBlacklistsRepository.getBlacklistedTags not stubbed") }
+    var getBlacklistedDomainsHandler: suspend (page: Int) -> Result<BlacklistedDomains> =
+        { error("FakeBlacklistsRepository.getBlacklistedDomains not stubbed") }
+    var addBlacklistedUserResult: Result<Unit> = Result.success(Unit)
+    var removeBlacklistedUserResult: Result<Unit> = Result.success(Unit)
+    var addBlacklistedTagResult: Result<Unit> = Result.success(Unit)
+    var removeBlacklistedTagResult: Result<Unit> = Result.success(Unit)
+    var addBlacklistedDomainResult: Result<Unit> = Result.success(Unit)
+    var removeBlacklistedDomainResult: Result<Unit> = Result.success(Unit)
+
+    val getBlacklistedUsersCalls = mutableListOf<Int>()
+    val getBlacklistedTagsCalls = mutableListOf<Int>()
+    val getBlacklistedDomainsCalls = mutableListOf<Int>()
+    val addBlacklistedUserCalls = mutableListOf<String>()
+    val removeBlacklistedUserCalls = mutableListOf<String>()
+    val addBlacklistedTagCalls = mutableListOf<String>()
+    val removeBlacklistedTagCalls = mutableListOf<String>()
+    val addBlacklistedDomainCalls = mutableListOf<String>()
+    val removeBlacklistedDomainCalls = mutableListOf<String>()
+
+    override suspend fun getBlacklistedUsers(page: Int): Result<BlacklistedUsers> {
+        getBlacklistedUsersCalls += page
+        return getBlacklistedUsersHandler(page)
+    }
+
+    override suspend fun getBlacklistedTags(page: Int): Result<BlacklistedTags> {
+        getBlacklistedTagsCalls += page
+        return getBlacklistedTagsHandler(page)
+    }
+
+    override suspend fun getBlacklistedDomains(page: Int): Result<BlacklistedDomains> {
+        getBlacklistedDomainsCalls += page
+        return getBlacklistedDomainsHandler(page)
+    }
+
+    override suspend fun addBlacklistedUser(username: String): Result<Unit> {
+        addBlacklistedUserCalls += username
+        return addBlacklistedUserResult
+    }
+
+    override suspend fun removeBlacklistedUser(username: String): Result<Unit> {
+        removeBlacklistedUserCalls += username
+        return removeBlacklistedUserResult
+    }
+
+    override suspend fun addBlacklistedTag(tag: String): Result<Unit> {
+        addBlacklistedTagCalls += tag
+        return addBlacklistedTagResult
+    }
+
+    override suspend fun removeBlacklistedTag(tag: String): Result<Unit> {
+        removeBlacklistedTagCalls += tag
+        return removeBlacklistedTagResult
+    }
+
+    override suspend fun addBlacklistedDomain(domain: String): Result<Unit> {
+        addBlacklistedDomainCalls += domain
+        return addBlacklistedDomainResult
+    }
+
+    override suspend fun removeBlacklistedDomain(domain: String): Result<Unit> {
+        removeBlacklistedDomainCalls += domain
+        return removeBlacklistedDomainResult
+    }
+
+    companion object {
+        fun withEmptyPages() = FakeBlacklistsRepository().apply {
+            getBlacklistedUsersHandler =
+                { page -> Result.success(blacklistedUsersPage(page = page, users = emptyList())) }
+            getBlacklistedTagsHandler = { page -> Result.success(blacklistedTagsPage(page = page, tags = emptyList())) }
+            getBlacklistedDomainsHandler = { page ->
+                Result.success(blacklistedDomainsPage(page = page, domains = emptyList()))
+            }
+        }
+    }
+}
+
+private class FakeProfileRepository : ProfileRepository {
+    var getUsersAutoCompleteHandler: suspend (query: String) -> Result<UsersAutoComplete> =
+        { Result.success(UsersAutoComplete(users = emptyList())) }
+
+    val getUsersAutoCompleteCalls = mutableListOf<String>()
+
+    override suspend fun getUsersAutoComplete(query: String): Result<UsersAutoComplete> {
+        getUsersAutoCompleteCalls += query
+        return getUsersAutoCompleteHandler(query)
+    }
+
+    override suspend fun getProfileShort(): Result<ProfileShort> = notUsed()
+    override suspend fun getProfile(): Result<Profile> = notUsed()
+    override suspend fun getProfile(name: String): Result<Profile> = notUsed()
+    override suspend fun getProfileBadges(username: String): Result<List<ProfileBadge>> = notUsed()
+    override suspend fun getProfileNote(username: String): Result<ProfileNote> = notUsed()
+    override suspend fun updateProfileNote(username: String, content: String): Result<Unit> = notUsed()
+    override suspend fun observeUser(username: String): Result<Unit> = notUsed()
+    override suspend fun unobserveUser(username: String): Result<Unit> = notUsed()
+    override suspend fun getProfileActions(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileEntriesAdded(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileEntriesVoted(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileEntriesCommented(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileLinksAdded(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileLinksPublished(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileLinksUp(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileLinksDown(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileLinksCommented(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileLinksRelated(username: String, page: Int): Result<Resources> = notUsed()
+    override suspend fun getProfileObservedTags(username: String, page: Int): Result<ObservedTags> = notUsed()
+    override suspend fun getProfileObservedUsersFollowing(username: String, page: Int): Result<ObservedUsers> =
+        notUsed()
+
+    override suspend fun getProfileObservedUsersFollowers(username: String, page: Int): Result<ObservedUsers> =
+        notUsed()
+}
+
+private class FakeTagsRepository : TagsRepository {
+    var getAutoCompleteTagsHandler: suspend (query: String) -> Result<TagsAutoComplete> =
+        { Result.success(TagsAutoComplete(tags = emptyList())) }
+
+    val getAutoCompleteTagsCalls = mutableListOf<String>()
+
+    override suspend fun getAutoCompleteTags(query: String): Result<TagsAutoComplete> {
+        getAutoCompleteTagsCalls += query
+        return getAutoCompleteTagsHandler(query)
+    }
+
+    override suspend fun getTagDetails(tagName: String): Result<TagDetails> = notUsed()
+    override suspend fun observeTag(tagName: String): Result<Unit> = notUsed()
+    override suspend fun unobserveTag(tagName: String): Result<Unit> = notUsed()
+    override suspend fun enableTagNotifications(tagName: String): Result<Unit> = notUsed()
+    override suspend fun disableTagNotifications(tagName: String): Result<Unit> = notUsed()
+    override suspend fun getTagStream(
+        tagName: String,
+        page: Any?,
+        limit: Int?,
+        sort: TagsSort,
+        type: TagsType,
+    ): Result<Resources> = notUsed()
+
+    override fun getTagsTypes(): List<TagsType> = emptyList()
+
+    override fun getTagsSorts(): List<TagsSort> = emptyList()
+}
+
+private class FakeAppLogger : AppLogger {
+    val errorMessages = mutableListOf<String>()
+
+    override fun debug(message: String) = Unit
+
+    override fun info(message: String) = Unit
+
+    override fun warn(message: String, throwable: Throwable?) = Unit
+
+    override fun error(message: String, throwable: Throwable?) {
+        errorMessages += message
+    }
+}
+
+private class FakeSnackbarManager : SnackbarManager {
+    private val mutableEvents = MutableSharedFlow<SnackbarEvent>(extraBufferCapacity = 16)
+
+    val emittedEvents = mutableListOf<SnackbarEvent>()
+
+    override val events: SharedFlow<SnackbarEvent> = mutableEvents
+
+    override suspend fun emit(event: SnackbarEvent) {
+        emittedEvents += event
+        mutableEvents.emit(event)
+    }
+
+    override fun tryEmit(event: SnackbarEvent): Boolean {
+        emittedEvents += event
+        return mutableEvents.tryEmit(event)
+    }
+}
+
+private fun blacklistedUser(username: String) = BlacklistedUser(
+    username = username,
+    createdAt = "2026-03-22 11:20:22",
+    gender = Gender.Male,
+    color = NameColor.Orange,
+    avatarUrl = "https://wykop.pl/$username.jpg",
+)
+
+private fun blacklistedTag(name: String) = BlacklistedTag(
+    name = name,
+    createdAt = "2026-03-22 11:20:22",
+)
+
+private fun blacklistedDomain(domain: String) = BlacklistedDomain(
+    domain = domain,
+    createdAt = "2026-03-22 11:20:22",
+)
+
+private fun blacklistedUsersPage(
+    page: Int,
+    users: List<BlacklistedUser>,
+    total: Int = users.size,
+    next: String = "",
+) = BlacklistedUsers(
+    data = users,
+    pagination = pagination(page = page, total = total, next = next),
+)
+
+private fun blacklistedTagsPage(
+    page: Int,
+    tags: List<BlacklistedTag>,
+    total: Int = tags.size,
+    next: String = "",
+) = BlacklistedTags(
+    data = tags,
+    pagination = pagination(page = page, total = total, next = next),
+)
+
+private fun blacklistedDomainsPage(
+    page: Int,
+    domains: List<BlacklistedDomain>,
+    total: Int = domains.size,
+    next: String = "",
+) = BlacklistedDomains(
+    data = domains,
+    pagination = pagination(page = page, total = total, next = next),
+)
+
+private fun pagination(page: Int, total: Int, next: String) = Pagination(
+    perPage = 30,
+    total = total,
+    next = next,
+    prev = if (page > 1) (page - 1).toString() else "",
+)
+
+private fun <T> notUsed(): Result<T> = error("This fake method is not used in the current test")

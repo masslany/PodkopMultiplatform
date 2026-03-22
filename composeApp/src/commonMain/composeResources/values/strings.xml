@@ -23,6 +23,7 @@
     <string name="topbar_label_new_conversation">Nowa wiadomość</string>
     <string name="topbar_label_add_link">Dodaj link</string>
     <string name="topbar_label_rank">Ranking</string>
+    <string name="topbar_label_blacklists">Czarna lista</string>
 
     <!-- More -->
     <string name="more_group_social">Społeczność</string>
@@ -155,11 +156,32 @@
     <string name="settings_headline_account">Konto</string>
     <string name="settings_headline_debug">Debug</string>
     <string name="settings_body_open_debug">Narzędzia debug</string>
+    <string name="settings_body_manage_blacklists">Zarządzaj czarną listą</string>
     <string name="settings_button_open_debug">Otwórz</string>
+    <string name="settings_button_open">Otwórz</string>
     <string name="settings_body_version">Wersja aplikacji: %1$s</string>
     <string name="settings_snackbar_cache_cleared">Wyczyszczono pamięć podręczną</string>
     <string name="settings_snackbar_diagnostics_copied">Skopiowano dane diagnostyczne</string>
     <string name="settings_snackbar_notifications_permission_required">Aby włączyć powiadomienia, zezwól aplikacji na wysyłanie powiadomień.</string>
+
+    <!-- Blacklists -->
+    <string name="blacklists_intro">Jeżeli nie chcesz widzieć niektórych treści, możesz dodać do czarnej listy użytkowników, tagi i domeny.</string>
+    <string name="blacklists_tab_users">Profile</string>
+    <string name="blacklists_tab_tags">Tagi</string>
+    <string name="blacklists_tab_domains">Domeny</string>
+    <string name="blacklists_empty_users">Nie masz jeszcze żadnych użytkowników na czarnej liście.</string>
+    <string name="blacklists_empty_tags">Nie masz jeszcze żadnych tagów na czarnej liście.</string>
+    <string name="blacklists_empty_domains">Nie masz jeszcze żadnych domen na czarnej liście.</string>
+    <string name="blacklists_input_user_label">Użytkownik</string>
+    <string name="blacklists_input_user_hint">Wpisz nazwę użytkownika</string>
+    <string name="blacklists_input_tag_label">Tag</string>
+    <string name="blacklists_input_tag_hint">Wpisz nazwę tagu</string>
+    <string name="blacklists_input_domain_label">Domena</string>
+    <string name="blacklists_input_domain_hint">Wpisz domenę</string>
+    <string name="blacklists_button_add">Dodaj</string>
+    <string name="blacklists_button_remove">Usuń</string>
+    <string name="blacklists_dialog_remove_title">Usunąć %1$s z czarnej listy?</string>
+    <string name="blacklists_suggestions_error">Nie udało się pobrać podpowiedzi.</string>
 
     <!-- Debug -->
     <string name="debug_entry_title">Przejdź do wpisu</string>
@@ -195,6 +217,7 @@
     <string name="accessibility_tag_gallery_open_entry">Otwórz wpis</string>
     <string name="accessibility_tag_enable_notifications">Włącz powiadomienia dla tagu</string>
     <string name="accessibility_tag_disable_notifications">Wyłącz powiadomienia dla tagu</string>
+    <string name="accessibility_blacklists_remove">Usuń %1$s z czarnej listy</string>
     <string name="accessibility_private_messages_new_conversation">Rozpocznij nową rozmowę</string>
     <string name="accessibility_private_messages_collapse_composer">Ukryj pole wiadomości</string>
     <string name="accessibility_private_messages_expand_composer">Pokaż pole wiadomości</string>

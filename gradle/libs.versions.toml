@@ -22,6 +22,7 @@ junit = "4.13.2"
 kotlin = "2.3.10"
 
 kotlinxCollectionsImmutable = "0.4.0"
+kotlinx-coroutines = "1.10.2"
 ktor = "3.4.1"
 kotlinx-serialization = "1.9.0"
 kotlinx-datetime = "0.7.1"
@@ -73,6 +74,7 @@ androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", versi
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work" }
 
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }

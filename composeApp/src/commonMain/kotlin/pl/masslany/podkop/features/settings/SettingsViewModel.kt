@@ -24,6 +24,7 @@ import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.blacklists.BlacklistsScreen
 import pl.masslany.podkop.features.debug.DebugScreen
 import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesBackgroundNotificationsController
 import pl.masslany.podkop.features.topbar.TopBarActions
@@ -98,7 +99,8 @@ class SettingsViewModel(
             supportsPrivateMessagesBackgroundNotifications =
                 privateMessagesBackgroundNotificationsController.supportsSettings &&
                     isLoggedIn,
-            areSystemNotificationsEnabled = privateMessagesBackgroundNotificationsController.areSystemNotificationsEnabled(),
+            areSystemNotificationsEnabled =
+                privateMessagesBackgroundNotificationsController.areSystemNotificationsEnabled(),
             shouldRequestNotificationPermission = shouldRequestNotificationPermission,
             autoplayGifs = preferencesState.autoplayGifs,
             themeOverride = preferencesState.themeOverride,
@@ -109,7 +111,7 @@ class SettingsViewModel(
             supportsTelemetryControls = telemetrySettingsController.supportsControls,
             supportsCacheClearing = appMaintenanceController.supportsCacheClearing,
             showDebugTools = buildInfo.isDebugBuild,
-            showLogoutButton = isLoggedIn,
+            showAccountSection = isLoggedIn,
             appVersion = buildInfo.appVersionName,
         )
     }
@@ -220,6 +222,10 @@ class SettingsViewModel(
         appNavigator.navigateTo(DebugScreen)
     }
 
+    override fun onManageBlacklistsClicked() {
+        appNavigator.navigateTo(BlacklistsScreen)
+    }
+
     override fun onLogoutClicked() {
         viewModelScope.launch {
             val dialog = GenericDialog.fromResources(
@@ -269,7 +275,7 @@ class SettingsViewModel(
         appendLine("platform=${buildInfo.platformName}")
         appendLine("version=${buildInfo.appVersionName}")
         appendLine("buildType=${if (buildInfo.isDebugBuild) "debug" else "release"}")
-        appendLine("loggedIn=${state.showLogoutButton}")
+        appendLine("loggedIn=${isLoggedIn.value}")
         appendLine("themeOverride=${state.themeOverride.name}")
         appendLine("dynamicColors=${state.dynamicColorsEnabled}")
         appendLine("autoplayGifs=${state.autoplayGifs}")

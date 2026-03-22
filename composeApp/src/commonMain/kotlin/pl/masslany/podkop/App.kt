@@ -57,6 +57,8 @@ import pl.masslany.podkop.common.theme.PodkopTheme
 import pl.masslany.podkop.common.theme.SystemAppearance
 import pl.masslany.podkop.features.about.AboutAppScreen
 import pl.masslany.podkop.features.about.AboutAppScreenRoot
+import pl.masslany.podkop.features.blacklists.BlacklistsScreen
+import pl.masslany.podkop.features.blacklists.BlacklistsScreenRoot
 import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
 import pl.masslany.podkop.features.composer.ComposerBottomSheetScreenRoot
 import pl.masslany.podkop.features.debug.DebugScreen
@@ -218,6 +220,12 @@ fun App() {
 
                         entry<SettingsScreen> {
                             SettingsScreenRoot(
+                                paddingValues = safeDrawingPaddingValues,
+                            )
+                        }
+
+                        entry<BlacklistsScreen> {
+                            BlacklistsScreenRoot(
                                 paddingValues = safeDrawingPaddingValues,
                             )
                         }

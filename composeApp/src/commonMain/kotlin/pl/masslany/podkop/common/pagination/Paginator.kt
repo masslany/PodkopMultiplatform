@@ -47,6 +47,17 @@ class Paginator<T>(
         }
     }
 
+    fun onItemsRemoved(count: Int = 1) {
+        if (count <= 0) {
+            return
+        }
+
+        emittedCount = (emittedCount - count).coerceAtLeast(0)
+        total = total?.let { currentTotal ->
+            (currentTotal - count).coerceAtLeast(0)
+        }
+    }
+
     fun shouldPaginate(
         lastVisibleIndex: Int?,
         totalItemsCount: Int,

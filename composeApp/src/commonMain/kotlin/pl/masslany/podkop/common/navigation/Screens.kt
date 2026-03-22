@@ -24,7 +24,7 @@ sealed interface DialogText {
      * the generated `Res.allStringResources` registry, then localized with `stringResource(...)`.
      */
     @Serializable
-    data class Resource(val key: String) : DialogText
+    data class Resource(val key: String, val args: List<String> = emptyList()) : DialogText
 }
 
 /**
@@ -68,6 +68,10 @@ data class GenericDialog(
 /**
  * Converts a Compose [StringResource] into a serializable dialog payload representation.
  */
-fun dialogText(resource: StringResource): DialogText = DialogText.Resource(resource.key)
+fun dialogText(resource: StringResource, vararg args: String): DialogText =
+    DialogText.Resource(
+        key = resource.key,
+        args = args.toList(),
+    )
 
 fun dialogText(value: String): DialogText = DialogText.Raw(value)
