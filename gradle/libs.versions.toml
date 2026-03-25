@@ -44,6 +44,7 @@ compose-ui = "1.10.2"
 multiplatformMarkdownRenderer = "0.39.2"
 
 kotlinter = "5.4.2"
+kover = "0.9.7"
 timber = "5.0.1"
 firebase-bom = "34.10.0"
 google-services = "4.4.4"
@@ -143,5 +144,6 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMul
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 googleServices = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebaseCrashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }

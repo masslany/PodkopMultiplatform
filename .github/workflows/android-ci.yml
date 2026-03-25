@@ -1,0 +1,271 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify-android:
+    name: Verify Android build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses >/dev/null
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Create CI-only Android config
+        shell: bash
+        run: |
+          cat <<'EOF' > apikeys.properties
+          WYKOP_KEY=ci-placeholder-key
+          WYKOP_SECRET=ci-placeholder-secret
+          EOF
+
+          mkdir -p androidApp/src/debug androidApp/src/release
+
+          cat <<'EOF' > androidApp/src/debug/google-services.json
+          {
+            "project_info": {
+              "project_number": "1234567890",
+              "project_id": "podkop-ci-debug",
+              "storage_bucket": "podkop-ci-debug.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:1234567890:android:debugplaceholder",
+                  "android_client_info": {
+                    "package_name": "pl.masslany.podkop.debug"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "ci-debug-placeholder-key"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+
+          cat <<'EOF' > androidApp/src/release/google-services.json
+          {
+            "project_info": {
+              "project_number": "1234567890",
+              "project_id": "podkop-ci-release",
+              "storage_bucket": "podkop-ci-release.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:1234567890:android:releaseplaceholder",
+                  "android_client_info": {
+                    "package_name": "pl.masslany.podkop"
+                  }
+                },
+                "oauth_client": [],
+                "api_key": [
+                  {
+                    "current_key": "ci-release-placeholder-key"
+                  }
+                ],
+                "services": {
+                  "appinvite_service": {
+                    "other_platform_oauth_client": []
+                  }
+                }
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
+
+      - name: Verify Android app assembles
+        run: ./gradlew --stacktrace :androidApp:assembleDebug
+
+      - name: Upload debug APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: androidApp-debug-apk
+          path: androidApp/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - name: Upload Android failure reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-build-reports
+          path: |
+            androidApp/build/reports
+            build/reports/problems
+          if-no-files-found: ignore
+
+  verify-kmp:
+    name: Verify KMP shared modules
+    runs-on: macos-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses >/dev/null
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Create CI-only iOS config
+        shell: bash
+        run: |
+          mkdir -p iosApp/Configuration
+
+          cat <<'EOF' > iosApp/Configuration/ApiKeys.xcconfig
+          WYKOP_KEY=ci-placeholder-key
+          WYKOP_SECRET=ci-placeholder-secret
+          EOF
+
+      - name: Verify KMP shared modules
+        run: ./gradlew --stacktrace :common:allTests :business:allTests :composeApp:allTests :composeApp:checkXcodeProjectConfiguration
+
+      - name: Upload KMP failure reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmp-test-reports
+          path: |
+            common/build/reports
+            business/build/reports
+            composeApp/build/reports
+            build/reports/problems
+          if-no-files-found: ignore
+
+  coverage:
+    name: Coverage summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Check out sources
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses >/dev/null
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Generate JVM coverage reports
+        run: ./gradlew --stacktrace koverXmlReport koverHtmlReport
+
+      - name: Publish coverage summary
+        shell: bash
+        run: |
+          coverage_from_xml() {
+            local report_path="$1"
+            local values
+            values=$(grep '<counter type="LINE"' "$report_path" | tail -n 1 | sed -E 's/.*missed="([0-9]+)".*covered="([0-9]+)".*/\1 \2/')
+            local missed covered total
+            read -r missed covered <<< "$values"
+            total=$((missed + covered))
+
+            if [ "$total" -eq 0 ]; then
+              printf "0.00"
+            else
+              awk -v covered="$covered" -v total="$total" 'BEGIN { printf "%.2f", (covered * 100) / total }'
+            fi
+          }
+
+          total_coverage=$(coverage_from_xml build/reports/kover/report.xml)
+          common_coverage=$(coverage_from_xml common/build/reports/kover/report.xml)
+          business_coverage=$(coverage_from_xml business/build/reports/kover/report.xml)
+          compose_app_coverage=$(coverage_from_xml composeApp/build/reports/kover/report.xml)
+
+          {
+            echo "## Coverage Summary"
+            echo
+            echo "JVM coverage is measured with Kover from Android host/JVM tests only."
+            echo
+            echo "| Scope | Line Coverage |"
+            echo "| --- | ---: |"
+            echo "| Total | ${total_coverage}% |"
+            echo "| common | ${common_coverage}% |"
+            echo "| business | ${business_coverage}% |"
+            echo "| composeApp | ${compose_app_coverage}% |"
+            echo
+            echo "HTML and XML coverage reports are available in the \`coverage-reports\` artifact."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            build/reports/kover
+            common/build/reports/kover
+            business/build/reports/kover
+            composeApp/build/reports/kover
+          if-no-files-found: error
