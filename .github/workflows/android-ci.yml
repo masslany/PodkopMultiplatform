@@ -166,6 +166,14 @@ jobs:
       - name: Install Android SDK packages
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
+      - name: Create CI-only API keys
+        shell: bash
+        run: |
+          cat <<'EOF' > apikeys.properties
+          WYKOP_KEY=ci-placeholder-key
+          WYKOP_SECRET=ci-placeholder-secret
+          EOF
+
       - name: Create CI-only iOS config
         shell: bash
         run: |
@@ -217,6 +225,14 @@ jobs:
 
       - name: Install Android SDK packages
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Create CI-only API keys
+        shell: bash
+        run: |
+          cat <<'EOF' > apikeys.properties
+          WYKOP_KEY=ci-placeholder-key
+          WYKOP_SECRET=ci-placeholder-secret
+          EOF
 
       - name: Generate JVM coverage reports
         run: ./gradlew --stacktrace koverXmlReport koverHtmlReport
