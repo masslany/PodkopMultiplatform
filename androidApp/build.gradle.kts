@@ -22,8 +22,8 @@ android {
         applicationId = "pl.masslany.podkop"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 12
-        versionName = "2.2.0"
+        versionCode = 13
+        versionName = "2.3.0"
 
         buildConfigField("String", "WYKOP_KEY", "\"${apikeyProperties.getProperty("WYKOP_KEY")}\"")
         buildConfigField("String", "WYKOP_SECRET", "\"${apikeyProperties.getProperty("WYKOP_SECRET")}\"")
