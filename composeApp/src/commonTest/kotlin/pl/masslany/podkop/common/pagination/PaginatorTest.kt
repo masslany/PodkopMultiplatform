@@ -1,6 +1,7 @@
 package pl.masslany.podkop.common.pagination
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.CoroutineScope
@@ -65,17 +66,17 @@ class PaginatorTest {
     }
 
     @Test
-    fun `reachedEnd returns true when api explicitly reports no next page`() {
-        assertTrue(
+    fun `reachedEnd returns false when next is blank but total says more items remain`() {
+        assertFalse(
             paginator.reachedEnd(
                 pagination = Pagination(
-                    perPage = 25,
-                    total = 340,
+                    perPage = 35,
+                    total = 2295,
                     next = "",
                     prev = "",
                 ),
-                receivedItemsCount = 25,
-                emittedItemsCount = 325,
+                receivedItemsCount = 35,
+                emittedItemsCount = 35,
             ),
         )
     }
@@ -94,6 +95,58 @@ class PaginatorTest {
                 emittedItemsCount = 9,
             ),
         )
+    }
+
+    @Test
+    fun `setup keeps paginator idle when next is blank but full page suggests more items`() {
+        paginator.setup(
+            pagination = Pagination(
+                perPage = 35,
+                total = 2295,
+                next = "",
+                prev = "",
+            ),
+            initialItemCount = 35,
+        )
+
+        assertEquals(PaginatorState.Idle, paginator.state.value)
+    }
+
+    @Test
+    fun `paginate requests second page when next is blank but full page suggests more items`() {
+        val requests = mutableListOf<PageRequest>()
+        val paginator = Paginator(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            onNewItems = {},
+        ) { request ->
+            requests += request
+            Result.success(
+                TestPaginatedData(
+                    data = List(35) { Any() },
+                    pagination = Pagination(
+                        perPage = 35,
+                        total = 2295,
+                        next = "",
+                        prev = "",
+                    ),
+                ),
+            )
+        }
+
+        paginator.setup(
+            pagination = Pagination(
+                perPage = 35,
+                total = 2295,
+                next = "",
+                prev = "",
+            ),
+            initialItemCount = 35,
+        )
+
+        paginator.paginate()
+
+        assertEquals(listOf<PageRequest>(PageRequest.Index(2)), requests)
+        assertEquals(PaginatorState.Idle, paginator.state.value)
     }
 }
 

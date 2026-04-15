@@ -1,5 +1,9 @@
 package pl.masslany.podkop.features.blacklists
 
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -36,10 +40,6 @@ import pl.masslany.podkop.testsupport.fakes.FakeProfileRepository
 import pl.masslany.podkop.testsupport.fakes.FakeSnackbarManager
 import pl.masslany.podkop.testsupport.fakes.FakeTagsRepository
 import pl.masslany.podkop.testsupport.navigation.createTestAppNavigator
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BlacklistsViewModelTest {
