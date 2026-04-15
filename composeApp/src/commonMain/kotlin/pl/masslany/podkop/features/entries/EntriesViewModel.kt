@@ -134,13 +134,13 @@ class EntriesViewModel(
         }
 
         viewModelScope.launch {
+            val isLoggedIn = authRepository.isLoggedIn()
             updateState { previousState ->
-                previousState.copy(
-                    isLoggedIn = authRepository.isLoggedIn(),
-                )
+                previousState.copy(isLoggedIn = isLoggedIn)
             }
+            val firstPage = resolveFirstPageParam(isLoggedIn)
             entriesRepository.getEntries(
-                page = resolveFirstPageParam(),
+                page = firstPage,
                 limit = null,
                 entriesSortType = currentEntriesSortType,
                 hotSortType = currentHotSortType,
@@ -182,8 +182,10 @@ class EntriesViewModel(
                 .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
+            val isLoggedIn = state.value.isLoggedIn
+            val firstPage = resolveFirstPageParam(isLoggedIn)
             entriesRepository.getEntries(
-                page = resolveFirstPageParam(),
+                page = firstPage,
                 limit = null,
                 entriesSortType = sortType.toEntriesSortType(),
                 hotSortType = currentHotSortType,
@@ -238,8 +240,10 @@ class EntriesViewModel(
                 .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
+            val isLoggedIn = state.value.isLoggedIn
+            val firstPage = resolveFirstPageParam(isLoggedIn)
             entriesRepository.getEntries(
-                page = resolveFirstPageParam(),
+                page = firstPage,
                 limit = null,
                 entriesSortType = currentEntriesSortType,
                 hotSortType = sortType.toHotSortType(),
@@ -290,8 +294,10 @@ class EntriesViewModel(
                 .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
+            val isLoggedIn = state.value.isLoggedIn
+            val firstPage = resolveFirstPageParam(isLoggedIn)
             entriesRepository.getEntries(
-                page = resolveFirstPageParam(),
+                page = firstPage,
                 limit = null,
                 entriesSortType = currentEntriesSortType,
                 hotSortType = currentHotSortType,
@@ -373,11 +379,12 @@ class EntriesViewModel(
         }
     }
 
-    private suspend fun resolveFirstPageParam(): Any? = if (authRepository.isLoggedIn()) {
-        null
-    } else {
-        1
-    }
+    private fun resolveFirstPageParam(isLoggedIn: Boolean): Any? =
+        if (isLoggedIn) {
+            null
+        } else {
+            1
+        }
 
     private inline fun updateState(transform: (EntriesScreenState) -> EntriesScreenState) {
         _state.update { previousState ->

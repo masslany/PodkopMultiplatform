@@ -327,9 +327,11 @@ class TagViewModel(
 
     private fun loadTagStream() {
         viewModelScope.launch {
+            val isLoggedIn = state.value.isLoggedIn
+            val firstPage = resolveFirstPageParam(isLoggedIn)
             tagsRepository.getTagStream(
                 tagName = tag,
-                page = resolveFirstPageParam(),
+                page = firstPage,
                 limit = null,
                 sort = currentSort,
                 type = currentType,
@@ -358,9 +360,10 @@ class TagViewModel(
         }
     }
 
-    private suspend fun resolveFirstPageParam(): Any? = if (authRepository.isLoggedIn()) {
-        null
-    } else {
-        1
-    }
+    private fun resolveFirstPageParam(isLoggedIn: Boolean): Any? =
+        if (isLoggedIn) {
+            null
+        } else {
+            1
+        }
 }
