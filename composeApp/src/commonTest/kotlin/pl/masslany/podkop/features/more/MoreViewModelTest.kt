@@ -13,6 +13,7 @@ class MoreViewModelTest {
         assertEquals(
             listOf(
                 MoreSectionItemType.Hits,
+                MoreSectionItemType.Rank,
                 MoreSectionItemType.Search,
                 MoreSectionItemType.MyWykop,
             ),
@@ -27,6 +28,7 @@ class MoreViewModelTest {
         assertEquals(
             listOf(
                 MoreSectionItemType.Hits,
+                MoreSectionItemType.Rank,
                 MoreSectionItemType.Search,
             ),
             result.map { it.type },

@@ -1,16 +1,18 @@
 package pl.masslany.podkop.features.home
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.common.navigation.NavigationConfigProvider
 import pl.masslany.podkop.common.navigation.TopLevelDestination
@@ -22,11 +24,16 @@ import pl.masslany.podkop.features.upcoming.UpcomingScreen
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_home
 import podkop.composeapp.generated.resources.navigation_label_homepage
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class HomeNavigatorTest {
 
     @Test
-    fun `initial state selects the first destination and creates root stacks`() = runBlocking {
+    fun `initial state selects the first destination and creates root stacks`() = runHomeNavigatorTest {
         val sut = createNavigator(
             destinations = persistentListOf(
                 topLevelDestination(LinksScreen),
@@ -34,94 +41,109 @@ class HomeNavigatorTest {
                 topLevelDestination(EntriesScreen),
             ),
         )
+        try {
+            advanceUntilIdle()
 
-        yield()
-
-        assertEquals(LinksScreen, sut.state.value.currentTabRoot)
-        assertEquals(
-            persistentListOf(LinksScreen),
-            sut.currentStack(),
-        )
+            assertEquals(LinksScreen, sut.state.value.currentTabRoot)
+            assertEquals(
+                persistentListOf(LinksScreen),
+                sut.currentStack(),
+            )
+        } finally {
+            sut.close()
+        }
     }
 
     @Test
-    fun `inline details navigation replaces previous inline destination on the current tab`() = runBlocking {
+    fun `inline details navigation replaces previous inline destination on the current tab`() = runHomeNavigatorTest {
         val sut = createNavigator(
             destinations = persistentListOf(
                 topLevelDestination(LinksScreen),
                 topLevelDestination(EntriesScreen),
             ),
         )
+        try {
+            advanceUntilIdle()
+            sut.navigateToLinkDetails(11)
+            sut.navigateToLinkDetails(22)
 
-        yield()
-        sut.navigateToLinkDetails(11)
-        sut.navigateToLinkDetails(22)
-
-        assertEquals(
-            persistentListOf<NavTarget>(LinksScreen, LinkDetailsScreen(22)),
-            sut.currentStack(),
-        )
+            assertEquals(
+                persistentListOf<NavTarget>(LinksScreen, LinkDetailsScreen(22)),
+                sut.currentStack(),
+            )
+        } finally {
+            sut.close()
+        }
     }
 
     @Test
-    fun `detachCurrentInlineDetailsDestination removes it from the active stack`() = runBlocking {
+    fun `detachCurrentInlineDetailsDestination removes it from the active stack`() = runHomeNavigatorTest {
         val sut = createNavigator(
             destinations = persistentListOf(
                 topLevelDestination(EntriesScreen),
                 topLevelDestination(UpcomingScreen),
             ),
         )
+        try {
+            advanceUntilIdle()
+            sut.navigateToEntryDetails(EntryDetailsScreen.forEntry(44))
 
-        yield()
-        sut.navigateToEntryDetails(EntryDetailsScreen.forEntry(44))
+            val detached = sut.detachCurrentInlineDetailsDestination()
 
-        val detached = sut.detachCurrentInlineDetailsDestination()
-
-        assertEquals(EntryDetailsScreen.forEntry(44), detached)
-        assertEquals(
-            persistentListOf<NavTarget>(EntriesScreen),
-            sut.currentStack(),
-        )
+            assertEquals(EntryDetailsScreen.forEntry(44), detached)
+            assertEquals(
+                persistentListOf<NavTarget>(EntriesScreen),
+                sut.currentStack(),
+            )
+        } finally {
+            sut.close()
+        }
     }
 
     @Test
-    fun `back on a root tab switches to the first tab before exiting home`() = runBlocking {
+    fun `back on a root tab switches to the first tab before exiting home`() = runHomeNavigatorTest {
         val sut = createNavigator(
             destinations = persistentListOf(
                 topLevelDestination(LinksScreen),
                 topLevelDestination(UpcomingScreen),
             ),
         )
+        try {
+            advanceUntilIdle()
+            sut.onTabChanged(UpcomingScreen)
 
-        yield()
-        sut.onTabChanged(UpcomingScreen)
+            val consumed = sut.onBack()
 
-        val consumed = sut.onBack()
-
-        assertTrue(consumed)
-        assertEquals(LinksScreen, sut.state.value.currentTabRoot)
-        assertEquals(
-            persistentListOf<NavTarget>(LinksScreen),
-            sut.currentStack(),
-        )
+            assertTrue(consumed)
+            assertEquals(LinksScreen, sut.state.value.currentTabRoot)
+            assertEquals(
+                persistentListOf<NavTarget>(LinksScreen),
+                sut.currentStack(),
+            )
+        } finally {
+            sut.close()
+        }
     }
 
     @Test
-    fun `back returns false when already on the first tab root`() = runBlocking {
+    fun `back returns false when already on the first tab root`() = runHomeNavigatorTest {
         val sut = createNavigator(
             destinations = persistentListOf(
                 topLevelDestination(LinksScreen),
                 topLevelDestination(UpcomingScreen),
             ),
         )
+        try {
+            advanceUntilIdle()
 
-        yield()
-
-        assertFalse(sut.onBack())
+            assertFalse(sut.onBack())
+        } finally {
+            sut.close()
+        }
     }
 
     @Test
-    fun `restored state keeps the selected tab and inline stack after destinations load`() = runBlocking {
+    fun `restored state keeps the selected tab and inline stack after destinations load`() = runHomeNavigatorTest {
         val sut = createNavigator(
             destinations = persistentListOf(
                 topLevelDestination(LinksScreen),
@@ -142,18 +164,21 @@ class HomeNavigatorTest {
                 ),
             ),
         )
+        try {
+            sut.restoreState(serializedState)
+            advanceUntilIdle()
 
-        sut.restoreState(serializedState)
-        yield()
-
-        assertEquals(EntriesScreen, sut.state.value.currentTabRoot)
-        assertEquals(
-            persistentListOf(
-                EntriesScreen,
-                EntryDetailsScreen.forEntry(44),
-            ),
-            sut.currentStack(),
-        )
+            assertEquals(EntriesScreen, sut.state.value.currentTabRoot)
+            assertEquals(
+                persistentListOf(
+                    EntriesScreen,
+                    EntryDetailsScreen.forEntry(44),
+                ),
+                sut.currentStack(),
+            )
+        } finally {
+            sut.close()
+        }
     }
 }
 
@@ -176,4 +201,15 @@ private class FakeNavigationConfigProvider(destinations: ImmutableList<TopLevelD
     override suspend fun resolveStartDestination(): NavTarget = LinksScreen
 
     override val topLevelDestinations: Flow<ImmutableList<TopLevelDestination>> = destinationsFlow
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun runHomeNavigatorTest(block: suspend TestScope.() -> Unit) {
+    val dispatcher = StandardTestDispatcher()
+    Dispatchers.setMain(dispatcher)
+    try {
+        runTest(dispatcher, testBody = block)
+    } finally {
+        Dispatchers.resetMain()
+    }
 }

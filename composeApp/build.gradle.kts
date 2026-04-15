@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinter)
+    alias(libs.plugins.kover)
     kotlin("plugin.serialization") version libs.versions.kotlinx.serialization
 }
 
@@ -72,6 +73,22 @@ private val aboutPomFileMappings = aboutDependencyCoordinates.associate { coordi
 }
 
 kotlin {
+    androidLibrary {
+        withHostTestBuilder {}.configure {
+            isIncludeAndroidResources = true
+        }
+
+        namespace = "pl.masslany.podkop.composeapp"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+
+        androidResources.enable = true
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+    }
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -130,17 +147,12 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
         }
     }
+}
 
-    androidLibrary {
-        namespace = "pl.masslany.podkop.composeapp"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
-
-        androidResources.enable = true
-
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
+kotlin.sourceSets.named("androidHostTest") {
+    dependencies {
+        implementation(libs.kotlin.testJunit)
+        implementation(libs.kotlinx.coroutines.test)
     }
 }
 

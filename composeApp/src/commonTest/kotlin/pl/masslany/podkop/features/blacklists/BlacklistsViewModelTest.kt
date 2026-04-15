@@ -342,10 +342,11 @@ class BlacklistsViewModelTest {
     private fun BlacklistsViewModel.categoryState(type: BlacklistCategoryType): BlacklistCategoryState =
         state.value.categories.first { it.type == type }
 
-    private fun runBlacklistsViewModelTest(block: suspend TestScope.() -> Unit) = runTest {
-        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+    private fun runBlacklistsViewModelTest(block: suspend TestScope.() -> Unit) {
+        val dispatcher = StandardTestDispatcher()
+        Dispatchers.setMain(dispatcher)
         try {
-            block()
+            runTest(dispatcher, testBody = block)
         } finally {
             Dispatchers.resetMain()
         }

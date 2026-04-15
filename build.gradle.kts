@@ -1,4 +1,5 @@
 plugins {
+    alias(libs.plugins.kover)
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
     alias(libs.plugins.androidKmpLibrary) apply false
@@ -9,4 +10,10 @@ plugins {
     alias(libs.plugins.kotlinter) apply false
     alias(libs.plugins.googleServices) apply false
     alias(libs.plugins.firebaseCrashlytics) apply false
+}
+
+dependencies {
+    kover(projects.common)
+    kover(projects.business)
+    kover(projects.composeApp)
 }
