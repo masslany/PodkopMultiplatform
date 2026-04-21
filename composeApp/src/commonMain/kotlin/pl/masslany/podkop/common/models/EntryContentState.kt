@@ -17,6 +17,8 @@ sealed class EntryContentState {
     data object DeletedByEntryAuthor : EntryContentState()
 }
 
+private val separatorOnlyDashLineRegex = Regex("(?m)^([ \\t]*)(-{3,})([ \\t]*)$")
+
 fun String.toHighlightedTagProfileMarkdown(): String = this
     .replace(Regex("@[\\w\\d-]+")) {
         "[${it.value}](${it.value})"
@@ -25,8 +27,20 @@ fun String.toHighlightedTagProfileMarkdown(): String = this
         "[${it.value}](${it.value})"
     }
 
+/**
+ * Keeps separator lines like `-------------` literal.
+ *
+ * Without escaping, the Markdown parser can reinterpret those lines as structural Markdown
+ * and promote the surrounding text into a heading or divider instead of showing the dashes.
+ */
+fun String.escapeStandaloneDashSeparators(): String =
+    replace(separatorOnlyDashLineRegex) { match ->
+        "${match.groupValues[1]}\\${match.groupValues[2]}${match.groupValues[3]}"
+    }
+
 fun String.toEntryContentState(isDownVoted: Boolean): EntryContentState.Content {
     val highlightedContent = toHighlightedTagProfileMarkdown()
+        .escapeStandaloneDashSeparators()
     return EntryContentState.Content(
         content = highlightedContent,
         markdownState = highlightedContent.toMarkdownStateSuccess(),

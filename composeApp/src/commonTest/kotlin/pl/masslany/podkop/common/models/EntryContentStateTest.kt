@@ -23,4 +23,16 @@ class EntryContentStateTest {
 
         assertEquals("[@user](@user) [#tag](#tag)", state.content)
     }
+
+    @Test
+    fun `to entry content state escapes standalone dash separators`() {
+        val state = assertIs<EntryContentState.Content>(
+            "-------------\n#maszprawo - tresc\n-------------".toEntryContentState(isDownVoted = false),
+        )
+
+        assertEquals(
+            "\\-------------\n[#maszprawo](#maszprawo) - tresc\n\\-------------",
+            state.content,
+        )
+    }
 }
