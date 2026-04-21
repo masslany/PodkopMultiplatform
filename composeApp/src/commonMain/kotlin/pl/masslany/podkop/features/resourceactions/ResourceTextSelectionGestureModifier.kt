@@ -1,6 +1,5 @@
 package pl.masslany.podkop.features.resourceactions
 
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,7 +15,13 @@ internal fun Modifier.resourceTextSelectionGesture(
         onClick == null && onLongClick == null -> this
 
         onClick != null && onLongClick == null -> {
-            clickable(onClick = onClick)
+            val interactionSource = remember { MutableInteractionSource() }
+
+            clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+            )
         }
 
         else -> {
@@ -24,7 +29,7 @@ internal fun Modifier.resourceTextSelectionGesture(
 
             combinedClickable(
                 interactionSource = interactionSource,
-                indication = if (onClick == null) null else LocalIndication.current,
+                indication = null,
                 onClick = onClick ?: {},
                 onLongClick = onLongClick,
             )
