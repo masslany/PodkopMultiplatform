@@ -35,6 +35,8 @@ import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
 import com.mikepenz.markdown.m3.markdownTypography
 import com.mikepenz.markdown.model.markdownAnimations
+import com.mikepenz.markdown.model.markdownAnnotator
+import com.mikepenz.markdown.model.markdownAnnotatorConfig
 import com.mikepenz.markdown.model.markdownPadding
 import com.mikepenz.markdown.utils.codeSpanStyle
 import com.mikepenz.markdown.utils.getUnescapedTextInNode
@@ -63,6 +65,11 @@ fun EntryContent(
     val profileClickHandler by rememberUpdatedState(onProfileClick)
     val tagClickHandler by rememberUpdatedState(onTagClick)
     val urlClickHandler by rememberUpdatedState(onUrlClick)
+    val markdownAnnotator = remember {
+        markdownAnnotator(
+            config = markdownAnnotatorConfig(eolAsNewLine = true),
+        )
+    }
     val uriHandler = remember {
         object : UriHandler {
             override fun openUri(uri: String) {
@@ -90,10 +97,13 @@ fun EntryContent(
     when (state) {
         is EntryContentState.Content -> {
             if (state.content.isNotEmpty()) {
-                CompositionLocalProvider(LocalUriHandler provides uriHandler) {
+                CompositionLocalProvider(
+                    LocalUriHandler provides uriHandler,
+                ) {
                     Markdown(
                         state = state.markdownState,
                         modifier = Modifier.fillMaxWidth(),
+                        annotator = markdownAnnotator,
                         components = markdownComponents,
                         colors = markdownColor(
                             text = if (state.isDownVoted) {
