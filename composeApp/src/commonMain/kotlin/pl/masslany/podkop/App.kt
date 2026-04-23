@@ -359,6 +359,7 @@ fun App() {
                             SetDialogDestinationToEdgeToEdge()
                             ResourceScreenshotPreviewDialogScreenRoot(
                                 modifier = Modifier
+                                    .padding(safeDrawingPaddingValues)
                                     .widthIn(max = DefaultDialogMaxWidth),
                                 screen = it,
                             )
@@ -374,6 +375,7 @@ fun App() {
                             SetDialogDestinationToEdgeToEdge()
                             ResourceTextSelectionDialogScreenRoot(
                                 modifier = Modifier
+                                    .padding(safeDrawingPaddingValues)
                                     .widthIn(max = DefaultDialogMaxWidth),
                                 screen = it,
                             )
@@ -397,6 +399,7 @@ fun App() {
                         ) {
                             ComposerMediaUrlDialogScreenRoot(
                                 modifier = Modifier
+                                    .padding(safeDrawingPaddingValues)
                                     .widthIn(max = DefaultDialogMaxWidth),
                                 screen = it,
                                 appNavigator = appNavigator,
@@ -412,6 +415,7 @@ fun App() {
                         ) {
                             ComposerMediaPickLocalScreenRoot(
                                 modifier = Modifier
+                                    .padding(safeDrawingPaddingValues)
                                     .widthIn(max = DefaultDialogMaxWidth),
                                 screen = it,
                                 appNavigator = appNavigator,
@@ -425,6 +429,7 @@ fun App() {
                         ) {
                             DefaultGenericDialog(
                                 modifier = Modifier
+                                    .padding(safeDrawingPaddingValues)
                                     .widthIn(max = DefaultDialogMaxWidth),
                                 dialog = it,
                                 navigator = appNavigator,
