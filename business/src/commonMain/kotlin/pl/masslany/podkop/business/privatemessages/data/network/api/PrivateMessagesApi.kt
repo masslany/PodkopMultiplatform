@@ -5,11 +5,11 @@ import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMe
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessagesListDto
 
 interface PrivateMessagesApi {
-    suspend fun getConversations(page: Any? = null): Result<PrivateMessagesListDto>
+    suspend fun getConversations(page: Int = 1): Result<PrivateMessagesListDto>
 
     suspend fun getConversationMessages(
         username: String,
-        page: Any? = null,
+        page: Int = 1,
     ): Result<PrivateMessageThreadDto>
 
     suspend fun getConversationMessagesNewer(username: String): Result<PrivateMessageThreadDto>

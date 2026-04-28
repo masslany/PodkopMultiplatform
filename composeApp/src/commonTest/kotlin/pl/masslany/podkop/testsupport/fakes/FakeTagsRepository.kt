@@ -6,6 +6,7 @@ import pl.masslany.podkop.business.tags.domain.models.TagDetails
 import pl.masslany.podkop.business.tags.domain.models.TagsAutoComplete
 import pl.masslany.podkop.business.tags.domain.models.request.TagsSort
 import pl.masslany.podkop.business.tags.domain.models.request.TagsType
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class FakeTagsRepository : TagsRepository {
     var getAutoCompleteTagsHandler: suspend (query: String) -> Result<TagsAutoComplete> =
@@ -25,7 +26,7 @@ class FakeTagsRepository : TagsRepository {
     override suspend fun disableTagNotifications(tagName: String): Result<Unit> = notUsed()
     override suspend fun getTagStream(
         tagName: String,
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: TagsSort,
         type: TagsType,

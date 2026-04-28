@@ -12,7 +12,7 @@ class PrivateMessagesRepositoryImpl(
     private val privateMessagesDataSource: PrivateMessagesDataSource,
     private val dispatcherProvider: DispatcherProvider,
 ) : PrivateMessagesRepository {
-    override suspend fun getConversations(page: Any?): Result<PrivateMessagesPage> =
+    override suspend fun getConversations(page: Int): Result<PrivateMessagesPage> =
         withContext(dispatcherProvider.io) {
             privateMessagesDataSource.getConversations(page = page)
                 .mapCatching { it.toPrivateMessagesPage() }
@@ -20,7 +20,7 @@ class PrivateMessagesRepositoryImpl(
 
     override suspend fun getConversationMessages(
         username: String,
-        page: Any?,
+        page: Int,
     ): Result<PrivateMessageThreadPage> = withContext(dispatcherProvider.io) {
         privateMessagesDataSource.getConversationMessages(
             username = username,

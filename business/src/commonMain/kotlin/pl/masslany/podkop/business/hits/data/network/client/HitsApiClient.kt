@@ -1,24 +1,26 @@
 package pl.masslany.podkop.business.hits.data.network.client
 
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.hits.data.network.api.HitsApi
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 
 class HitsApiClient(
     private val apiClient: ApiClient,
 ) : HitsApi {
     override suspend fun getLinkHits(
-        page: Any?,
+        page: Int,
         sort: String,
         year: Int?,
         month: Int?,
     ): Result<ResourceResponseDto> {
         val queryParameters = buildMap {
             put("sort", sort)
-            page?.let { put("page", it.toString()) }
+            putPagination(PageRequest.Number(page))
             year?.let { put("year", it.toString()) }
             month?.let { put("month", it.toString().padStart(2, '0')) }
         }

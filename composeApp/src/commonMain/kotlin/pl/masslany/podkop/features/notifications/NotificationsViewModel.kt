@@ -18,12 +18,14 @@ import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.notifications.models.NotificationGroupChipState
 import pl.masslany.podkop.features.notifications.models.NotificationNavigationTarget
+import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
 import pl.masslany.podkop.features.privatemessages.ConversationScreen
 import pl.masslany.podkop.features.profile.ProfileScreen
 import pl.masslany.podkop.features.tag.TagScreen
@@ -59,10 +61,7 @@ class NotificationsViewModel(
     ) { request ->
         notificationsRepository.getNotifications(
             group = _state.value.selectedGroup,
-            page = when (request) {
-                is PageRequest.Cursor -> request.key
-                is PageRequest.Index -> request.page
-            },
+            page = request,
         )
     }
 
@@ -208,10 +207,17 @@ class NotificationsViewModel(
                     }
             }
 
-            notificationsRepository.getNotifications(group = selectedGroup, page = 1)
+            notificationsRepository.getNotifications(
+                group = selectedGroup,
+                page = selectedGroup.paginationMode().initialRequest(),
+            )
                 .onSuccess { page ->
                     items.value = page.data.toPersistentList()
-                    paginator.setup(page.pagination, page.data.size)
+                    paginator.setup(
+                        pagination = page.pagination,
+                        initialItemCount = page.data.size,
+                        paginationMode = selectedGroup.paginationMode(),
+                    )
                     _state.update { previousState ->
                         previousState.copy(
                             isLoading = false,
@@ -237,6 +243,8 @@ class NotificationsViewModel(
                 }
         }
     }
+
+    private fun NotificationGroup.paginationMode() = FeaturePaginationPolicies.notifications(this)
 
     private fun navigateTo(target: NotificationNavigationTarget) {
         when (target) {

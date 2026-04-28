@@ -5,7 +5,7 @@ import pl.masslany.podkop.business.hits.data.api.HitsDataSource
 
 class FakeHitsDataSource : HitsDataSource {
     data class GetLinkHitsCall(
-        val page: Any?,
+        val page: Int,
         val sort: String,
         val year: Int?,
         val month: Int?,
@@ -15,7 +15,7 @@ class FakeHitsDataSource : HitsDataSource {
     val getLinkHitsCalls = mutableListOf<GetLinkHitsCall>()
 
     override suspend fun getLinkHits(
-        page: Any?,
+        page: Int,
         sort: String,
         year: Int?,
         month: Int?,

@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.testsupport.fakes
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.tags.data.api.TagsDataSource
 import pl.masslany.podkop.business.tags.data.network.models.TagDetailsResponseDto
@@ -8,7 +10,7 @@ import pl.masslany.podkop.business.tags.data.network.models.TagsAutoCompleteResp
 class FakeTagsDataSource : TagsDataSource {
     data class GetTagStreamCall(
         val tagName: String,
-        val page: Any?,
+        val page: PageRequest,
         val limit: Int?,
         val sort: String,
         val type: String,
@@ -57,7 +59,7 @@ class FakeTagsDataSource : TagsDataSource {
 
     override suspend fun getTagStream(
         tagName: String,
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         type: String,

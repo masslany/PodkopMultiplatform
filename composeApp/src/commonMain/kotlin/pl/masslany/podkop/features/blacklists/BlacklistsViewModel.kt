@@ -29,6 +29,7 @@ import pl.masslany.podkop.common.navigation.dialogText
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.requireNumber
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.blacklists.models.BlacklistCategoryState
@@ -206,10 +207,7 @@ class BlacklistsViewModel(
             },
         ) { request ->
             loadPage(
-                page = when (request) {
-                    is PageRequest.Index -> request.page
-                    is PageRequest.Cursor -> request.key.toIntOrNull() ?: 1
-                },
+                page = request.requireNumber(),
             )
         }
 

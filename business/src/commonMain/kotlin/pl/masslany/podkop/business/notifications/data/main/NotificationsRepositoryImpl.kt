@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.notifications.data.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -21,6 +23,7 @@ import pl.masslany.podkop.business.notifications.domain.models.NotificationsStat
 import pl.masslany.podkop.business.privatemessages.data.api.PrivateMessagesDataSource
 import pl.masslany.podkop.business.privatemessages.data.main.toPrivateMessagesPage
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
+import pl.masslany.podkop.common.pagination.requireNumber
 import kotlin.time.Duration.Companion.minutes
 
 class NotificationsRepositoryImpl(
@@ -58,11 +61,11 @@ class NotificationsRepositoryImpl(
 
     override suspend fun getNotifications(
         group: NotificationGroup,
-        page: Any?,
+        page: PageRequest,
     ): Result<NotificationsPage> = withContext(dispatcherProvider.io) {
         when (group) {
             NotificationGroup.PrivateMessages -> {
-                privateMessagesDataSource.getConversations(page = page)
+                privateMessagesDataSource.getConversations(page = page.requireNumber())
                     .mapCatching { it.toPrivateMessagesPage().toNotificationsPage() }
             }
 

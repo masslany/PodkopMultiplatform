@@ -9,6 +9,7 @@ import pl.masslany.podkop.business.tags.domain.models.request.TagsSort
 import pl.masslany.podkop.business.tags.domain.models.request.TagsType
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeTagsDataSource
+import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.business.testsupport.fixtures.BusinessFixtures as Fixtures
 
 class TagsRepositoryImplTest {
@@ -65,7 +66,7 @@ class TagsRepositoryImplTest {
 
         val actual = sut.getTagStream(
             tagName = "compose",
-            page = "cursor",
+            page = PageRequest.KeyCursor("cursor"),
             limit = 25,
             sort = TagsSort.Best,
             type = TagsType.Links,
@@ -75,7 +76,7 @@ class TagsRepositoryImplTest {
             listOf(
                 FakeTagsDataSource.GetTagStreamCall(
                     tagName = "compose",
-                    page = "cursor",
+                    page = PageRequest.KeyCursor("cursor"),
                     limit = 25,
                     sort = "best",
                     type = "link",
@@ -204,7 +205,7 @@ class TagsRepositoryImplTest {
             dispatcherProvider = FakeDispatcherProvider(),
         )
 
-        val actual = sut.getTagStream("tag", null, null, TagsSort.All, TagsType.All)
+        val actual = sut.getTagStream("tag", PageRequest.Initial, null, TagsSort.All, TagsType.All)
 
         assertTrue(actual.isFailure)
         assertSame(expected, actual.exceptionOrNull())

@@ -1,5 +1,6 @@
 package pl.masslany.podkop.business.links.data.network.client
 
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.common.domain.models.common.VoteReason
@@ -21,12 +22,13 @@ import pl.masslany.podkop.business.links.data.network.models.LinkDraftUpdateRequ
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class LinksApiClient(
     private val apiClient: ApiClient,
 ) : LinksApi {
     override suspend fun getLinks(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         type: String,
@@ -36,7 +38,7 @@ class LinksApiClient(
         val queryParameters = buildMap {
             put("sort", sort)
             put("type", type)
-            page?.let { put("page", it.toString()) }
+            putPagination(page)
             limit?.let { put("limit", it.toString()) }
             category?.let { put("category", it) }
             bucket?.let { put("bucket", it) }
@@ -76,7 +78,7 @@ class LinksApiClient(
         ama: Boolean?,
     ): Result<ResourceResponseDto> {
         val queryParameters = buildMap {
-            page?.let { put("page", it.toString()) }
+            page?.let { putPagination(PageRequest.Number(it)) }
             limit?.let { put("limit", it.toString()) }
             sort?.let { put("sort", it) }
             ama?.let { put("ama", it.toString()) }
@@ -101,7 +103,7 @@ class LinksApiClient(
         page: Int?,
     ): Result<ResourceResponseDto> {
         val queryParameters = buildMap {
-            page?.let { put("page", it.toString()) }
+            page?.let { putPagination(PageRequest.Number(it)) }
         }.takeIf { it.isNotEmpty() }
 
         val request =
@@ -308,7 +310,7 @@ class LinksApiClient(
 
     override suspend fun getLinkUpvotes(linkId: Int, type: String, page: Int?): Result<LinkUpvotesResponseDto> {
         val queryParameters = buildMap {
-            page?.let { put("page", it.toString()) }
+            page?.let { putPagination(PageRequest.Number(it)) }
         }.takeIf { it.isNotEmpty() }
 
         val request =

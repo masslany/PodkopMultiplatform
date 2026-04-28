@@ -5,7 +5,7 @@ import pl.masslany.podkop.business.common.data.network.models.common.ResourceRes
 
 interface HitsDataSource {
     suspend fun getLinkHits(
-        page: Any? = null,
+        page: Int = 1,
         sort: String,
         year: Int? = null,
         month: Int? = null,

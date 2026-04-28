@@ -17,9 +17,9 @@ import pl.masslany.podkop.business.hits.domain.models.request.HitsSortType
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
-import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.requireNumber
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.hits.archivepicker.HitsArchivePickerState
@@ -54,10 +54,7 @@ class HitsViewModel(
         },
     ) { request ->
         hitsRepository.getLinkHits(
-            page = when (request) {
-                is PageRequest.Index -> request.page
-                is PageRequest.Cursor -> request.key
-            },
+            page = request.requireNumber(),
             hitsSortType = selectedSortType,
             year = selectedArchive?.year,
             month = selectedArchive?.month,

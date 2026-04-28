@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.entries.domain.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.common.domain.models.common.Voters
@@ -12,7 +14,7 @@ import kotlin.time.Instant
 interface EntriesRepository {
     @Suppress("LongParameterList")
     suspend fun getEntries(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         entriesSortType: EntriesSortType,
         hotSortType: HotSortType,
@@ -28,18 +30,18 @@ interface EntriesRepository {
 
     suspend fun getEntryComments(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<Resources>
 
     suspend fun getEntryVotes(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<Voters>
 
     suspend fun getEntryCommentVotes(
         entryId: Int,
         commentId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<Voters>
 
     suspend fun createEntryComment(

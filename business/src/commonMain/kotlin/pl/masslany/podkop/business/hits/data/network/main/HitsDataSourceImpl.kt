@@ -9,7 +9,7 @@ class HitsDataSourceImpl(
     private val hitsApi: HitsApi,
 ) : HitsDataSource {
     override suspend fun getLinkHits(
-        page: Any?,
+        page: Int,
         sort: String,
         year: Int?,
         month: Int?,

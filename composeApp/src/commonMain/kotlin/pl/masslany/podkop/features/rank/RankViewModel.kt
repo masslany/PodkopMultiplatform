@@ -16,6 +16,7 @@ import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.requireNumber
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.profile.ProfileScreen
@@ -46,10 +47,7 @@ class RankViewModel(
         },
     ) { request ->
         rankRepository.getRank(
-            page = when (request) {
-                is PageRequest.Index -> request.page
-                is PageRequest.Cursor -> request.key.toIntOrNull() ?: 1
-            },
+            page = request.requireNumber(),
         )
     }
 

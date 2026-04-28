@@ -6,7 +6,7 @@ import pl.masslany.podkop.business.hits.domain.models.request.HitsSortType
 
 interface HitsRepository {
     suspend fun getLinkHits(
-        page: Any? = null,
+        page: Int = 1,
         hitsSortType: HitsSortType,
         year: Int? = null,
         month: Int? = null,

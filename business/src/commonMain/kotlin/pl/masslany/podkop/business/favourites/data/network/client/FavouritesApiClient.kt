@@ -1,5 +1,6 @@
 package pl.masslany.podkop.business.favourites.data.network.client
 
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.favourites.data.network.api.FavouritesApi
 import pl.masslany.podkop.business.favourites.data.network.models.FavouriteRequestDataDto
@@ -8,18 +9,19 @@ import pl.masslany.podkop.business.favourites.domain.models.FavouriteType
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class FavouritesApiClient(
     private val apiClient: ApiClient,
 ) : FavouritesApi {
     override suspend fun getFavourites(
-        page: Any?,
+        page: PageRequest,
         sort: String,
         resource: String?,
     ): Result<ResourceResponseDto> {
         val queryParameters = buildMap {
             put("sort", sort)
-            page?.let { put("page", it.toString()) }
+            putPagination(page)
             resource?.let { put("resource", it) }
         }
 

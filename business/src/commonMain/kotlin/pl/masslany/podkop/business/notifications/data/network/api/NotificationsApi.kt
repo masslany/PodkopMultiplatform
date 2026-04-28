@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.notifications.data.network.api
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationItemResponseDto
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationsListDto
@@ -10,7 +12,7 @@ interface NotificationsApi {
 
     suspend fun getNotifications(
         group: NotificationGroup,
-        page: Any? = null,
+        page: PageRequest = PageRequest.Initial,
     ): Result<NotificationsListDto>
 
     suspend fun getNotification(

@@ -6,7 +6,7 @@ import pl.masslany.podkop.business.search.domain.models.request.SearchStreamQuer
 
 class FakeSearchDataSource : SearchDataSource {
     data class GetSearchStreamCall(
-        val page: Any?,
+        val page: Int,
         val limit: Int?,
         val query: SearchStreamQuery,
     )
@@ -16,7 +16,7 @@ class FakeSearchDataSource : SearchDataSource {
     val getSearchStreamCalls = mutableListOf<GetSearchStreamCall>()
 
     override suspend fun getSearchStream(
-        page: Any?,
+        page: Int,
         limit: Int?,
         query: SearchStreamQuery,
     ): Result<ResourceResponseDto> {

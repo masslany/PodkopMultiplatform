@@ -30,7 +30,7 @@ class HitsRepositoryImplTest {
 
         assertEquals(
             FakeHitsDataSource.GetLinkHitsCall(
-                page = null,
+                page = 1,
                 sort = "day",
                 year = null,
                 month = null,

@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.testsupport.fakes
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.notifications.data.api.NotificationsDataSource
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationItemResponseDto
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationsListDto
@@ -18,7 +20,7 @@ class FakeNotificationsDataSource : NotificationsDataSource {
 
     override suspend fun getNotifications(
         group: NotificationGroup,
-        page: Any?,
+        page: PageRequest,
     ): Result<NotificationsListDto> = unstubbedResult("getNotifications")
 
     override suspend fun getNotification(

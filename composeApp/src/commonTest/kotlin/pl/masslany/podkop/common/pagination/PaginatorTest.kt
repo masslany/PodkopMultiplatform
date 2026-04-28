@@ -145,7 +145,187 @@ class PaginatorTest {
 
         paginator.paginate()
 
-        assertEquals(listOf<PageRequest>(PageRequest.Index(2)), requests)
+        assertEquals(listOf<PageRequest>(PageRequest.Number(2)), requests)
+        assertEquals(PaginatorState.Idle, paginator.state.value)
+    }
+
+    @Test
+    fun `cursor in page pagination requests page cursor when present`() {
+        val requests = mutableListOf<PageRequest>()
+        val paginator = Paginator(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            onNewItems = {},
+        ) { request ->
+            requests += request
+            Result.success(
+                TestPaginatedData(
+                    data = listOf(Any()),
+                    pagination = Pagination(
+                        perPage = 25,
+                        total = 100,
+                        next = "next-cursor",
+                        prev = "",
+                    ),
+                ),
+            )
+        }
+
+        paginator.setup(
+            pagination = Pagination(
+                perPage = 25,
+                total = 100,
+                next = "cursor-2",
+                prev = "",
+            ),
+            initialItemCount = 25,
+            paginationMode = PaginationMode.CursorInPage,
+        )
+
+        paginator.paginate()
+
+        assertEquals(listOf<PageRequest>(PageRequest.PageCursor("cursor-2")), requests)
+        assertEquals(PaginatorState.Idle, paginator.state.value)
+    }
+
+    @Test
+    fun `cursor in key pagination requests key cursor when present`() {
+        val requests = mutableListOf<PageRequest>()
+        val paginator = Paginator(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            onNewItems = {},
+        ) { request ->
+            requests += request
+            Result.success(
+                TestPaginatedData(
+                    data = listOf(Any()),
+                    pagination = Pagination(
+                        perPage = 25,
+                        total = 100,
+                        next = "next-key",
+                        prev = "",
+                    ),
+                ),
+            )
+        }
+
+        paginator.setup(
+            pagination = Pagination(
+                perPage = 25,
+                total = 100,
+                next = "key-2",
+                prev = "",
+            ),
+            initialItemCount = 25,
+            paginationMode = PaginationMode.CursorInKey,
+        )
+
+        paginator.paginate()
+
+        assertEquals(listOf<PageRequest>(PageRequest.KeyCursor("key-2")), requests)
+        assertEquals(PaginatorState.Idle, paginator.state.value)
+    }
+
+    @Test
+    fun `setup exhausts cursor pagination when next cursor is missing even if totals indicate more`() {
+        paginator.setup(
+            pagination = Pagination(
+                perPage = 25,
+                total = 340,
+                next = "",
+                prev = "",
+            ),
+            initialItemCount = 25,
+            paginationMode = PaginationMode.CursorInPage,
+        )
+
+        assertEquals(PaginatorState.Exhausted, paginator.state.value)
+    }
+
+    @Test
+    fun `cursor pagination exhausts when next cursor does not advance`() {
+        val requests = mutableListOf<PageRequest>()
+        val paginator = Paginator(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            onNewItems = {},
+        ) { request ->
+            requests += request
+            Result.success(
+                TestPaginatedData(
+                    data = listOf(Any()),
+                    pagination = Pagination(
+                        perPage = 25,
+                        total = 100,
+                        next = "same-cursor",
+                        prev = "",
+                    ),
+                ),
+            )
+        }
+
+        paginator.setup(
+            pagination = Pagination(
+                perPage = 25,
+                total = 100,
+                next = "same-cursor",
+                prev = "",
+            ),
+            initialItemCount = 25,
+            paginationMode = PaginationMode.CursorInPage,
+        )
+
+        paginator.paginate()
+
+        assertEquals(listOf<PageRequest>(PageRequest.PageCursor("same-cursor")), requests)
+        assertEquals(PaginatorState.Exhausted, paginator.state.value)
+    }
+
+    @Test
+    fun `setup can switch from exhausted cursor mode back to numbered mode`() {
+        val requests = mutableListOf<PageRequest>()
+        val paginator = Paginator(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            onNewItems = {},
+            defaultPaginationMode = PaginationMode.CursorInPage,
+        ) { request ->
+            requests += request
+            Result.success(
+                TestPaginatedData(
+                    data = List(25) { Any() },
+                    pagination = Pagination(
+                        perPage = 25,
+                        total = 100,
+                        next = "",
+                        prev = "",
+                    ),
+                ),
+            )
+        }
+
+        paginator.setup(
+            pagination = Pagination(
+                perPage = 25,
+                total = 100,
+                next = "",
+                prev = "",
+            ),
+            initialItemCount = 25,
+            paginationMode = PaginationMode.CursorInPage,
+        )
+        assertEquals(PaginatorState.Exhausted, paginator.state.value)
+
+        paginator.setup(
+            pagination = Pagination(
+                perPage = 25,
+                total = 100,
+                next = "",
+                prev = "",
+            ),
+            initialItemCount = 25,
+            paginationMode = PaginationMode.Numbered,
+        )
+        paginator.paginate()
+
+        assertEquals(listOf<PageRequest>(PageRequest.Number(2)), requests)
         assertEquals(PaginatorState.Idle, paginator.state.value)
     }
 }

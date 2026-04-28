@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.notifications.data.network.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.notifications.data.api.NotificationsDataSource
 import pl.masslany.podkop.business.notifications.data.network.api.NotificationsApi
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationItemResponseDto
@@ -16,7 +18,7 @@ class NotificationsDataSourceImpl(
 
     override suspend fun getNotifications(
         group: NotificationGroup,
-        page: Any?,
+        page: PageRequest,
     ): Result<NotificationsListDto> {
         return notificationsApi.getNotifications(group = group, page = page)
     }

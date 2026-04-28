@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.entries.data.network.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.entries.data.api.EntriesDataSource
@@ -11,7 +13,7 @@ class EntriesDataSourceImpl(
     private val entriesApi: EntriesApi,
 ) : EntriesDataSource {
     override suspend fun getEntries(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         hotSort: Int,
@@ -27,14 +29,14 @@ class EntriesDataSourceImpl(
 
     override suspend fun getEntryComments(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<ResourceResponseDto> {
         return entriesApi.getEntryComments(entryId, page)
     }
 
     override suspend fun getEntryVotes(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<EntryVotersResponseDto> {
         return entriesApi.getEntryVotes(entryId, page)
     }
@@ -42,7 +44,7 @@ class EntriesDataSourceImpl(
     override suspend fun getEntryCommentVotes(
         entryId: Int,
         commentId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<EntryVotersResponseDto> {
         return entriesApi.getEntryCommentVotes(entryId, commentId, page)
     }

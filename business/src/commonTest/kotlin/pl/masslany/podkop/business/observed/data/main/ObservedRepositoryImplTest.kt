@@ -10,6 +10,7 @@ import pl.masslany.podkop.business.observed.domain.models.ObservedResources
 import pl.masslany.podkop.business.observed.domain.models.request.ObservedType
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeObservedDataSource
+import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.business.testsupport.fixtures.BusinessFixtures as Fixtures
 
 class ObservedRepositoryImplTest {
@@ -40,12 +41,12 @@ class ObservedRepositoryImplTest {
         }
         val sut = createSut(observedDataSource = observedDataSource)
 
-        val actual = sut.getObserved(page = "cursor-1", type = ObservedType.Discussions)
+        val actual = sut.getObserved(page = PageRequest.PageCursor("cursor-1"), type = ObservedType.Discussions)
 
         assertEquals(
             listOf(
                 FakeObservedDataSource.GetObservedCall(
-                    page = "cursor-1",
+                    page = PageRequest.PageCursor("cursor-1"),
                     type = ObservedType.Discussions,
                 ),
             ),

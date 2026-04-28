@@ -32,11 +32,13 @@ import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
 import pl.masslany.podkop.features.composer.ComposerRequest
 import pl.masslany.podkop.features.composer.ComposerResult
+import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -72,10 +74,7 @@ class EntriesViewModel(
         },
     ) { request ->
         entriesRepository.getEntries(
-            page = when (request) {
-                is PageRequest.Index -> request.page
-                is PageRequest.Cursor -> request.key
-            },
+            page = request,
             limit = null,
             entriesSortType = currentEntriesSortType,
             hotSortType = currentHotSortType,
@@ -138,9 +137,9 @@ class EntriesViewModel(
             updateState { previousState ->
                 previousState.copy(isLoggedIn = isLoggedIn)
             }
-            val firstPage = resolveFirstPageParam(isLoggedIn)
+            val paginationMode = paginationMode(isLoggedIn)
             entriesRepository.getEntries(
-                page = firstPage,
+                page = paginationMode.initialRequest(),
                 limit = null,
                 entriesSortType = currentEntriesSortType,
                 hotSortType = currentHotSortType,
@@ -149,7 +148,7 @@ class EntriesViewModel(
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
+                    paginator.setup(it.pagination, it.data.size, paginationMode)
                     updateState { previousState ->
                         previousState
                             .updateLoading(false)
@@ -183,9 +182,9 @@ class EntriesViewModel(
         }
         viewModelScope.launch {
             val isLoggedIn = state.value.isLoggedIn
-            val firstPage = resolveFirstPageParam(isLoggedIn)
+            val paginationMode = paginationMode(isLoggedIn)
             entriesRepository.getEntries(
-                page = firstPage,
+                page = paginationMode.initialRequest(),
                 limit = null,
                 entriesSortType = sortType.toEntriesSortType(),
                 hotSortType = currentHotSortType,
@@ -194,7 +193,7 @@ class EntriesViewModel(
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
+                    paginator.setup(it.pagination, it.data.size, paginationMode)
                     updateState { previousState ->
                         previousState
                             .updateLoading(false)
@@ -241,9 +240,9 @@ class EntriesViewModel(
         }
         viewModelScope.launch {
             val isLoggedIn = state.value.isLoggedIn
-            val firstPage = resolveFirstPageParam(isLoggedIn)
+            val paginationMode = paginationMode(isLoggedIn)
             entriesRepository.getEntries(
-                page = firstPage,
+                page = paginationMode.initialRequest(),
                 limit = null,
                 entriesSortType = currentEntriesSortType,
                 hotSortType = sortType.toHotSortType(),
@@ -252,7 +251,7 @@ class EntriesViewModel(
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
+                    paginator.setup(it.pagination, it.data.size, paginationMode)
                     updateState { previousState ->
                         previousState
                             .updateLoading(false)
@@ -295,9 +294,9 @@ class EntriesViewModel(
         }
         viewModelScope.launch {
             val isLoggedIn = state.value.isLoggedIn
-            val firstPage = resolveFirstPageParam(isLoggedIn)
+            val paginationMode = paginationMode(isLoggedIn)
             entriesRepository.getEntries(
-                page = firstPage,
+                page = paginationMode.initialRequest(),
                 limit = null,
                 entriesSortType = currentEntriesSortType,
                 hotSortType = currentHotSortType,
@@ -306,7 +305,7 @@ class EntriesViewModel(
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
+                    paginator.setup(it.pagination, it.data.size, paginationMode)
                     updateState { previousState ->
                         previousState
                             .updateLoading(false)
@@ -379,12 +378,7 @@ class EntriesViewModel(
         }
     }
 
-    private fun resolveFirstPageParam(isLoggedIn: Boolean): Any? =
-        if (isLoggedIn) {
-            null
-        } else {
-            1
-        }
+    private fun paginationMode(isLoggedIn: Boolean) = FeaturePaginationPolicies.entries(isLoggedIn)
 
     private inline fun updateState(transform: (EntriesScreenState) -> EntriesScreenState) {
         _state.update { previousState ->

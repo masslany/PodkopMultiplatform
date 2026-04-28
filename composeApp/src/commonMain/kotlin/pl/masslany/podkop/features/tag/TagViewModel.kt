@@ -22,8 +22,10 @@ import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -58,10 +60,7 @@ class TagViewModel(
     ) { request ->
         tagsRepository.getTagStream(
             tagName = tag,
-            page = when (request) {
-                is PageRequest.Index -> request.page
-                is PageRequest.Cursor -> request.key
-            },
+            page = request,
             limit = null,
             sort = currentSort,
             type = currentType,
@@ -327,18 +326,22 @@ class TagViewModel(
 
     private fun loadTagStream() {
         viewModelScope.launch {
-            val isLoggedIn = state.value.isLoggedIn
-            val firstPage = resolveFirstPageParam(isLoggedIn)
+            val isLoggedIn = _state.value.isLoggedIn
+            val paginationMode = paginationMode(isLoggedIn)
             tagsRepository.getTagStream(
                 tagName = tag,
-                page = firstPage,
+                page = paginationMode.initialRequest(),
                 limit = null,
                 sort = currentSort,
                 type = currentType,
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
+                    paginator.setup(
+                        pagination = it.pagination,
+                        initialItemCount = it.data.size,
+                        paginationMode = paginationMode,
+                    )
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
@@ -360,10 +363,5 @@ class TagViewModel(
         }
     }
 
-    private fun resolveFirstPageParam(isLoggedIn: Boolean): Any? =
-        if (isLoggedIn) {
-            null
-        } else {
-            1
-        }
+    private fun paginationMode(isLoggedIn: Boolean) = FeaturePaginationPolicies.tagStream(isLoggedIn)
 }

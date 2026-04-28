@@ -20,7 +20,7 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
-import pl.masslany.podkop.common.pagination.toPage
+import pl.masslany.podkop.common.pagination.requireNumber
 import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
@@ -94,10 +94,7 @@ class ProfileViewModel(
             snackbarManager.tryEmitGenericError()
         },
     ) { request ->
-        val page = request.toPage()
-            ?: return@Paginator Result.failure(
-                IllegalArgumentException("Unsupported profile pagination request: $request"),
-            )
+        val page = request.requireNumber()
         val targetSubAction = paginatedSubActionType ?: selectedSubActionType
 
         profileRepository.getProfileListItems(

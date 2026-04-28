@@ -21,6 +21,7 @@ import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMe
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageUserDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessagesListDto
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class NotificationsRepositoryImplTest {
 
@@ -163,10 +164,10 @@ class NotificationsRepositoryImplTest {
             appScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
         )
 
-        val actual = sut.getNotifications(group = NotificationGroup.PrivateMessages, page = 1)
+        val actual = sut.getNotifications(group = NotificationGroup.PrivateMessages, page = PageRequest.Number(1))
 
         val item = actual.getOrThrow().data.single()
-        assertEquals(listOf<Any?>(1), privateMessagesDataSource.getConversationsCalls)
+        assertEquals(listOf(1), privateMessagesDataSource.getConversationsCalls)
         assertEquals(NotificationGroup.PrivateMessages, item.group)
         assertEquals("ZjemCiWanne", item.id)
         assertEquals("ZjemCiWanne", item.actor?.username)

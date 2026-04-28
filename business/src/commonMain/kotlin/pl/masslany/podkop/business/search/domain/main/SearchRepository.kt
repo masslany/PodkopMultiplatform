@@ -5,7 +5,7 @@ import pl.masslany.podkop.business.search.domain.models.request.SearchStreamQuer
 
 interface SearchRepository {
     suspend fun getSearchStream(
-        page: Any?,
+        page: Int,
         limit: Int?,
         query: SearchStreamQuery,
     ): Result<Resources>

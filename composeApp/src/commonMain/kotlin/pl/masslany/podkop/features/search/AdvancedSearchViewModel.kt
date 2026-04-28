@@ -13,9 +13,9 @@ import pl.masslany.podkop.business.search.domain.main.SearchRepository
 import pl.masslany.podkop.business.search.domain.models.request.SearchSort
 import pl.masslany.podkop.business.search.domain.models.request.SearchStreamQuery
 import pl.masslany.podkop.common.logging.api.AppLogger
-import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.requireNumber
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
@@ -47,10 +47,7 @@ class AdvancedSearchViewModel(
     ) { request ->
         val activeRequest = currentRequest ?: return@Paginator Result.success(Resources(emptyList(), null))
         val currentItemCount = resourceItemStateHolder.items.value.size
-        val page = when (request) {
-            is PageRequest.Index -> request.page
-            is PageRequest.Cursor -> request.key
-        }
+        val page = request.requireNumber()
         searchRepository.getSearchStream(
             page = page,
             limit = null,
@@ -58,7 +55,7 @@ class AdvancedSearchViewModel(
         ).map { resources ->
             resources.withSearchFallbackPagination(
                 currentItemCount = currentItemCount,
-                request = request,
+                currentPage = page,
             )
         }
     }

@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.observed.data.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.observed.data.api.ObservedDataSource
 import pl.masslany.podkop.business.observed.data.main.mapper.toResources
@@ -13,7 +15,7 @@ class ObservedRepositoryImpl(
     private val dispatcherProvider: DispatcherProvider,
 ) : ObservedRepository {
     override suspend fun getObserved(
-        page: Any?,
+        page: PageRequest,
         type: ObservedType,
     ): Result<ObservedResources> {
         return withContext(dispatcherProvider.io) {

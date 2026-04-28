@@ -13,6 +13,7 @@ import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeEntriesDataSource
 import pl.masslany.podkop.business.testsupport.fakes.FakeKeyValueStorage
+import pl.masslany.podkop.common.pagination.PageRequest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
@@ -38,7 +39,7 @@ class EntriesRepositoryImplTest {
         val sut = createSut(entriesDataSource = entriesDataSource)
 
         val actual = sut.getEntries(
-            page = "cursor-1",
+            page = PageRequest.PageCursor("cursor-1"),
             limit = 30,
             entriesSortType = EntriesSortType.Hot,
             hotSortType = HotSortType.SixHours,
@@ -49,7 +50,7 @@ class EntriesRepositoryImplTest {
         assertEquals(
             listOf(
                 FakeEntriesDataSource.GetEntriesCall(
-                    page = "cursor-1",
+                    page = PageRequest.PageCursor("cursor-1"),
                     limit = 30,
                     sort = "hot",
                     hotSort = 6,
@@ -114,10 +115,10 @@ class EntriesRepositoryImplTest {
         }
         val sut = createSut(entriesDataSource = entriesDataSource)
 
-        val actual = sut.getEntryComments(entryId = 123, page = "next-page")
+        val actual = sut.getEntryComments(entryId = 123, page = 2)
 
         assertEquals(
-            listOf(FakeEntriesDataSource.GetEntryCommentsCall(entryId = 123, page = "next-page")),
+            listOf(FakeEntriesDataSource.GetEntryCommentsCall(entryId = 123, page = 2)),
             entriesDataSource.getEntryCommentsCalls,
         )
         assertEquals(Fixtures.resources(), actual.getOrThrow())
@@ -156,10 +157,10 @@ class EntriesRepositoryImplTest {
         }
         val sut = createSut(entriesDataSource = entriesDataSource)
 
-        val actual = sut.getEntryVotes(entryId = 85140119, page = "2")
+        val actual = sut.getEntryVotes(entryId = 85140119, page = 2)
 
         assertEquals(
-            listOf(FakeEntriesDataSource.GetEntryVotesCall(entryId = 85140119, page = "2")),
+            listOf(FakeEntriesDataSource.GetEntryVotesCall(entryId = 85140119, page = 2)),
             entriesDataSource.getEntryVotesCalls,
         )
         assertEquals(
@@ -582,7 +583,7 @@ class EntriesRepositoryImplTest {
         val sut = createSut(entriesDataSource = entriesDataSource)
 
         val actual = sut.getEntries(
-            page = null,
+            page = PageRequest.Initial,
             limit = null,
             entriesSortType = EntriesSortType.Newest,
             hotSortType = HotSortType.TwoHours,
