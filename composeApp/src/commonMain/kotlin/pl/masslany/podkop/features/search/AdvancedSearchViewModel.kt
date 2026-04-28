@@ -15,7 +15,7 @@ import pl.masslany.podkop.business.search.domain.models.request.SearchStreamQuer
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
-import pl.masslany.podkop.common.pagination.requireNumber
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
@@ -47,7 +47,10 @@ class AdvancedSearchViewModel(
     ) { request ->
         val activeRequest = currentRequest ?: return@Paginator Result.success(Resources(emptyList(), null))
         val currentItemCount = resourceItemStateHolder.items.value.size
-        val page = request.requireNumber()
+        val page = request.numberOrNull() ?: run {
+            logger.warn("Ignoring advanced search pagination request because numbered page was expected, got $request")
+            return@Paginator Result.success(Resources(emptyList(), null))
+        }
         searchRepository.getSearchStream(
             page = page,
             limit = null,

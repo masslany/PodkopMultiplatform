@@ -7,20 +7,20 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
+import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
-import pl.masslany.podkop.common.pagination.requireNumber
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
@@ -63,8 +63,13 @@ class EntryDetailsViewModel(
             snackbarManager.tryEmitGenericError()
         },
     ) { request ->
+        val page = request.numberOrNull() ?: run {
+            logger.warn("Ignoring entry comments pagination request because numbered page was expected, got $request")
+            return@Paginator Result.success(Resources(emptyList(), null))
+        }
+
         entriesRepository.getEntryComments(
-            page = request.requireNumber(),
+            page = page,
             entryId = entryId,
         )
     }

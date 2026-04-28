@@ -20,11 +20,12 @@ import pl.masslany.podkop.business.media.domain.main.MediaRepository
 import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.business.privatemessages.domain.main.PrivateMessagesRepository
 import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessage
+import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessageThreadPage
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
-import pl.masslany.podkop.common.pagination.requireNumber
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
@@ -80,9 +81,14 @@ class ConversationViewModel(
             snackbarManager.tryEmitGenericError()
         },
     ) { request ->
+        val page = request.numberOrNull() ?: run {
+            logger.warn("Ignoring private message thread pagination request because numbered page was expected, got $request")
+            return@Paginator Result.success(PrivateMessageThreadPage(emptyList(), null))
+        }
+
         privateMessagesRepository.getConversationMessages(
             username = screen.username,
-            page = request.requireNumber(),
+            page = page,
         )
     }
 

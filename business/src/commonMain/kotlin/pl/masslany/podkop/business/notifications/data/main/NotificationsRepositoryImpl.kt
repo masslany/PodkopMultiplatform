@@ -1,7 +1,5 @@
 package pl.masslany.podkop.business.notifications.data.main
 
-import pl.masslany.podkop.common.pagination.PageRequest
-
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -23,7 +21,9 @@ import pl.masslany.podkop.business.notifications.domain.models.NotificationsStat
 import pl.masslany.podkop.business.privatemessages.data.api.PrivateMessagesDataSource
 import pl.masslany.podkop.business.privatemessages.data.main.toPrivateMessagesPage
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
-import pl.masslany.podkop.common.pagination.requireNumber
+import pl.masslany.podkop.common.logging.api.AppLogger
+import pl.masslany.podkop.common.pagination.PageRequest
+import pl.masslany.podkop.common.pagination.numberOrNull
 import kotlin.time.Duration.Companion.minutes
 
 class NotificationsRepositoryImpl(
@@ -32,6 +32,7 @@ class NotificationsRepositoryImpl(
     private val authRepository: AuthRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val appScope: CoroutineScope,
+    private val logger: AppLogger,
 ) : NotificationsRepository {
     private val _status = MutableStateFlow(NotificationsStatus.empty)
     override val status: StateFlow<NotificationsStatus> = _status.asStateFlow()
@@ -65,7 +66,12 @@ class NotificationsRepositoryImpl(
     ): Result<NotificationsPage> = withContext(dispatcherProvider.io) {
         when (group) {
             NotificationGroup.PrivateMessages -> {
-                privateMessagesDataSource.getConversations(page = page.requireNumber())
+                val pageNumber = page.numberOrNull() ?: run {
+                    logger.warn("Ignoring private message notifications pagination request because numbered page was expected, got $page")
+                    return@withContext Result.success(NotificationsPage.empty)
+                }
+
+                privateMessagesDataSource.getConversations(page = pageNumber)
                     .mapCatching { it.toPrivateMessagesPage().toNotificationsPage() }
             }
 

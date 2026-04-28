@@ -2,7 +2,6 @@ package pl.masslany.podkop.common.pagination
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 class PageRequestTest {
@@ -43,10 +42,10 @@ class PageRequestTest {
     }
 
     @Test
-    fun `require number rejects non-number requests`() {
-        assertEquals(3, PageRequest.Number(3).requireNumber())
-        assertFailsWith<IllegalStateException> { PageRequest.Initial.requireNumber() }
-        assertFailsWith<IllegalStateException> { PageRequest.PageCursor("hash").requireNumber() }
-        assertFailsWith<IllegalStateException> { PageRequest.KeyCursor("hash").requireNumber() }
+    fun `numberOrNull returns number only for numbered requests`() {
+        assertEquals(3, PageRequest.Number(3).numberOrNull())
+        assertNull(PageRequest.Initial.numberOrNull())
+        assertNull(PageRequest.PageCursor("hash").numberOrNull())
+        assertNull(PageRequest.KeyCursor("hash").numberOrNull())
     }
 }

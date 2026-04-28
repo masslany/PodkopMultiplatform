@@ -89,11 +89,17 @@ fun PaginationMode.nextRequest(
     }
 }
 
-fun PageRequest.requireNumber(): Int =
+/**
+ * Returns the numeric page value only when this request is known to be numbered.
+ *
+ * Mismatched pagination modes should be handled by the caller as a recoverable no-op rather than
+ * crashing the app.
+ */
+fun PageRequest.numberOrNull(): Int? =
     when (this) {
         is PageRequest.Number -> value
         PageRequest.Initial,
         is PageRequest.PageCursor,
         is PageRequest.KeyCursor,
-        -> error("Expected numbered pagination request, got $this")
+        -> null
     }

@@ -13,11 +13,12 @@ import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.privatemessages.domain.main.PrivateMessagesRepository
 import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessageConversation
+import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessagesPage
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
-import pl.masslany.podkop.common.pagination.requireNumber
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.privatemessages.ConversationScreen
@@ -48,8 +49,13 @@ class PrivateMessagesViewModel(
             snackbarManager.tryEmitGenericError()
         },
     ) { request ->
+        val page = request.numberOrNull() ?: run {
+            logger.warn("Ignoring private messages inbox pagination request because numbered page was expected, got $request")
+            return@Paginator Result.success(PrivateMessagesPage(emptyList(), null))
+        }
+
         privateMessagesRepository.getConversations(
-            page = request.requireNumber(),
+            page = page,
         )
     }
 
