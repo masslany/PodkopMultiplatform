@@ -12,6 +12,7 @@ val notificationsDataModule = module {
             authRepository = get(),
             dispatcherProvider = get(),
             appScope = get(),
+            logger = get(),
         )
     }
 }

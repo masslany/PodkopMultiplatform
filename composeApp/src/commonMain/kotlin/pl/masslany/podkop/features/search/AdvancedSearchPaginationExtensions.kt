@@ -1,15 +1,12 @@
 package pl.masslany.podkop.features.search
 
 import pl.masslany.podkop.business.common.domain.models.common.Resources
-import pl.masslany.podkop.common.pagination.PageRequest
-import pl.masslany.podkop.common.pagination.toPage
 
 internal fun Resources.withSearchFallbackPagination(
     currentItemCount: Int,
-    request: PageRequest,
+    currentPage: Int,
 ): Resources {
     val currentPagination = pagination ?: return this
-    val currentPage = request.toPage() ?: return this
     val totalItemsAfterAppend = currentItemCount + data.size
     val shouldProbeNextPage = currentPagination.next.isBlank() &&
         currentPagination.total > 0 &&

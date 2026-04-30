@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.links.data.network.api
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.common.domain.models.common.VoteReason
@@ -13,7 +15,7 @@ import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 interface LinksApi {
     @Suppress("LongParameterList")
     suspend fun getLinks(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         type: String,

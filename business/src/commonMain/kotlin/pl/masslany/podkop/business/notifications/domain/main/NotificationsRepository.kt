@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.notifications.domain.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import kotlinx.coroutines.flow.StateFlow
 import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
 import pl.masslany.podkop.business.notifications.domain.models.NotificationItem
@@ -14,7 +16,7 @@ interface NotificationsRepository {
 
     suspend fun getNotifications(
         group: NotificationGroup,
-        page: Any? = null,
+        page: PageRequest = PageRequest.Initial,
     ): Result<NotificationsPage>
 
     suspend fun getNotification(

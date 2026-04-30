@@ -1,5 +1,6 @@
 package pl.masslany.podkop.business.tags.data.network.client
 
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.tags.data.network.api.TagsApi
 import pl.masslany.podkop.business.tags.data.network.models.TagDetailsResponseDto
@@ -7,6 +8,7 @@ import pl.masslany.podkop.business.tags.data.network.models.TagsAutoCompleteResp
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class TagsApiClient(
     private val apiClient: ApiClient,
@@ -78,7 +80,7 @@ class TagsApiClient(
 
     override suspend fun getTagStream(
         tagName: String,
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         type: String,
@@ -86,7 +88,7 @@ class TagsApiClient(
         val queryParameters = buildMap {
             put("sort", sort)
             put("type", type)
-            page?.let { put("page", it.toString()) }
+            putPagination(page)
             limit?.let { put("limit", it.toString()) }
         }
 

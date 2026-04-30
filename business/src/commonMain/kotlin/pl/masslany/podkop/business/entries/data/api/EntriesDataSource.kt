@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.entries.data.api
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
@@ -8,7 +10,7 @@ import pl.masslany.podkop.business.entries.data.network.models.EntryVotersRespon
 interface EntriesDataSource {
     @Suppress("LongParameterList")
     suspend fun getEntries(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         hotSort: Int,
@@ -20,18 +22,18 @@ interface EntriesDataSource {
 
     suspend fun getEntryComments(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<ResourceResponseDto>
 
     suspend fun getEntryVotes(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<EntryVotersResponseDto>
 
     suspend fun getEntryCommentVotes(
         entryId: Int,
         commentId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<EntryVotersResponseDto>
 
     suspend fun createEntryComment(

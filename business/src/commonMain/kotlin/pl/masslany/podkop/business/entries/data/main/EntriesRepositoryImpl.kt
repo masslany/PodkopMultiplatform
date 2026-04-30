@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.entries.data.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResourceItemList
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
@@ -24,7 +26,7 @@ class EntriesRepositoryImpl(
     private val keyValueStorage: KeyValueStorage,
 ) : EntriesRepository {
     override suspend fun getEntries(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         entriesSortType: EntriesSortType,
         hotSortType: HotSortType,
@@ -63,7 +65,7 @@ class EntriesRepositoryImpl(
 
     override suspend fun getEntryComments(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<Resources> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.getEntryComments(entryId, page).mapCatching {
@@ -74,7 +76,7 @@ class EntriesRepositoryImpl(
 
     override suspend fun getEntryVotes(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<Voters> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.getEntryVotes(entryId, page).mapCatching {
@@ -86,7 +88,7 @@ class EntriesRepositoryImpl(
     override suspend fun getEntryCommentVotes(
         entryId: Int,
         commentId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<Voters> {
         return withContext(dispatcherProvider.io) {
             entriesDataSource.getEntryCommentVotes(entryId, commentId, page).mapCatching {

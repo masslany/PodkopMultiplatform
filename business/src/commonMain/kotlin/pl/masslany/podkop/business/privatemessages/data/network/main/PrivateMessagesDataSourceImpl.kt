@@ -9,13 +9,13 @@ import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMe
 class PrivateMessagesDataSourceImpl(
     private val privateMessagesApi: PrivateMessagesApi,
 ) : PrivateMessagesDataSource {
-    override suspend fun getConversations(page: Any?): Result<PrivateMessagesListDto> {
+    override suspend fun getConversations(page: Int): Result<PrivateMessagesListDto> {
         return privateMessagesApi.getConversations(page = page)
     }
 
     override suspend fun getConversationMessages(
         username: String,
-        page: Any?,
+        page: Int,
     ): Result<PrivateMessageThreadDto> {
         return privateMessagesApi.getConversationMessages(
             username = username,

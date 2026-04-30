@@ -9,13 +9,14 @@ import pl.masslany.podkop.business.favourites.domain.models.FavouriteType
 import pl.masslany.podkop.business.favourites.domain.models.request.FavouritesResourceType
 import pl.masslany.podkop.business.favourites.domain.models.request.FavouritesSortType
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class FavouritesRepositoryImpl(
     private val favouritesDataSource: FavouritesDataSource,
     private val dispatcherProvider: DispatcherProvider,
 ) : FavouritesRepository {
     override suspend fun getFavourites(
-        page: Any?,
+        page: PageRequest,
         sortType: FavouritesSortType,
         resourceType: FavouritesResourceType,
     ): Result<Resources> {

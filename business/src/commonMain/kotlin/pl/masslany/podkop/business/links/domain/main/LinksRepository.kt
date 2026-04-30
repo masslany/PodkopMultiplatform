@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.links.domain.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.common.domain.models.links.Link
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
@@ -17,7 +19,7 @@ import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 interface LinksRepository {
     @Suppress("LongParameterList")
     suspend fun getLinks(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         linksSortType: LinksSortType,
         linksType: LinksType,

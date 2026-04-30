@@ -1,5 +1,6 @@
 package pl.masslany.podkop.business.profile.data.network.client
 
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.profile.data.network.api.ProfileApi
 import pl.masslany.podkop.business.profile.data.network.models.ObservedTagsResponseDto
@@ -14,6 +15,7 @@ import pl.masslany.podkop.business.profile.data.network.models.UsersAutoComplete
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class ProfileApiClient(
     private val apiClient: ApiClient,
@@ -294,7 +296,7 @@ class ProfileApiClient(
         endpoint: String,
     ): Result<T> {
         val queryParameters = buildMap {
-            put("page", page.toString())
+            putPagination(PageRequest.Number(page))
         }
 
         val request =

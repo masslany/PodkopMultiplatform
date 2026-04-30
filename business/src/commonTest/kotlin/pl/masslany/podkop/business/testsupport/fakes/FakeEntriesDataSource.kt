@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.testsupport.fakes
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.entries.data.api.EntriesDataSource
@@ -7,7 +9,7 @@ import pl.masslany.podkop.business.entries.data.network.models.EntryVotersRespon
 
 class FakeEntriesDataSource : EntriesDataSource {
     data class GetEntriesCall(
-        val page: Any?,
+        val page: PageRequest,
         val limit: Int?,
         val sort: String,
         val hotSort: Int,
@@ -17,18 +19,18 @@ class FakeEntriesDataSource : EntriesDataSource {
 
     data class GetEntryCommentsCall(
         val entryId: Int,
-        val page: Any?,
+        val page: Int?,
     )
 
     data class GetEntryVotesCall(
         val entryId: Int,
-        val page: Any?,
+        val page: Int?,
     )
 
     data class GetEntryCommentVotesCall(
         val entryId: Int,
         val commentId: Int,
-        val page: Any?,
+        val page: Int?,
     )
 
     data class CreateEntryCommentCall(
@@ -104,7 +106,7 @@ class FakeEntriesDataSource : EntriesDataSource {
     val removeVoteUpCommentCalls = mutableListOf<Pair<Int, Int>>()
 
     override suspend fun getEntries(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         hotSort: Int,
@@ -122,7 +124,7 @@ class FakeEntriesDataSource : EntriesDataSource {
 
     override suspend fun getEntryComments(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<ResourceResponseDto> {
         getEntryCommentsCalls += GetEntryCommentsCall(entryId, page)
         return getEntryCommentsResult
@@ -130,7 +132,7 @@ class FakeEntriesDataSource : EntriesDataSource {
 
     override suspend fun getEntryVotes(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<EntryVotersResponseDto> {
         getEntryVotesCalls += GetEntryVotesCall(entryId, page)
         return getEntryVotesResult
@@ -139,7 +141,7 @@ class FakeEntriesDataSource : EntriesDataSource {
     override suspend fun getEntryCommentVotes(
         entryId: Int,
         commentId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<EntryVotersResponseDto> {
         getEntryCommentVotesCalls += GetEntryCommentVotesCall(entryId, commentId, page)
         return getEntryCommentVotesResult

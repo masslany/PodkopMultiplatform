@@ -19,8 +19,10 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.pagination.PageRequest
+import pl.masslany.podkop.common.pagination.PaginationMode
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
@@ -56,10 +58,7 @@ class ObservedViewModel(
         },
     ) { request ->
         observedRepository.getObserved(
-            page = when (request) {
-                is PageRequest.Index -> request.page
-                is PageRequest.Cursor -> request.key
-            },
+            page = request,
             type = currentType,
         )
     }
@@ -158,13 +157,13 @@ class ObservedViewModel(
     ) {
         viewModelScope.launch {
             observedRepository.getObserved(
-                page = null,
+                page = PaginationMode.CursorInPage.initialRequest(),
                 type = currentType,
             )
                 .onSuccess {
                     observedItems.value = it.data.toImmutableList()
                     resourceItemStateHolder.updateData(it.data.map { observedItem -> observedItem.item })
-                    paginator.setup(it.pagination, it.data.size)
+                    paginator.setup(it.pagination, it.data.size, PaginationMode.CursorInPage)
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)

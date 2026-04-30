@@ -20,7 +20,7 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
-import pl.masslany.podkop.common.pagination.toPage
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarEvent
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.SnackbarMessage
@@ -29,6 +29,7 @@ import pl.masslany.podkop.features.privatemessages.ConversationScreen
 import pl.masslany.podkop.features.profile.models.ProfileAchievementsSectionState
 import pl.masslany.podkop.features.profile.models.ProfileListContentState
 import pl.masslany.podkop.features.profile.models.ProfileListItem
+import pl.masslany.podkop.features.profile.models.ProfileListItemsPage
 import pl.masslany.podkop.features.profile.models.ProfileNoteState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionState
 import pl.masslany.podkop.features.profile.models.ProfileSubActionType
@@ -94,10 +95,10 @@ class ProfileViewModel(
             snackbarManager.tryEmitGenericError()
         },
     ) { request ->
-        val page = request.toPage()
-            ?: return@Paginator Result.failure(
-                IllegalArgumentException("Unsupported profile pagination request: $request"),
-            )
+        val page = request.numberOrNull() ?: run {
+            logger.warn("Ignoring profile list pagination request because numbered page was expected, got $request")
+            return@Paginator Result.success(ProfileListItemsPage(emptyList(), null))
+        }
         val targetSubAction = paginatedSubActionType ?: selectedSubActionType
 
         profileRepository.getProfileListItems(

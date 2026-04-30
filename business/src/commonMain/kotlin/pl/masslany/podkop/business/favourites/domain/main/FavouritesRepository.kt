@@ -4,10 +4,11 @@ import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.favourites.domain.models.FavouriteType
 import pl.masslany.podkop.business.favourites.domain.models.request.FavouritesResourceType
 import pl.masslany.podkop.business.favourites.domain.models.request.FavouritesSortType
+import pl.masslany.podkop.common.pagination.PageRequest
 
 interface FavouritesRepository {
     suspend fun getFavourites(
-        page: Any?,
+        page: PageRequest,
         sortType: FavouritesSortType,
         resourceType: FavouritesResourceType,
     ): Result<Resources>

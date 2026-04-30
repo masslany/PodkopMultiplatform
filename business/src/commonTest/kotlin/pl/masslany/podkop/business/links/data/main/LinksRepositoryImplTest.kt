@@ -23,6 +23,7 @@ import pl.masslany.podkop.business.links.domain.models.request.PublishLinkDraft
 import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeLinksDataSource
+import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.business.testsupport.fixtures.BusinessFixtures as Fixtures
 
 class LinksRepositoryImplTest {
@@ -39,7 +40,7 @@ class LinksRepositoryImplTest {
         val sut = createSut(linksDataSource)
 
         val actual = sut.getLinks(
-            page = "cursor",
+            page = PageRequest.PageCursor("cursor"),
             limit = 20,
             linksSortType = LinksSortType.Commented,
             linksType = LinksType.UPCOMING,
@@ -50,7 +51,7 @@ class LinksRepositoryImplTest {
         assertEquals(
             listOf(
                 FakeLinksDataSource.GetLinksCall(
-                    page = "cursor",
+                    page = PageRequest.PageCursor("cursor"),
                     limit = 20,
                     sort = "commented",
                     type = "upcoming",
@@ -645,7 +646,7 @@ class LinksRepositoryImplTest {
         val sut = createSut(linksDataSource)
 
         val actual = sut.getLinks(
-            page = null,
+            page = PageRequest.Initial,
             limit = null,
             linksSortType = LinksSortType.Active,
             linksType = LinksType.HOMEPAGE,

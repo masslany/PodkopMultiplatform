@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.testsupport.fakes
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.common.domain.models.common.VoteReason
@@ -13,7 +15,7 @@ import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 
 class FakeLinksDataSource : LinksDataSource {
     data class GetLinksCall(
-        val page: Any?,
+        val page: PageRequest,
         val limit: Int?,
         val sort: String,
         val type: String,
@@ -155,7 +157,7 @@ class FakeLinksDataSource : LinksDataSource {
     val removeVoteOnLinkCommentCalls = mutableListOf<LinkCommentVoteCall>()
 
     override suspend fun getLinks(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         type: String,

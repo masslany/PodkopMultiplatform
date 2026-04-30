@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.tags.data.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
 import pl.masslany.podkop.business.common.domain.models.common.Resources
@@ -45,7 +47,7 @@ class TagsRepositoryImpl(
 
     override suspend fun getTagStream(
         tagName: String,
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: TagsSort,
         type: TagsType,

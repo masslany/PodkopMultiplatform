@@ -16,6 +16,7 @@ class Paginator<T>(
     private val scope: CoroutineScope,
     private val onNewItems: suspend (items: List<T>) -> Unit,
     private val onError: suspend (Throwable) -> Unit = {},
+    private val defaultPaginationMode: PaginationMode = PaginationMode.Numbered,
     private val loader: suspend (PageRequest) -> Result<PaginatedData<T>>,
 ) {
 
@@ -28,8 +29,14 @@ class Paginator<T>(
     private var perPage: Int? = null
     private var total: Int? = null
     private var emittedCount = 0
+    private var paginationMode: PaginationMode = defaultPaginationMode
 
-    fun setup(pagination: Pagination?, initialItemCount: Int) {
+    fun setup(
+        pagination: Pagination?,
+        initialItemCount: Int,
+        paginationMode: PaginationMode = defaultPaginationMode,
+    ) {
+        this.paginationMode = paginationMode
         nextPage = 2
         nextCursor = pagination?.next
         perPage = pagination?.perPage?.takeIf { it > 0 }
@@ -74,16 +81,32 @@ class Paginator<T>(
         _state.value = PaginatorState.Loading
 
         scope.launch {
-            val currentNextCursor = nextCursor
-            val request = if (!currentNextCursor.isNullOrEmpty()) {
-                PageRequest.Cursor(currentNextCursor)
-            } else {
-                PageRequest.Index(nextPage)
+            val request = paginationMode.nextRequest(
+                next = nextCursor,
+                nextNumber = nextPage,
+            ) ?: run {
+                _state.value = PaginatorState.Exhausted
+                return@launch
+            }
+            val requestedCursor = when (request) {
+                is PageRequest.PageCursor -> request.value
+
+                is PageRequest.KeyCursor -> request.value
+
+                PageRequest.Initial,
+                is PageRequest.Number,
+                -> null
             }
 
             loader(request)
                 .onSuccess { resources ->
-                    nextCursor = resources.pagination?.next
+                    val responseNextCursor = resources.pagination?.next
+                    val cursorDidNotAdvance =
+                        requestedCursor != null &&
+                            requestedCursor.isNotBlank() &&
+                            responseNextCursor == requestedCursor
+
+                    nextCursor = if (cursorDidNotAdvance) null else responseNextCursor
                     perPage = resources.pagination?.perPage?.takeIf { it > 0 } ?: perPage
                     total = resources.pagination?.total?.takeIf { it > 0 }
                     nextPage++
@@ -97,7 +120,7 @@ class Paginator<T>(
                         emittedItemsCount = emittedCount,
                     )
                     _state.value =
-                        if (noMoreItems) {
+                        if (cursorDidNotAdvance || noMoreItems) {
                             PaginatorState.Exhausted
                         } else {
                             PaginatorState.Idle
@@ -116,22 +139,36 @@ class Paginator<T>(
         emittedItemsCount: Int,
     ): Boolean {
         val hasNextCursor = pagination != null && pagination.next.isNotBlank()
-        if (hasNextCursor) {
-            if (receivedItemsCount == 0) return true
+        return when (paginationMode) {
+            PaginationMode.CursorInPage,
+            PaginationMode.CursorInKey,
+            -> {
+                if (!hasNextCursor) return true
+                if (receivedItemsCount == 0) return true
 
-            val knownTotal = pagination.total.takeIf { it > 0 } ?: total
-            return knownTotal != null && emittedItemsCount >= knownTotal
-        }
+                val knownTotal = pagination.total.takeIf { it > 0 } ?: total
+                knownTotal != null && emittedItemsCount >= knownTotal
+            }
 
-        val knownTotal = pagination?.total?.takeIf { it > 0 } ?: total
-        if (knownTotal != null && emittedItemsCount >= knownTotal) return true
+            PaginationMode.Numbered -> {
+                if (hasNextCursor) {
+                    if (receivedItemsCount == 0) return true
 
-        val expectedPageSize = pagination?.perPage?.takeIf { it > 0 } ?: perPage
-        return when {
-            receivedItemsCount == 0 -> true
-            expectedPageSize != null -> receivedItemsCount < expectedPageSize
-            pagination != null && pagination.next.isBlank() -> true
-            else -> false
+                    val knownTotal = pagination.total.takeIf { it > 0 } ?: total
+                    return knownTotal != null && emittedItemsCount >= knownTotal
+                }
+
+                val knownTotal = pagination?.total?.takeIf { it > 0 } ?: total
+                if (knownTotal != null && emittedItemsCount >= knownTotal) return true
+
+                val expectedPageSize = pagination?.perPage?.takeIf { it > 0 } ?: perPage
+                when {
+                    receivedItemsCount == 0 -> true
+                    expectedPageSize != null -> receivedItemsCount < expectedPageSize
+                    pagination != null && pagination.next.isBlank() -> true
+                    else -> false
+                }
+            }
         }
     }
 }

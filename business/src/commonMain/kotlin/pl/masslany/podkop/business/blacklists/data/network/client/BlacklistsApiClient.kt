@@ -10,16 +10,18 @@ import pl.masslany.podkop.business.blacklists.data.network.models.BlacklistUserR
 import pl.masslany.podkop.business.blacklists.data.network.models.BlacklistedDomainsResponseDto
 import pl.masslany.podkop.business.blacklists.data.network.models.BlacklistedTagsResponseDto
 import pl.masslany.podkop.business.blacklists.data.network.models.BlacklistedUsersResponseDto
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class BlacklistsApiClient(
     private val apiClient: ApiClient,
 ) : BlacklistsApi {
     override suspend fun getBlacklistedUsers(page: Int): Result<BlacklistedUsersResponseDto> {
         val queryParameters = buildMap {
-            put("page", page.toString())
+            putPagination(PageRequest.Number(page))
         }
 
         val request = Request<BlacklistedUsersResponseDto>(
@@ -36,7 +38,7 @@ class BlacklistsApiClient(
 
     override suspend fun getBlacklistedTags(page: Int): Result<BlacklistedTagsResponseDto> {
         val queryParameters = buildMap {
-            put("page", page.toString())
+            putPagination(PageRequest.Number(page))
         }
 
         val request = Request<BlacklistedTagsResponseDto>(
@@ -53,7 +55,7 @@ class BlacklistsApiClient(
 
     override suspend fun getBlacklistedDomains(page: Int): Result<BlacklistedDomainsResponseDto> {
         val queryParameters = buildMap {
-            put("page", page.toString())
+            putPagination(PageRequest.Number(page))
         }
 
         val request = Request<BlacklistedDomainsResponseDto>(

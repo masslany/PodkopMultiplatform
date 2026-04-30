@@ -8,7 +8,7 @@ import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMe
 class FakePrivateMessagesDataSource : PrivateMessagesDataSource {
     data class GetConversationMessagesCall(
         val username: String,
-        val page: Any?,
+        val page: Int,
     )
 
     data class OpenConversationCall(
@@ -29,20 +29,20 @@ class FakePrivateMessagesDataSource : PrivateMessagesDataSource {
         unstubbedResult("PrivateMessagesDataSource.openConversation")
     var readAllResult: Result<Unit> = unstubbedResult("PrivateMessagesDataSource.readAll")
 
-    val getConversationsCalls = mutableListOf<Any?>()
+    val getConversationsCalls = mutableListOf<Int>()
     val getConversationMessagesCalls = mutableListOf<GetConversationMessagesCall>()
     val getConversationMessagesNewerCalls = mutableListOf<String>()
     val openConversationCalls = mutableListOf<OpenConversationCall>()
     var readAllCalls = 0
 
-    override suspend fun getConversations(page: Any?): Result<PrivateMessagesListDto> {
+    override suspend fun getConversations(page: Int): Result<PrivateMessagesListDto> {
         getConversationsCalls += page
         return getConversationsResult
     }
 
     override suspend fun getConversationMessages(
         username: String,
-        page: Any?,
+        page: Int,
     ): Result<PrivateMessageThreadDto> {
         getConversationMessagesCalls += GetConversationMessagesCall(
             username = username,

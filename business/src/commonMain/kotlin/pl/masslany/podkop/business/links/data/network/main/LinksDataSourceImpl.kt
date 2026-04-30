@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.links.data.network.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.common.domain.models.common.VoteReason
@@ -16,7 +18,7 @@ class LinksDataSourceImpl(
     private val linksApi: LinksApi,
 ) : LinksDataSource {
     override suspend fun getLinks(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         type: String,

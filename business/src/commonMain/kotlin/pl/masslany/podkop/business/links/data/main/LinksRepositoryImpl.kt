@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.links.data.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.data.main.mapper.common.toMedia
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResourceItemList
@@ -29,7 +31,7 @@ class LinksRepositoryImpl(
     private val dispatcherProvider: DispatcherProvider,
 ) : LinksRepository {
     override suspend fun getLinks(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         linksSortType: LinksSortType,
         linksType: LinksType,

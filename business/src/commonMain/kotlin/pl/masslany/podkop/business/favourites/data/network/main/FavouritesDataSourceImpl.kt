@@ -3,12 +3,13 @@ package pl.masslany.podkop.business.favourites.data.network.main
 import pl.masslany.podkop.business.favourites.data.api.FavouritesDataSource
 import pl.masslany.podkop.business.favourites.data.network.api.FavouritesApi
 import pl.masslany.podkop.business.favourites.domain.models.FavouriteType
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class FavouritesDataSourceImpl(
     private val favouritesApi: FavouritesApi,
 ) : FavouritesDataSource {
     override suspend fun getFavourites(
-        page: Any?,
+        page: PageRequest,
         sort: String,
         resource: String?,
     ) = favouritesApi.getFavourites(

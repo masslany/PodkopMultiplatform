@@ -58,7 +58,7 @@ class PrivateMessagesRepositoryImplTest {
 
         val actual = sut.getConversations(page = 2).getOrThrow()
 
-        assertEquals(listOf<Any?>(2), dataSource.getConversationsCalls)
+        assertEquals(listOf(2), dataSource.getConversationsCalls)
         assertEquals("sender", actual.data.single().username)
         assertEquals("hello", actual.data.single().lastMessageContent)
         assertTrue(actual.data.single().unread)

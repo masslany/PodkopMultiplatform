@@ -1,5 +1,7 @@
 package pl.masslany.podkop.business.tags.domain.main
 
+import pl.masslany.podkop.common.pagination.PageRequest
+
 import pl.masslany.podkop.business.tags.domain.models.TagDetails
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.tags.domain.models.TagsAutoComplete
@@ -19,7 +21,7 @@ interface TagsRepository {
 
     suspend fun getTagStream(
         tagName: String,
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: TagsSort,
         type: TagsType,

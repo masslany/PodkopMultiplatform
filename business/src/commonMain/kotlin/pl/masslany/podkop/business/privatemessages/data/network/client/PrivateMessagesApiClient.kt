@@ -1,5 +1,6 @@
 package pl.masslany.podkop.business.privatemessages.data.network.client
 
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.business.privatemessages.data.network.api.PrivateMessagesApi
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageItemResponseDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageOpenDataDto
@@ -9,13 +10,14 @@ import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMe
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class PrivateMessagesApiClient(
     private val apiClient: ApiClient,
 ) : PrivateMessagesApi {
-    override suspend fun getConversations(page: Any?): Result<PrivateMessagesListDto> {
+    override suspend fun getConversations(page: Int): Result<PrivateMessagesListDto> {
         val queryParameters = buildMap {
-            page?.let { put("page", it.toString()) }
+            putPagination(PageRequest.Number(page))
         }.takeIf { it.isNotEmpty() }
 
         val request =
@@ -30,10 +32,10 @@ class PrivateMessagesApiClient(
 
     override suspend fun getConversationMessages(
         username: String,
-        page: Any?,
+        page: Int,
     ): Result<PrivateMessageThreadDto> {
         val queryParameters = buildMap {
-            page?.let { put("page", it.toString()) }
+            putPagination(PageRequest.Number(page))
         }.takeIf { it.isNotEmpty() }
 
         val request =

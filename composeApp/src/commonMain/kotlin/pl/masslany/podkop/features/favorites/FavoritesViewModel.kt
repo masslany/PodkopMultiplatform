@@ -18,11 +18,13 @@ import pl.masslany.podkop.business.favourites.domain.models.request.FavouritesSo
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
-import pl.masslany.podkop.common.pagination.PageRequest
+import pl.masslany.podkop.common.pagination.PaginationMode
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -54,10 +56,7 @@ class FavoritesViewModel(
         },
     ) { request ->
         favouritesRepository.getFavourites(
-            page = when (request) {
-                is PageRequest.Index -> request.page
-                is PageRequest.Cursor -> request.key
-            },
+            page = request,
             sortType = currentSortType,
             resourceType = currentResourceType,
         )
@@ -170,14 +169,19 @@ class FavoritesViewModel(
 
     private fun loadFavourites() {
         viewModelScope.launch {
+            val paginationMode = resolvePaginationMode()
             favouritesRepository.getFavourites(
-                page = resolveFirstPageParam(),
+                page = paginationMode.initialRequest(),
                 sortType = currentSortType,
                 resourceType = currentResourceType,
             )
                 .onSuccess {
                     resourceItemStateHolder.updateData(it.data)
-                    paginator.setup(it.pagination, it.data.size)
+                    paginator.setup(
+                        pagination = it.pagination,
+                        initialItemCount = it.data.size,
+                        paginationMode = paginationMode,
+                    )
                     _state.update { previousState ->
                         previousState
                             .updateLoading(false)
@@ -202,9 +206,6 @@ class FavoritesViewModel(
         }
     }
 
-    private suspend fun resolveFirstPageParam(): Any? = if (authRepository.isLoggedIn()) {
-        null
-    } else {
-        1
-    }
+    private suspend fun resolvePaginationMode(): PaginationMode =
+        FeaturePaginationPolicies.favourites(isLoggedIn = authRepository.isLoggedIn())
 }

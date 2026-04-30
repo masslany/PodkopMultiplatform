@@ -14,18 +14,17 @@ class SearchRepositoryImpl(
     private val dispatcherProvider: DispatcherProvider,
 ) : SearchRepository {
     override suspend fun getSearchStream(
-        page: Any?,
+        page: Int,
         limit: Int?,
         query: SearchStreamQuery,
     ): Result<Resources> = withContext(dispatcherProvider.io) {
-        val currentPage = page.toSearchPage()
         searchDataSource.getSearchStream(
             page = page,
             limit = limit,
             query = query,
         ).mapCatching { response ->
             response.toResources()
-                .withResolvedPagePagination(currentPage = currentPage)
+                .withResolvedPagePagination(currentPage = page)
         }
     }
 
@@ -44,11 +43,5 @@ class SearchRepositoryImpl(
         }
 
         return this.copy(next = (currentPage + 1).toString())
-    }
-
-    private fun Any?.toSearchPage(): Int = when (this) {
-        is Int -> this
-        is String -> this.toIntOrNull() ?: 1
-        else -> 1
     }
 }

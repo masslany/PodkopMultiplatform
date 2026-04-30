@@ -8,7 +8,6 @@ import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.common.domain.models.common.Voted
-import pl.masslany.podkop.common.pagination.PageRequest
 
 class AdvancedSearchPaginationExtensionsTest {
 
@@ -28,7 +27,7 @@ class AdvancedSearchPaginationExtensionsTest {
 
         val actual = resources.withSearchFallbackPagination(
             currentItemCount = 38,
-            request = PageRequest.Cursor("2"),
+            currentPage = 2,
         )
 
         assertEquals("3", actual.pagination?.next)
@@ -50,7 +49,7 @@ class AdvancedSearchPaginationExtensionsTest {
 
         val actual = resources.withSearchFallbackPagination(
             currentItemCount = 58,
-            request = PageRequest.Cursor("3"),
+            currentPage = 3,
         )
 
         assertEquals("", actual.pagination?.next)

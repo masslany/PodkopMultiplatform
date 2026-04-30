@@ -5,11 +5,11 @@ import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessageT
 import pl.masslany.podkop.business.privatemessages.domain.models.PrivateMessagesPage
 
 interface PrivateMessagesRepository {
-    suspend fun getConversations(page: Any? = null): Result<PrivateMessagesPage>
+    suspend fun getConversations(page: Int = 1): Result<PrivateMessagesPage>
 
     suspend fun getConversationMessages(
         username: String,
-        page: Any? = null,
+        page: Int = 1,
     ): Result<PrivateMessageThreadPage>
 
     suspend fun getConversationMessagesNewer(username: String): Result<PrivateMessageThreadPage>

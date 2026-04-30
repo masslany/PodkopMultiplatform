@@ -1,17 +1,19 @@
 package pl.masslany.podkop.business.search.data.network.client
 
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.search.data.network.api.SearchApi
 import pl.masslany.podkop.business.search.domain.models.request.SearchStreamQuery
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class SearchApiClient(
     private val apiClient: ApiClient,
 ) : SearchApi {
     override suspend fun getSearchStream(
-        page: Any?,
+        page: Int,
         limit: Int?,
         query: SearchStreamQuery,
     ): Result<ResourceResponseDto> {
@@ -22,7 +24,7 @@ class SearchApiClient(
             query.dateFrom?.let { put("date_from", it) }
             query.dateTo?.let { put("date_to", it) }
             query.category?.takeIf(String::isNotBlank)?.let { put("category", it) }
-            page?.let { put("page", it.toString()) }
+            putPagination(PageRequest.Number(page))
             limit?.let { put("limit", it.toString()) }
         }.takeIf { it.isNotEmpty() }
 

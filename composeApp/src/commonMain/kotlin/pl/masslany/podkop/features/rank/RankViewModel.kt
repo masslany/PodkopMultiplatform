@@ -11,11 +11,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.rank.domain.main.RankRepository
+import pl.masslany.podkop.business.rank.domain.models.RankEntries
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
-import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.profile.ProfileScreen
@@ -45,11 +46,13 @@ class RankViewModel(
             snackbarManager.tryEmitGenericError()
         },
     ) { request ->
+        val page = request.numberOrNull() ?: run {
+            logger.warn("Ignoring rank pagination request because numbered page was expected, got $request")
+            return@Paginator Result.success(RankEntries(emptyList(), null))
+        }
+
         rankRepository.getRank(
-            page = when (request) {
-                is PageRequest.Index -> request.page
-                is PageRequest.Cursor -> request.key.toIntOrNull() ?: 1
-            },
+            page = page,
         )
     }
 

@@ -1,5 +1,6 @@
 package pl.masslany.podkop.business.notifications.data.network.client
 
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.business.notifications.data.network.api.NotificationsApi
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationItemResponseDto
 import pl.masslany.podkop.business.notifications.data.network.models.NotificationsListDto
@@ -8,6 +9,7 @@ import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class NotificationsApiClient(
     private val apiClient: ApiClient,
@@ -24,10 +26,10 @@ class NotificationsApiClient(
 
     override suspend fun getNotifications(
         group: NotificationGroup,
-        page: Any?,
+        page: PageRequest,
     ): Result<NotificationsListDto> {
         val queryParameters = buildMap {
-            page?.let { put("page", it.toString()) }
+            putPagination(page)
         }.takeIf { it.isNotEmpty() }
 
         val request =

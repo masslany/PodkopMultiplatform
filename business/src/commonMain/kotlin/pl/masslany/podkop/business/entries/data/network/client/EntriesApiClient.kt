@@ -1,5 +1,6 @@
 package pl.masslany.podkop.business.entries.data.network.client
 
+import pl.masslany.podkop.business.common.data.network.client.putPagination
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.entries.data.network.api.EntriesApi
@@ -13,12 +14,13 @@ import pl.masslany.podkop.business.entries.data.network.models.EntryVotersRespon
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
 import pl.masslany.podkop.common.network.models.request.Request
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class EntriesApiClient(
     private val apiClient: ApiClient,
 ) : EntriesApi {
     override suspend fun getEntries(
-        page: Any?,
+        page: PageRequest,
         limit: Int?,
         sort: String,
         hotSort: Int,
@@ -28,7 +30,7 @@ class EntriesApiClient(
         val queryParameters = buildMap {
             put("sort", sort)
             put("last_update", hotSort.toString())
-            page?.let { put("page", it.toString()) }
+            putPagination(page)
             limit?.let { put("limit", it.toString()) }
             category?.let { put("category", it) }
             bucket?.let { put("bucket", it) }
@@ -62,10 +64,10 @@ class EntriesApiClient(
 
     override suspend fun getEntryComments(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<ResourceResponseDto> {
         val queryParameters = buildMap {
-            page?.let { put("page", it.toString()) }
+            page?.let { putPagination(PageRequest.Number(it)) }
         }.takeIf { it.isNotEmpty() }
 
         val request =
@@ -83,10 +85,10 @@ class EntriesApiClient(
 
     override suspend fun getEntryVotes(
         entryId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<EntryVotersResponseDto> {
         val queryParameters = buildMap {
-            page?.let { put("page", it.toString()) }
+            page?.let { putPagination(PageRequest.Number(it)) }
         }.takeIf { it.isNotEmpty() }
 
         val request =
@@ -105,10 +107,10 @@ class EntriesApiClient(
     override suspend fun getEntryCommentVotes(
         entryId: Int,
         commentId: Int,
-        page: Any?,
+        page: Int?,
     ): Result<EntryVotersResponseDto> {
         val queryParameters = buildMap {
-            page?.let { put("page", it.toString()) }
+            page?.let { putPagination(PageRequest.Number(it)) }
         }.takeIf { it.isNotEmpty() }
 
         val request =

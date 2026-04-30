@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.common.domain.models.common.Voter
+import pl.masslany.podkop.business.common.domain.models.common.Voters
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.common.logging.api.AppLogger
@@ -22,7 +23,7 @@ import pl.masslany.podkop.common.models.vote.toStringResource
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
-import pl.masslany.podkop.common.pagination.toPage
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.profile.ProfileScreen
@@ -55,10 +56,10 @@ class ResourceVotesBottomSheetViewModel(
             snackbarManager.tryEmitGenericError()
         },
     ) { request ->
-        val page = request.toPage()
-            ?: return@Paginator Result.failure(
-                IllegalArgumentException("Unsupported votes pagination request: $request"),
-            )
+        val page = request.numberOrNull() ?: run {
+            logger.warn("Ignoring resource vote users pagination request because numbered page was expected, got $request")
+            return@Paginator Result.success(Voters(emptyList(), null))
+        }
 
         loadVotes(page = page)
     }

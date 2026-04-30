@@ -102,7 +102,7 @@ class SearchRepositoryImplTest {
         )
 
         val actual = sut.getSearchStream(
-            page = null,
+            page = 1,
             limit = null,
             query = SearchStreamQuery(query = "test"),
         )

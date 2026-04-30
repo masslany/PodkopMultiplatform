@@ -12,14 +12,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
+import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.hits.domain.main.HitsRepository
 import pl.masslany.podkop.business.hits.domain.models.request.HitsSortType
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
-import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.hits.archivepicker.HitsArchivePickerState
@@ -53,11 +54,13 @@ class HitsViewModel(
             snackbarManager.tryEmitGenericError()
         },
     ) { request ->
+        val page = request.numberOrNull() ?: run {
+            logger.warn("Ignoring hits pagination request because numbered page was expected, got $request")
+            return@Paginator Result.success(Resources(emptyList(), null))
+        }
+
         hitsRepository.getLinkHits(
-            page = when (request) {
-                is PageRequest.Index -> request.page
-                is PageRequest.Cursor -> request.key
-            },
+            page = page,
             hitsSortType = selectedSortType,
             year = selectedArchive?.year,
             month = selectedArchive?.month,

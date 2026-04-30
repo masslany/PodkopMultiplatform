@@ -21,6 +21,8 @@ import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMe
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessageUserDto
 import pl.masslany.podkop.business.privatemessages.data.network.models.PrivateMessagesListDto
+import pl.masslany.podkop.common.logging.api.AppLogger
+import pl.masslany.podkop.common.pagination.PageRequest
 
 class NotificationsRepositoryImplTest {
 
@@ -53,6 +55,7 @@ class NotificationsRepositoryImplTest {
             ),
             dispatcherProvider = FakeDispatcherProvider(),
             appScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
+            logger = NoOpLogger,
         )
 
         val actual = sut.refreshStatus()
@@ -75,6 +78,7 @@ class NotificationsRepositoryImplTest {
             ),
             dispatcherProvider = FakeDispatcherProvider(),
             appScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
+            logger = NoOpLogger,
         )
         sut.clearUnreadCount()
 
@@ -115,6 +119,7 @@ class NotificationsRepositoryImplTest {
             ),
             dispatcherProvider = FakeDispatcherProvider(),
             appScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
+            logger = NoOpLogger,
         )
         sut.refreshStatus()
         notificationsDataSource.getNotificationsStatusResult = Result.failure(expected)
@@ -161,16 +166,27 @@ class NotificationsRepositoryImplTest {
             ),
             dispatcherProvider = FakeDispatcherProvider(),
             appScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
+            logger = NoOpLogger,
         )
 
-        val actual = sut.getNotifications(group = NotificationGroup.PrivateMessages, page = 1)
+        val actual = sut.getNotifications(group = NotificationGroup.PrivateMessages, page = PageRequest.Number(1))
 
         val item = actual.getOrThrow().data.single()
-        assertEquals(listOf<Any?>(1), privateMessagesDataSource.getConversationsCalls)
+        assertEquals(listOf(1), privateMessagesDataSource.getConversationsCalls)
         assertEquals(NotificationGroup.PrivateMessages, item.group)
         assertEquals("ZjemCiWanne", item.id)
         assertEquals("ZjemCiWanne", item.actor?.username)
         assertEquals("2137", item.message)
         assertEquals(false, item.isRead)
     }
+}
+
+private object NoOpLogger : AppLogger {
+    override fun debug(message: String) = Unit
+
+    override fun info(message: String) = Unit
+
+    override fun warn(message: String, throwable: Throwable?) = Unit
+
+    override fun error(message: String, throwable: Throwable?) = Unit
 }

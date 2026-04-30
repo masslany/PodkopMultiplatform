@@ -9,7 +9,7 @@ class SearchDataSourceImpl(
     private val searchApi: SearchApi,
 ) : SearchDataSource {
     override suspend fun getSearchStream(
-        page: Any?,
+        page: Int,
         limit: Int?,
         query: SearchStreamQuery,
     ): Result<ResourceResponseDto> = searchApi.getSearchStream(

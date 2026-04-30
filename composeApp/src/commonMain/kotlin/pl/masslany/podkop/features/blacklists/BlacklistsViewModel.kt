@@ -26,9 +26,9 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.navigation.dialogText
-import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.blacklists.models.BlacklistCategoryState
@@ -205,11 +205,13 @@ class BlacklistsViewModel(
                 snackbarManager.tryEmitGenericError()
             },
         ) { request ->
+            val page = request.numberOrNull() ?: run {
+                logger.warn("Ignoring blacklist pagination request for $type because numbered page was expected, got $request")
+                return@Paginator Result.success(BlacklistPage(emptyList(), null))
+            }
+
             loadPage(
-                page = when (request) {
-                    is PageRequest.Index -> request.page
-                    is PageRequest.Cursor -> request.key.toIntOrNull() ?: 1
-                },
+                page = page,
             )
         }
 

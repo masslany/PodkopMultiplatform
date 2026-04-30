@@ -13,7 +13,7 @@ class HitsRepositoryImpl(
     private val dispatcherProvider: DispatcherProvider,
 ) : HitsRepository {
     override suspend fun getLinkHits(
-        page: Any?,
+        page: Int,
         hitsSortType: HitsSortType,
         year: Int?,
         month: Int?,

@@ -28,11 +28,14 @@ import pl.masslany.podkop.common.models.toDropdownMenuItemType
 import pl.masslany.podkop.common.models.toLinksSortType
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.PageRequest
+import pl.masslany.podkop.common.pagination.PaginationMode
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
+import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.linksubmission.AddLinkScreen
+import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 @OptIn(ExperimentalUuidApi::class)
@@ -69,10 +72,7 @@ class LinksViewModel(
         },
     ) { request ->
         linksRepository.getLinks(
-            page = when (request) {
-                is PageRequest.Index -> request.page
-                is PageRequest.Cursor -> request.key
-            },
+            page = request,
             limit = null,
             linksType = linksType,
             linksSortType = selectedLinksSortType,
@@ -124,8 +124,10 @@ class LinksViewModel(
             _state.update { previousState ->
                 previousState.copy(isLoggedIn = isLoggedIn)
             }
+            val paginationMode = paginationMode(isLoggedIn)
             loadLinks(
-                page = resolveFirstPageParam(isLoggedIn),
+                page = paginationMode.initialRequest(),
+                paginationMode = paginationMode,
                 showErrorScreenOnFailure = true,
                 logMessage = "Failed to load links",
             )
@@ -145,8 +147,10 @@ class LinksViewModel(
                 .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
+            val paginationMode = paginationMode()
             loadLinks(
-                page = resolveFirstPageParam(),
+                page = paginationMode.initialRequest(),
+                paginationMode = paginationMode,
                 showErrorScreenOnFailure = state.value.links.isEmpty(),
                 logMessage = "Failed to load links for sort type $sortType",
             )
@@ -175,8 +179,10 @@ class LinksViewModel(
                 .updateRefreshPromptVisible(false)
         }
         viewModelScope.launch {
+            val paginationMode = paginationMode()
             loadLinks(
-                page = resolveFirstPageParam(),
+                page = paginationMode.initialRequest(),
+                paginationMode = paginationMode,
                 showErrorScreenOnFailure = state.value.links.isEmpty(),
                 logMessage = "Failed to refresh links for sort type $sortType",
             )
@@ -220,16 +226,14 @@ class LinksViewModel(
         }
     }
 
-    private suspend fun resolveFirstPageParam(): Any? = resolveFirstPageParam(authRepository.isLoggedIn())
+    private suspend fun paginationMode() = paginationMode(authRepository.isLoggedIn())
 
-    private fun resolveFirstPageParam(isLoggedIn: Boolean): Any? = if (isLoggedIn) {
-        null
-    } else {
-        1
-    }
+    private fun paginationMode(isLoggedIn: Boolean) =
+        FeaturePaginationPolicies.links(isLoggedIn = isLoggedIn, isUpcoming = isUpcoming)
 
     private suspend fun loadLinks(
-        page: Any?,
+        page: PageRequest,
+        paginationMode: PaginationMode,
         showErrorScreenOnFailure: Boolean,
         logMessage: String,
     ) {
@@ -242,7 +246,7 @@ class LinksViewModel(
             bucket = null,
         ).onSuccess {
             linksResourceItemStateHolder.updateData(it.data)
-            paginator.setup(it.pagination, it.data.size)
+            paginator.setup(it.pagination, it.data.size, paginationMode)
             _state.update { previousState ->
                 previousState
                     .updateLoading(false)
