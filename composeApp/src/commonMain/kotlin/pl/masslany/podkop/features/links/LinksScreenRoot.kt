@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.coerceIn
@@ -308,7 +309,7 @@ private fun LinksScreenList(
     lazyListState: LazyListState,
 ) {
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.testTag(LinksTestTags.Screen.List),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = lazyListState,
         contentPadding = PaddingValues(
@@ -350,11 +351,12 @@ private fun LinksScreenList(
             items = state.links,
             key = { item -> item.id },
             contentType = { item -> item.contentType },
-        ) {
+        ) { item ->
             ResourceItemRenderer(
                 modifier = Modifier
+                    .testTag(LinksTestTags.Item.link(item.id))
                     .padding(horizontal = 16.dp),
-                state = it,
+                state = item,
                 actions = actions,
                 config = ResourceItemConfig(
                     showEntryInlineActions = false,
