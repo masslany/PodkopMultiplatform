@@ -6,9 +6,14 @@ import org.koin.dsl.module
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.infrastructure.main.ApiClientImpl
 import pl.masslany.podkop.common.network.infrastructure.main.HttpClientFactory
+import pl.masslany.podkop.common.network.infrastructure.main.NetworkConfig
 import pl.masslany.podkop.common.network.infrastructure.main.TokenRefreshCoordinator
 
 val networkModule = module {
+    single {
+        NetworkConfig()
+    }
+
     single<Json> {
         Json {
             ignoreUnknownKeys = true
@@ -21,6 +26,7 @@ val networkModule = module {
             configStorage = get(),
             json = get(),
             logger = get(),
+            networkConfig = get(),
         )
     }
 
@@ -28,6 +34,7 @@ val networkModule = module {
         HttpClientFactory(
             configStorage = get(),
             tokenRefreshCoordinator = get(),
+            networkConfig = get(),
             json = get(),
         ).create()
     }

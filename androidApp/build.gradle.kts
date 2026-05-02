@@ -30,6 +30,8 @@ android {
         versionCode = podkopVersionCode
         versionName = podkopVersionName
 
+        testInstrumentationRunner = "pl.masslany.podkop.test.PodkopTestRunner"
+
         buildConfigField("String", "WYKOP_KEY", "\"${apikeyProperties.getProperty("WYKOP_KEY")}\"")
         buildConfigField("String", "WYKOP_SECRET", "\"${apikeyProperties.getProperty("WYKOP_SECRET")}\"")
     }
@@ -61,6 +63,13 @@ android {
     }
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    if (name == "compileDebugAndroidTestKotlin") {
+        // Reference-only sample app pasted for test-harness inspiration.
+        exclude("**/example/**")
+    }
+}
+
 dependencies {
     implementation(projects.composeApp)
     implementation(projects.business)
@@ -78,4 +87,16 @@ dependencies {
 
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.leakcanary.android)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.testExt.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.uiautomator)
+    androidTestImplementation(libs.okhttp)
+    androidTestImplementation(libs.mockwebserver3)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
 }
