@@ -54,13 +54,6 @@ android {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    if (name == "compileDebugAndroidTestKotlin") {
-        // Reference-only sample app pasted for test-harness inspiration.
-        exclude("**/example/**")
-    }
-}
-
 dependencies {
     implementation(projects.composeApp)
     implementation(projects.business)
