@@ -23,7 +23,7 @@ import androidx.navigationevent.NavigationEvent
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
-private const val PredictiveBackTransitionDurationMs = 280
+private const val PREDICTIVE_BACK_TRANSITION_DURATION_MS = 280
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +82,7 @@ private fun GenericNavDisplay(
             navigationInput = navigationInput,
         ),
         backStack = backStack,
-        sceneStrategy = bottomSheetStrategy then dialogSceneStrategy,
+        sceneStrategies = listOf(bottomSheetStrategy, dialogSceneStrategy),
         transitionSpec = {
             ContentTransform(
                 targetContentEnter = EnterTransition.None,
@@ -95,7 +95,7 @@ private fun GenericNavDisplay(
                 initialContentExit = ExitTransition.None,
             )
         },
-        predictivePopTransitionSpec = { edge ->
+        predictivePopTransitionSpec = { edge: Int ->
             val direction = if (edge == NavigationEvent.EDGE_LEFT) {
                 AnimatedContentTransitionScope.SlideDirection.Right
             } else {
@@ -106,14 +106,14 @@ private fun GenericNavDisplay(
                     towards = direction,
                     initialOffset = { it / 4 },
                     animationSpec = tween(
-                        durationMillis = PredictiveBackTransitionDurationMs,
+                        durationMillis = PREDICTIVE_BACK_TRANSITION_DURATION_MS,
                         easing = LinearEasing,
                     ),
                 ),
                 initialContentExit = slideOutOfContainer(
                     towards = direction,
                     animationSpec = tween(
-                        durationMillis = PredictiveBackTransitionDurationMs,
+                        durationMillis = PREDICTIVE_BACK_TRANSITION_DURATION_MS,
                         easing = LinearEasing,
                     ),
                 ),
