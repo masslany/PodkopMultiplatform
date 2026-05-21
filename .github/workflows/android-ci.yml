@@ -141,7 +141,7 @@ jobs:
 
   verify-kmp:
     name: Verify KMP shared modules
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 45
 
     steps:
@@ -156,6 +156,11 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      - name: Print Xcode version
+        run: |
+          xcodebuild -version
+          xcode-select -p
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
