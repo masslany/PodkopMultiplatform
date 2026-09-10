@@ -21,6 +21,7 @@ internal class TokenRefreshCoordinator(
     private val configStorage: ConfigStorage,
     private val json: Json,
     private val logger: AppLogger,
+    private val networkConfig: NetworkConfig,
     private val refreshHttpClient: HttpClient = createRefreshHttpClient(json),
 ) : TokenRefreshHandler {
     private val refreshMutex = Mutex()
@@ -61,7 +62,7 @@ internal class TokenRefreshCoordinator(
     private suspend fun refreshWithRefreshToken(refreshToken: String): Boolean {
         return runCatching {
             val response =
-                refreshHttpClient.post("$BASE_URL$REFRESH_TOKEN_PATH") {
+                refreshHttpClient.post("${networkConfig.normalizedBaseUrl}$REFRESH_TOKEN_PATH") {
                     contentType(ContentType.Application.Json)
                     accept(ContentType.Application.Json)
                     setBody(
@@ -92,7 +93,7 @@ internal class TokenRefreshCoordinator(
 
         return runCatching {
             val response =
-                refreshHttpClient.post("$BASE_URL$AUTH_PATH") {
+                refreshHttpClient.post("${networkConfig.normalizedBaseUrl}$AUTH_PATH") {
                     contentType(ContentType.Application.Json)
                     accept(ContentType.Application.Json)
                     setBody(
@@ -112,7 +113,6 @@ internal class TokenRefreshCoordinator(
     }
 
     private companion object {
-        const val BASE_URL = "https://wykop.pl/"
         const val AUTH_PATH = "api/v3/auth"
         const val REFRESH_TOKEN_PATH = "api/v3/refresh-token"
         const val TOKEN_EXPIRATION_LEEWAY_SECONDS = 60L

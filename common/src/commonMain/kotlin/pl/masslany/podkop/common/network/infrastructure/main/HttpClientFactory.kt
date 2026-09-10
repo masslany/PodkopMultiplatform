@@ -18,13 +18,14 @@ import pl.masslany.podkop.common.configstorage.api.ConfigStorage
 internal class HttpClientFactory(
     private val configStorage: ConfigStorage,
     private val tokenRefreshCoordinator: TokenRefreshCoordinator,
+    private val networkConfig: NetworkConfig,
     private val json: Json,
     private val logger: Logger,
 ) {
     fun create(): HttpClient {
         return HttpClient(HttpClientEngineProvider.provide()) {
             defaultRequest {
-                url(BASE_URL)
+                url(networkConfig.normalizedBaseUrl)
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
             }
@@ -53,9 +54,5 @@ internal class HttpClientFactory(
                 }
             }
         }
-    }
-
-    private companion object {
-        const val BASE_URL = "https://wykop.pl/"
     }
 }

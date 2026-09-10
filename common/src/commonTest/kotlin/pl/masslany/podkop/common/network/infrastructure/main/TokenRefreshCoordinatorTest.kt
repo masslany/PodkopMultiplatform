@@ -24,6 +24,7 @@ class TokenRefreshCoordinatorTest {
                 json = testJson,
                 logger = RecordingLogger(),
                 refreshHttpClient = client,
+                networkConfig = NetworkConfig(),
             )
 
         try {
@@ -61,6 +62,7 @@ class TokenRefreshCoordinatorTest {
                 json = testJson,
                 logger = RecordingLogger(),
                 refreshHttpClient = client,
+                networkConfig = NetworkConfig(),
             )
 
         try {
@@ -107,6 +109,7 @@ class TokenRefreshCoordinatorTest {
                 json = testJson,
                 logger = logger,
                 refreshHttpClient = client,
+                networkConfig = NetworkConfig(),
             )
 
         try {
@@ -147,6 +150,7 @@ class TokenRefreshCoordinatorTest {
                 json = testJson,
                 logger = RecordingLogger(),
                 refreshHttpClient = client,
+                networkConfig = NetworkConfig(),
             )
 
         try {

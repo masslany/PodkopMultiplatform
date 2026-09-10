@@ -32,6 +32,37 @@ Planned structure as tests expand:
 - `.../testsupport/fakes` for hand-written fake repositories/data sources/services
 - `.../testsupport/assertions` for custom assertions/matchers when repeated patterns appear
 
+### Android Integration Tests
+
+Android integration tests live in `androidApp/src/androidTest` and use a test-only application
+started by `PodkopTestRunner`.
+
+The integration harness should:
+
+- Start `MainActivity` through Android instrumentation.
+- Put common activity/server/Koin lifecycle setup in `BaseTest`.
+- Put repeated UI operations and assertions in feature robots that extend `BaseRobot`.
+- Point the app network stack at `MockWebServer` using the injected network base URL.
+- Serve deterministic response JSON from `androidTest/assets/mock-api`.
+- Use synthetic fixtures first, with short sentinel text values that make UI assertions obvious.
+- Keep the mocked dispatcher strict: unknown requests should fail loudly instead of falling through.
+- Replace startup/auth/background polling dependencies with deterministic fakes unless the test is
+  explicitly covering those flows.
+
+Integration flow tests should assert visible UI behavior, not implementation details of the mocked
+web requests. Pagination tests should prove the user can reach content from later pages by checking
+that later-page content is displayed after scrolling.
+
+Mock server request recording can remain available for diagnostics or lower-level harness tests, but
+feature flows should not pass only because the correct URL was requested.
+
+When a synthetic fixture proves a regression path, add real trimmed API JSON later for contract
+coverage without replacing the simpler sentinel fixture.
+
+Feature UI test tags should live in one feature-level object, for example `LinksTestTags`, with
+nested groups such as `Screen` when a feature grows. Keep tag names stable and hierarchical, for
+example `links:screen:list`.
+
 ### Fixtures
 
 Fixtures are centralized builders that provide:
@@ -68,6 +99,8 @@ Use Kotlin backtick function names for test cases.
 
 - Preferred: ``fun `maps null values to defaults`()``
 - Avoid: `fun maps_null_values_to_defaults()`
+- Exception: Android instrumented tests should use dex-safe camelCase names because older dex
+  targets reject spaces in method names.
 
 ### SUT naming
 
@@ -123,6 +156,7 @@ Completed:
 - Standardized mapper test names to Kotlin backtick format
 - Added centralized repository fakes (`testsupport/fakes`)
 - Added repository tests for all business repositories (`Auth`, `Entries`, `Hits`, `Links`, `Profile`, `Tags`)
+- Added the first Android integration harness for deterministic MockWebServer-backed UI flows.
 
 ## Next Recommended Targets
 
