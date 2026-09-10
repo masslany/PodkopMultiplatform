@@ -34,6 +34,7 @@ import podkop.composeapp.generated.resources.dropdown_menu_label_entry_comments
 import podkop.composeapp.generated.resources.dropdown_menu_label_everything
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot_12h
+import podkop.composeapp.generated.resources.dropdown_menu_label_hot_24h
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot_2h
 import podkop.composeapp.generated.resources.dropdown_menu_label_hot_6h
 import podkop.composeapp.generated.resources.dropdown_menu_label_link_comments
@@ -137,6 +138,9 @@ private fun DropdownMenuItemType.toText(): String = when (this) {
 
     DropdownMenuItemType.TwelveHours ->
         stringResource(resource = Res.string.dropdown_menu_label_hot_12h)
+
+    DropdownMenuItemType.TwentyFourHours ->
+        stringResource(resource = Res.string.dropdown_menu_label_hot_24h)
 
     DropdownMenuItemType.All ->
         stringResource(resource = Res.string.dropdown_menu_label_all)

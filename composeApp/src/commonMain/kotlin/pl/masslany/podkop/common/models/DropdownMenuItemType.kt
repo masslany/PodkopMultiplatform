@@ -25,6 +25,8 @@ sealed class DropdownMenuItemType {
 
     data object TwelveHours : DropdownMenuItemType()
 
+    data object TwentyFourHours : DropdownMenuItemType()
+
     data object All : DropdownMenuItemType()
 
     data object Day : DropdownMenuItemType()
@@ -69,6 +71,7 @@ fun HotSortType.toDropdownMenuItemType(): DropdownMenuItemType = when (this) {
     HotSortType.TwoHours -> DropdownMenuItemType.TwoHours
     HotSortType.SixHours -> DropdownMenuItemType.SixHours
     HotSortType.TwelveHours -> DropdownMenuItemType.TwelveHours
+    HotSortType.TwentyFourHours -> DropdownMenuItemType.TwentyFourHours
 }
 
 fun DropdownMenuItemType.toLinksSortType(): LinksSortType = when (this) {
@@ -90,5 +93,6 @@ fun DropdownMenuItemType.toHotSortType(): HotSortType = when (this) {
     DropdownMenuItemType.TwoHours -> HotSortType.TwoHours
     DropdownMenuItemType.SixHours -> HotSortType.SixHours
     DropdownMenuItemType.TwelveHours -> HotSortType.TwelveHours
+    DropdownMenuItemType.TwentyFourHours -> HotSortType.TwentyFourHours
     else -> throw IllegalArgumentException("Attempt to convert $this to HotSortType")
 }

@@ -1,7 +1,5 @@
 package pl.masslany.podkop.business.entries.data.main
 
-import pl.masslany.podkop.common.pagination.PageRequest
-
 import kotlinx.coroutines.withContext
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResourceItemList
 import pl.masslany.podkop.business.common.data.main.mapper.common.toResources
@@ -14,6 +12,7 @@ import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
+import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.persistence.api.KeyValueStorage
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -52,7 +51,7 @@ class EntriesRepositoryImpl(
     }
 
     override fun getHotSortTypes(): List<HotSortType> {
-        return listOf(HotSortType.TwoHours, HotSortType.SixHours, HotSortType.TwelveHours)
+        return listOf(HotSortType.TwoHours, HotSortType.SixHours, HotSortType.TwelveHours, HotSortType.TwentyFourHours)
     }
 
     override suspend fun getEntry(entryId: Int): Result<ResourceItem> {
