@@ -1,19 +1,20 @@
 package pl.masslany.podkop.business.entries.data.main
 
 import kotlinx.coroutines.runBlocking
-import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.Gender
 import pl.masslany.podkop.business.common.domain.models.common.NameColor
+import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.Voted
-import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 import pl.masslany.podkop.business.common.domain.models.common.Voter
 import pl.masslany.podkop.business.common.domain.models.common.Voters
+import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeEntriesDataSource
 import pl.masslany.podkop.business.testsupport.fakes.FakeKeyValueStorage
 import pl.masslany.podkop.common.pagination.PageRequest
+import kotlin.math.abs
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
@@ -21,7 +22,6 @@ import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
-import kotlin.math.abs
 import pl.masslany.podkop.business.testsupport.fixtures.BusinessFixtures as Fixtures
 
 @OptIn(ExperimentalTime::class)
@@ -83,7 +83,12 @@ class EntriesRepositoryImplTest {
         val sut = createSut()
 
         assertEquals(
-            listOf(HotSortType.TwoHours, HotSortType.SixHours, HotSortType.TwelveHours),
+            listOf(
+                HotSortType.TwoHours,
+                HotSortType.SixHours,
+                HotSortType.TwelveHours,
+                HotSortType.TwentyFourHours,
+            ),
             sut.getHotSortTypes(),
         )
     }

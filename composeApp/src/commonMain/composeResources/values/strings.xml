@@ -288,6 +288,7 @@
     <string name="dropdown_menu_label_hot_2h">2h</string>
     <string name="dropdown_menu_label_hot_6h">6h</string>
     <string name="dropdown_menu_label_hot_12h">12h</string>
+    <string name="dropdown_menu_label_hot_24h">24h</string>
     <string name="dropdown_menu_label_all">Wszystko</string>
     <string name="dropdown_menu_label_day">Dzień</string>
     <string name="dropdown_menu_label_week">Tydzień</string>
