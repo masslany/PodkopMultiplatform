@@ -30,6 +30,7 @@ import com.mikepenz.markdown.compose.LocalMarkdownPadding
 import com.mikepenz.markdown.compose.LocalMarkdownTypography
 import com.mikepenz.markdown.compose.components.markdownComponents
 import com.mikepenz.markdown.compose.elements.MarkdownListItems
+import com.mikepenz.markdown.compose.elements.MarkdownParagraph
 import com.mikepenz.markdown.compose.elements.MarkdownText
 import com.mikepenz.markdown.m3.Markdown
 import com.mikepenz.markdown.m3.markdownColor
@@ -201,6 +202,8 @@ private val markdownComponents = markdownComponents(
 
                 MarkdownText(
                     content = strippedText,
+                    node = node,
+                    style = typography.paragraph,
                 )
             } else {
                 Button(
@@ -216,7 +219,7 @@ private val markdownComponents = markdownComponents(
                 }
             }
         } else {
-            MarkdownText(
+            MarkdownParagraph(
                 content = content,
                 node = node,
                 style = typography.paragraph,
