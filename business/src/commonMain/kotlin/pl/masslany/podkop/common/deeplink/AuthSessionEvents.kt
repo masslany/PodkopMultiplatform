@@ -14,7 +14,7 @@ interface AuthSessionEvents {
     fun tryEmit(event: AuthSessionEvent): Boolean
 }
 
-internal class AuthSessionEventsImpl : AuthSessionEvents {
+class AuthSessionEventsImpl : AuthSessionEvents {
     private val eventsFlow = MutableSharedFlow<AuthSessionEvent>(
         extraBufferCapacity = 1,
     )

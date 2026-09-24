@@ -11,7 +11,7 @@ import pl.masslany.podkop.common.pagination.PaginationMode
  * the shared paginator handles the actual [PageRequest][pl.masslany.podkop.common.pagination.PageRequest]
  * generation.
  */
-internal object FeaturePaginationPolicies {
+object FeaturePaginationPolicies {
     /**
      * Logged-in entries use opaque cursors under `page`; anonymous entries still use page numbers.
      */

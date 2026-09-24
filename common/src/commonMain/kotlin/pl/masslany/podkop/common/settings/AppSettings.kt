@@ -1,6 +1,5 @@
 package pl.masslany.podkop.common.settings
 
-import androidx.compose.runtime.Stable
 import kotlinx.coroutines.flow.Flow
 
 enum class ThemeOverride {
@@ -9,7 +8,6 @@ enum class ThemeOverride {
     DARK,
 }
 
-@Stable
 interface AppSettings {
     val autoplayGifs: Flow<Boolean>
     val themeOverride: Flow<ThemeOverride>

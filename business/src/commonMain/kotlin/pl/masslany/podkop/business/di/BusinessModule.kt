@@ -33,8 +33,11 @@ import pl.masslany.podkop.business.startup.infrastructure.di.startupModule
 import pl.masslany.podkop.business.tags.data.di.tagsDataModule
 import pl.masslany.podkop.business.tags.data.network.di.tagsNetworkModule
 import pl.masslany.podkop.commonModule
+import pl.masslany.podkop.common.deeplink.AuthSessionEvents
+import pl.masslany.podkop.common.deeplink.AuthSessionEventsImpl
 
 val businessModule = module {
+    single<AuthSessionEvents> { AuthSessionEventsImpl() }
     includes(
         commonModule,
         linksDataModule,

@@ -3,7 +3,7 @@ package pl.masslany.podkop.common.deeplink
 import io.ktor.http.Url
 import io.ktor.http.parseQueryString
 
-internal class AppDeepLinkParser {
+class AppDeepLinkParser {
 
     fun parse(rawUrl: String): AppDeepLink? {
         val normalizedUrl = rawUrl.trim()
