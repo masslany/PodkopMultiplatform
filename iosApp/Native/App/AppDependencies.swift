@@ -11,6 +11,12 @@ final class AppDependencies {
     lazy var ingress = LinkIngress(router: router)
     lazy var session = SessionModel(dependencies: self)
     let sceneActivity = SceneActivity()
+    lazy var feedLoader: FeedLoading = {
+        #if DEBUG
+        if isFixture { return FixtureFeedLoader() }
+        #endif
+        return SharedFeedLoader(client: client, adapter: adapter)
+    }()
     private var isFixture: Bool {
         #if DEBUG
         ProcessInfo.processInfo.arguments.contains("-nativeFixture")
@@ -84,6 +90,8 @@ final class SessionModel {
            arguments.indices.contains(marker + 1) {
             switch arguments[marker + 1] {
             case "guest", "authenticated", "content":
+                dependencies.router.paths = [:]
+                dependencies.router.selectedTab = .links
                 phase = .ready
                 isLoggedIn = arguments[marker + 1] == "authenticated"
                 dependencies.router.applySession(isLoggedIn: isLoggedIn, revision: 0)

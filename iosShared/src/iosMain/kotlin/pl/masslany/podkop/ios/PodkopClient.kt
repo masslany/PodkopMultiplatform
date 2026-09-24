@@ -22,6 +22,11 @@ import pl.masslany.podkop.business.common.domain.models.common.NameColor
 import pl.masslany.podkop.business.common.domain.models.common.Voted
 import pl.masslany.podkop.business.di.businessModule
 import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
+import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
+import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
+import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
+import pl.masslany.podkop.business.hits.domain.main.HitsRepository
+import pl.masslany.podkop.business.hits.domain.models.request.HitsSortType
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksType
@@ -133,6 +138,8 @@ class PodkopClient private constructor(
     private val settingsStore: AppSettings = AppSettingsImpl(app.koin.get<KeyValueStorage>())
     private val notificationsRepository: NotificationsRepository = app.koin.get()
     private val linksRepository: LinksRepository = app.koin.get()
+    private val entriesRepository: EntriesRepository = app.koin.get()
+    private val hitsRepository: HitsRepository = app.koin.get()
     private val twitterPreviewRepository: TwitterEmbedPreviewRepository = app.koin.get()
     private val parser = AppDeepLinkParser()
     private var closed = false
@@ -142,6 +149,7 @@ class PodkopClient private constructor(
     val settings = SettingsService()
     val notifications = NotificationsService()
     val links = LinksService()
+    val entries = EntriesService()
     val embeds = EmbedsService()
 
     fun close() {
@@ -325,6 +333,47 @@ class PodkopClient private constructor(
                 next = result.pagination?.next,
                 total = result.pagination?.total,
             )
+        }
+
+        fun hits(completion: (IOSResourcePage?, IOSFailure?) -> Unit): IOSOperation = operation(completion) {
+            val result = hitsRepository.getLinkHits(hitsSortType = HitsSortType.Day).getOrThrow()
+            IOSResourcePage(result.data.map(ResourceItem::toIOSResource), result.pagination?.next, result.pagination?.total)
+        }
+    }
+
+    inner class EntriesService {
+        fun policy(isLoggedIn: Boolean): IOSPagePolicy {
+            val mode = FeaturePaginationPolicies.entries(isLoggedIn)
+            return IOSPagePolicy(mode.name, mode.initialRequest().toIOS())
+        }
+
+        fun nextRequest(isLoggedIn: Boolean, next: String?, nextNumber: Int): IOSPageRequest? =
+            FeaturePaginationPolicies.entries(isLoggedIn).nextRequest(next, nextNumber)?.toIOS()
+
+        fun load(
+            request: IOSPageRequest,
+            sort: String,
+            hotHours: Int,
+            completion: (IOSResourcePage?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            val sortType = when (sort) {
+                "newest" -> EntriesSortType.Newest
+                "active" -> EntriesSortType.Active
+                "hot" -> EntriesSortType.Hot
+                else -> throw IllegalArgumentException("invalid sort")
+            }
+            val period = when (hotHours) {
+                2 -> HotSortType.TwoHours
+                6 -> HotSortType.SixHours
+                12 -> HotSortType.TwelveHours
+                24 -> HotSortType.TwentyFourHours
+                else -> throw IllegalArgumentException("invalid hot period")
+            }
+            val result = entriesRepository.getEntries(
+                page = request.toDomain(), limit = null, entriesSortType = sortType,
+                hotSortType = period, category = null, bucket = null,
+            ).getOrThrow()
+            IOSResourcePage(result.data.map(ResourceItem::toIOSResource), result.pagination?.next, result.pagination?.total)
         }
     }
 

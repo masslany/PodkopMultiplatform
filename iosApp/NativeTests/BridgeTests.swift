@@ -9,6 +9,13 @@ final class BridgeTests: XCTestCase {
         let policy = client.links.policy(isLoggedIn: true, isUpcoming: false)
         XCTAssertEqual(policy.kind, "CursorInPage")
         XCTAssertEqual(policy.initial.kind, "initial")
+        XCTAssertEqual(client.entries.policy(isLoggedIn: false).initial.kind, "number")
+        XCTAssertEqual(client.entries.policy(isLoggedIn: true).initial.kind, "initial")
+        XCTAssertEqual(client.entries.nextRequest(isLoggedIn: true, next: "002", nextNumber: 2)?.kind,
+                       "pageCursor")
+        XCTAssertEqual(client.entries.nextRequest(isLoggedIn: true, next: "002", nextNumber: 2)?.value,
+                       "002")
+        XCTAssertEqual(client.links.policy(isLoggedIn: true, isUpcoming: true).initial.kind, "number")
         let stream = adapter.stream { client.startup.observe(onChange: $0) }
         var iterator = stream.makeAsyncIterator()
         let first = await iterator.next()

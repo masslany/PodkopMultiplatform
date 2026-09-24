@@ -180,11 +180,7 @@ private struct TabContent: View {
                 #endif
             }
         } else {
-            ContentUnavailableView {
-                Label(tab.title, systemImage: tab.symbol)
-            } description: {
-                Text("Feed content is coming in the next stage.")
-            }
+            NativeFeedView(tab: tab, dependencies: dependencies)
         }
     }
 
@@ -207,6 +203,12 @@ private struct TabContent: View {
                 }
                 .accessibilityLabel("Write a post")
             }
+            if session.isLoggedIn {
+                Button { router.navigate(.notifications, in: tab) } label: {
+                    Image(systemName: "bell")
+                }
+                .accessibilityLabel("Notifications")
+            }
             #endif
         }
     }
@@ -220,6 +222,8 @@ private struct TabContent: View {
         case .search: DevelopmentView(title: String(localized: "Search"))
         case .tags: DevelopmentView(title: String(localized: "Tags"))
         case .profile: DevelopmentView(title: String(localized: "Profile"))
+        case .tag(let name): DevelopmentView(title: "#\(name)")
+        case .user(let name): DevelopmentView(title: name)
         case .settings: DevelopmentView(title: String(localized: "Settings"))
         case .favorites: DevelopmentView(title: String(localized: "Favorites"))
         case .observed: DevelopmentView(title: String(localized: "Observed"))

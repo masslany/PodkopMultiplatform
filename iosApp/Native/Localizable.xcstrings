@@ -1,6 +1,15 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Active" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Aktywne" } } } },
+    "Commented" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Komentowane" } } } },
+    "Could not refresh" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Nie udało się odświeżyć" } } } },
+    "Digged" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wykopywane" } } } },
+    "Gallery view" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Widok galerii" } } } },
+    "List view" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Widok listy" } } } },
+    "Newest" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Najnowsze" } } } },
+    "Retry next page" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Ponów następną stronę" } } } },
+    "See all" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zobacz wszystkie" } } } },
     "Add the app configuration and try again." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Dodaj konfigurację aplikacji i spróbuj ponownie." } } } },
     "About" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "O aplikacji" } } } },
     "Cancel" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Anuluj" } } } },
