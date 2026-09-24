@@ -2,6 +2,8 @@
 
 Podkop is a Kotlin Multiplatform (KMP) client for Wykop.pl, built with modern Android development practices and Compose Multiplatform.
 
+The proposed native iOS migration is documented in [the migration plan](docs/ios-native-migration/README.md), including architecture, parity tracking, and implementation task packets for agents. This is a plan; the current implementation is described below.
+
 ## Project Structure
 
 The project is divided into several modules to ensure a clean separation of concerns and maximize code sharing:
