@@ -12,6 +12,7 @@ class AppDeepLinkParser {
             ?: return null
 
         val url = runCatching { Url(normalizedUrl) }.getOrNull() ?: return null
+        if (url.protocol.name.lowercase() != "https") return null
         if (url.host.lowercase() != SUPPORTED_HOST) return null
 
         parseLoginCallback(url = normalizedUrl)?.let { return it }

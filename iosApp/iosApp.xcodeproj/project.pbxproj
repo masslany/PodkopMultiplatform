@@ -8,9 +8,14 @@
 
 /* Begin PBXBuildFile section */
         61C15A94C3E544BB939D67CC /* NativeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B67E2E3D39E49A3A045A6B5 /* NativeApp.swift */; };
+        6AC4F2076DE74EA08D08B105 /* Navigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24D4922734BF474EBB88AF90 /* Navigation.swift */; };
+        66ECDFE970A3470C9C20635D /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D17579B10E45EC8444FC9D /* AppDependencies.swift */; };
         EA6FB1290B8641528214D00C /* BridgeAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8938F95AE105476FBFAED90F /* BridgeAdapter.swift */; };
         0A03C3378B6842BB92176384 /* BridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D56A2BD57647A0AAC55C50 /* BridgeTests.swift */; };
+        B6CCCA61EC664508A2A9EB7E /* NavigationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCA90B552E6E419AB9BC1E1F /* NavigationTests.swift */; };
+        5E8F6213798A4CFDB0D0E854 /* ShellUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF3C4D3A623A46E4B9518E05 /* ShellUITests.swift */; };
         0D91B5B012E34DDF9850C07F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A1D77A1EE3A4455926341B6 /* Assets.xcassets */; };
+        B45D929D657D42B28C07A0F2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 209581F294714C7DB471EEB1 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,9 +24,15 @@
         42BE2C4B8E164EB58EE39D2C /* PodkopNative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Podkop.app; sourceTree = BUILT_PRODUCTS_DIR; };
         FF61EE37102F46BD95675463 /* PodkopNativeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PodkopNativeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
         7B67E2E3D39E49A3A045A6B5 /* NativeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/NativeApp.swift; sourceTree = "<group>"; };
+        24D4922734BF474EBB88AF90 /* Navigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/Navigation.swift; sourceTree = "<group>"; };
+        83D17579B10E45EC8444FC9D /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/AppDependencies.swift; sourceTree = "<group>"; };
         8938F95AE105476FBFAED90F /* BridgeAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services/BridgeAdapter.swift; sourceTree = "<group>"; };
         68D56A2BD57647A0AAC55C50 /* BridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgeTests.swift; sourceTree = "<group>"; };
+        BCA90B552E6E419AB9BC1E1F /* NavigationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationTests.swift; sourceTree = "<group>"; };
+        BF3C4D3A623A46E4B9518E05 /* ShellUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellUITests.swift; sourceTree = "<group>"; };
+        F0D99D990D0942B2AA73E349 /* PodkopNativeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PodkopNativeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
         9A1D77A1EE3A4455926341B6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = iosApp/Assets.xcassets; sourceTree = SOURCE_ROOT; };
+        209581F294714C7DB471EEB1 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
         8D06BDD538C947C1AEA6865F /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Configuration/Config.xcconfig; sourceTree = SOURCE_ROOT; };
 
 /* End PBXFileReference section */
@@ -63,6 +74,7 @@
 
         29E83668E36743EA9924DD1A /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
         4CE2FE1D6BAB4C1E8DD8906B /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+        A8D894A6201645A4AFF0618F /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 
 /* End PBXFrameworksBuildPhase section */
 
@@ -74,6 +86,7 @@
 				B4ED8A67DF565EECC27A5944 /* iosApp */,
 				41370817FA524246A45B23AF /* Native */,
 				FE5C1FC6E0CD4AFAA32FB958 /* NativeTests */,
+				4EAA0D5A89C340D890F18B57 /* NativeUITests */,
 				9A1D77A1EE3A4455926341B6 /* Assets.xcassets */,
 				8D06BDD538C947C1AEA6865F /* Config.xcconfig */,
 				AD66322D4D348E8E3A9FA20D /* Products */,
@@ -86,13 +99,15 @@
 				9A6FC594DDCDDD41C2C7EC6A /* Podkop.app */,
 				42BE2C4B8E164EB58EE39D2C /* PodkopNative.app */,
 				FF61EE37102F46BD95675463 /* PodkopNativeTests.xctest */,
+				F0D99D990D0942B2AA73E349 /* PodkopNativeUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
 
-        41370817FA524246A45B23AF /* Native */ = {isa = PBXGroup; children = (7B67E2E3D39E49A3A045A6B5 /* NativeApp.swift */, 8938F95AE105476FBFAED90F /* BridgeAdapter.swift */); path = Native; sourceTree = "<group>"; };
-        FE5C1FC6E0CD4AFAA32FB958 /* NativeTests */ = {isa = PBXGroup; children = (68D56A2BD57647A0AAC55C50 /* BridgeTests.swift */); path = NativeTests; sourceTree = "<group>"; };
+        41370817FA524246A45B23AF /* Native */ = {isa = PBXGroup; children = (7B67E2E3D39E49A3A045A6B5 /* NativeApp.swift */, 24D4922734BF474EBB88AF90 /* Navigation.swift */, 83D17579B10E45EC8444FC9D /* AppDependencies.swift */, 8938F95AE105476FBFAED90F /* BridgeAdapter.swift */, 209581F294714C7DB471EEB1 /* Localizable.xcstrings */); path = Native; sourceTree = "<group>"; };
+        FE5C1FC6E0CD4AFAA32FB958 /* NativeTests */ = {isa = PBXGroup; children = (68D56A2BD57647A0AAC55C50 /* BridgeTests.swift */, BCA90B552E6E419AB9BC1E1F /* NavigationTests.swift */); path = NativeTests; sourceTree = "<group>"; };
+        4EAA0D5A89C340D890F18B57 /* NativeUITests */ = {isa = PBXGroup; children = (BF3C4D3A623A46E4B9518E05 /* ShellUITests.swift */); path = NativeUITests; sourceTree = "<group>"; };
 
 /* End PBXGroup section */
 
@@ -143,6 +158,17 @@
             productReference = FF61EE37102F46BD95675463 /* PodkopNativeTests.xctest */;
             productType = "com.apple.product-type.bundle.unit-test";
         };
+        C6B7DC2B00CD4C8F9B659F4F /* PodkopNativeUITests */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = 0612759F424D493C9269F4BC /* Build configuration list for PBXNativeTarget "PodkopNativeUITests" */;
+            buildPhases = (19AD0EE6EDC543D793058849 /* Sources */, A8D894A6201645A4AFF0618F /* Frameworks */, BDECE971E824433C90DEBE14 /* Resources */);
+            buildRules = ();
+            dependencies = (D0988721251F4F5DB6DB58E7 /* PBXTargetDependency */);
+            name = PodkopNativeUITests;
+            productName = PodkopNativeUITests;
+            productReference = F0D99D990D0942B2AA73E349 /* PodkopNativeUITests.xctest */;
+            productType = "com.apple.product-type.bundle.ui-testing";
+        };
 
 /* End PBXNativeTarget section */
 
@@ -158,7 +184,8 @@
 						CreatedOnToolsVersion = 16.2;
 					};
 					FE9DDBCC85BF464D8A9E1499 = { CreatedOnToolsVersion = 27.0; };
-					77E4A4C544EB4E7BABB16189 = { CreatedOnToolsVersion = 27.0; TestTargetID = FE9DDBCC85BF464D8A9E1499; };
+				77E4A4C544EB4E7BABB16189 = { CreatedOnToolsVersion = 27.0; TestTargetID = FE9DDBCC85BF464D8A9E1499; };
+				C6B7DC2B00CD4C8F9B659F4F = { CreatedOnToolsVersion = 27.0; TestTargetID = FE9DDBCC85BF464D8A9E1499; };
 				};
 			};
 			buildConfigurationList = 3F2C799EBCE6A9A764DDFE89 /* Build configuration list for PBXProject "iosApp" */;
@@ -178,6 +205,7 @@
 				506B98A03DA423371A6299ED /* iosApp */,
 				FE9DDBCC85BF464D8A9E1499 /* PodkopNative */,
 				77E4A4C544EB4E7BABB16189 /* PodkopNativeTests */,
+				C6B7DC2B00CD4C8F9B659F4F /* PodkopNativeUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -191,8 +219,9 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 
-        C86FDA9CDD5C4A7B9A883907 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (0D91B5B012E34DDF9850C07F /* Assets.xcassets in Resources */); runOnlyForDeploymentPostprocessing = 0; };
+        C86FDA9CDD5C4A7B9A883907 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (0D91B5B012E34DDF9850C07F /* Assets.xcassets in Resources */, B45D929D657D42B28C07A0F2 /* Localizable.xcstrings in Resources */); runOnlyForDeploymentPostprocessing = 0; };
         16914481027745E893E4AFA8 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+        BDECE971E824433C90DEBE14 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 
 /* End PBXResourcesBuildPhase section */
 
@@ -243,17 +272,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 
-        2A8CE1E60CC94E4CA9963C38 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (61C15A94C3E544BB939D67CC /* NativeApp.swift in Sources */, EA6FB1290B8641528214D00C /* BridgeAdapter.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
-        830BBEA643AC4253B8C6086A /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (0A03C3378B6842BB92176384 /* BridgeTests.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+        2A8CE1E60CC94E4CA9963C38 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (61C15A94C3E544BB939D67CC /* NativeApp.swift in Sources */, 6AC4F2076DE74EA08D08B105 /* Navigation.swift in Sources */, 66ECDFE970A3470C9C20635D /* AppDependencies.swift in Sources */, EA6FB1290B8641528214D00C /* BridgeAdapter.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+        830BBEA643AC4253B8C6086A /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (0A03C3378B6842BB92176384 /* BridgeTests.swift in Sources */, B6CCCA61EC664508A2A9EB7E /* NavigationTests.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+        19AD0EE6EDC543D793058849 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (5E8F6213798A4CFDB0D0E854 /* ShellUITests.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
 
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXContainerItemProxy section */
         5DAF920E79174656982F6CC0 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = BA9D32A715B2F10824809DBD /* Project object */; proxyType = 1; remoteGlobalIDString = FE9DDBCC85BF464D8A9E1499; remoteInfo = PodkopNative; };
+        E4D20C18AB8A4F529BBA2650 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = BA9D32A715B2F10824809DBD /* Project object */; proxyType = 1; remoteGlobalIDString = FE9DDBCC85BF464D8A9E1499; remoteInfo = PodkopNative; };
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXTargetDependency section */
         13D93BC1CEBA429CB74F58A8 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = FE9DDBCC85BF464D8A9E1499 /* PodkopNative */; targetProxy = 5DAF920E79174656982F6CC0 /* PBXContainerItemProxy */; };
+        D0988721251F4F5DB6DB58E7 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = FE9DDBCC85BF464D8A9E1499 /* PodkopNative */; targetProxy = E4D20C18AB8A4F529BBA2650 /* PBXContainerItemProxy */; };
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -448,6 +480,8 @@
         87016B50EA2542F1937FCFFE /* Release */ = {isa = XCBuildConfiguration; baseConfigurationReference = 8D06BDD538C947C1AEA6865F /* Config.xcconfig */; buildSettings = { ARCHS = arm64; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = J56J6ZLN8W; ENABLE_USER_SCRIPT_SANDBOXING = NO; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = iosApp/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 18.0; PRODUCT_NAME = Podkop; PRODUCT_MODULE_NAME = PodkopNative; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; }; name = Release; };
         8587F296035C4E68BEEF5CDC /* Debug */ = {isa = XCBuildConfiguration; baseConfigurationReference = 8D06BDD538C947C1AEA6865F /* Config.xcconfig */; buildSettings = { ARCHS = arm64; CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 18.0; PRODUCT_BUNDLE_IDENTIFIER = pl.masslany.podkop.PodkopNativeTests; PRODUCT_NAME = PodkopNativeTests; PRODUCT_MODULE_NAME = PodkopNativeTests; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Podkop.app/Podkop"; BUNDLE_LOADER = "$(TEST_HOST)"; }; name = Debug; };
         08F2099D38EB40EB9C6F8CA9 /* Release */ = {isa = XCBuildConfiguration; baseConfigurationReference = 8D06BDD538C947C1AEA6865F /* Config.xcconfig */; buildSettings = { ARCHS = arm64; CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 18.0; PRODUCT_BUNDLE_IDENTIFIER = pl.masslany.podkop.PodkopNativeTests; PRODUCT_NAME = PodkopNativeTests; PRODUCT_MODULE_NAME = PodkopNativeTests; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Podkop.app/Podkop"; BUNDLE_LOADER = "$(TEST_HOST)"; }; name = Release; };
+        2F5A2C0E768A4B76A102B330 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { ARCHS = arm64; CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 18.0; PRODUCT_BUNDLE_IDENTIFIER = pl.masslany.podkop.PodkopNativeUITests; PRODUCT_NAME = PodkopNativeUITests; PRODUCT_MODULE_NAME = PodkopNativeUITests; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; TEST_TARGET_NAME = PodkopNative; }; name = Debug; };
+        352F472D9D0D49EF916CFF46 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { ARCHS = arm64; CODE_SIGNING_ALLOWED = NO; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 18.0; PRODUCT_BUNDLE_IDENTIFIER = pl.masslany.podkop.PodkopNativeUITests; PRODUCT_NAME = PodkopNativeUITests; PRODUCT_MODULE_NAME = PodkopNativeUITests; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; TEST_TARGET_NAME = PodkopNative; }; name = Release; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -472,6 +506,7 @@
 
         1A866AB58EB545F1847DCB4A /* Build configuration list for PBXNativeTarget "PodkopNative" */ = {isa = XCConfigurationList; buildConfigurations = (E1698F77A8EA4C999E392BF4 /* Debug */, 87016B50EA2542F1937FCFFE /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
         502C8F3EAF804592A997AC2F /* Build configuration list for PBXNativeTarget "PodkopNativeTests" */ = {isa = XCConfigurationList; buildConfigurations = (8587F296035C4E68BEEF5CDC /* Debug */, 08F2099D38EB40EB9C6F8CA9 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+        0612759F424D493C9269F4BC /* Build configuration list for PBXNativeTarget "PodkopNativeUITests" */ = {isa = XCConfigurationList; buildConfigurations = (2F5A2C0E768A4B76A102B330 /* Debug */, 352F472D9D0D49EF916CFF46 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 
 /* End XCConfigurationList section */
 	};

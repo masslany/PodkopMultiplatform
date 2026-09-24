@@ -41,7 +41,7 @@ import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
 class IOSFailure(val category: String, val code: String? = null)
 class IOSSuccess(val completed: Boolean = true)
 class IOSStartupState(val phase: String)
-class IOSSessionState(val isLoggedIn: Boolean)
+class IOSSessionState(val isLoggedIn: Boolean, val revision: Int)
 class IOSSettings(val autoplayGifs: Boolean, val themeOverride: String, val dynamicColorsEnabled: Boolean)
 class IOSNotificationStatus(val totalUnreadCount: Int, val privateMessagesUnreadCount: Int)
 class IOSLinkIntent(val kind: String, val id: Int? = null)
@@ -159,7 +159,7 @@ class PodkopClient private constructor(
 
     inner class SessionService {
         fun current(completion: (IOSSessionState?, IOSFailure?) -> Unit): IOSOperation = operation(completion) {
-            IOSSessionState(authRepository.isLoggedIn())
+            IOSSessionState(authRepository.isLoggedIn(), 0)
         }
 
         fun loginUrl(completion: (String?, IOSFailure?) -> Unit): IOSOperation = operation(completion) {
@@ -189,8 +189,12 @@ class PodkopClient private constructor(
         }
 
         fun observe(onChange: (IOSSessionState) -> Unit): IOSObservation = observe(onChange) { emit ->
-            emit(IOSSessionState(authRepository.isLoggedIn()))
-            sessionEvents.events.collect { emit(IOSSessionState(authRepository.isLoggedIn())) }
+            var revision = 0
+            emit(IOSSessionState(authRepository.isLoggedIn(), revision))
+            sessionEvents.events.collect {
+                revision += 1
+                emit(IOSSessionState(authRepository.isLoggedIn(), revision))
+            }
         }
     }
 
@@ -217,6 +221,10 @@ class PodkopClient private constructor(
     }
 
     inner class NotificationsService {
+        fun startPolling() { notificationsRepository.startPolling() }
+
+        fun stopPolling() { notificationsRepository.stopPolling() }
+
         fun observeStatus(onChange: (IOSNotificationStatus) -> Unit): IOSObservation = observe(onChange) { emit ->
             notificationsRepository.status.collect { status ->
                 emit(IOSNotificationStatus(status.totalUnreadCount, status.privateMessagesUnreadCount))

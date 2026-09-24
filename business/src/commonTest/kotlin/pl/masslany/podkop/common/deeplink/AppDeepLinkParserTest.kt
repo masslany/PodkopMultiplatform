@@ -69,4 +69,10 @@ class AppDeepLinkParserTest {
 
         assertNull(result)
     }
+
+    @Test
+    fun ignoresUnsupportedSchemeEvenForTrustedHost() {
+        assertNull(parser.parse("http://masslany.pl/wykop/link/99999999/test"))
+        assertNull(parser.parse("javascript://masslany.pl/wykop/connect?token=abc&rtoken=def"))
+    }
 }
