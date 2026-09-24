@@ -40,6 +40,13 @@ final class AppDependencies {
         adapter.close()
         client.close()
     }
+
+    func loadTweet(_ url: String) async throws -> NativeTweetPreview {
+        let value: IOSTweetPreview = try await adapter.call {
+            self.client.embeds.twitterPreview(url: url, completion: $0)
+        }
+        return NativeTweetPreview(value)
+    }
 }
 
 @MainActor @Observable
@@ -59,6 +66,7 @@ final class SessionModel {
     var phase: Phase = .initializing
     var isLoggedIn = false
     var unreadCount = 0
+    var autoplayGifs = true
     var banner: String?
     var loginURL: URL?
     private unowned let dependencies: AppDependencies
@@ -75,7 +83,7 @@ final class SessionModel {
         if let marker = arguments.firstIndex(of: "-nativeFixture"),
            arguments.indices.contains(marker + 1) {
             switch arguments[marker + 1] {
-            case "guest", "authenticated":
+            case "guest", "authenticated", "content":
                 phase = .ready
                 isLoggedIn = arguments[marker + 1] == "authenticated"
                 dependencies.router.applySession(isLoggedIn: isLoggedIn, revision: 0)
@@ -115,6 +123,11 @@ final class SessionModel {
         observationTasks.append(Task {
             for await value in adapter.stream({ client.notifications.observeStatus(onChange: $0) }) {
                 unreadCount = Int(value.totalUnreadCount)
+            }
+        })
+        observationTasks.append(Task {
+            for await value in adapter.stream({ client.settings.observe(onChange: $0) }) {
+                autoplayGifs = value.autoplayGifs
             }
         })
         Task { await start() }

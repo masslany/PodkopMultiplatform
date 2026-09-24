@@ -49,4 +49,18 @@ final class ShellUITests: XCTestCase {
         app.buttons["Cancel"].tap()
         XCTAssertFalse(app.staticTexts["Sign in to continue"].exists)
     }
+
+    func testContentFixtureSpoilerAndAdultReveal() {
+        let app = launch("content")
+        XCTAssertTrue(app.staticTexts["Przykładowy link o długim tytule"].waitForExistence(timeout: 5))
+        let spoiler = app.buttons["Show spoiler"]
+        XCTAssertTrue(spoiler.exists)
+        spoiler.tap()
+        XCTAssertTrue(app.staticTexts["Ukryty tekst ze spoilerem."].exists)
+        let adult = app.buttons["Show adult content"]
+        app.swipeUp()
+        XCTAssertTrue(adult.waitForExistence(timeout: 5))
+        adult.tap()
+        XCTAssertTrue(app.staticTexts["Treść tylko dla dorosłych z wieloma zdaniami."].exists)
+    }
 }

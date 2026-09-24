@@ -17,7 +17,11 @@ import org.koin.dsl.module
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
+import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
+import pl.masslany.podkop.business.common.domain.models.common.NameColor
+import pl.masslany.podkop.business.common.domain.models.common.Voted
 import pl.masslany.podkop.business.di.businessModule
+import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksType
@@ -47,6 +51,27 @@ class IOSNotificationStatus(val totalUnreadCount: Int, val privateMessagesUnread
 class IOSLinkIntent(val kind: String, val id: Int? = null)
 class IOSPageRequest(val kind: String, val value: String? = null)
 class IOSPagePolicy(val kind: String, val initial: IOSPageRequest)
+class IOSPhoto(val url: String, val width: Int, val height: Int, val mimeType: String)
+class IOSEmbed(val key: String, val url: String, val thumbnailUrl: String, val type: String)
+class IOSSurveyAnswer(val id: Int, val text: String, val count: Int, val selected: Boolean)
+class IOSSurvey(
+    val question: String,
+    val answers: List<IOSSurveyAnswer>,
+    val count: Int,
+    val canVote: Boolean,
+    val selectedOption: Int?,
+)
+class IOSTweetPreview(
+    val authorName: String,
+    val authorHandle: String,
+    val avatarUrl: String?,
+    val text: String,
+    val replyCount: Int,
+    val retweetCount: Int,
+    val likeCount: Int,
+    val mediaThumbnailUrl: String?,
+    val mediaAspectRatio: Float?,
+)
 class IOSResource(
     val id: Int,
     val kind: String,
@@ -57,6 +82,31 @@ class IOSResource(
     val deleted: Boolean,
     val editable: Boolean,
     val favourite: Boolean,
+    val description: String,
+    val authorAvatarUrl: String?,
+    val authorColor: String?,
+    val authorVerified: Boolean,
+    val authorOnline: Boolean,
+    val authorRank: Int?,
+    val deletionReason: String?,
+    val parentId: Int?,
+    val createdAt: String?,
+    val commentsCount: Int,
+    val votesUp: Int,
+    val votesDown: Int,
+    val voted: String,
+    val canVoteUp: Boolean,
+    val canVoteDown: Boolean,
+    val canUndoVote: Boolean,
+    val canDelete: Boolean,
+    val tags: List<String>,
+    val photo: IOSPhoto?,
+    val embed: IOSEmbed?,
+    val survey: IOSSurvey?,
+    val sourceUrl: String?,
+    val sourceLabel: String?,
+    val hot: Boolean,
+    val recommended: Boolean,
 )
 class IOSResourcePage(
     val items: List<IOSResource>,
@@ -83,6 +133,7 @@ class PodkopClient private constructor(
     private val settingsStore: AppSettings = AppSettingsImpl(app.koin.get<KeyValueStorage>())
     private val notificationsRepository: NotificationsRepository = app.koin.get()
     private val linksRepository: LinksRepository = app.koin.get()
+    private val twitterPreviewRepository: TwitterEmbedPreviewRepository = app.koin.get()
     private val parser = AppDeepLinkParser()
     private var closed = false
 
@@ -91,6 +142,7 @@ class PodkopClient private constructor(
     val settings = SettingsService()
     val notifications = NotificationsService()
     val links = LinksService()
+    val embeds = EmbedsService()
 
     fun close() {
         if (closed) return
@@ -269,27 +321,30 @@ class PodkopClient private constructor(
                 bucket = null,
             ).getOrThrow()
             IOSResourcePage(
-                items = result.data.map { item ->
-                    IOSResource(
-                        id = item.id,
-                        kind = when (item.resource) {
-                            Resource.Link -> "link"
-                            Resource.Entry -> "entry"
-                            Resource.EntryComment -> "entryComment"
-                            Resource.LinkComment -> "linkComment"
-                            Resource.Unknown -> "unknown"
-                        },
-                        title = item.title,
-                        content = item.content,
-                        author = item.author?.username,
-                        adult = item.adult,
-                        deleted = item.deleted != Deleted.None,
-                        editable = item.editable,
-                        favourite = item.favourite,
-                    )
-                },
+                items = result.data.map(ResourceItem::toIOSResource),
                 next = result.pagination?.next,
                 total = result.pagination?.total,
+            )
+        }
+    }
+
+    inner class EmbedsService {
+        fun twitterPreview(
+            url: String,
+            completion: (IOSTweetPreview?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(url.startsWith("https://")) { "invalid URL" }
+            val preview = twitterPreviewRepository.getTweet(url).getOrThrow()
+            IOSTweetPreview(
+                authorName = preview.authorName,
+                authorHandle = preview.authorHandle,
+                avatarUrl = preview.avatarUrl,
+                text = preview.text,
+                replyCount = preview.replyCount,
+                retweetCount = preview.retweetCount,
+                likeCount = preview.likeCount,
+                mediaThumbnailUrl = preview.mediaThumbnailUrl,
+                mediaAspectRatio = preview.mediaAspectRatio,
             )
         }
     }
@@ -307,6 +362,81 @@ class PodkopClient private constructor(
             ).also { active = it }
         }
     }
+}
+
+internal fun ResourceItem.toIOSResource(): IOSResource {
+    val selectedSurveyOption = media?.survey?.let { survey ->
+        survey.answers.indexOfFirst { it.voted > 0 }
+            .takeIf { it >= 0 }?.plus(1)
+            ?: survey.voted.takeIf { it in 1..survey.answers.size }
+    }
+    return IOSResource(
+        id = id,
+        kind = when (resource) {
+            Resource.Link -> "link"
+            Resource.Entry -> "entry"
+            Resource.EntryComment -> "entryComment"
+            Resource.LinkComment -> "linkComment"
+            Resource.Unknown -> "unknown"
+        },
+        title = title,
+        content = content,
+        author = author?.username,
+        adult = adult,
+        deleted = deleted != Deleted.None,
+        editable = editable,
+        favourite = favourite,
+        description = description,
+        authorAvatarUrl = author?.avatar,
+        authorColor = when (author?.color) {
+            NameColor.Orange -> "orange"
+            NameColor.Burgundy -> "burgundy"
+            NameColor.Green -> "green"
+            NameColor.Black -> "black"
+            null -> null
+        },
+        authorVerified = author?.verified ?: false,
+        authorOnline = author?.online ?: false,
+        authorRank = author?.rank?.position,
+        deletionReason = when (deleted) {
+            Deleted.Moderator -> "moderator"
+            Deleted.Author -> "author"
+            Deleted.Host -> "entryAuthor"
+            Deleted.None -> null
+        },
+        parentId = parentId ?: parent?.id,
+        createdAt = createdAt?.toString(),
+        commentsCount = comments?.count ?: 0,
+        votesUp = votes?.up ?: 0,
+        votesDown = votes?.down ?: 0,
+        voted = when (voted) {
+            Voted.Positive -> "positive"
+            Voted.Negative -> "negative"
+            Voted.None -> "none"
+        },
+        canVoteUp = actions?.voteUp ?: false,
+        canVoteDown = actions?.voteDown ?: false,
+        canUndoVote = actions?.undoVote ?: false,
+        canDelete = deletable && (actions?.delete ?: false),
+        tags = tags,
+        photo = media?.photo?.let { IOSPhoto(it.url, it.width, it.height, it.mimeType) },
+        embed = media?.embed?.let { IOSEmbed(it.key, it.url, it.thumbnail, it.type) },
+        survey = media?.survey?.let { survey ->
+            IOSSurvey(
+                question = survey.question,
+                answers = survey.answers.map { answer ->
+                    IOSSurveyAnswer(answer.id, answer.text, answer.count, answer.voted > 0)
+                },
+                count = survey.count,
+                canVote = survey.actions.vote && selectedSurveyOption == null,
+                selectedOption = selectedSurveyOption,
+            )
+        },
+        sourceUrl = source?.url,
+        sourceLabel = source?.label,
+        hot = hot,
+        recommended = recommended,
+    )
 }
 
 private fun PageRequest.toIOS(): IOSPageRequest = when (this) {

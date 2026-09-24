@@ -33,13 +33,15 @@ private struct NativeRoot: View {
                     explanation: String(localized: "Check your connection and try again.")
                 )
             case .ready:
-                TabView(selection: Binding(get: { router.selectedTab }, set: { router.selectedTab = $0 })) {
-                    ForEach(AppTab.allCases) { tab in
-                        TabContent(tab: tab, dependencies: dependencies)
-                            .tabItem { Label(tab.title, systemImage: tab.symbol) }
-                            .tag(tab)
-                    }
+                #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("content") {
+                    ContentFixtureGallery()
+                } else {
+                    tabs
                 }
+                #else
+                tabs
+                #endif
             }
         }
         .task { session.startIfNeeded() }
@@ -87,6 +89,16 @@ private struct NativeRoot: View {
                 .accessibilityIdentifier("appBanner")
             }
         }
+    }
+
+    private var tabs: some View {
+                TabView(selection: Binding(get: { router.selectedTab }, set: { router.selectedTab = $0 })) {
+                    ForEach(AppTab.allCases) { tab in
+                        TabContent(tab: tab, dependencies: dependencies)
+                            .tabItem { Label(tab.title, systemImage: tab.symbol) }
+                            .tag(tab)
+                    }
+                }
     }
 
     private func startupProblem(title: String, explanation: String) -> some View {
