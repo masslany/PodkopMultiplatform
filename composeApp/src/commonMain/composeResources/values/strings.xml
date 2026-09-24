@@ -540,4 +540,5 @@
     <string name="favorites_empty_entries">Brak ulubionych wpisów</string>
     <string name="favorites_empty_link_comments">Brak ulubionych komentarzy znalezisk</string>
     <string name="favorites_empty_entry_comments">Brak ulubionych komentarzy wpisów</string>
+    <string name="image_actions_label">Opcje obrazu</string>
 </resources>

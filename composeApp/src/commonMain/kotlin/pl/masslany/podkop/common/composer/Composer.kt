@@ -48,6 +48,7 @@ import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.common.preview.PodkopPreview
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_reply_composer_attach_photo
@@ -302,7 +303,7 @@ fun Composer(
                         .background(MaterialTheme.colorScheme.surfaceContainerHighest),
                 ) {
                     AsyncImage(
-                        modifier = Modifier
+                        modifier = Modifier.imageActions(currentPhotoUrl)
                             .fillMaxSize()
                             .clip(RoundedCornerShape(8.dp)),
                         model = currentPhotoUrl,

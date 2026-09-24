@@ -28,6 +28,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.features.tag.TagActions
 import pl.masslany.podkop.features.tag.TagGalleryItemState
 import podkop.composeapp.generated.resources.Res
@@ -51,7 +52,7 @@ fun TagGalleryImageItem(
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             AsyncImage(
-                modifier = Modifier
+                modifier = Modifier.imageActions(item.imageUrl)
                     .fillMaxWidth()
                     .heightIn(min = 120.dp)
                     .aspectRatio(item.galleryAspectRatio),

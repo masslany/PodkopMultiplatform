@@ -40,6 +40,7 @@ import pl.masslany.podkop.common.components.Source
 import pl.masslany.podkop.common.components.Tag
 import pl.masslany.podkop.common.components.Title
 import pl.masslany.podkop.common.components.embed.EmbedContent
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.resourceactions.resourceTextSelectionGesture
@@ -121,7 +122,7 @@ fun LinkItem(
                     if (state.imageUrl.isNotEmpty()) {
                         Spacer(modifier = Modifier.size(8.dp))
                         AsyncImage(
-                            modifier = Modifier
+                            modifier = Modifier.imageActions(state.imageUrl)
                                 .height(80.dp)
                                 .width(80.dp)
                                 .clip(MaterialTheme.shapes.small),

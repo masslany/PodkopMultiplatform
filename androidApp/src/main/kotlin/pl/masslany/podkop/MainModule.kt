@@ -6,6 +6,7 @@ import org.koin.dsl.module
 import pl.masslany.podkop.common.navigation.ExternalBrowser
 import pl.masslany.podkop.common.platform.AppMaintenanceController
 import pl.masslany.podkop.common.platform.BuildInfo
+import pl.masslany.podkop.common.platform.ImageClipboard
 import pl.masslany.podkop.common.platform.ImageDownloader
 import pl.masslany.podkop.common.platform.ScreenshotExporter
 import pl.masslany.podkop.common.platform.TextClipboardController
@@ -59,6 +60,7 @@ val mainModule = module {
         )
     }
 
+    single { ImageClipboard(application = androidApplication(), screenshotExporter = get()) }
     single {
         ImageDownloader(
             application = androidApplication(),

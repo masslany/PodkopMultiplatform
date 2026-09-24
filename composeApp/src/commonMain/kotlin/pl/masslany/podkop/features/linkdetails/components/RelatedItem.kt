@@ -29,6 +29,7 @@ import org.jetbrains.compose.resources.painterResource
 import pl.masslany.podkop.common.components.Author
 import pl.masslany.podkop.common.components.Source
 import pl.masslany.podkop.common.components.Title
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.common.components.vote.Vote
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.preview.PreviewFixtures
@@ -77,7 +78,7 @@ fun RelatedItem(
                 AsyncImage(
                     model = state.imageUrl,
                     contentDescription = null,
-                    modifier = Modifier
+                    modifier = Modifier.imageActions(state.imageUrl)
                         .fillMaxHeight()
                         .aspectRatio(1f),
                     contentScale = ContentScale.FillHeight,

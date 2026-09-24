@@ -16,6 +16,7 @@ import pl.masslany.podkop.features.entries.EntriesScreen
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.favorites.FavoritesScreen
 import pl.masslany.podkop.features.hits.HitsScreen
+import pl.masslany.podkop.features.imageviewer.ImageActionsBottomSheetScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.links.LinksScreen
@@ -81,6 +82,7 @@ internal object NavigationBackstackSerializer {
                 subclass(ResourceVotesBottomSheetScreen::class, ResourceVotesBottomSheetScreen.serializer())
                 subclass(LinkDetailsScreen::class, LinkDetailsScreen.serializer())
                 subclass(ImageViewerScreen::class, ImageViewerScreen.serializer())
+                subclass(ImageActionsBottomSheetScreen::class, ImageActionsBottomSheetScreen.serializer())
                 subclass(TagScreen::class, TagScreen.serializer())
                 subclass(EntryDetailsScreen::class, EntryDetailsScreen.serializer())
                 subclass(SettingsScreen::class, SettingsScreen.serializer())

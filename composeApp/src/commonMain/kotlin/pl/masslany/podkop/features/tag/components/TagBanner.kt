@@ -13,6 +13,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import pl.masslany.podkop.common.components.imageActions
 
 private val TagBannerHeight = 160.dp
 
@@ -21,7 +22,7 @@ fun TagBanner(
     bannerUrl: String,
 ) {
     AsyncImage(
-        modifier = Modifier
+        modifier = Modifier.imageActions(bannerUrl)
             .fillMaxWidth()
             .height(TagBannerHeight),
         model = ImageRequest.Builder(LocalPlatformContext.current)

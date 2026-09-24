@@ -34,6 +34,7 @@ import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.LocalImageActions
 import pl.masslany.podkop.common.components.dialog.DefaultGenericDialog
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreen
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreenRoot
@@ -70,6 +71,8 @@ import pl.masslany.podkop.features.favorites.FavoritesScreenRoot
 import pl.masslany.podkop.features.hits.HitsScreen
 import pl.masslany.podkop.features.hits.HitsScreenRoot
 import pl.masslany.podkop.features.home.HomeScreenRoot
+import pl.masslany.podkop.features.imageviewer.ImageActionsBottomSheetScreen
+import pl.masslany.podkop.features.imageviewer.ImageActionsBottomSheetScreenRoot
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.imageviewer.ImageViewerScreenRoot
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
@@ -167,9 +170,14 @@ fun App() {
             }
         }
 
+        val showImageActions = remember(appNavigator) {
+            { url: String -> appNavigator.navigateTo(ImageActionsBottomSheetScreen(url)) }
+        }
+
         CompositionLocalProvider(
             LocalAppSnackbarHostState provides snackbarHostState,
             LocalAppSettings provides appSettings,
+            LocalImageActions provides showImageActions,
         ) {
             val safeDrawingPaddingValues = WindowInsets.safeDrawing.asPaddingValues()
 
@@ -194,6 +202,12 @@ fun App() {
                                 id = it.id,
                                 paddingValues = safeDrawingPaddingValues,
                             )
+                        }
+
+                        entry<ImageActionsBottomSheetScreen>(
+                            metadata = BottomSheetSceneStrategy.bottomSheet(),
+                        ) {
+                            ImageActionsBottomSheetScreenRoot(screen = it)
                         }
 
                         entry<ImageViewerScreen> {

@@ -20,6 +20,7 @@ import pl.masslany.podkop.common.platform.AppMaintenanceController
 import pl.masslany.podkop.common.platform.BuildInfo
 import pl.masslany.podkop.common.platform.IOSAppMaintenanceController
 import pl.masslany.podkop.common.platform.IOSTextClipboardController
+import pl.masslany.podkop.common.platform.ImageClipboard
 import pl.masslany.podkop.common.platform.ImageDownloader
 import pl.masslany.podkop.common.platform.ScreenshotExporter
 import pl.masslany.podkop.common.platform.TextClipboardController
@@ -54,6 +55,7 @@ val iOSModule = module {
             logger = get(),
         )
     }
+    single { ImageClipboard(screenshotExporter = get()) }
     single { ImageDownloader() }
     single {
         ScreenshotExporter(

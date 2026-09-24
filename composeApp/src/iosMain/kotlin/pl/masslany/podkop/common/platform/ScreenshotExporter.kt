@@ -27,11 +27,13 @@ actual class ScreenshotExporter(private val viewControllerProvider: () -> UIView
         image: ImageBitmap,
         fileName: String,
     ): Boolean {
-        val uiImage = image.toUiImage() ?: return false
+        val uiImage = withContext(Dispatchers.Default) { image.toUiImage() } ?: return false
 
-        return runCatching {
-            UIPasteboard.generalPasteboard.image = uiImage
-        }.isSuccess
+        return withContext(Dispatchers.Main) {
+            runCatching {
+                UIPasteboard.generalPasteboard.image = uiImage
+            }.isSuccess
+        }
     }
 
     actual suspend fun shareImage(

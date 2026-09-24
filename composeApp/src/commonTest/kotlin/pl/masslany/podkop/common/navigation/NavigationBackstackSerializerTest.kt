@@ -7,6 +7,8 @@ import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
 import pl.masslany.podkop.features.composer.ComposerPrefill
 import pl.masslany.podkop.features.composer.ComposerRequest
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
+import pl.masslany.podkop.features.imageviewer.ImageActionsBottomSheetScreen
+import pl.masslany.podkop.features.imageviewer.ImageViewerScreen
 import pl.masslany.podkop.features.linksubmission.AddLinkScreen
 import pl.masslany.podkop.features.linksubmission.LinkDraftScreen
 import pl.masslany.podkop.features.observed.ObservedScreen
@@ -25,6 +27,8 @@ class NavigationBackstackSerializerTest {
                 author = "alice",
             ),
             ObservedScreen,
+            ImageViewerScreen("https://example.com/image.jpg"),
+            ImageActionsBottomSheetScreen("https://example.com/image.jpg"),
             ComposerBottomSheetScreen(
                 resultKey = "composer",
                 request = ComposerRequest.CreateEntry(

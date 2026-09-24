@@ -37,6 +37,7 @@ import coil3.compose.AsyncImage
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.features.linksubmission.models.AddLinkSuggestedImageState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.add_link_action_cancel
@@ -118,7 +119,7 @@ internal fun LinkDraftImageSection(
                             .background(MaterialTheme.colorScheme.surfaceContainer),
                     ) {
                         AsyncImage(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.imageActions(photoUrl).fillMaxSize(),
                             model = photoUrl,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
@@ -227,7 +228,7 @@ private fun SuggestedImagesCarousel(
                         ),
                 ) {
                     AsyncImage(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.imageActions(images[itemIndex].url).fillMaxSize(),
                         model = images[itemIndex].url,
                         contentDescription = null,
                         contentScale = ContentScale.Crop,

@@ -99,6 +99,7 @@ fun EmbedImage(
     val usePlatformGifRenderer = state.isGif && supportsPlatformGifImage && isGifPlaybackEnabled
     val isGifOverlayVisible = state.isGif && !isGifAutoplayEnabled && !isGifPlaybackEnabled
     val imageContainerModifier = Modifier
+        .imageActions(state.url.takeUnless { isAdultOverlayVisible })
         .then(sizeResolver)
         .then(
             if (aspectRatio != null) {

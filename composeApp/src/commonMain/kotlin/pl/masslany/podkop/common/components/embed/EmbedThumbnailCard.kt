@@ -26,6 +26,7 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.common.preview.PodkopPreview
 
 @Composable
@@ -53,7 +54,7 @@ fun EmbedThumbnailCard(
                 ),
         ) {
             AsyncImage(
-                modifier = Modifier
+                modifier = Modifier.imageActions(thumbnailUrl)
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
                     .heightIn(min = 120.dp),
