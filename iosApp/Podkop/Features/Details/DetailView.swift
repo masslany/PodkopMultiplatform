@@ -6,9 +6,10 @@ struct DetailView: View {
     let dependencies: AppDependencies
     @State private var actionTarget: Resource?
     @State private var downvoteTarget: Resource?
-    /// Where the link title ends in the scroll content, and how far the page has scrolled.
+    /// Where the link title ends in the scroll content, and whether it has scrolled under the bar.
+    /// Only the boolean is state, so scrolling does not re-render the page on every frame.
     @State private var titleBottom: CGFloat?
-    @State private var scrolledTop: CGFloat = 0
+    @State private var showsLinkTitle = false
 
     init(kind: ResourceKind, id: Int, dependencies: AppDependencies) {
         _model = State(initialValue: DetailModel(kind: kind, id: id,
@@ -49,7 +50,7 @@ struct DetailView: View {
                 }
                 if model.phase == .loaded {
                     if model.kind == .link, !model.related.isEmpty { relatedSection }
-                    commentsSection.padding(.horizontal, 12)
+                    commentsSection
                 }
             }
             .padding(.bottom, 20)
@@ -58,7 +59,8 @@ struct DetailView: View {
             .coordinateSpace(name: ResourceCard.detailContentSpace)
         }
         .onScrollGeometryChange(for: CGFloat.self) { $0.contentOffset.y + $0.contentInsets.top } action: { _, top in
-            scrolledTop = top
+            let shows = titleBottom.map { top > $0 } ?? false
+            if shows != showsLinkTitle { showsLinkTitle = shows }
         }
         .refreshable { model.reload() }
         .task { model.start() }
@@ -105,13 +107,10 @@ struct DetailView: View {
         model.kind == .link ? String(localized: "Link") : String(localized: "Entry")
     }
 
-    private var showsLinkTitle: Bool {
-        guard let titleBottom else { return false }
-        return scrolledTop > titleBottom
-    }
-
-    private var commentsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+    /// Direct children of the page's `LazyVStack`, so only visible comment threads are built and
+    /// the next page loads when the last thread appears, not all at once.
+    @ViewBuilder private var commentsSection: some View {
+        Group {
             if model.kind == .link {
                 Menu {
                     Button("Best") { model.selectCommentSort("best") }
@@ -124,6 +123,9 @@ struct DetailView: View {
             } else {
                 Text("Comments").font(.headline).padding(.horizontal, 4)
             }
+        }
+        .padding(.horizontal, 12)
+        Group {
             if model.commentsLoading && model.comments.isEmpty {
                 ProgressView("Loading…").frame(maxWidth: .infinity)
             } else if model.commentsError && model.comments.isEmpty {
@@ -143,6 +145,7 @@ struct DetailView: View {
                 }
             }
         }
+        .padding(.horizontal, 12)
     }
 
     /// A comment card with its replies inside it: the two the API embeds until the reader asks
