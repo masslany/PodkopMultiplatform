@@ -75,4 +75,14 @@ class AppDeepLinkParserTest {
         assertNull(parser.parse("http://masslany.pl/wykop/link/99999999/test"))
         assertNull(parser.parse("javascript://masslany.pl/wykop/connect?token=abc&rtoken=def"))
     }
+
+    @Test
+    fun recognizesOnlyHttpsAppHostForEmbeddedLogin() {
+        kotlin.test.assertTrue(parser.isAppHost("https://masslany.pl/wykop/connect?error=denied"))
+        kotlin.test.assertTrue(parser.isAppHost("https://MASSLANY.pl/anything"))
+        kotlin.test.assertFalse(parser.isAppHost("http://masslany.pl/wykop/connect?token=a&rtoken=b"))
+        kotlin.test.assertFalse(parser.isAppHost("https://wykop.pl/connect"))
+        kotlin.test.assertFalse(parser.isAppHost("https://masslany.pl.evil.example/connect"))
+        kotlin.test.assertFalse(parser.isAppHost(""))
+    }
 }

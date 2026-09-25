@@ -304,6 +304,9 @@ class PodkopClient private constructor(
                 }
             }
 
+        /** Whether an embedded login page must stop at [url] and hand it to [acceptUrl]. */
+        fun isAppUrl(url: String): Boolean = parser.isAppHost(url)
+
         fun logout(completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation = operation(completion) {
             val result = authRepository.logout()
             sessionEvents.tryEmit(AuthSessionEvent.TokensUpdated)

@@ -14,6 +14,7 @@ final class SessionModel {
     var theme: ThemeChoice = .auto
     var banner: String?
     var loginURL: URL?
+    private(set) var loginPending = false
     private unowned let dependencies: AppDependencies
     private var started = false
     private var observationTasks: [Task<Void, Never>] = []
@@ -140,6 +141,9 @@ final class SessionModel {
     }
 
     func beginLogin() async {
+        guard !loginPending else { return }
+        loginPending = true
+        defer { loginPending = false }
         do {
             let raw: String = try await dependencies.adapter.call {
                 self.dependencies.client.session.loginUrl(completion: $0)
@@ -153,6 +157,20 @@ final class SessionModel {
             return
         } catch {
             banner = String(localized: "Unable to open sign in.")
+        }
+    }
+
+    /// Asks the shared parser whether the embedded login page must stop at this URL.
+    func isAppURL(_ url: URL) -> Bool {
+        dependencies.client.session.isAppUrl(url: url.absoluteString)
+    }
+
+    /// Hands the intercepted login redirect to the shared parser, which stores the tokens.
+    func completeLogin(_ url: URL) async {
+        await accept(url)
+        if !isLoggedIn, dependencies.router.sheet == .login {
+            loginURL = nil
+            banner = String(localized: "Sign in failed. Try again.")
         }
     }
 

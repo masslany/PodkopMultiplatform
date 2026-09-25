@@ -4,7 +4,6 @@ import PodkopShared
 struct NativeRoot: View {
     let dependencies: AppDependencies
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.openURL) private var openURL
     @State private var sceneID = UUID()
     @State private var externalPage: ExternalPage?
 
@@ -58,22 +57,12 @@ struct NativeRoot: View {
         .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
             if let url = activity.webpageURL { Task { await session.accept(url) } }
         }
-        .onChange(of: session.loginURL) { _, url in
-            if let url { openURL(url); session.loginURL = nil }
-        }
         .sheet(item: Binding(get: { router.sheet }, set: { value in
             if value == nil { router.dismissSheet() } else { router.sheet = value }
         })) { sheet in
             switch sheet {
             case .login:
-                VStack(spacing: 20) {
-                    Text("Sign in to continue").font(.title2)
-                    Button("Sign in") { Task { await session.beginLogin() } }
-                        .buttonStyle(.borderedProminent)
-                    Button("Cancel") { router.dismissSheet() }
-                }
-                .padding()
-                .presentationDetents([.medium])
+                LoginSheet(session: session) { router.dismissSheet() }
             case .composer:
                 if let intent = router.composerIntent {
                     NativeComposerView(intent: intent, seed: router.composerSeed,

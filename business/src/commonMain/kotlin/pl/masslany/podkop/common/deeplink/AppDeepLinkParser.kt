@@ -40,6 +40,17 @@ class AppDeepLinkParser {
         }
     }
 
+    /**
+     * True for HTTPS URLs on the app's own host, including login callbacks that carry no tokens.
+     * An embedded login page must not load these; it hands them to [parse] instead.
+     */
+    fun isAppHost(rawUrl: String): Boolean {
+        val url = rawUrl.trim().takeIf { it.isNotEmpty() }
+            ?.let { runCatching { Url(it) }.getOrNull() }
+            ?: return false
+        return url.protocol.name.lowercase() == "https" && url.host.lowercase() == SUPPORTED_HOST
+    }
+
     private fun parseLoginCallback(url: String): AppDeepLink.LoginCallback? {
         val query = url.substringAfter('?', missingDelimiterValue = "")
             .substringBefore('#')
