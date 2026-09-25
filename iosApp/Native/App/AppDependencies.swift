@@ -36,6 +36,30 @@ final class AppDependencies {
         #endif
         return SharedVoterLoader(client: client, adapter: adapter)
     }()
+    lazy var composerSubmitter: ComposerSubmitting = {
+        #if DEBUG
+        if isFixture { return FixtureComposerSubmitter() }
+        #endif
+        return SharedComposerSubmitter(client: client, adapter: adapter)
+    }()
+    lazy var composerMedia: ComposerMediaHandling = {
+        #if DEBUG
+        if isFixture { return FixtureComposerMedia() }
+        #endif
+        return SharedComposerMedia(client: client, adapter: adapter)
+    }()
+    lazy var linkDrafting: LinkDrafting = {
+        #if DEBUG
+        if isFixture { return FixtureLinkDrafting() }
+        #endif
+        return SharedLinkDrafting(client: client, adapter: adapter)
+    }()
+    lazy var linkDraftMedia: ComposerMediaHandling = {
+        #if DEBUG
+        if isFixture { return FixtureComposerMedia() }
+        #endif
+        return SharedComposerMedia(client: client, adapter: adapter, forLink: true)
+    }()
     private var isFixture: Bool {
         #if DEBUG
         ProcessInfo.processInfo.arguments.contains("-nativeFixture")

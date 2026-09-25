@@ -70,7 +70,10 @@ private struct NativeRoot: View {
                 .padding()
                 .presentationDetents([.medium])
             case .composer:
-                DevelopmentView(title: String(localized: "Write a post"))
+                if let intent = router.composerIntent {
+                    NativeComposerView(intent: intent, seed: router.composerSeed,
+                                       dependencies: dependencies)
+                }
             }
         }
         .alert(item: Binding(get: { router.alert }, set: { router.alert = $0 })) { alert in
@@ -160,6 +163,7 @@ private struct TabContent: View {
                         routeButton("Observed", symbol: "eye", route: .observed)
                         routeButton("Messages", symbol: "envelope", route: .messages)
                         routeButton("Notifications", symbol: "bell", route: .notifications)
+                        routeButton("Add link", symbol: "link.badge.plus", route: .addLink)
                     }
                     #endif
                     if session.isLoggedIn {
@@ -228,6 +232,7 @@ private struct TabContent: View {
         case .favorites: DevelopmentView(title: String(localized: "Favorites"))
         case .observed: DevelopmentView(title: String(localized: "Observed"))
         case .hits: DevelopmentView(title: String(localized: "Hits"))
+        case .addLink: NativeLinkSubmissionView(dependencies: dependencies)
         case .rank: DevelopmentView(title: String(localized: "Rank"))
         case .about: DevelopmentView(title: String(localized: "About"))
         }

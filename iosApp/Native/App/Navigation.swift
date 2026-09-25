@@ -38,12 +38,13 @@ enum AppRoute: Hashable, Codable {
     case favorites
     case observed
     case hits
+    case addLink
     case rank
     case about
 
     var needsAccount: Bool {
         switch self {
-        case .messages, .notifications, .profile, .favorites, .observed: true
+        case .messages, .notifications, .profile, .favorites, .observed, .addLink: true
         default: false
         }
     }
@@ -84,6 +85,7 @@ final class AppRouter {
     var banner: String?
     var pendingAccountRoute: AppRoute?
     var composerIntent: ComposerIntent?
+    var composerSeed: NativeResource?
     var pendingComposerIntent: ComposerIntent?
     var isLoggedIn = false {
         didSet {
@@ -123,6 +125,7 @@ final class AppRouter {
         pendingAccountRoute = nil
         pendingComposerIntent = nil
         composerIntent = nil
+        composerSeed = nil
         if sheet == .composer { sheet = nil }
     }
 
@@ -140,9 +143,10 @@ final class AppRouter {
         }
     }
 
-    func presentComposer(_ intent: ComposerIntent) {
+    func presentComposer(_ intent: ComposerIntent, seed: NativeResource? = nil) {
         if isLoggedIn {
             composerIntent = intent
+            composerSeed = seed
             sheet = .composer
         } else {
             pendingComposerIntent = intent
@@ -155,6 +159,7 @@ final class AppRouter {
         pendingAccountRoute = nil
         pendingComposerIntent = nil
         composerIntent = nil
+        composerSeed = nil
     }
 
     func detail(for tab: AppTab) -> AppRoute? {

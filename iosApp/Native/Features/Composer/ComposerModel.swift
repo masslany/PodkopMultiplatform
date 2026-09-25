@@ -1,0 +1,258 @@
+import Foundation
+import Observation
+import PodkopShared
+
+@MainActor protocol ComposerSubmitting {
+    func submit(intent: ComposerIntent, text: String, adult: Bool,
+                photoKey: String?) async throws -> NativeResource
+}
+
+@MainActor
+final class SharedComposerSubmitter: ComposerSubmitting {
+    private let client: PodkopClient
+    private let adapter: BridgeAdapter
+
+    init(client: PodkopClient, adapter: BridgeAdapter) {
+        self.client = client
+        self.adapter = adapter
+    }
+
+    func submit(intent: ComposerIntent, text: String, adult: Bool,
+                photoKey: String?) async throws -> NativeResource {
+        let target = intent.target
+        let value: IOSResource = try await adapter.call {
+            self.client.composer.submit(kind: target.kind,
+                                        rootId: target.rootID.map { KotlinInt(int: Int32($0)) },
+                                        commentId: target.commentID.map { KotlinInt(int: Int32($0)) },
+                                        content: text, adult: adult, photoKey: photoKey,
+                                        completion: $0)
+        }
+        return NativeResource(value)
+    }
+}
+
+struct ComposerTarget {
+    let kind: String
+    let rootID: Int?
+    let commentID: Int?
+    let replyTarget: String?
+    let isEdit: Bool
+}
+
+extension ComposerIntent {
+    var target: ComposerTarget {
+        switch self {
+        case .createEntry:
+            ComposerTarget(kind: "createEntry", rootID: nil, commentID: nil,
+                           replyTarget: nil, isEdit: false)
+        case .createEntryComment(let id, let replyTarget):
+            ComposerTarget(kind: "createEntryComment", rootID: id, commentID: nil,
+                           replyTarget: replyTarget, isEdit: false)
+        case .createLinkComment(let id, let parentID, let replyTarget):
+            ComposerTarget(kind: "createLinkComment", rootID: id, commentID: parentID,
+                           replyTarget: replyTarget, isEdit: false)
+        case .editEntry(let id):
+            ComposerTarget(kind: "editEntry", rootID: id, commentID: nil,
+                           replyTarget: nil, isEdit: true)
+        case .editEntryComment(let entryID, let commentID):
+            ComposerTarget(kind: "editEntryComment", rootID: entryID, commentID: commentID,
+                           replyTarget: nil, isEdit: true)
+        case .editLinkComment(let linkID, let commentID):
+            ComposerTarget(kind: "editLinkComment", rootID: linkID, commentID: commentID,
+                           replyTarget: nil, isEdit: true)
+        }
+    }
+}
+
+@MainActor @Observable
+final class ComposerModel {
+    let intent: ComposerIntent
+    let seed: NativeResource?
+    var text: String
+    var adult: Bool
+    var selection: NSRange
+    private(set) var photoKey: String?
+    private(set) var photoURL: String?
+    private(set) var mediaUploading = false
+    private(set) var mediaFailed = false
+    private(set) var submitting = false
+    private(set) var failed = false
+    private(set) var outcomeUnknown = false
+    private(set) var submittedResource: NativeResource?
+    private let submitter: ComposerSubmitting
+    private let media: ComposerMediaHandling?
+    private let updates: ResourceUpdates
+    private let initialText: String
+    private let initialAdult: Bool
+    private let initialPhotoKey: String?
+    private var ownedPhotoKey: String?
+    private var mediaGeneration = 0
+
+    init(intent: ComposerIntent, seed: NativeResource?, submitter: ComposerSubmitting,
+         updates: ResourceUpdates, media: ComposerMediaHandling? = nil) {
+        self.intent = intent
+        self.seed = seed
+        self.submitter = submitter
+        self.media = media
+        self.updates = updates
+        let initialText = seed?.body ?? ""
+        let initialAdult = seed?.adult ?? false
+        let initialPhotoKey = seed?.photo?.key
+        text = initialText
+        selection = NSRange(location: initialText.utf16.count, length: 0)
+        adult = initialAdult
+        photoKey = initialPhotoKey
+        photoURL = seed?.photo?.url
+        self.initialText = initialText
+        self.initialAdult = initialAdult
+        self.initialPhotoKey = initialPhotoKey
+    }
+
+    var isDirty: Bool {
+        text != initialText || adult != initialAdult || photoKey != initialPhotoKey
+    }
+
+    var canSubmit: Bool {
+        !submitting && !mediaUploading && !outcomeUnknown && submittedResource == nil &&
+            !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    func attachURL(_ rawURL: String) {
+        guard let media, !submitting, !mediaUploading,
+              let url = URL(string: rawURL.trimmingCharacters(in: .whitespacesAndNewlines)),
+              ["http", "https"].contains(url.scheme?.lowercased() ?? "") else {
+            mediaFailed = true
+            return
+        }
+        upload(using: { try await media.uploadURL(url.absoluteString) })
+    }
+
+    func attachDevice(_ data: Data, fileName: String, mimeType: String) {
+        guard let media, !submitting, !mediaUploading else { return }
+        upload(using: { try await media.uploadDevice(data, fileName: fileName, mimeType: mimeType) })
+    }
+
+    private func upload(using operation: @escaping () async throws -> ComposerPhoto) {
+        mediaGeneration += 1
+        let generation = mediaGeneration
+        mediaUploading = true
+        mediaFailed = false
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                let photo = try await operation()
+                guard generation == mediaGeneration else {
+                    if let media { try? await media.delete(photo.key) }
+                    return
+                }
+                let previousOwned = ownedPhotoKey
+                ownedPhotoKey = photo.key
+                photoKey = photo.key
+                photoURL = photo.url
+                if let previousOwned, previousOwned != photo.key,
+                   let media { try? await media.delete(previousOwned) }
+            } catch {
+                guard generation == mediaGeneration else { return }
+                mediaFailed = true
+            }
+            if generation == mediaGeneration { mediaUploading = false }
+        }
+    }
+
+    func removePhoto() {
+        guard !submitting, !mediaUploading else { return }
+        let owned = ownedPhotoKey
+        ownedPhotoKey = nil
+        photoKey = nil
+        photoURL = nil
+        if let owned, let media { Task { try? await media.delete(owned) } }
+    }
+
+    func photoSelectionFailed() { mediaFailed = true }
+
+    func discard() {
+        mediaGeneration += 1
+        let owned = ownedPhotoKey
+        ownedPhotoKey = nil
+        if let owned, let media { Task { try? await media.delete(owned) } }
+    }
+
+    func insert(prefix: String, suffix: String, placeholder: String) {
+        let source = text as NSString
+        guard selection.location <= source.length,
+              selection.length <= source.length - selection.location else { return }
+        let selected = source.substring(with: selection)
+        let middle = selected.isEmpty ? placeholder : selected
+        text = source.replacingCharacters(in: selection, with: prefix + middle + suffix)
+        selection = NSRange(location: selection.location + prefix.utf16.count,
+                            length: middle.utf16.count)
+    }
+
+    func insertSpoilerAtLineStart() {
+        let source = text as NSString
+        guard selection.location <= source.length else { return }
+        let preceding = source.substring(to: selection.location) as NSString
+        let newline = preceding.range(of: "\n", options: .backwards)
+        let lineStart = newline.location == NSNotFound ? 0 : newline.location + 1
+        if lineStart < source.length, source.substring(with: NSRange(location: lineStart, length: 1)) == "!" {
+            return
+        }
+        text = source.replacingCharacters(in: NSRange(location: lineStart, length: 0), with: "!")
+        selection = NSRange(location: selection.location + 1, length: selection.length)
+    }
+
+    func acknowledgeUnknownOutcome() { outcomeUnknown = false }
+
+    func submit() {
+        guard canSubmit else { return }
+        submitting = true
+        failed = false
+        outcomeUnknown = false
+        let revision = updates.sessionRevision
+        let content = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                let result = try await submitter.submit(intent: intent, text: content,
+                                                        adult: adult, photoKey: photoKey)
+                guard revision == updates.sessionRevision else { submitting = false; return }
+                updates.publish(.replacement(result), for: ResourceIdentity(result))
+                if let seed { updates.publish(.replacement(result), for: ResourceIdentity(seed)) }
+                if case .createEntry = intent { updates.publishNewResource() }
+                if result.kind == .entryComment || result.kind == .linkComment,
+                   let rootID = intent.target.rootID {
+                    let kind: NativeResourceKind = result.kind == .entryComment ? .entry : .link
+                    updates.publish(.invalidated, for: ResourceIdentity(
+                        NativeResource(sourceID: rootID, kind: kind, body: "")))
+                }
+                submittedResource = result
+            } catch {
+                guard revision == updates.sessionRevision else { submitting = false; return }
+                failed = true
+                if let failure = error as? BridgeFailure {
+                    outcomeUnknown = failure.category == "unknown" || failure.category == "server"
+                }
+            }
+            submitting = false
+        }
+    }
+}
+
+#if DEBUG
+@MainActor
+final class FixtureComposerSubmitter: ComposerSubmitting {
+    func submit(intent: ComposerIntent, text: String, adult: Bool,
+                photoKey: String?) async throws -> NativeResource {
+        let target = intent.target
+        let kind: NativeResourceKind
+        switch target.kind {
+        case "createEntry", "editEntry": kind = .entry
+        case "createEntryComment", "editEntryComment": kind = .entryComment
+        default: kind = .linkComment
+        }
+        return NativeResource(sourceID: target.isEdit ? (target.commentID ?? target.rootID ?? 801) : 801,
+                              kind: kind, body: text, adult: adult,
+                              parentID: kind == .entry ? nil : target.rootID)
+    }
+}
+#endif

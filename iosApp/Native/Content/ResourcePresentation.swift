@@ -32,6 +32,7 @@ struct NativePhoto: Hashable {
     let width: Int
     let height: Int
     let mimeType: String
+    let key: String
     var isAnimated: Bool { mimeType.lowercased().contains("gif") }
 }
 
@@ -111,7 +112,8 @@ struct NativeResource: Identifiable, Hashable {
                           canUndo: value.canUndoVote)
         tags = value.tags
         photo = value.photo.map { NativePhoto(url: $0.url, width: Int($0.width),
-                                              height: Int($0.height), mimeType: $0.mimeType) }
+                                              height: Int($0.height), mimeType: $0.mimeType,
+                                              key: $0.key) }
         embed = value.embed.map { NativeEmbed(key: $0.key, url: $0.url,
                                              thumbnailURL: $0.thumbnailUrl, type: $0.type) }
         survey = value.survey.map { survey in

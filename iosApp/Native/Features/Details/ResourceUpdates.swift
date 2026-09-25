@@ -23,6 +23,7 @@ enum ResourceChange {
 @MainActor @Observable
 final class ResourceUpdates {
     private(set) var revision = 0
+    private(set) var feedRevision = 0
     private(set) var sessionRevision = 0
     private var values: [ResourceIdentity: (revision: Int, change: ResourceChange)] = [:]
 
@@ -37,6 +38,8 @@ final class ResourceUpdates {
         revision += 1
         values[identity] = (revision, change)
     }
+
+    func publishNewResource() { feedRevision += 1 }
 
     func reconcile(_ resource: NativeResource) -> NativeResource? {
         switch values[ResourceIdentity(resource)]?.change {

@@ -9,7 +9,7 @@ import PodkopShared
 final class ContentTests: XCTestCase {
     func testBridgePayloadPreservesUnknownDeletionMediaAndCapabilities() {
         let photo = IOSPhoto(url: "https://example.com/p.png", width: 640, height: 480,
-                             mimeType: "image/png")
+                             mimeType: "image/png", key: "photo-key")
         let survey = IOSSurvey(question: "Pytanie?",
                                answers: [IOSSurveyAnswer(id: 2, text: "Tak", count: 3, selected: true)],
                                count: 3, canVote: false, selectedOption: nil)
@@ -34,6 +34,7 @@ final class ContentTests: XCTestCase {
         XCTAssertEqual(resource.vote.down, 1)
         XCTAssertTrue(resource.vote.canDown)
         XCTAssertEqual(resource.photo?.width, 640)
+        XCTAssertEqual(resource.photo?.key, "photo-key")
         XCTAssertEqual(resource.survey?.answers.first?.selected, true)
         XCTAssertEqual(resource.tags, ["nauka"])
         let unknownDeletion = NativeResource(IOSResource(

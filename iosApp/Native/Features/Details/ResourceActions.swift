@@ -90,7 +90,7 @@ struct NativeResourceActionsSheet: View {
                         default: return
                         }
                         dismiss()
-                        dependencies.router.presentComposer(intent)
+                        dependencies.router.presentComposer(intent, seed: resource)
                     }
                 }
                 #endif

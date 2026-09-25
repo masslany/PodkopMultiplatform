@@ -68,6 +68,9 @@ struct NativeFeedView: View {
         .onChange(of: dependencies.resourceUpdates.revision) { _, _ in
             model.reconcile(dependencies.resourceUpdates)
         }
+        .onChange(of: dependencies.resourceUpdates.feedRevision) { _, _ in
+            Task { await model.refresh() }
+        }
         .accessibilityIdentifier("feed-\(model.query.tab.rawValue)")
     }
 

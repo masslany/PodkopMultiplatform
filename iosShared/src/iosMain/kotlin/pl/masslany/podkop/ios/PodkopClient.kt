@@ -10,10 +10,15 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.usePinned
 import io.ktor.client.plugins.ResponseException
 import org.koin.core.KoinApplication
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
+import platform.Foundation.NSData
+import platform.posix.memcpy
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
@@ -33,6 +38,12 @@ import pl.masslany.podkop.business.favourites.domain.models.FavouriteType
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksType
+import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
+import pl.masslany.podkop.business.links.domain.models.request.PublishLinkDraft
+import pl.masslany.podkop.business.links.domain.models.LinkDraftDetails
+import pl.masslany.podkop.business.media.domain.main.MediaPhotoType
+import pl.masslany.podkop.business.media.domain.main.MediaRepository
+import pl.masslany.podkop.business.tags.domain.main.TagsRepository
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
 import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.business.startup.api.StartupManager
@@ -60,7 +71,7 @@ class IOSNotificationStatus(val totalUnreadCount: Int, val privateMessagesUnread
 class IOSLinkIntent(val kind: String, val id: Int? = null)
 class IOSPageRequest(val kind: String, val value: String? = null)
 class IOSPagePolicy(val kind: String, val initial: IOSPageRequest)
-class IOSPhoto(val url: String, val width: Int, val height: Int, val mimeType: String)
+class IOSPhoto(val url: String, val width: Int, val height: Int, val mimeType: String, val key: String)
 class IOSEmbed(val key: String, val url: String, val thumbnailUrl: String, val type: String)
 class IOSSurveyAnswer(val id: Int, val text: String, val count: Int, val selected: Boolean)
 class IOSSurvey(
@@ -125,6 +136,20 @@ class IOSResourcePage(
 )
 class IOSVoter(val username: String, val avatarUrl: String, val verified: Boolean, val reason: String?)
 class IOSVoterPage(val items: List<IOSVoter>, val next: String?, val total: Int?)
+class IOSUploadedPhoto(val key: String, val url: String, val mimeType: String)
+class IOSLinkDraftCheck(val key: String, val duplicate: Boolean, val similar: List<IOSResource>)
+class IOSLinkDraft(
+    val key: String,
+    val url: String,
+    val title: String,
+    val description: String,
+    val tags: List<String>,
+    val adult: Boolean,
+    val photoKey: String?,
+    val photoUrl: String?,
+    val suggestedImages: List<String>,
+    val selectedImageIndex: Int?,
+)
 
 class IOSOperation internal constructor(private val job: Job) {
     fun cancel() { job.cancel() }
@@ -148,6 +173,8 @@ class PodkopClient private constructor(
     private val entriesRepository: EntriesRepository = app.koin.get()
     private val hitsRepository: HitsRepository = app.koin.get()
     private val favouritesRepository: FavouritesRepository = app.koin.get()
+    private val mediaRepository: MediaRepository = app.koin.get()
+    private val tagsRepository: TagsRepository = app.koin.get()
     private val twitterPreviewRepository: TwitterEmbedPreviewRepository = app.koin.get()
     private val parser = AppDeepLinkParser()
     private var closed = false
@@ -160,6 +187,9 @@ class PodkopClient private constructor(
     val entries = EntriesService()
     val details = DetailsService()
     val mutations = MutationService()
+    val composer = ComposerService()
+    val media = MediaService()
+    val linkDrafts = LinkDraftService()
     val voters = VotersService()
     val embeds = EmbedsService()
 
@@ -440,6 +470,135 @@ class PodkopClient private constructor(
             }
     }
 
+    inner class ComposerService {
+        fun submit(
+            kind: String,
+            rootId: Int?,
+            commentId: Int?,
+            content: String,
+            adult: Boolean,
+            photoKey: String?,
+            completion: (IOSResource?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            val text = content.trim()
+            require(text.isNotEmpty()) { "empty content" }
+            val result = when (kind) {
+                "createEntry" -> entriesRepository.createEntry(text, adult, photoKey)
+                "createEntryComment" -> entriesRepository.createEntryComment(
+                    requireNotNull(rootId), text, adult, photoKey,
+                )
+                "createLinkComment" -> {
+                    val linkId = requireNotNull(rootId)
+                    if (commentId == null) linksRepository.createLinkComment(linkId, text, adult, photoKey)
+                    else linksRepository.createLinkCommentReply(linkId, commentId, text, adult, photoKey)
+                }
+                "editEntry" -> entriesRepository.updateEntry(
+                    requireNotNull(rootId), text, adult, photoKey,
+                )
+                "editEntryComment" -> entriesRepository.updateEntryComment(
+                    requireNotNull(rootId), requireNotNull(commentId), text, adult, photoKey,
+                )
+                "editLinkComment" -> linksRepository.updateLinkComment(
+                    requireNotNull(rootId), requireNotNull(commentId), text, adult, photoKey,
+                )
+                else -> throw IllegalArgumentException("invalid composer kind")
+            }.getOrThrow()
+            result.toIOSResource()
+        }
+    }
+
+    inner class MediaService {
+        fun uploadUrl(
+            url: String, forLink: Boolean,
+            completion: (IOSUploadedPhoto?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(url.startsWith("https://", ignoreCase = true) ||
+                    url.startsWith("http://", ignoreCase = true)) { "invalid photo url" }
+            val photo = mediaRepository.uploadPhotoFromUrl(
+                url, if (forLink) MediaPhotoType.Links else MediaPhotoType.Comments,
+            ).getOrThrow()
+            IOSUploadedPhoto(photo.key, photo.url, photo.mimeType)
+        }
+
+        @OptIn(ExperimentalForeignApi::class)
+        fun uploadDevice(
+            data: NSData, fileName: String?, mimeType: String?, forLink: Boolean,
+            completion: (IOSUploadedPhoto?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(data.length in 1uL..(20uL * 1024uL * 1024uL)) { "invalid photo size" }
+            val bytes = ByteArray(data.length.toInt())
+            bytes.usePinned { pinned -> memcpy(pinned.addressOf(0), data.bytes, data.length) }
+            val photo = mediaRepository.uploadPhotoFromDevice(
+                bytes, fileName, mimeType,
+                if (forLink) MediaPhotoType.Links else MediaPhotoType.Comments,
+            ).getOrThrow()
+            IOSUploadedPhoto(photo.key, photo.url, photo.mimeType)
+        }
+
+        fun delete(key: String, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) {
+                require(key.isNotBlank()) { "empty photo key" }
+                mediaRepository.deletePhoto(key).getOrThrow()
+                IOSSuccess()
+            }
+    }
+
+    inner class LinkDraftService {
+        fun suggest(query: String, completion: (List<String>?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) {
+                val normalized = query.trim().removePrefix("#")
+                require(normalized.length >= 2) { "query too short" }
+                tagsRepository.getAutoCompleteTags(normalized).getOrThrow()
+                    .tags.map { it.name }
+            }
+
+        fun check(url: String, completion: (IOSLinkDraftCheck?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) {
+                require(url.startsWith("https://", ignoreCase = true) ||
+                        url.startsWith("http://", ignoreCase = true)) { "invalid link url" }
+                val result = linksRepository.createLinkDraft(url).getOrThrow()
+                IOSLinkDraftCheck(result.key, result.duplicate,
+                    result.similar.map(ResourceItem::toIOSResource))
+            }
+
+        fun list(completion: (List<IOSLinkDraft>?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) {
+                linksRepository.getLinkDrafts().getOrThrow().map { it.toIOSLinkDraft() }
+            }
+
+        fun get(key: String, completion: (IOSLinkDraft?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) { linksRepository.getLinkDraft(key).getOrThrow().toIOSLinkDraft() }
+
+        fun save(
+            key: String, title: String, description: String?, tags: List<String>,
+            photoKey: String?, adult: Boolean, selectedImageIndex: Int?,
+            completion: (IOSSuccess?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            linksRepository.updateLinkDraft(key, UpdateLinkDraft(
+                title, description, tags, photoKey, adult, selectedImageIndex,
+            )).getOrThrow()
+            IOSSuccess()
+        }
+
+        fun publish(
+            key: String, title: String, description: String?, tags: List<String>,
+            photoKey: String?, adult: Boolean, selectedImageIndex: Int?,
+            completion: (IOSSuccess?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(title.isNotBlank() && tags.isNotEmpty()) { "title and tags required" }
+            linksRepository.publishLinkDraft(key, PublishLinkDraft(
+                title, description, tags, photoKey, adult, selectedImageIndex,
+            )).getOrThrow()
+            IOSSuccess()
+        }
+
+        fun delete(key: String, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) {
+                linksRepository.deleteLinkDraft(key).getOrThrow()
+                IOSSuccess()
+            }
+    }
+
     inner class MutationService {
         fun voteUp(
             kind: String, id: Int, parentId: Int?, remove: Boolean,
@@ -661,7 +820,7 @@ internal fun ResourceItem.toIOSResource(): IOSResource {
         canUndoVote = actions?.undoVote ?: false,
         canDelete = deletable && (actions?.delete ?: false),
         tags = tags,
-        photo = media?.photo?.let { IOSPhoto(it.url, it.width, it.height, it.mimeType) },
+        photo = media?.photo?.let { IOSPhoto(it.url, it.width, it.height, it.mimeType, it.key) },
         embed = media?.embed?.let { IOSEmbed(it.key, it.url, it.thumbnail, it.type) },
         survey = media?.survey?.let { survey ->
             IOSSurvey(
@@ -681,6 +840,11 @@ internal fun ResourceItem.toIOSResource(): IOSResource {
         slug = slug,
     )
 }
+
+private fun LinkDraftDetails.toIOSLinkDraft() = IOSLinkDraft(
+    key, url, title.orEmpty(), description.orEmpty(), tags, adult,
+    photoKey, photoUrl, suggestedImages, selectedImageIndex,
+)
 
 private fun PageRequest.toIOS(): IOSPageRequest = when (this) {
     PageRequest.Initial -> IOSPageRequest("initial")

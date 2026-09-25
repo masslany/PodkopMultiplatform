@@ -66,6 +66,32 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.images["Screenshot preview"].exists)
     }
 
+    func testFixtureComposerKeepsDraftWhenDiscardCancelled() {
+        let app = launch("authenticated")
+        app.buttons["Write a post"].tap()
+        let editor = app.textViews.firstMatch
+        XCTAssertTrue(editor.waitForExistence(timeout: 5))
+        editor.tap()
+        editor.typeText("Hello 👩🏽‍💻")
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.buttons["Keep writing"].waitForExistence(timeout: 5))
+        app.buttons["Keep writing"].tap()
+        XCTAssertTrue(editor.exists)
+        XCTAssertTrue(app.buttons["composerSubmit"].isEnabled)
+    }
+
+    func testFixtureLinkSubmissionOpensDraftForm() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Add link"].tap()
+        XCTAssertTrue(app.textFields["https://example.com/article"].waitForExistence(timeout: 5))
+        app.textFields["https://example.com/article"].tap()
+        app.textFields["https://example.com/article"].typeText("https://example.com")
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(app.textFields["Title"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Publish"].exists)
+    }
+
     func testRealFeedSmokeWhenRequested() throws {
         guard ProcessInfo.processInfo.environment["PODKOP_REAL_FEED"] == "1" else {
             throw XCTSkip("Run explicitly with a configured network and PODKOP_REAL_FEED=1")
