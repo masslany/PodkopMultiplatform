@@ -22,7 +22,7 @@ final class ContentTests: XCTestCase {
             commentsCount: 9, votesUp: 5, votesDown: 1, voted: "negative",
             canVoteUp: true, canVoteDown: true, canUndoVote: false, canDelete: false,
             tags: ["nauka"], photo: photo, embed: nil, survey: survey,
-            sourceUrl: nil, sourceLabel: nil, hot: false, recommended: true
+            sourceUrl: nil, sourceLabel: nil, hot: false, recommended: true, slug: ""
         )
         let resource = NativeResource(payload)
         XCTAssertEqual(resource.id, "unknown:77")
@@ -45,7 +45,7 @@ final class ContentTests: XCTestCase {
             commentsCount: 0, votesUp: 0, votesDown: 0, voted: "none",
             canVoteUp: false, canVoteDown: false, canUndoVote: false, canDelete: false,
             tags: [], photo: nil, embed: nil, survey: nil,
-            sourceUrl: nil, sourceLabel: nil, hot: false, recommended: false
+            sourceUrl: nil, sourceLabel: nil, hot: false, recommended: false, slug: ""
         ))
         XCTAssertEqual(unknownDeletion.deletion, .unknown)
     }

@@ -94,7 +94,10 @@ final class FeedModel {
     var gallery = false
 
     private let loader: FeedLoading
+    private let updates: ResourceUpdates?
     private var generation = 0
+    private var sessionRevision = 0
+    private var appliedUpdateRevision = 0
     private var active: Task<Void, Never>?
     private var hitTask: Task<Void, Never>?
     private var next: FeedRequest?
@@ -107,10 +110,11 @@ final class FeedModel {
         let exhausted: Bool
     }
 
-    init(tab: AppTab, loggedIn: Bool, loader: FeedLoading) {
+    init(tab: AppTab, loggedIn: Bool, loader: FeedLoading, updates: ResourceUpdates? = nil) {
         query = FeedQuery(tab: tab, loggedIn: loggedIn,
                           sort: tab == .entries ? "hot" : tab == .upcoming ? "active" : "newest")
         self.loader = loader
+        self.updates = updates
     }
 
     func start() {
@@ -119,8 +123,9 @@ final class FeedModel {
         if query.tab == .links { loadHits() }
     }
 
-    func setSession(_ loggedIn: Bool) {
-        guard query.loggedIn != loggedIn else { return }
+    func setSession(_ loggedIn: Bool, revision: Int = 0) {
+        guard query.loggedIn != loggedIn || sessionRevision != revision else { return }
+        sessionRevision = revision
         query.loggedIn = loggedIn
         // Rows from another account must never remain visible after a session change.
         items = []
@@ -191,7 +196,8 @@ final class FeedModel {
         do {
             let page = try await loader.load(request, query: current)
             guard token == generation, !Task.isCancelled else { return }
-            let fresh = replacing ? page.items : page.items.filter { item in
+            let pageItems = updates.map { store in page.items.compactMap(store.reconcile) } ?? page.items
+            let fresh = replacing ? pageItems : pageItems.filter { item in
                 !items.contains { $0.id == item.id && $0.parentID == item.parentID }
             }
             if replacing {
@@ -241,7 +247,7 @@ final class FeedModel {
         hitTask = Task { [weak self] in
             guard let self else { return }
             if let rows = try? await loader.hits(), token == generation, !Task.isCancelled {
-                hits = rows
+                hits = updates.map { store in rows.compactMap(store.reconcile) } ?? rows
             }
         }
     }
@@ -254,6 +260,14 @@ final class FeedModel {
         hitTask = nil
         nextLoading = false
         if phase == .loading || phase == .refreshing { phase = .idle }
+    }
+
+    func reconcile(_ updates: ResourceUpdates) {
+        let mustReload = updates.needsReload(items, since: appliedUpdateRevision)
+        appliedUpdateRevision = updates.revision
+        items = items.compactMap(updates.reconcile)
+        hits = hits.compactMap(updates.reconcile)
+        if mustReload { reload() }
     }
 }
 

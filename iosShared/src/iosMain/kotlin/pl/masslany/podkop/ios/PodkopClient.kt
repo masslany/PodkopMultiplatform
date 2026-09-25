@@ -20,6 +20,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Deleted
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.NameColor
 import pl.masslany.podkop.business.common.domain.models.common.Voted
+import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.di.businessModule
 import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
@@ -27,9 +28,12 @@ import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.business.hits.domain.main.HitsRepository
 import pl.masslany.podkop.business.hits.domain.models.request.HitsSortType
+import pl.masslany.podkop.business.favourites.domain.main.FavouritesRepository
+import pl.masslany.podkop.business.favourites.domain.models.FavouriteType
 import pl.masslany.podkop.business.links.domain.main.LinksRepository
 import pl.masslany.podkop.business.links.domain.models.request.LinksSortType
 import pl.masslany.podkop.business.links.domain.models.request.LinksType
+import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
 import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
@@ -112,12 +116,15 @@ class IOSResource(
     val sourceLabel: String?,
     val hot: Boolean,
     val recommended: Boolean,
+    val slug: String,
 )
 class IOSResourcePage(
     val items: List<IOSResource>,
     val next: String?,
     val total: Int?,
 )
+class IOSVoter(val username: String, val avatarUrl: String, val verified: Boolean, val reason: String?)
+class IOSVoterPage(val items: List<IOSVoter>, val next: String?, val total: Int?)
 
 class IOSOperation internal constructor(private val job: Job) {
     fun cancel() { job.cancel() }
@@ -140,6 +147,7 @@ class PodkopClient private constructor(
     private val linksRepository: LinksRepository = app.koin.get()
     private val entriesRepository: EntriesRepository = app.koin.get()
     private val hitsRepository: HitsRepository = app.koin.get()
+    private val favouritesRepository: FavouritesRepository = app.koin.get()
     private val twitterPreviewRepository: TwitterEmbedPreviewRepository = app.koin.get()
     private val parser = AppDeepLinkParser()
     private var closed = false
@@ -150,6 +158,9 @@ class PodkopClient private constructor(
     val notifications = NotificationsService()
     val links = LinksService()
     val entries = EntriesService()
+    val details = DetailsService()
+    val mutations = MutationService()
+    val voters = VotersService()
     val embeds = EmbedsService()
 
     fun close() {
@@ -377,6 +388,188 @@ class PodkopClient private constructor(
         }
     }
 
+    inner class DetailsService {
+        fun link(id: Int, completion: (IOSResource?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) { linksRepository.getLink(id).getOrThrow().data.toIOSResource() }
+
+        fun entry(id: Int, completion: (IOSResource?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) { entriesRepository.getEntry(id).getOrThrow().toIOSResource() }
+
+        fun linkComments(
+            linkId: Int,
+            page: Int,
+            sort: String,
+            completion: (IOSResourcePage?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(page > 0) { "invalid page" }
+            val sortType = when (sort) {
+                "best" -> CommentsSortType.Best
+                "newest" -> CommentsSortType.Newest
+                "oldest" -> CommentsSortType.Oldest
+                else -> throw IllegalArgumentException("invalid comment sort")
+            }
+            val result = linksRepository.getComments(linkId, page, null, sortType, null).getOrThrow()
+            IOSResourcePage(result.data.map(ResourceItem::toIOSResource), result.pagination?.next, result.pagination?.total)
+        }
+
+        fun entryComments(
+            entryId: Int,
+            page: Int,
+            completion: (IOSResourcePage?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(page > 0) { "invalid page" }
+            val result = entriesRepository.getEntryComments(entryId, page).getOrThrow()
+            IOSResourcePage(result.data.map(ResourceItem::toIOSResource), result.pagination?.next, result.pagination?.total)
+        }
+
+        fun linkReplies(
+            linkId: Int,
+            commentId: Int,
+            page: Int,
+            completion: (IOSResourcePage?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(page > 0) { "invalid page" }
+            val result = linksRepository.getSubComments(linkId, commentId, page).getOrThrow()
+            IOSResourcePage(result.data.map(ResourceItem::toIOSResource), result.pagination?.next, result.pagination?.total)
+        }
+
+        fun relatedLinks(linkId: Int, completion: (IOSResourcePage?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) {
+                val result = linksRepository.getRelatedLinks(linkId).getOrThrow()
+                IOSResourcePage(result.data.map(ResourceItem::toIOSResource), result.pagination?.next, result.pagination?.total)
+            }
+    }
+
+    inner class MutationService {
+        fun voteUp(
+            kind: String, id: Int, parentId: Int?, remove: Boolean,
+            completion: (IOSSuccess?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            when (kind) {
+                "link" -> if (remove) linksRepository.removeVoteOnLink(id).getOrThrow()
+                    else linksRepository.voteOnLink(id).getOrThrow()
+                "entry" -> if (remove) entriesRepository.removeVoteUp(id).getOrThrow()
+                    else entriesRepository.voteUp(id).getOrThrow()
+                "linkComment" -> {
+                    val linkId = requireNotNull(parentId) { "missing parent link" }
+                    if (remove) linksRepository.removeVoteOnLinkComment(linkId, id).getOrThrow()
+                    else linksRepository.voteOnLinkComment(linkId, id).getOrThrow()
+                }
+                "entryComment" -> {
+                    val entryId = requireNotNull(parentId) { "missing parent entry" }
+                    if (remove) entriesRepository.removeVoteUpComment(entryId, id).getOrThrow()
+                    else entriesRepository.voteUpComment(entryId, id).getOrThrow()
+                }
+                else -> throw IllegalArgumentException("invalid resource kind")
+            }
+            IOSSuccess()
+        }
+
+        fun voteDown(
+            kind: String, id: Int, parentId: Int?, remove: Boolean, reason: String?,
+            completion: (IOSSuccess?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            when (kind) {
+                "link" -> {
+                    if (remove) linksRepository.removeVoteOnLink(id).getOrThrow()
+                    else linksRepository.voteDownOnLink(id, reason.toVoteReason()).getOrThrow()
+                }
+                "linkComment" -> {
+                    val linkId = requireNotNull(parentId) { "missing parent link" }
+                    if (remove) linksRepository.removeVoteOnLinkComment(linkId, id).getOrThrow()
+                    else linksRepository.voteDownOnLinkComment(linkId, id).getOrThrow()
+                }
+                else -> throw IllegalArgumentException("downvote unavailable")
+            }
+            IOSSuccess()
+        }
+
+        fun setFavourite(
+            kind: String, id: Int, enabled: Boolean,
+            completion: (IOSSuccess?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            val type = when (kind) {
+                "link" -> FavouriteType.Link
+                "entry" -> FavouriteType.Entry
+                "linkComment" -> FavouriteType.LinkComment
+                "entryComment" -> FavouriteType.EntryComment
+                else -> throw IllegalArgumentException("invalid resource kind")
+            }
+            if (enabled) favouritesRepository.createFavourite(type, id).getOrThrow()
+            else favouritesRepository.deleteFavourite(type, id).getOrThrow()
+            IOSSuccess()
+        }
+
+        fun voteSurvey(
+            entryId: Int, option: Int,
+            completion: (IOSSuccess?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(option > 0) { "invalid survey option" }
+            entriesRepository.voteSurvey(entryId, option).getOrThrow()
+            IOSSuccess()
+        }
+
+        fun voteRelated(
+            linkId: Int, relatedId: Int, remove: Boolean, down: Boolean,
+            completion: (IOSSuccess?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            when {
+                remove -> linksRepository.removeVoteOnRelatedLink(linkId, relatedId)
+                down -> linksRepository.voteDownOnRelatedLink(linkId, relatedId)
+                else -> linksRepository.voteUpOnRelatedLink(linkId, relatedId)
+            }.getOrThrow()
+            IOSSuccess()
+        }
+
+        fun delete(
+            kind: String, id: Int, parentId: Int?,
+            completion: (IOSSuccess?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            when (kind) {
+                "entry" -> entriesRepository.deleteEntry(id).getOrThrow()
+                "entryComment" -> entriesRepository.deleteEntryComment(
+                    requireNotNull(parentId) { "missing parent entry" }, id,
+                ).getOrThrow()
+                else -> throw IllegalArgumentException("delete unavailable")
+            }
+            IOSSuccess()
+        }
+
+        private fun String?.toVoteReason(): VoteReason = when (this) {
+            "duplicate" -> VoteReason.Duplicate
+            "spam" -> VoteReason.Spam
+            "fake" -> VoteReason.Fake
+            "wrong" -> VoteReason.Wrong
+            "invalid" -> VoteReason.Invalid
+            else -> throw IllegalArgumentException("invalid downvote reason")
+        }
+    }
+
+    inner class VotersService {
+        fun load(
+            kind: String, rootId: Int, commentId: Int?, side: String, page: Int,
+            completion: (IOSVoterPage?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(page > 0) { "invalid page" }
+            val result = when (kind) {
+                "entry" -> entriesRepository.getEntryVotes(rootId, page)
+                "entryComment" -> entriesRepository.getEntryCommentVotes(
+                    rootId, requireNotNull(commentId) { "missing comment" }, page,
+                )
+                "link" -> {
+                    require(side == "up" || side == "down") { "invalid side" }
+                    linksRepository.getLinkUpvotes(rootId, side, page)
+                }
+                else -> throw IllegalArgumentException("voters unavailable")
+            }.getOrThrow()
+            IOSVoterPage(
+                result.data.map { IOSVoter(it.username, it.avatar, it.verified, it.reason?.name) },
+                result.pagination?.next,
+                result.pagination?.total,
+            )
+        }
+    }
+
     inner class EmbedsService {
         fun twitterPreview(
             url: String,
@@ -485,6 +678,7 @@ internal fun ResourceItem.toIOSResource(): IOSResource {
         sourceLabel = source?.label,
         hot = hot,
         recommended = recommended,
+        slug = slug,
     )
 }
 

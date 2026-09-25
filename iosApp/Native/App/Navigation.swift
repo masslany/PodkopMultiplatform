@@ -54,6 +54,15 @@ enum AppSheet: String, Identifiable {
     var id: String { rawValue }
 }
 
+enum ComposerIntent: Hashable {
+    case createEntry
+    case createEntryComment(entryID: Int, replyTarget: String?)
+    case createLinkComment(linkID: Int, parentCommentID: Int?, replyTarget: String?)
+    case editEntry(Int)
+    case editEntryComment(entryID: Int, commentID: Int)
+    case editLinkComment(linkID: Int, commentID: Int)
+}
+
 struct AppAlert: Identifiable {
     let id = UUID()
     let title: String
@@ -74,6 +83,8 @@ final class AppRouter {
     var alert: AppAlert?
     var banner: String?
     var pendingAccountRoute: AppRoute?
+    var composerIntent: ComposerIntent?
+    var pendingComposerIntent: ComposerIntent?
     var isLoggedIn = false {
         didSet {
             if !isLoggedIn { clearAccountRoutes() }
@@ -110,18 +121,40 @@ final class AppRouter {
     func clearAccountRoutes() {
         paths = paths.mapValues { $0.filter { !$0.needsAccount } }
         pendingAccountRoute = nil
+        pendingComposerIntent = nil
+        composerIntent = nil
         if sheet == .composer { sheet = nil }
     }
 
     func applySession(isLoggedIn: Bool, revision: Int) {
+        let waitingRoute = isLoggedIn ? pendingAccountRoute : nil
+        let waitingComposer = isLoggedIn ? pendingComposerIntent : nil
         if let sessionRevision, sessionRevision != revision { clearAccountRoutes() }
         sessionRevision = revision
+        if isLoggedIn { pendingAccountRoute = waitingRoute }
         self.isLoggedIn = isLoggedIn
+        if isLoggedIn, let waitingComposer {
+            self.pendingComposerIntent = nil
+            composerIntent = waitingComposer
+            sheet = .composer
+        }
+    }
+
+    func presentComposer(_ intent: ComposerIntent) {
+        if isLoggedIn {
+            composerIntent = intent
+            sheet = .composer
+        } else {
+            pendingComposerIntent = intent
+            sheet = .login
+        }
     }
 
     func dismissSheet() {
         sheet = nil
         pendingAccountRoute = nil
+        pendingComposerIntent = nil
+        composerIntent = nil
     }
 
     func detail(for tab: AppTab) -> AppRoute? {

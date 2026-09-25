@@ -168,7 +168,7 @@ struct NativeResourceCard: View {
                 Label("\(resource.vote.up)", systemImage: "hand.thumbsup")
                     .accessibilityLabel(String(localized: "Upvotes") + ": \(resource.vote.up)")
             }
-            if resource.kind == .linkComment, let voteDown = actions.voteDown,
+            if (resource.kind == .link || resource.kind == .linkComment), let voteDown = actions.voteDown,
                resource.vote.canDown || resource.vote.canUndo {
                 Button { voteDown() } label: {
                     Label("\(resource.vote.down)", systemImage: "hand.thumbsdown")
@@ -185,6 +185,13 @@ struct NativeResourceCard: View {
                     .accessibilityLabel(String(localized: "Comments") + ": \(resource.commentCount)")
             }
             Spacer(minLength: 0)
+            if resource.title.isEmpty, let open = actions.open,
+               resource.kind == .entry || resource.kind == .link {
+                Button(action: open) {
+                    Label("Open", systemImage: "arrow.up.right")
+                }
+                .accessibilityLabel(resource.kind == .entry ? "Open entry" : "Open link")
+            }
             if let favourite = actions.favourite {
                 Button { favourite() } label: {
                     Image(systemName: resource.favourite ? "star.fill" : "star")

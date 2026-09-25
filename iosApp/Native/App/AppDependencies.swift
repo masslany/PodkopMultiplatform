@@ -11,11 +11,30 @@ final class AppDependencies {
     lazy var ingress = LinkIngress(router: router)
     lazy var session = SessionModel(dependencies: self)
     let sceneActivity = SceneActivity()
+    let resourceUpdates = ResourceUpdates()
     lazy var feedLoader: FeedLoading = {
         #if DEBUG
         if isFixture { return FixtureFeedLoader() }
         #endif
         return SharedFeedLoader(client: client, adapter: adapter)
+    }()
+    lazy var detailLoader: DetailLoading = {
+        #if DEBUG
+        if isFixture { return FixtureDetailLoader() }
+        #endif
+        return SharedDetailLoader(client: client, adapter: adapter)
+    }()
+    lazy var detailMutator: DetailMutating = {
+        #if DEBUG
+        if isFixture { return FixtureDetailMutator() }
+        #endif
+        return SharedDetailMutator(client: client, adapter: adapter)
+    }()
+    lazy var voterLoader: VoterLoading = {
+        #if DEBUG
+        if isFixture { return FixtureVoterLoader() }
+        #endif
+        return SharedVoterLoader(client: client, adapter: adapter)
     }()
     private var isFixture: Bool {
         #if DEBUG
@@ -71,6 +90,7 @@ final class SessionModel {
     enum Phase { case initializing, ready, error, missingConfiguration }
     var phase: Phase = .initializing
     var isLoggedIn = false
+    var revision = 0
     var unreadCount = 0
     var autoplayGifs = true
     var banner: String?
@@ -94,6 +114,7 @@ final class SessionModel {
                 dependencies.router.selectedTab = .links
                 phase = .ready
                 isLoggedIn = arguments[marker + 1] == "authenticated"
+                revision = 0
                 dependencies.router.applySession(isLoggedIn: isLoggedIn, revision: 0)
                 dependencies.ingress.ready = true
                 dependencies.updatePolling()
@@ -125,6 +146,8 @@ final class SessionModel {
         observationTasks.append(Task {
             for await value in adapter.stream({ client.session.observe(onChange: $0) }) {
                 isLoggedIn = value.isLoggedIn
+                revision = Int(value.revision)
+                dependencies.resourceUpdates.reset(for: revision)
                 dependencies.router.applySession(isLoggedIn: value.isLoggedIn, revision: Int(value.revision))
             }
         })
@@ -207,6 +230,8 @@ final class SessionModel {
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-nativeFixture") {
             isLoggedIn = false
+            revision += 1
+            dependencies.resourceUpdates.reset(for: revision)
             dependencies.router.applySession(isLoggedIn: false, revision: 1)
             return
         }

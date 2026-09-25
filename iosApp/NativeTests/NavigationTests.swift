@@ -69,6 +69,24 @@ final class NavigationTests: XCTestCase {
         XCTAssertEqual(router.paths[.links], [.link(19)])
     }
 
+    func testComposerIntentSurvivesLoginAndClearsOnSignOut() {
+        let router = AppRouter(storage: nil)
+        let intent = ComposerIntent.createLinkComment(linkID: 31, parentCommentID: 9,
+                                                     replyTarget: "author")
+        router.presentComposer(intent)
+        XCTAssertEqual(router.sheet, .login)
+        XCTAssertEqual(router.pendingComposerIntent, intent)
+
+        router.applySession(isLoggedIn: true, revision: 1)
+        XCTAssertEqual(router.sheet, .composer)
+        XCTAssertEqual(router.composerIntent, intent)
+        XCTAssertNil(router.pendingComposerIntent)
+
+        router.applySession(isLoggedIn: false, revision: 2)
+        XCTAssertNil(router.sheet)
+        XCTAssertNil(router.composerIntent)
+    }
+
     func testRepeatedSceneRegistrationCountsOnceAndStopsAtLastScene() {
         let scenes = SceneActivity()
         let first = UUID()

@@ -11,7 +11,7 @@ enum ContentFixtures {
         vote: NativeVote(up: 58, down: 4, state: "positive", canUp: true,
                          canDown: false, canUndo: true),
         tags: ["technologia", "nauka"], sourceURL: "https://example.com",
-        sourceLabel: "example.com", hot: true)
+        sourceLabel: "example.com", hot: true, slug: "sample-link")
 
     static let entry = NativeResource(
         sourceID: 102, kind: .entry, body: "Pierwszy akapit z emoji 👩🏽‍💻 i łączonymi znakami é.\n!Ukryty tekst ze spoilerem.\n- Pierwszy punkt\n- Drugi punkt\n> Cytat\n```swift\nlet a = 1\n```",

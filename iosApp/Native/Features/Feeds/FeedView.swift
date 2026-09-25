@@ -8,7 +8,8 @@ struct NativeFeedView: View {
 
     init(tab: AppTab, dependencies: AppDependencies) {
         _model = State(initialValue: FeedModel(tab: tab, loggedIn: dependencies.session.isLoggedIn,
-                                               loader: dependencies.feedLoader))
+                                               loader: dependencies.feedLoader,
+                                               updates: dependencies.resourceUpdates))
         router = dependencies.router
         session = dependencies.session
         self.dependencies = dependencies
@@ -58,7 +59,15 @@ struct NativeFeedView: View {
         .refreshable { await model.refresh() }
         .task { model.start() }
         .onDisappear { model.stop() }
-        .onChange(of: session.isLoggedIn) { _, value in model.setSession(value) }
+        .onChange(of: session.revision) { _, value in
+            model.setSession(session.isLoggedIn, revision: value)
+        }
+        .onChange(of: session.isLoggedIn) { _, value in
+            model.setSession(value, revision: session.revision)
+        }
+        .onChange(of: dependencies.resourceUpdates.revision) { _, _ in
+            model.reconcile(dependencies.resourceUpdates)
+        }
         .accessibilityIdentifier("feed-\(model.query.tab.rawValue)")
     }
 

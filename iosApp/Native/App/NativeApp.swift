@@ -198,7 +198,7 @@ private struct TabContent: View {
             }
             .accessibilityLabel("Search")
             if tab != .more {
-                Button { router.sheet = session.isLoggedIn ? .composer : .login } label: {
+                Button { router.presentComposer(.createEntry) } label: {
                     Image(systemName: "square.and.pencil")
                 }
                 .accessibilityLabel("Write a post")
@@ -215,8 +215,8 @@ private struct TabContent: View {
 
     @ViewBuilder private func destination(_ route: AppRoute) -> some View {
         switch route {
-        case .link(let id): DevelopmentView(title: "Link \(id)")
-        case .entry(let id): DevelopmentView(title: "Entry \(id)")
+        case .link(let id): NativeDetailView(kind: .link, id: id, dependencies: dependencies)
+        case .entry(let id): NativeDetailView(kind: .entry, id: id, dependencies: dependencies)
         case .messages: DevelopmentView(title: String(localized: "Messages"))
         case .notifications: DevelopmentView(title: String(localized: "Notifications"))
         case .search: DevelopmentView(title: String(localized: "Search"))

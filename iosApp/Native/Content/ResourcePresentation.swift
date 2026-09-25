@@ -81,6 +81,7 @@ struct NativeResource: Identifiable, Hashable {
     let sourceLabel: String?
     let hot: Bool
     let recommended: Bool
+    let slug: String
 
     var id: String { "\(kind.rawValue):\(sourceID)" }
 
@@ -125,6 +126,7 @@ struct NativeResource: Identifiable, Hashable {
         sourceLabel = value.sourceLabel
         hot = value.hot
         recommended = value.recommended
+        slug = value.slug
     }
 
     init(sourceID: Int, kind: NativeResourceKind, title: String = "", body: String,
@@ -136,7 +138,7 @@ struct NativeResource: Identifiable, Hashable {
                                        canDown: false, canUndo: false),
          tags: [String] = [], photo: NativePhoto? = nil, embed: NativeEmbed? = nil,
          survey: NativeSurvey? = nil, sourceURL: String? = nil, sourceLabel: String? = nil,
-         hot: Bool = false, recommended: Bool = false) {
+         hot: Bool = false, recommended: Bool = false, slug: String = "") {
         self.sourceID = sourceID
         self.kind = kind
         self.title = title
@@ -160,5 +162,6 @@ struct NativeResource: Identifiable, Hashable {
         self.sourceLabel = sourceLabel
         self.hot = hot
         self.recommended = recommended
+        self.slug = slug
     }
 }
