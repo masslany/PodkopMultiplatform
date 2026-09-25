@@ -39,59 +39,10 @@ struct TabContent: View {
 
     @ViewBuilder private var listContent: some View {
         if tab == .more {
-            List {
-                Section {
-                    if session.isLoggedIn {
-                        routeButton("Profile", symbol: "person", route: .profile)
-                        badgeRouteButton("Messages", symbol: "envelope", route: .messages,
-                                         count: session.notificationCounts.pm)
-                        badgeRouteButton("Notifications", symbol: "bell", route: .notifications,
-                                         count: session.notificationCounts.total - session.notificationCounts.pm)
-                        routeButton("Favorites", symbol: "star", route: .favorites)
-                        routeButton("Observed", symbol: "eye", route: .observed)
-                    } else {
-                        Button("Sign in") { router.sheet = .login }
-                    }
-                }
-                Section {
-                    routeButton("Search", symbol: "magnifyingglass", route: .search)
-                    routeButton("Hits", symbol: "flame", route: .hits)
-                    routeButton("Rank", symbol: "chart.bar", route: .rank)
-                }
-                if session.isLoggedIn {
-                    Section {
-                        routeButton("Add link", symbol: "link.badge.plus", route: .addLink)
-                    }
-                }
-                Section {
-                    routeButton("Settings", symbol: "gear", route: .settings)
-                    routeButton("About", symbol: "info.circle", route: .about)
-                }
-            }
+            MoreView(dependencies: dependencies)
         } else {
             FeedView(tab: tab, dependencies: dependencies)
                 .background(WykopTheme.background.ignoresSafeArea())
-        }
-    }
-
-    private func badgeRouteButton(_ title: LocalizedStringKey, symbol: String, route: AppRoute,
-                                  count: Int) -> some View {
-        Button { router.navigate(route, in: tab) } label: {
-            HStack {
-                Label(title, systemImage: symbol)
-                Spacer()
-                if count > 0 {
-                    Text("\(count)").font(.caption.bold()).padding(.horizontal, 7).padding(.vertical, 2)
-                        .background(.red, in: Capsule()).foregroundStyle(.white)
-                        .accessibilityLabel(String(localized: "Unread: \(count)"))
-                }
-            }
-        }
-    }
-
-    private func routeButton(_ title: LocalizedStringKey, symbol: String, route: AppRoute) -> some View {
-        Button { router.navigate(route, in: tab) } label: {
-            Label(title, systemImage: symbol)
         }
     }
 

@@ -158,7 +158,7 @@ final class ShellUITests: XCTestCase {
     func testAuthenticatedMoreAndSignOut() {
         let app = launch("authenticated")
         app.tabBars.buttons["More"].tap()
-        XCTAssertTrue(app.buttons["Profile"].exists)
+        XCTAssertTrue(app.buttons["Profile"].waitForExistence(timeout: 5))
         app.buttons["Settings"].tap()
         app.buttons["settingsSignOut"].tap()
         XCTAssertTrue(app.alerts.buttons["Sign out"].waitForExistence(timeout: 5))
@@ -226,7 +226,7 @@ final class ShellUITests: XCTestCase {
         app.buttons["Favorites"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["resource-entry:102"].waitForExistence(timeout: 5))
         app.navigationBars.buttons.firstMatch.tap()
-        app.buttons["Observed"].tap()
+        app.buttons["more-observed"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["resource-link:101"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["3 new comments on an observed link"].exists)
     }
@@ -267,6 +267,7 @@ final class ShellUITests: XCTestCase {
     func testFixtureOwnProfileHasNoViewerActions() {
         let app = launch("authenticated")
         app.tabBars.buttons["More"].tap()
+        XCTAssertTrue(app.buttons["Profile"].waitForExistence(timeout: 5))
         app.buttons["Profile"].tap()
         XCTAssertTrue(app.buttons["profileDetails"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["profileObserve"].exists)
