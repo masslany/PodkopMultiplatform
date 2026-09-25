@@ -21,6 +21,8 @@ struct TabContent: View {
                         destination(route)
                     } else {
                         ContentUnavailableView(.appSelectItem, systemImage: tab.symbol)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(WykopTheme.background.ignoresSafeArea())
                     }
                 }
             } else {
