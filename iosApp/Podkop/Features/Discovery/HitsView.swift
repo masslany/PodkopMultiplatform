@@ -33,7 +33,7 @@ struct HitsView: View {
         } rows: {
             PagedResourceRows(pager: model.pager, tab: tab, dependencies: dependencies)
         }
-        .navigationTitle("Hits")
+        .navigationTitle(.commonHits)
         .task { model.start() }
         .onDisappear { model.stop() }
         .onChange(of: dependencies.resourceUpdates.revision) { _, _ in
@@ -49,17 +49,17 @@ struct HitsView: View {
     }
 
     private var archiveTitle: String {
-        guard let archive = model.archive else { return String(localized: "Archive") }
+        guard let archive = model.archive else { return String(localized: .discoveryArchive) }
         return "\(Calendar.current.standaloneMonthSymbols[archive.month - 1]) \(String(archive.year))"
     }
 
     private func title(for sort: HitsModel.Sort) -> String {
         switch sort {
-        case .all: String(localized: "All time")
-        case .day: String(localized: "Day")
-        case .week: String(localized: "Week")
-        case .month: String(localized: "Month")
-        case .year: String(localized: "Year")
+        case .all: String(localized: .discoveryAllTime)
+        case .day: String(localized: .discoveryDay)
+        case .week: String(localized: .discoveryWeek)
+        case .month: String(localized: .discoveryMonth)
+        case .year: String(localized: .discoveryYear)
         }
     }
 }
@@ -84,11 +84,11 @@ private struct HitsArchivePicker: View {
                 HStack {
                     Button { changeYear(-1) } label: { Image(systemName: "chevron.left") }
                         .disabled(year <= HitsArchive.startYear)
-                        .accessibilityLabel("Previous year")
+                        .accessibilityLabel(.discoveryPreviousYear)
                     Text(String(year)).font(.title2.monospacedDigit()).frame(minWidth: 80)
                     Button { changeYear(1) } label: { Image(systemName: "chevron.right") }
                         .disabled(year >= maxYear)
-                        .accessibilityLabel("Next year")
+                        .accessibilityLabel(.discoveryNextYear)
                 }
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 10) {
                     ForEach(1...12, id: \.self) { value in
@@ -102,12 +102,12 @@ private struct HitsArchivePicker: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("Archive")
+            .navigationTitle(.discoveryArchive)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                ToolbarItem(placement: .cancellationAction) { Button(.commonCancel) { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Show") { confirm(HitsArchive(year: year, month: month)) }
+                    Button(.discoveryShow) { confirm(HitsArchive(year: year, month: month)) }
                         .disabled(!HitsArchive.isAvailable(year: year, month: month))
                 }
             }

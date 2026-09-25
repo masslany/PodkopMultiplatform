@@ -15,46 +15,46 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("Theme") {
-                Picker("Theme", selection: Binding(get: { session.theme }, set: { model.setTheme($0) })) {
-                    Text("Auto").tag(ThemeChoice.auto)
-                    Text("Light").tag(ThemeChoice.light)
-                    Text("Dark").tag(ThemeChoice.dark)
+            Section(.settingsTheme) {
+                Picker(.settingsTheme, selection: Binding(get: { session.theme }, set: { model.setTheme($0) })) {
+                    Text(.settingsAuto).tag(ThemeChoice.auto)
+                    Text(.settingsLight).tag(ThemeChoice.light)
+                    Text(.settingsDark).tag(ThemeChoice.dark)
                 }
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("settingsTheme")
             }
-            Section("Media") {
-                Toggle("Autoplay GIFs", isOn: Binding(get: { session.autoplayGifs }, set: { model.setAutoplay($0) }))
+            Section(.settingsMedia) {
+                Toggle(.settingsAutoplayGIFs, isOn: Binding(get: { session.autoplayGifs }, set: { model.setAutoplay($0) }))
                     .accessibilityIdentifier("settingsAutoplay")
             }
-            Section("Data") {
-                Button("Clear cache") { model.clearCache() }
+            Section(.settingsData) {
+                Button(.settingsClearCache) { model.clearCache() }
                     .accessibilityIdentifier("settingsClearCache")
-                Button("Copy diagnostics") { model.copyDiagnostics(session: session) }
+                Button(.settingsCopyDiagnostics) { model.copyDiagnostics(session: session) }
             }
             if session.isLoggedIn {
-                Section("Account") {
-                    Button("Manage blacklists") { dependencies.router.navigate(.blacklists, in: tab) }
-                    Button("Sign out", role: .destructive) { confirmLogout = true }
+                Section(.settingsAccount) {
+                    Button(.settingsManageBlacklists) { dependencies.router.navigate(.blacklists, in: tab) }
+                    Button(.settingsSignOut, role: .destructive) { confirmLogout = true }
                         .accessibilityIdentifier("settingsSignOut")
                 }
             }
             #if DEBUG
-            Section("Debug") {
-                Button("Debug tools") { dependencies.router.navigate(.debug, in: tab) }
+            Section(.settingsDebug) {
+                Button(.settingsDebugTools) { dependencies.router.navigate(.debug, in: tab) }
             }
             #endif
             Section {
-                Button("About") { dependencies.router.navigate(.about, in: tab) }
+                Button(.commonAbout) { dependencies.router.navigate(.about, in: tab) }
             } footer: {
-                Text("App version: \(AppBuild.version)")
+                Text(.settingsAppVersion(AppBuild.version))
             }
         }
-        .navigationTitle("Settings")
-        .alert("Are you sure you want to sign out?", isPresented: $confirmLogout) {
-            Button("Sign out", role: .destructive) { Task { await session.logout() } }
-            Button("Cancel", role: .cancel) {}
+        .navigationTitle(.commonSettings)
+        .alert(.settingsSureWantSignOut, isPresented: $confirmLogout) {
+            Button(.settingsSignOut, role: .destructive) { Task { await session.logout() } }
+            Button(.commonCancel, role: .cancel) {}
         }
         // Android confirms these with a snackbar; the app banner is the iOS equivalent.
         .onChange(of: model.confirmation) { _, message in
@@ -64,7 +64,7 @@ struct SettingsView: View {
         }
         .onChange(of: model.failed) { _, failed in
             guard failed else { return }
-            dependencies.router.banner = String(localized: "Could not complete this action. Try again.")
+            dependencies.router.banner = String(localized: .commonCouldNotCompleteAction)
             model.dismissMessages()
         }
     }

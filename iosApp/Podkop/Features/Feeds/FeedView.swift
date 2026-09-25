@@ -22,24 +22,24 @@ struct FeedView: View {
                 controls
                 if model.refreshError {
                     HStack {
-                        Label("Could not refresh", systemImage: "exclamationmark.triangle")
+                        Label(.commonCouldNotRefresh, systemImage: "exclamationmark.triangle")
                         Spacer()
-                        Button("Retry") { Task { await model.refresh() } }
+                        Button(.commonRetry) { Task { await model.refresh() } }
                     }
                     .font(.subheadline)
                     .padding(10)
                     .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 if model.phase == .loading && model.items.isEmpty {
-                    ProgressView("Loading…").frame(maxWidth: .infinity, minHeight: 180)
+                    ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 180)
                 } else if model.phase == .failed && model.items.isEmpty {
                     ContentUnavailableView {
-                        Label("Could not load content", systemImage: "wifi.exclamationmark")
+                        Label(.commonCouldNotLoadContent, systemImage: "wifi.exclamationmark")
                     } actions: {
-                        Button("Retry") { model.retry() }
+                        Button(.commonRetry) { model.retry() }
                     }
                 } else if model.items.isEmpty && model.phase == .loaded {
-                    ContentUnavailableView("Nothing here yet", systemImage: "tray")
+                    ContentUnavailableView(.commonNothingHereYet, systemImage: "tray")
                 } else {
                     if model.gallery {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 12)], spacing: 12) {
@@ -78,15 +78,15 @@ struct FeedView: View {
         HStack {
             Menu {
                 if model.query.tab == .entries {
-                    sortItem("Hot", value: "hot")
-                    sortItem("Newest", value: "newest")
-                    sortItem("Active", value: "active")
+                    sortItem(.feedsHot, value: "hot")
+                    sortItem(.commonNewest, value: "newest")
+                    sortItem(.feedsActive, value: "active")
                 } else {
-                    sortItem("Newest", value: "newest")
-                    sortItem("Active", value: "active")
+                    sortItem(.commonNewest, value: "newest")
+                    sortItem(.feedsActive, value: "active")
                     if model.query.tab == .upcoming {
-                        sortItem("Commented", value: "commented")
-                        sortItem("Digged", value: "digged")
+                        sortItem(.commonCommented, value: "commented")
+                        sortItem(.feedsDigged, value: "digged")
                     }
                 }
             } label: {
@@ -96,7 +96,7 @@ struct FeedView: View {
             if model.query.tab == .entries && model.query.sort == "hot" {
                 Menu {
                     ForEach([2, 6, 12, 24], id: \.self) { hours in
-                        Button("\(hours) h") { model.select(sort: "hot", hotHours: hours) }
+                        Button { model.select(sort: "hot", hotHours: hours) } label: { Text(verbatim: "\(hours) h") }
                     }
                 } label: {
                     DropdownLabel(title: "\(model.query.hotHours) h", systemImage: "clock")
@@ -111,37 +111,37 @@ struct FeedView: View {
                     .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(model.gallery ? "List view" : "Gallery view")
+            .accessibilityLabel(model.gallery ? .commonListView : .commonGalleryView)
             .accessibilityIdentifier("feedGallery")
         }
         .padding(.top, 8)
     }
 
-    private func sortItem(_ title: LocalizedStringKey, value: String) -> some View {
+    private func sortItem(_ title: LocalizedStringResource, value: String) -> some View {
         Button(title) { model.select(sort: value) }
     }
 
     private var sortTitle: String {
         switch model.query.sort {
-        case "hot": String(localized: "Hot")
-        case "active": String(localized: "Active")
-        case "commented": String(localized: "Commented")
-        case "digged": String(localized: "Digged")
-        default: String(localized: "Newest")
+        case "hot": String(localized: .feedsHot)
+        case "active": String(localized: .feedsActive)
+        case "commented": String(localized: .commonCommented)
+        case "digged": String(localized: .feedsDigged)
+        default: String(localized: .commonNewest)
         }
     }
 
     private var hitStrip: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Label("Hits", systemImage: "flame.fill")
+                Label(.commonHits, systemImage: "flame.fill")
                     .font(.headline)
                     .labelStyle(.titleAndIcon)
                     .foregroundStyle(WykopTheme.hotOrange)
                 Spacer()
                 Button { router.navigate(.hits, in: .links) } label: {
                     HStack(spacing: 2) {
-                        Text("See all")
+                        Text(.feedsSeeAll)
                         Image(systemName: "chevron.right").font(.caption.weight(.semibold))
                     }
                     .font(.subheadline)
@@ -170,9 +170,9 @@ struct FeedView: View {
     }
 
     @ViewBuilder private var pageFooter: some View {
-        if model.nextLoading { ProgressView("Loading…").padding() }
+        if model.nextLoading { ProgressView(.commonLoading).padding() }
         if model.nextError {
-            Button("Retry next page") { model.retry() }.buttonStyle(.bordered)
+            Button(.commonRetryNextPage) { model.retry() }.buttonStyle(.bordered)
         }
     }
 }

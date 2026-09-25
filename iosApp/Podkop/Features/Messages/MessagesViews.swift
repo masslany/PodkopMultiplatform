@@ -16,18 +16,18 @@ struct InboxView: View {
             let pager = model.pager
             switch pager.phase {
             case .idle, .loading:
-                ProgressView("Loading…").frame(maxWidth: .infinity)
+                ProgressView(.commonLoading).frame(maxWidth: .infinity)
             case .failed:
                 ContentUnavailableView {
-                    Label("Could not load content", systemImage: "wifi.exclamationmark")
+                    Label(.commonCouldNotLoadContent, systemImage: "wifi.exclamationmark")
                 } actions: {
-                    Button("Retry") { pager.retry() }
+                    Button(.commonRetry) { pager.retry() }
                 }
             case .loaded where pager.items.isEmpty:
-                ContentUnavailableView("You have no conversations yet", systemImage: "envelope")
+                ContentUnavailableView(.messagesHaveNoConversationsYet, systemImage: "envelope")
             case .loaded:
                 if pager.refreshError {
-                    Label("Could not refresh", systemImage: "exclamationmark.triangle")
+                    Label(.commonCouldNotRefresh, systemImage: "exclamationmark.triangle")
                 }
                 ForEach(pager.items) { conversation in
                     Button {
@@ -44,7 +44,7 @@ struct InboxView: View {
                                     Text(date.formatted(.relative(presentation: .named))).font(.caption).foregroundStyle(.secondary)
                                 }
                                 if conversation.unread {
-                                    Circle().fill(.red).frame(width: 9, height: 9).accessibilityLabel("Unread")
+                                    Circle().fill(.red).frame(width: 9, height: 9).accessibilityLabel(.commonUnread)
                                 }
                             }
                         }
@@ -56,13 +56,13 @@ struct InboxView: View {
             }
         }
         .refreshable { await model.refresh() }
-        .navigationTitle("Messages")
+        .navigationTitle(.commonMessages)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { dependencies.router.navigate(.newConversation, in: tab) } label: {
                     Image(systemName: "square.and.pencil")
                 }
-                .accessibilityLabel("New conversation")
+                .accessibilityLabel(.messagesNewConversation)
                 .accessibilityIdentifier("newConversation")
             }
         }

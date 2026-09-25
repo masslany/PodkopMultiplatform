@@ -46,7 +46,7 @@ struct HitTile: View {
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(resource.title)
-        .accessibilityValue(String(localized: "Votes: \(resource.vote.up)"))
+        .accessibilityValue(String(localized: .commonVotes(resource.vote.up)))
         .accessibilityAddTraits(.isButton)
     }
 }

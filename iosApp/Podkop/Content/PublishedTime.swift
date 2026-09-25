@@ -14,13 +14,13 @@ enum PublishedTime {
             formatter.dateFormat = "yyyy.MM.dd HH:mm"
             return formatter.string(from: date)
         }
-        if hours >= 24 { return String(localized: "\(days) days ago") }
+        if hours >= 24 { return String(localized: .contentDaysAgo(days)) }
         if hours >= 1 {
             let rest = minutes % 60
-            return rest > 0 ? String(localized: "\(hours) h \(rest) min ago") : String(localized: "\(hours) h ago")
+            return rest > 0 ? String(localized: .contentHoursMinutesAgo(hours, rest)) : String(localized: .contentHoursAgo(hours))
         }
-        if minutes > 0 { return String(localized: "\(minutes) min ago") }
-        return String(localized: "just now")
+        if minutes > 0 { return String(localized: .contentMinutesAgo(minutes)) }
+        return String(localized: .contentJustNow)
     }
 
     static func text(iso raw: String?, now: Date = Date()) -> String? {

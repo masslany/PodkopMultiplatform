@@ -15,11 +15,11 @@ struct ScreenshotPreview: View {
             ScrollView {
                 VStack(spacing: 16) {
                     if parent != nil {
-                        Toggle("Include parent", isOn: $includeParent)
+                        Toggle(.detailsIncludeParent, isOn: $includeParent)
                     }
                     if let image {
                         Image(uiImage: image).resizable().scaledToFit()
-                            .accessibilityLabel("Screenshot preview")
+                            .accessibilityLabel(.detailsScreenshotPreview)
                         if let data = image.pngData() {
                             ImageExportControls(data: data) { message = $0 }
                         }
@@ -28,17 +28,17 @@ struct ScreenshotPreview: View {
                         }
                     } else {
                         ContentUnavailableView {
-                            Label("Could not create screenshot", systemImage: "photo")
+                            Label(.detailsCouldNotCreateScreenshot, systemImage: "photo")
                         } actions: {
-                            Button("Retry") { render() }
+                            Button(.commonRetry) { render() }
                         }
                     }
                 }
                 .padding()
             }
-            .navigationTitle("Screenshot preview")
+            .navigationTitle(.detailsScreenshotPreview)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } }
+                ToolbarItem(placement: .topBarTrailing) { Button(.detailsDone) { dismiss() } }
             }
         }
         .task { await loadPhotos(); render() }

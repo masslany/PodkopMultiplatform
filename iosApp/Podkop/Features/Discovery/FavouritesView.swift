@@ -25,10 +25,10 @@ struct FavouritesView: View {
                 }
                 .accessibilityIdentifier("favouritesType")
                 Menu {
-                    Button("Newest") { model.select(sort: .newest) }
-                    Button("Oldest") { model.select(sort: .oldest) }
+                    Button(.commonNewest) { model.select(sort: .newest) }
+                    Button(.commonOldest) { model.select(sort: .oldest) }
                 } label: {
-                    DropdownLabel(title: model.sort == .newest ? String(localized: "Newest") : String(localized: "Oldest"))
+                    DropdownLabel(title: model.sort == .newest ? String(localized: .commonNewest) : String(localized: .commonOldest))
                 }
                 .accessibilityIdentifier("favouritesSort")
             }
@@ -36,7 +36,7 @@ struct FavouritesView: View {
             PagedResourceRows(pager: model.pager, tab: tab, dependencies: dependencies,
                               emptyTitle: emptyTitle)
         }
-        .navigationTitle("Favorites")
+        .navigationTitle(.commonFavorites)
         .task { model.start() }
         .onDisappear { model.stop() }
         .onChange(of: dependencies.session.revision) { _, _ in
@@ -47,23 +47,23 @@ struct FavouritesView: View {
         }
     }
 
-    private var emptyTitle: LocalizedStringKey {
+    private var emptyTitle: LocalizedStringResource {
         switch model.kind {
-        case .all: "No favorites yet"
-        case .link: "No favorite links"
-        case .entry: "No favorite entries"
-        case .linkComment: "No favorite link comments"
-        case .entryComment: "No favorite entry comments"
+        case .all: .discoveryNoFavoritesYet
+        case .link: .discoveryNoFavoriteLinks
+        case .entry: .discoveryNoFavoriteEntries
+        case .linkComment: .discoveryNoFavoriteLinkComments
+        case .entryComment: .discoveryNoFavoriteEntryComments
         }
     }
 
     private func title(for kind: FavouritesModel.Kind) -> String {
         switch kind {
-        case .all: String(localized: "Everything")
-        case .link: String(localized: "Links")
-        case .entry: String(localized: "Entries")
-        case .linkComment: String(localized: "Link comments")
-        case .entryComment: String(localized: "Entry comments")
+        case .all: String(localized: .commonEverything)
+        case .link: String(localized: .commonLinks)
+        case .entry: String(localized: .commonEntries)
+        case .linkComment: String(localized: .discoveryLinkComments)
+        case .entryComment: String(localized: .discoveryEntryComments)
         }
     }
 }

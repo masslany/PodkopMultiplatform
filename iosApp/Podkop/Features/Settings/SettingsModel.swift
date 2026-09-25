@@ -15,7 +15,7 @@ final class SettingsModel {
 
     func clearCache() {
         service.clearMediaCache()
-        confirmation = String(localized: "Cache cleared")
+        confirmation = String(localized: .settingsCacheCleared)
     }
 
     /// Same fields as Android's diagnostics snapshot; no identifiers or tokens.
@@ -29,7 +29,7 @@ final class SettingsModel {
             "themeOverride=\(session.theme.rawValue)",
             "autoplayGifs=\(session.autoplayGifs)",
         ].joined(separator: "\n")
-        confirmation = String(localized: "Diagnostics copied")
+        confirmation = String(localized: .settingsDiagnosticsCopied)
     }
 
     func dismissMessages() {

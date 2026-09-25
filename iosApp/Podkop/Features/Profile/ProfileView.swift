@@ -18,18 +18,18 @@ struct ProfileView: View {
         Group {
             switch model.phase {
             case .loading:
-                ProgressView("Loading…").frame(maxWidth: .infinity, maxHeight: .infinity)
+                ProgressView(.commonLoading).frame(maxWidth: .infinity, maxHeight: .infinity)
             case .failed:
                 ContentUnavailableView {
-                    Label("Could not load the profile.", systemImage: "person.crop.circle.badge.exclamationmark")
+                    Label(.profileCouldNotLoadProfile, systemImage: "person.crop.circle.badge.exclamationmark")
                 } actions: {
-                    Button("Retry") { model.retry() }
+                    Button(.commonRetry) { model.retry() }
                 }
             case .loaded:
                 if let profile = model.profile { content(profile) }
             }
         }
-        .navigationTitle(model.profile?.username ?? model.username ?? String(localized: "Profile"))
+        .navigationTitle(model.profile?.username ?? model.username ?? String(localized: .commonProfile))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar { if let profile = model.profile, model.phase == .loaded { profileToolbar(profile) } }
         .task { model.start() }
@@ -38,13 +38,13 @@ struct ProfileView: View {
         .onChange(of: dependencies.resourceUpdates.revision) { _, _ in
             model.reconcile(dependencies.resourceUpdates)
         }
-        .alert("Could not complete this action. Try again.",
+        .alert(.commonCouldNotCompleteAction,
                isPresented: Binding(get: { model.actionFailed }, set: { if !$0 { model.dismissActionFailure() } })) {
-            Button("OK", role: .cancel) {}
+            Button(.commonOk, role: .cancel) {}
         }
-        .alert("The note was saved.",
+        .alert(.profileNoteWasSaved,
                isPresented: Binding(get: { model.noteSaved }, set: { if !$0 { model.dismissNoteSaved() } })) {
-            Button("OK", role: .cancel) {}
+            Button(.commonOk, role: .cancel) {}
         }
     }
 
@@ -94,7 +94,7 @@ struct ProfileView: View {
                                 .padding(.horizontal, 7).padding(.vertical, 3)
                                 .background(WykopTheme.tagBlue, in: Capsule())
                                 .offset(x: 10, y: -6)
-                                .accessibilityLabel(String(localized: "Rank position \(rank)"))
+                                .accessibilityLabel(String(localized: .profileRankPosition(rank)))
                         }
                     }
                     .padding(.leading, 16)
@@ -112,7 +112,7 @@ struct ProfileView: View {
                 Button {
                     withAnimation { model.detailsExpanded.toggle() }
                 } label: {
-                    Label(model.detailsExpanded ? "Hide details" : "Show details",
+                    Label(model.detailsExpanded ? .profileHideDetails : .profileShowDetails,
                           systemImage: model.detailsExpanded ? "chevron.up" : "chevron.down")
                         .labelStyle(.iconOnly)
                         .frame(width: 32, height: 32)
@@ -138,7 +138,7 @@ struct ProfileView: View {
                 Button { router.navigate(.conversation(profile.username), in: tab) } label: {
                     Image(systemName: "envelope")
                 }
-                .accessibilityLabel("Send a private message")
+                .accessibilityLabel(.profileSendPrivateMessage)
                 .accessibilityIdentifier("profileMessage")
             }
             if profile.canBlacklist {
@@ -146,7 +146,7 @@ struct ProfileView: View {
                     Image(systemName: profile.blacklisted ? "lock.fill" : "lock.open")
                 }
                 .disabled(model.pending.contains(.blacklist))
-                .accessibilityLabel(profile.blacklisted ? "Unblock user" : "Block user")
+                .accessibilityLabel(profile.blacklisted ? .profileUnblockUser : .profileBlockUser)
                 .accessibilityIdentifier("profileBlacklist")
             }
             if profile.canManageObservation {
@@ -154,7 +154,7 @@ struct ProfileView: View {
                     Image(systemName: profile.observed ? "eye.fill" : "eye")
                 }
                 .disabled(model.pending.contains(.observe))
-                .accessibilityLabel(profile.observed ? "Observing" : "Observe")
+                .accessibilityLabel(profile.observed ? .commonObserving : .commonObserve)
                 .accessibilityIdentifier("profileObserve")
             }
         }
@@ -163,17 +163,17 @@ struct ProfileView: View {
     @ViewBuilder private func details(_ profile: Profile) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             if profile.isLoggedIn && !profile.isOwnProfile { noteSection }
-            Text("Achievements").font(.headline)
+            Text(.profileAchievements).font(.headline)
             if model.badgesFailed {
                 HStack {
-                    Text("Could not load achievements.").foregroundStyle(.secondary)
+                    Text(.profileCouldNotLoadAchievements).foregroundStyle(.secondary)
                     Spacer()
-                    Button("Retry") { model.retryDetails() }
+                    Button(.commonRetry) { model.retryDetails() }
                 }
             } else if !model.badgesLoaded {
                 ProgressView().frame(maxWidth: .infinity)
             } else if model.badges.isEmpty {
-                Text("No achievements to show.").foregroundStyle(.secondary)
+                Text(.profileNoAchievementsShow).foregroundStyle(.secondary)
             } else {
                 ForEach(model.badges) { badge in
                     VStack(alignment: .leading, spacing: 2) {
@@ -183,10 +183,10 @@ struct ProfileView: View {
                             Text(badge.description).font(.caption)
                         }
                         HStack(spacing: 8) {
-                            if let level = badge.level { Text("Level \(level)") }
-                            if let progress = badge.progress { Text("Progress \(progress)%") }
+                            if let level = badge.level { Text(.profileLevel(level)) }
+                            if let progress = badge.progress { Text(.profileProgress(progress)) }
                             if let date = badge.achievedAt.flatMap(Dates.parse) {
-                                Text("Achieved \(date.formatted(date: .numeric, time: .omitted))")
+                                Text(.profileAchieved(date.formatted(date: .numeric, time: .omitted)))
                             }
                         }
                         .font(.caption2).foregroundStyle(.secondary)
@@ -199,26 +199,26 @@ struct ProfileView: View {
     }
 
     @ViewBuilder private var noteSection: some View {
-        Text("Note about this user").font(.headline)
+        Text(.profileNoteAboutUser).font(.headline)
         if model.note.failed {
             HStack {
-                Text("Could not load the note.").foregroundStyle(.secondary)
+                Text(.profileCouldNotLoadNote).foregroundStyle(.secondary)
                 Spacer()
-                Button("Retry") { model.retryDetails() }
+                Button(.commonRetry) { model.retryDetails() }
             }
         } else {
-            TextField("Add a note", text: $model.note.content, axis: .vertical)
+            TextField(String(localized: .profileAddNote), text: $model.note.content, axis: .vertical)
                 .lineLimit(2...6)
                 .textFieldStyle(.roundedBorder)
                 .disabled(model.note.loading || model.note.saving)
                 .accessibilityIdentifier("profileNote")
             HStack {
                 if model.note.saveFailed {
-                    Label("Could not save. Your text is kept.", systemImage: "exclamationmark.circle")
+                    Label(.profileCouldNotSaveText, systemImage: "exclamationmark.circle")
                         .font(.caption).foregroundStyle(.red)
                 }
                 Spacer()
-                Button("Save") { model.saveNote() }
+                Button(.commonSave) { model.saveNote() }
                     .buttonStyle(.borderedProminent)
                     .disabled(!model.note.canSave)
                     .accessibilityIdentifier("profileNoteSave")
@@ -271,13 +271,13 @@ struct ProfileView: View {
         let pager = model.pager
         switch pager.phase {
         case .idle, .loading:
-            ProgressView("Loading…").frame(maxWidth: .infinity, minHeight: 120)
+            ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 120)
         case .failed:
             // Android shows a failed section as empty; offer an explicit retry instead.
             ContentUnavailableView {
-                Label("Could not load content", systemImage: "wifi.exclamationmark")
+                Label(.commonCouldNotLoadContent, systemImage: "wifi.exclamationmark")
             } actions: {
-                Button("Retry") { pager.retry() }
+                Button(.commonRetry) { pager.retry() }
             }
         case .loaded where pager.items.isEmpty:
             ContentUnavailableView(emptyTitle, systemImage: "tray")
@@ -300,8 +300,8 @@ struct ProfileView: View {
                 HStack {
                     UserIdentityRow(username: name, color: color, gender: gender, avatarURL: avatarURL)
                     if verified { Image(systemName: "checkmark.seal.fill").foregroundStyle(ContentTokens.brand)
-                        .accessibilityLabel("Verified author") }
-                    if online { Circle().fill(.green).frame(width: 7, height: 7).accessibilityLabel("Online") }
+                        .accessibilityLabel(.commonVerifiedAuthor) }
+                    if online { Circle().fill(.green).frame(width: 7, height: 7).accessibilityLabel(.profileOnline) }
                     Spacer()
                 }
                 .wykopCard(padding: 10)
@@ -310,8 +310,8 @@ struct ProfileView: View {
         case .tag(let name, let pinned):
             Button { router.navigate(.tag(name), in: tab) } label: {
                 HStack {
-                    Text("#\(name)").font(.body.bold())
-                    if pinned { Image(systemName: "pin.fill").accessibilityLabel("Pinned") }
+                    Text(verbatim: "#\(name)").font(.body.bold())
+                    if pinned { Image(systemName: "pin.fill").accessibilityLabel(.profilePinned) }
                     Spacer()
                 }
                 .wykopCard(padding: 10)
@@ -320,17 +320,17 @@ struct ProfileView: View {
         }
     }
 
-    private var emptyTitle: LocalizedStringKey {
+    private var emptyTitle: LocalizedStringResource {
         switch model.section {
-        case .followingTags: "No observed tags to show."
-        case .followers, .followingUsers: "No observed users to show."
-        default: "Nothing here yet"
+        case .followingTags: .profileNoObservedTagsShow
+        case .followers, .followingUsers: .profileNoObservedUsersShow
+        default: .commonNothingHereYet
         }
     }
 
     private func joined(_ profile: Profile) -> String? {
         guard let raw = profile.memberSince, let date = Dates.parse(raw) else { return nil }
-        return String(localized: "Joined \(RelativeDateTimeFormatter().localizedString(for: date, relativeTo: Date()))")
+        return String(localized: .commonJoined(RelativeDateTimeFormatter().localizedString(for: date, relativeTo: Date())))
     }
 
     private func count(_ item: ProfileSummary, _ profile: Profile) -> Int {
@@ -345,27 +345,27 @@ struct ProfileView: View {
 
     private func title(for item: ProfileSummary) -> String {
         switch item {
-        case .actions: String(localized: "Actions")
-        case .links: String(localized: "Links")
-        case .entries: String(localized: "Microblog")
-        case .followers: String(localized: "Followers")
-        case .following: String(localized: "Following")
+        case .actions: String(localized: .profileActions)
+        case .links: String(localized: .commonLinks)
+        case .entries: String(localized: .profileMicroblog)
+        case .followers: String(localized: .profileFollowers)
+        case .following: String(localized: .profileFollowing)
         }
     }
 
     private func title(for section: ProfileSection) -> String {
         switch section {
-        case .actions: String(localized: "All")
-        case .entriesAdded, .linksAdded: String(localized: "Added")
-        case .entriesVoted: String(localized: "Upvoted")
-        case .entriesCommented, .linksCommented: String(localized: "Commented")
-        case .linksPublished: String(localized: "Published")
-        case .linksUp: String(localized: "Dug")
-        case .linksDown: String(localized: "Buried")
-        case .linksRelated: String(localized: "Related")
-        case .followers: String(localized: "Followers")
-        case .followingTags: String(localized: "Tags")
-        case .followingUsers: String(localized: "Users")
+        case .actions: String(localized: .commonAll)
+        case .entriesAdded, .linksAdded: String(localized: .profileAdded)
+        case .entriesVoted: String(localized: .profileUpvoted)
+        case .entriesCommented, .linksCommented: String(localized: .commonCommented)
+        case .linksPublished: String(localized: .profilePublished)
+        case .linksUp: String(localized: .commonDug)
+        case .linksDown: String(localized: .profileBuried)
+        case .linksRelated: String(localized: .profileRelated)
+        case .followers: String(localized: .profileFollowers)
+        case .followingTags: String(localized: .commonTags)
+        case .followingUsers: String(localized: .commonUsers)
         }
     }
 }

@@ -15,16 +15,16 @@ struct NewConversationView: View {
     var body: some View {
         List {
             Section {
-                TextField("Username", text: $model.username)
+                TextField(String(localized: .commonUsername), text: $model.username)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .accessibilityIdentifier("newConversationUsername")
             } footer: {
-                Text("Type a username and choose one of the suggestions.")
+                Text(.messagesTypeUsernameChooseOne)
             }
             Section {
                 if model.query.count < NewConversationModel.minimumQueryLength && model.status == .hidden {
-                    Text("Suggestions appear after at least \(NewConversationModel.minimumQueryLength) characters.")
+                    Text(.messagesSuggestionsAppearAfterLeast(NewConversationModel.minimumQueryLength))
                         .foregroundStyle(.secondary)
                 }
                 switch model.status {
@@ -32,12 +32,12 @@ struct NewConversationView: View {
                 case .loading: ProgressView().frame(maxWidth: .infinity)
                 case .failed:
                     HStack {
-                        Text("Could not load user suggestions.").foregroundStyle(.secondary)
+                        Text(.messagesCouldNotLoadUser).foregroundStyle(.secondary)
                         Spacer()
-                        Button("Retry") { model.retry() }
+                        Button(.commonRetry) { model.retry() }
                     }
                 case .loaded where model.suggestions.isEmpty:
-                    Text("No results").foregroundStyle(.secondary)
+                    Text(.commonNoResults).foregroundStyle(.secondary)
                 case .loaded:
                     ForEach(model.suggestions) { user in
                         Button { open(user.username) } label: {
@@ -48,7 +48,7 @@ struct NewConversationView: View {
                 }
             }
         }
-        .navigationTitle("New conversation")
+        .navigationTitle(.messagesNewConversation)
         .onDisappear { model.stop() }
     }
 

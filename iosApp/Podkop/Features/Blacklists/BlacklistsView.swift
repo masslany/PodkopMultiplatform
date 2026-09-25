@@ -17,9 +17,9 @@ struct BlacklistsView: View {
         let current = model.current
         List {
             Section {
-                Text("If you don't want to see some content, you can blacklist users, tags and domains.")
+                Text(.blacklistsIfDontWantSee)
                     .font(.subheadline).foregroundStyle(.secondary)
-                Picker("Category", selection: $model.selected) {
+                Picker(.blacklistsCategory, selection: $model.selected) {
                     ForEach(BlacklistCategory.allCases, id: \.self) { category in
                         Text(title(for: category)).tag(category)
                     }
@@ -36,18 +36,18 @@ struct BlacklistsView: View {
             }
         }
         .refreshable { await model.refresh() }
-        .navigationTitle("Blacklists")
+        .navigationTitle(.blacklistsBlacklists)
         .task { model.start() }
         .onDisappear { model.stop() }
-        .alert(removal.map { String(localized: "Remove \($0.label) from the blacklist?") } ?? "",
+        .alert(removal.map { String(localized: .blacklistsRemoveFromBlacklist($0.label)) } ?? "",
                isPresented: Binding(get: { removal != nil }, set: { if !$0 { removal = nil } }),
                presenting: removal) { entry in
-            Button("Remove", role: .destructive) { model.categories[entry.category]?.remove(entry) }
-            Button("Cancel", role: .cancel) {}
+            Button(.commonRemove, role: .destructive) { model.categories[entry.category]?.remove(entry) }
+            Button(.commonCancel, role: .cancel) {}
         }
-        .alert("Could not complete this action. Try again.",
+        .alert(.commonCouldNotCompleteAction,
                isPresented: Binding(get: { current.failed }, set: { if !$0 { current.dismissFailure() } })) {
-            Button("OK", role: .cancel) {}
+            Button(.commonOk, role: .cancel) {}
         }
     }
 
@@ -65,7 +65,7 @@ struct BlacklistsView: View {
             if category.busy {
                 ProgressView()
             } else {
-                Button("Add") { category.submit() }
+                Button(.blacklistsAdd) { category.submit() }
                     .disabled(!category.canSubmit)
                     .accessibilityIdentifier("blacklistAdd")
             }
@@ -78,12 +78,12 @@ struct BlacklistsView: View {
         case .loading: ProgressView().frame(maxWidth: .infinity)
         case .failed:
             HStack {
-                Text("Could not load suggestions.").foregroundStyle(.secondary)
+                Text(.blacklistsCouldNotLoadSuggestions).foregroundStyle(.secondary)
                 Spacer()
-                Button("Retry") { category.retrySuggestions() }
+                Button(.commonRetry) { category.retrySuggestions() }
             }
         case .loaded where category.suggestions.isEmpty:
-            Text("No results").foregroundStyle(.secondary)
+            Text(.commonNoResults).foregroundStyle(.secondary)
         case .loaded:
             ForEach(category.suggestions) { suggestion in
                 Button { category.submit(suggestion.value) } label: {
@@ -93,14 +93,14 @@ struct BlacklistsView: View {
                                         avatarURL: user.avatarURL)
                     case .tag(let tag):
                         VStack(alignment: .leading) {
-                            Text("#\(tag.name)").font(.body.bold())
-                            Text("Followers: \(tag.followers)").font(.caption).foregroundStyle(.secondary)
+                            Text(verbatim: "#\(tag.name)").font(.body.bold())
+                            Text(.commonFollowers(tag.followers)).font(.caption).foregroundStyle(.secondary)
                         }
                     }
                 }
                 .foregroundStyle(.primary)
                 .disabled(category.busy)
-                .accessibilityHint("Adds to the blacklist")
+                .accessibilityHint(.blacklistsAddsBlacklist)
             }
         }
     }
@@ -109,12 +109,12 @@ struct BlacklistsView: View {
         let pager = category.pager
         switch pager.phase {
         case .idle, .loading:
-            ProgressView("Loading…").frame(maxWidth: .infinity)
+            ProgressView(.commonLoading).frame(maxWidth: .infinity)
         case .failed:
             HStack {
-                Text("Could not load content").foregroundStyle(.secondary)
+                Text(.commonCouldNotLoadContent).foregroundStyle(.secondary)
                 Spacer()
-                Button("Retry") { pager.retry() }
+                Button(.commonRetry) { pager.retry() }
             }
         case .loaded where pager.items.isEmpty:
             Text(emptyMessage(for: category.category)).foregroundStyle(.secondary)
@@ -135,7 +135,7 @@ struct BlacklistsView: View {
                     Button { removal = entry } label: { Image(systemName: "trash") }
                         .buttonStyle(.borderless)
                         .disabled(category.busy)
-                        .accessibilityLabel(String(localized: "Remove \(entry.label)"))
+                        .accessibilityLabel(String(localized: .blacklistsRemove(entry.label)))
                 }
                 .onAppear { pager.loadNextIfNeeded(after: entry) }
             }
@@ -154,26 +154,26 @@ struct BlacklistsView: View {
     private func title(for category: BlacklistCategory) -> String {
         let count = model.categories[category]?.total
         let name = switch category {
-        case .users: String(localized: "Profiles")
-        case .tags: String(localized: "Tags")
-        case .domains: String(localized: "Domains")
+        case .users: String(localized: .commonProfiles)
+        case .tags: String(localized: .commonTags)
+        case .domains: String(localized: .commonDomains)
         }
         return count.map { "\(name) (\($0))" } ?? name
     }
 
     private func emptyMessage(for category: BlacklistCategory) -> String {
         switch category {
-        case .users: String(localized: "You have no blacklisted users yet.")
-        case .tags: String(localized: "You have no blacklisted tags yet.")
-        case .domains: String(localized: "You have no blacklisted domains yet.")
+        case .users: String(localized: .blacklistsHaveNoBlacklistedUsers)
+        case .tags: String(localized: .blacklistsHaveNoBlacklistedTags)
+        case .domains: String(localized: .blacklistsHaveNoBlacklistedDomains)
         }
     }
 
     private func placeholder(for category: BlacklistCategory) -> String {
         switch category {
-        case .users: String(localized: "Username")
-        case .tags: String(localized: "Tag")
-        case .domains: String(localized: "Domain, e.g. example.com")
+        case .users: String(localized: .commonUsername)
+        case .tags: String(localized: .blacklistsTag)
+        case .domains: String(localized: .blacklistsDomainEGExample)
         }
     }
 }

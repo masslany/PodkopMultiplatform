@@ -31,7 +31,7 @@ final class AppDependencies {
         return SharedDetailMutator(client: client, adapter: adapter)
     }()
     lazy var interactor = ResourceInteractor(mutator: detailMutator, updates: resourceUpdates) { [router] in
-        router.banner = String(localized: "Could not complete this action. Try again.")
+        router.banner = String(localized: .commonCouldNotCompleteAction)
     }
     lazy var voterLoader: VoterLoading = {
         #if DEBUG

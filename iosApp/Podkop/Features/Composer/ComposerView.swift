@@ -21,29 +21,29 @@ struct ComposerView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     if let target = model.intent.target.replyTarget {
-                        Text("Reply to \(target)").font(.subheadline).foregroundStyle(.secondary)
+                        Text(.composerReplyTo(target)).font(.subheadline).foregroundStyle(.secondary)
                     }
                     formatBar
                     ComposerEditor(text: $model.text, selection: $model.selection)
                         .frame(minHeight: 230)
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
                         .accessibilityIdentifier("composerEditor")
-                    Toggle("Adult content", isOn: $model.adult)
+                    Toggle(.commonAdultContent, isOn: $model.adult)
                     ComposerAttachmentControls(attachment: model.attachment, disabled: model.submitting)
                     ComposerAttachmentStatus(attachment: model.attachment, disabled: model.submitting)
                     if model.failed {
                         Label(model.outcomeUnknown
-                              ? "Submission status is unclear. Check your content before sending again."
-                              : "Could not send. Your text is saved here.",
+                              ? .composerSubmissionStatusUnclearCheck
+                              : .composerCouldNotSendText,
                               systemImage: "exclamationmark.triangle")
                             .foregroundStyle(.red)
                     }
                     if model.outcomeUnknown {
-                        Button("I checked; allow retry") { model.acknowledgeUnknownOutcome() }
+                        Button(.commonICheckedAllowRetry) { model.acknowledgeUnknownOutcome() }
                     }
                     Button { model.submit() } label: {
                         if model.submitting { ProgressView().frame(maxWidth: .infinity) }
-                        else { Text(model.intent.target.isEdit ? "Save changes" : "Send")
+                        else { Text(model.intent.target.isEdit ? .composerSaveChanges : .commonSend)
                                 .frame(maxWidth: .infinity) }
                     }
                     .buttonStyle(.borderedProminent)
@@ -54,11 +54,11 @@ struct ComposerView: View {
                 .frame(maxWidth: 760)
                 .frame(maxWidth: .infinity)
             }
-            .navigationTitle(model.intent.target.isEdit ? "Edit" : "Write a post")
+            .navigationTitle(model.intent.target.isEdit ? .commonEdit : .commonWritePost)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
+                    Button(.commonCancel) {
                         if model.isDirty { showDiscard = true }
                         else { model.discard(); dependencies.router.dismissSheet() }
                     }
@@ -67,12 +67,12 @@ struct ComposerView: View {
             }
         }
         .interactiveDismissDisabled(model.isDirty || model.submitting || model.mediaUploading)
-        .alert("Discard your changes?", isPresented: $showDiscard) {
-            Button("Discard", role: .destructive) {
+        .alert(.commonDiscardChanges, isPresented: $showDiscard) {
+            Button(.commonDiscard, role: .destructive) {
                 model.discard()
                 dependencies.router.dismissSheet()
             }
-            Button("Keep writing", role: .cancel) {}
+            Button(.commonKeepWriting, role: .cancel) {}
         }
         .onChange(of: model.submittedResource) { _, value in
             if value != nil { dependencies.router.dismissSheet() }
@@ -82,15 +82,15 @@ struct ComposerView: View {
     private var formatBar: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
-                formatButton("Bold", symbol: "bold", prefix: "**", suffix: "**", placeholder: "bold")
-                formatButton("Italic", symbol: "italic", prefix: "__", suffix: "__", placeholder: "italic")
-                formatButton("Code", symbol: "chevron.left.forwardslash.chevron.right",
+                formatButton(.composerBold, symbol: "bold", prefix: "**", suffix: "**", placeholder: "bold")
+                formatButton(.composerItalic, symbol: "italic", prefix: "__", suffix: "__", placeholder: "italic")
+                formatButton(.composerCode, symbol: "chevron.left.forwardslash.chevron.right",
                              prefix: "`", suffix: "`", placeholder: "code")
-                formatButton("Link", symbol: "link", prefix: "[", suffix: "](url)",
+                formatButton(.commonLink, symbol: "link", prefix: "[", suffix: "](url)",
                              placeholder: "description")
-                formatButton("Quote", symbol: "text.quote", prefix: ">", suffix: "", placeholder: "quote")
+                formatButton(.composerQuote, symbol: "text.quote", prefix: ">", suffix: "", placeholder: "quote")
                 Button { model.insertSpoilerAtLineStart() } label: {
-                    Label("Spoiler", systemImage: "eye.slash")
+                    Label(.composerSpoiler, systemImage: "eye.slash")
                 }
                 .buttonStyle(.bordered)
                 .disabled(model.submitting)
@@ -98,7 +98,7 @@ struct ComposerView: View {
         }
     }
 
-    private func formatButton(_ title: LocalizedStringKey, symbol: String,
+    private func formatButton(_ title: LocalizedStringResource, symbol: String,
                               prefix: String, suffix: String, placeholder: String) -> some View {
         Button { model.insert(prefix: prefix, suffix: suffix, placeholder: placeholder) } label: {
             Label(title, systemImage: symbol)

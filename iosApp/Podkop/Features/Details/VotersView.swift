@@ -28,12 +28,12 @@ struct VotersSheet: View {
                     .onAppear { if voter.username == model.voters.last?.username { model.load() } }
                 }
                 if model.loading { ProgressView() }
-                if model.failed { Button("Retry") { model.load() } }
-                if model.exhausted && model.voters.isEmpty { Text("Nothing here yet") }
+                if model.failed { Button(.commonRetry) { model.load() } }
+                if model.exhausted && model.voters.isEmpty { Text(.commonNothingHereYet) }
             }
-            .navigationTitle("Voters")
+            .navigationTitle(.detailsVoters)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } }
+                ToolbarItem(placement: .topBarTrailing) { Button(.detailsDone) { dismiss() } }
             }
         }
         .task { model.load() }

@@ -3,7 +3,7 @@ import SwiftUI
 /// One entry of the More menu.
 struct MoreItem: Identifiable {
     let id: String
-    let title: LocalizedStringKey
+    let title: LocalizedStringResource
     let symbol: String
     let tint: Color
     var badge = 0
@@ -13,7 +13,7 @@ struct MoreItem: Identifiable {
 /// A titled group of More entries on one card, with iOS Settings-style glyph tiles
 /// (Android's More sections).
 struct MoreMenuSection: View {
-    let title: LocalizedStringKey
+    let title: LocalizedStringResource
     let items: [MoreItem]
 
     var body: some View {
@@ -29,7 +29,7 @@ struct MoreMenuSection: View {
                     Button(action: item.action) { row(item) }
                         .buttonStyle(MoreRowStyle())
                         .accessibilityIdentifier("more-\(item.id)")
-                        .accessibilityValue(item.badge > 0 ? String(localized: "Unread: \(item.badge)") : "")
+                        .accessibilityValue(item.badge > 0 ? String(localized: .commonUnread2(item.badge)) : "")
                     if index < items.count - 1 {
                         Divider().overlay(WykopTheme.separator).padding(.leading, 60)
                     }
@@ -53,7 +53,7 @@ struct MoreMenuSection: View {
                 .foregroundStyle(.primary)
             Spacer(minLength: 8)
             if item.badge > 0 {
-                Text(item.badge > 999 ? "999+" : "\(item.badge)")
+                Text(verbatim: item.badge > 999 ? "999+" : "\(item.badge)")
                     .font(.footnote.weight(.bold).monospacedDigit())
                     .foregroundStyle(.white)
                     .padding(.horizontal, 8).padding(.vertical, 3)

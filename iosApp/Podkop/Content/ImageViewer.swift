@@ -22,9 +22,9 @@ struct ImageViewerScreen: View {
                               onDrag: { dragProgress = $0 },
                               onDismiss: { dismiss() })
                     .ignoresSafeArea()
-                    .accessibilityLabel("Image")
+                    .accessibilityLabel(.commonImage)
             } else {
-                ProgressView("Loading image…").tint(.white).foregroundStyle(.white)
+                ProgressView(.contentLoadingImage).tint(.white).foregroundStyle(.white)
             }
         }
         .overlay(alignment: .topLeading) {
@@ -39,7 +39,7 @@ struct ImageViewerScreen: View {
                 }
                 .padding(.leading, 16)
                 .padding(.top, 8)
-                .accessibilityLabel("Close")
+                .accessibilityLabel(.contentClose)
                 .transition(.opacity)
             }
         }

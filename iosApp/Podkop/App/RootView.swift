@@ -18,13 +18,13 @@ struct RootView: View {
                     .transition(.opacity)
             case .missingConfiguration:
                 startupProblem(
-                    title: String(localized: "Configuration required"),
-                    explanation: String(localized: "Add the app configuration and try again.")
+                    title: String(localized: .appConfigurationRequired),
+                    explanation: String(localized: .appAddAppConfigurationTry)
                 )
             case .error:
                 startupProblem(
-                    title: String(localized: "Could not start Podkop"),
-                    explanation: String(localized: "Check your connection and try again.")
+                    title: String(localized: .appCouldNotStartPodkop),
+                    explanation: String(localized: .appCheckConnectionTryAgain)
                 )
             case .ready:
                 #if DEBUG
@@ -72,14 +72,14 @@ struct RootView: View {
         }
         .sheet(item: $externalPage) { page in SafariView(url: page.url) }
         .alert(item: Binding(get: { router.alert }, set: { router.alert = $0 })) { alert in
-            Alert(title: Text(alert.title), message: Text(alert.message), dismissButton: .default(Text("OK")))
+            Alert(title: Text(alert.title), message: Text(alert.message), dismissButton: .default(Text(.commonOk)))
         }
         .overlay(alignment: .top) {
             if let message = session.banner ?? router.banner {
                 HStack {
                     Text(message)
                     Spacer()
-                    Button("Dismiss") { session.banner = nil; router.banner = nil }
+                    Button(.appDismiss) { session.banner = nil; router.banner = nil }
                 }
                 .padding()
                 .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
@@ -114,7 +114,7 @@ struct RootView: View {
         } description: {
             Text(explanation)
         } actions: {
-            Button("Retry") { Task { await session.retry() } }
+            Button(.commonRetry) { Task { await session.retry() } }
                 .buttonStyle(.borderedProminent)
         }
     }

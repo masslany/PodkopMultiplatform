@@ -20,7 +20,7 @@ struct TabContent: View {
                     if let route = router.detail(for: tab) {
                         destination(route)
                     } else {
-                        ContentUnavailableView("Select an item", systemImage: tab.symbol)
+                        ContentUnavailableView(.appSelectItem, systemImage: tab.symbol)
                     }
                 }
             } else {
@@ -51,19 +51,19 @@ struct TabContent: View {
             Button { router.navigate(.search, in: tab) } label: {
                 Image(systemName: "magnifyingglass")
             }
-            .accessibilityLabel("Search")
+            .accessibilityLabel(.commonSearch)
             if tab != .more {
                 Button { router.presentComposer(.createEntry) } label: {
                     Image(systemName: "square.and.pencil")
                 }
-                .accessibilityLabel("Write a post")
+                .accessibilityLabel(.commonWritePost)
             }
             if session.isLoggedIn {
                 Button { router.navigate(.notifications, in: tab) } label: {
                     Image(systemName: session.unreadCount > 0 ? "bell.badge" : "bell")
                 }
-                .accessibilityLabel("Notifications")
-                .accessibilityValue(session.unreadCount > 0 ? String(localized: "Unread: \(session.unreadCount)") : "")
+                .accessibilityLabel(.commonNotifications)
+                .accessibilityValue(session.unreadCount > 0 ? String(localized: .commonUnread2(session.unreadCount)) : "")
                 .accessibilityIdentifier("toolbarNotifications")
             }
         }

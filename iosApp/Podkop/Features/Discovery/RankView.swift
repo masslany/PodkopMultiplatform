@@ -15,16 +15,16 @@ struct RankView: View {
         List {
             switch model.pager.phase {
             case .idle, .loading:
-                ProgressView("Loading…").frame(maxWidth: .infinity, minHeight: 180)
+                ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 180)
             case .failed:
                 ContentUnavailableView {
-                    Label("Could not load content", systemImage: "wifi.exclamationmark")
+                    Label(.commonCouldNotLoadContent, systemImage: "wifi.exclamationmark")
                 } actions: {
-                    Button("Retry") { model.pager.retry() }
+                    Button(.commonRetry) { model.pager.retry() }
                 }
             case .loaded:
                 if model.pager.refreshError {
-                    Label("Could not refresh", systemImage: "exclamationmark.triangle")
+                    Label(.commonCouldNotRefresh, systemImage: "exclamationmark.triangle")
                 }
                 ForEach(model.pager.items) { user in
                     Button { dependencies.router.navigate(.user(user.username), in: tab) } label: {
@@ -37,7 +37,7 @@ struct RankView: View {
             }
         }
         .refreshable { await model.refresh() }
-        .navigationTitle("Rank")
+        .navigationTitle(.commonRank)
         .task { model.start() }
         .onDisappear { model.stop() }
     }
@@ -49,14 +49,14 @@ private struct RankRow: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             VStack(spacing: 2) {
-                Text("#\(user.position)").font(.headline.monospacedDigit())
+                Text(verbatim: "#\(user.position)").font(.headline.monospacedDigit())
                 if user.trend != 0 {
-                    Label("\(abs(user.trend))", systemImage: user.trend > 0 ? "arrow.up" : "arrow.down")
+                    Label(String(abs(user.trend)), systemImage: user.trend > 0 ? "arrow.up" : "arrow.down")
                         .font(.caption2)
                         .foregroundStyle(user.trend > 0 ? .green : .red)
                         .accessibilityLabel(user.trend > 0
-                            ? String(localized: "Up \(abs(user.trend))")
-                            : String(localized: "Down \(abs(user.trend))"))
+                            ? String(localized: .discoveryUp(abs(user.trend)))
+                            : String(localized: .discoveryDown(abs(user.trend))))
                 }
             }
             .frame(minWidth: 44)
@@ -75,15 +75,15 @@ private struct RankRow: View {
     }
 
     @ViewBuilder private var counts: some View {
-        Text("Actions: \(user.actions)")
-        Text("Links: \(user.links)")
-        Text("Entries: \(user.entries)")
-        Text("Followers: \(user.followers)")
+        Text(.discoveryActions(user.actions))
+        Text(.discoveryLinks(user.links))
+        Text(.discoveryEntries(user.entries))
+        Text(.commonFollowers(user.followers))
     }
 
     private var memberSince: String? {
         guard let raw = user.memberSince, let date = Dates.parse(raw) else { return nil }
         let text = RelativeDateTimeFormatter().localizedString(for: date, relativeTo: Date())
-        return String(localized: "Joined \(text)")
+        return String(localized: .commonJoined(text))
     }
 }

@@ -45,10 +45,10 @@ struct EmbedCard: View {
                 } else if let url = tweet.mediaThumbnailURL {
                     thumbnail(url)
                 }
-                Text("\(tweet.replies) ↩ · \(tweet.reposts) ↻ · \(tweet.likes) ♥")
+                Text(verbatim: "\(tweet.replies) ↩ · \(tweet.reposts) ↻ · \(tweet.likes) ♥")
                     .font(.caption).foregroundStyle(.secondary)
             } else {
-                Label(failed ? "Preview unavailable" : embed.type.capitalized,
+                Label(failed ? String(localized: .contentPreviewUnavailable) : embed.type.capitalized,
                       systemImage: failed ? "exclamationmark.triangle" : "play.rectangle")
                 if let bytes = thumbnailBytes {
                     DecodedImage(bytes: bytes, cacheKey: embed.thumbnailURL, maxDimension: 700)
@@ -58,7 +58,7 @@ struct EmbedCard: View {
                 }
             }
             if let url = URL(string: embed.url), let open {
-                Button("Open source") { open(url) }.font(.caption)
+                Button(.contentOpenSource) { open(url) }.font(.caption)
             }
         }
         .padding(10)

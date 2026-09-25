@@ -95,11 +95,11 @@ struct ResourceCard: View {
         linkMeta(showsTime: true)
         HStack(alignment: .bottom, spacing: 8) {
             tags.frame(maxWidth: .infinity, alignment: .leading)
-            Label("\(resource.commentCount)", systemImage: "text.bubble.fill")
+            Label(String(resource.commentCount), systemImage: "text.bubble.fill")
                 .font(.footnote)
                 .foregroundStyle(.primary)
-                .accessibilityLabel(resource.kind == .link ? "Open link" : "Open entry")
-                .accessibilityValue(String(localized: "Comments") + ": \(resource.commentCount)")
+                .accessibilityLabel(resource.kind == .link ? .commonOpenLink : .commonOpenEntry)
+                .accessibilityValue(String(localized: .commonComments) + ": \(resource.commentCount)")
                 .accessibilityAddTraits(.isButton)
         }
     }
@@ -123,13 +123,13 @@ struct ResourceCard: View {
                                   action: actions.voteUp)
                     if let voteDown = actions.voteDown {
                         Button(action: voteDown) {
-                            Text(resource.vote.state == "negative" ? "Undo bury" : "Bury")
+                            Text(resource.vote.state == "negative" ? .contentUndoBury : .contentBury)
                                 .font(.caption.weight(.medium))
                                 .foregroundStyle(resource.vote.state == "negative" ? WykopTheme.voteNegative : .secondary)
                         }
                         .buttonStyle(.plain)
                         .disabled(actions.pending)
-                        .accessibilityLabel(resource.vote.state == "negative" ? "Remove downvote" : "Downvote")
+                        .accessibilityLabel(resource.vote.state == "negative" ? .contentRemoveDownvote : .contentDownvote)
                     }
                 }
                 Text(resource.title)
@@ -195,9 +195,9 @@ struct ResourceCard: View {
                 ForEach(Array(resource.tags.enumerated()), id: \.element) { index, tag in
                     Group {
                         if let open = actions.openTag {
-                            Button("#\(tag)") { open(tag) }.buttonStyle(.plain)
+                            Button("#" + tag) { open(tag) }.buttonStyle(.plain)
                         } else {
-                            Text("#\(tag)")
+                            Text(verbatim: "#\(tag)")
                         }
                     }
                     .foregroundStyle(WykopTheme.tagBlue)
@@ -279,13 +279,13 @@ struct ResourceCard: View {
                     Image(systemName: "checkmark.seal.fill")
                         .font(.caption)
                         .foregroundStyle(WykopTheme.tagBlue)
-                        .accessibilityLabel("Verified author")
+                        .accessibilityLabel(.commonVerifiedAuthor)
                 }
             }
             .font(font)
             .foregroundStyle(authorColor(author.color))
         } else {
-            Text("Unknown author").font(font).foregroundStyle(.secondary)
+            Text(.contentUnknownAuthor).font(font).foregroundStyle(.secondary)
         }
     }
 
@@ -321,7 +321,7 @@ struct ResourceCard: View {
     private var actionsRow: some View {
         HStack(spacing: 16) {
             Button { actions.comment?() } label: {
-                Label("Reply", systemImage: "arrowshape.turn.up.left")
+                Label(.contentReply, systemImage: "arrowshape.turn.up.left")
                     .font(.subheadline.weight(.medium))
             }
             .disabled(actions.comment == nil)
@@ -332,7 +332,7 @@ struct ResourceCard: View {
             }
             .disabled(actions.favourite == nil || actions.pending)
             .opacity(actions.favourite == nil ? 0.4 : 1)
-            .accessibilityLabel(resource.favourite ? "Remove favorite" : "Favorite")
+            .accessibilityLabel(resource.favourite ? .contentRemoveFavorite : .contentFavorite)
             Spacer(minLength: 0)
             if let menu = actions.menu {
                 Button(action: menu) {
@@ -341,7 +341,7 @@ struct ResourceCard: View {
                         .frame(width: 28, height: 24)
                         .contentShape(Rectangle())
                 }
-                .accessibilityLabel("More actions")
+                .accessibilityLabel(.contentMoreActions)
             }
         }
         .labelStyle(.titleAndIcon)

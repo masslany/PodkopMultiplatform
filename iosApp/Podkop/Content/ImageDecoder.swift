@@ -71,9 +71,9 @@ struct DecodedImage: View {
         Group {
             if let image {
                 AnimatedImageView(image: image, playing: animated)
-                    .accessibilityLabel("Image")
+                    .accessibilityLabel(.commonImage)
             } else if failed {
-                Label("Image unavailable", systemImage: "photo")
+                Label(.contentImageUnavailable, systemImage: "photo")
             } else {
                 ProgressView().frame(maxWidth: .infinity, minHeight: 120)
             }

@@ -22,7 +22,7 @@ struct RichContent: View {
                         blockView(item.element)
                     }
                     if source.count > 1000 && !expanded {
-                        Button("Show more") { expanded = true }
+                        Button(.contentShowMore) { expanded = true }
                     }
                 }
                 .foregroundStyle(muted ? .secondary : .primary)
@@ -49,13 +49,13 @@ struct RichContent: View {
         case .paragraph(let text):
             Text(RichContentParser.attributed(text))
         case .bullet(let indent, let text):
-            (Text("• ") + Text(RichContentParser.attributed(text)))
+            (Text(verbatim: "• ") + Text(RichContentParser.attributed(text)))
                 .padding(.leading, CGFloat(indent) * 18)
         case .numbered(let indent, let number, let text):
-            (Text("\(number). ") + Text(RichContentParser.attributed(text)))
+            (Text(verbatim: "\(number). ") + Text(RichContentParser.attributed(text)))
                 .padding(.leading, CGFloat(indent) * 18)
         case .quote(let text):
-            Text("▏ ") + Text(RichContentParser.attributed(text))
+            Text(verbatim: "▏ ") + Text(RichContentParser.attributed(text))
         case .code(let text):
             Text(verbatim: text).font(.system(.subheadline, design: .monospaced))
                 .padding(8).background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
@@ -66,12 +66,12 @@ struct RichContent: View {
         }
     }
 
-    private func deletionLabel(_ deletion: Deletion) -> LocalizedStringKey {
+    private func deletionLabel(_ deletion: Deletion) -> LocalizedStringResource {
         switch deletion {
-        case .author: "Removed by author"
-        case .moderator: "Removed by moderator"
-        case .entryAuthor: "Removed by entry author"
-        case .unknown: "Removed content"
+        case .author: .contentRemovedAuthor
+        case .moderator: .contentRemovedModerator
+        case .entryAuthor: .contentRemovedEntryAuthor
+        case .unknown: .contentRemovedContent
         }
     }
 }
@@ -83,9 +83,9 @@ private struct SpoilerBlock: View {
         if revealed {
             Text(RichContentParser.attributed(text))
         } else {
-            Button("Show spoiler") { revealed = true }
+            Button(.contentShowSpoiler) { revealed = true }
                 .buttonStyle(.bordered)
-                .accessibilityHint("Reveals hidden text")
+                .accessibilityHint(.contentRevealsHiddenText)
         }
     }
 }

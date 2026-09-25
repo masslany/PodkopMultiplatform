@@ -21,9 +21,9 @@ struct LoginSheet: View {
                     .overlay {
                         if failed {
                             ContentUnavailableView {
-                                Label("Could not load the sign-in page.", systemImage: "wifi.exclamationmark")
+                                Label(.appCouldNotLoadSignInPage, systemImage: "wifi.exclamationmark")
                             } actions: {
-                                Button("Retry") {
+                                Button(.commonRetry) {
                                     failed = false
                                     session.loginURL = nil
                                     Task { await session.beginLogin() }
@@ -37,11 +37,11 @@ struct LoginSheet: View {
                     .ignoresSafeArea(edges: .bottom)
                 } else {
                     VStack(spacing: 20) {
-                        Text("Sign in to continue").font(.title2)
+                        Text(.appSignInContinue).font(.title2)
                         Button {
                             Task { await session.beginLogin() }
                         } label: {
-                            if session.loginPending { ProgressView() } else { Text("Sign in") }
+                            if session.loginPending { ProgressView() } else { Text(.commonSignIn) }
                         }
                         .buttonStyle(.borderedProminent)
                         .disabled(session.loginPending)
@@ -50,11 +50,11 @@ struct LoginSheet: View {
                     .padding()
                 }
             }
-            .navigationTitle(session.loginURL == nil ? "" : String(localized: "Sign in"))
+            .navigationTitle(session.loginURL == nil ? "" : String(localized: .commonSignIn))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel", action: dismiss)
+                    Button(.commonCancel, action: dismiss)
                 }
             }
         }

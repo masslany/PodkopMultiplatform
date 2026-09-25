@@ -28,27 +28,27 @@ struct ImageExportControls: View {
             Button {
                 Task {
                     switch await PlatformExport.saveToPhotos(data) {
-                    case .saved: onMessage(String(localized: "Saved to Photos"))
-                    case .denied: onMessage(String(localized: "Allow adding photos in Settings to save images."))
-                    case .failed: onMessage(String(localized: "Could not complete this action. Try again."))
+                    case .saved: onMessage(String(localized: .platformSavedToPhotos))
+                    case .denied: onMessage(String(localized: .platformAllowAddingPhotos))
+                    case .failed: onMessage(String(localized: .commonCouldNotCompleteAction))
                     }
                 }
             } label: {
-                Label("Save", systemImage: "square.and.arrow.down")
+                Label(.commonSave, systemImage: "square.and.arrow.down")
             }
             .accessibilityIdentifier("imageSave")
             Button {
                 onMessage(PlatformExport.copyImage(data)
-                          ? String(localized: "Image copied")
-                          : String(localized: "Could not complete this action. Try again."))
+                          ? String(localized: .platformImageCopied)
+                          : String(localized: .commonCouldNotCompleteAction))
             } label: {
-                Label("Copy", systemImage: "doc.on.doc")
+                Label(.platformCopy, systemImage: "doc.on.doc")
             }
             .accessibilityIdentifier("imageCopy")
             Button {
                 sharing = true
             } label: {
-                Label("Share", systemImage: "square.and.arrow.up")
+                Label(.platformShare, systemImage: "square.and.arrow.up")
             }
             .accessibilityIdentifier("imageShare")
             .disabled(PlatformExport.fileExtension(for: data) == nil)
@@ -100,14 +100,14 @@ private struct ImageShareSheet: UIViewControllerRepresentable {
                 try? FileManager.default.removeItem(at: directory)
                 if error != nil {
                     Task { @MainActor in
-                        onMessage(String(localized: "Could not complete this action. Try again."))
+                        onMessage(String(localized: .commonCouldNotCompleteAction))
                     }
                 }
             }
             return controller
         } catch {
             try? FileManager.default.removeItem(at: directory)
-            onMessage(String(localized: "Could not complete this action. Try again."))
+            onMessage(String(localized: .commonCouldNotCompleteAction))
             return UIActivityViewController(activityItems: [], applicationActivities: nil)
         }
     }

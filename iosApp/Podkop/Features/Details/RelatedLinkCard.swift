@@ -51,6 +51,6 @@ struct RelatedLinkCard: View {
         .contentShape(Rectangle())
         .onTapGesture(perform: open)
         .accessibilityElement(children: .contain)
-        .accessibilityAction(named: Text("Open link"), open)
+        .accessibilityAction(named: Text(.commonOpenLink), open)
     }
 }

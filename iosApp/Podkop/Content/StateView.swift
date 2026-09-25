@@ -9,14 +9,14 @@ struct StateView<Content: View>: View {
     var retry: (() -> Void)?
     var body: some View {
         switch state {
-        case .loading: ProgressView("Loading…")
-        case .empty: ContentUnavailableView("Nothing here yet", systemImage: "tray")
+        case .loading: ProgressView(.commonLoading)
+        case .empty: ContentUnavailableView(.commonNothingHereYet, systemImage: "tray")
         case .content(let content): content
         case .failure:
             ContentUnavailableView {
-                Label("Could not load content", systemImage: "wifi.exclamationmark")
+                Label(.commonCouldNotLoadContent, systemImage: "wifi.exclamationmark")
             } actions: {
-                if let retry { Button("Retry", action: retry) }
+                if let retry { Button(.commonRetry, action: retry) }
             }
         }
     }

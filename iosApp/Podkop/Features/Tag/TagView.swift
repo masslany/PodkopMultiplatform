@@ -21,7 +21,7 @@ struct TagView: View {
                 controls
                 if model.gallery { gallery } else {
                     PagedResourceRows(pager: model.pager, tab: tab, dependencies: dependencies,
-                                      emptyTitle: "No results")
+                                      emptyTitle: .commonNoResults)
                 }
             }
             .padding(.horizontal, 12)
@@ -30,14 +30,14 @@ struct TagView: View {
             .frame(maxWidth: .infinity)
         }
         .refreshable { await model.refresh() }
-        .navigationTitle("#\(model.tag)")
+        .navigationTitle("#" + model.tag)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { model.gallery.toggle() } label: {
                     Image(systemName: model.gallery ? "list.bullet" : "square.grid.2x2")
                 }
-                .accessibilityLabel(model.gallery ? "List view" : "Gallery view")
+                .accessibilityLabel(model.gallery ? .commonListView : .commonGalleryView)
                 .accessibilityIdentifier("tagGallery")
             }
         }
@@ -47,9 +47,9 @@ struct TagView: View {
         .onChange(of: dependencies.resourceUpdates.revision) { _, _ in
             model.reconcile(dependencies.resourceUpdates)
         }
-        .alert("Could not complete this action. Try again.",
+        .alert(.commonCouldNotCompleteAction,
                isPresented: Binding(get: { model.actionFailed }, set: { if !$0 { model.dismissActionFailure() } })) {
-            Button("OK", role: .cancel) {}
+            Button(.commonOk, role: .cancel) {}
         }
     }
 
@@ -63,7 +63,7 @@ struct TagView: View {
                     .accessibilityHidden(true)
             }
             HStack(alignment: .center, spacing: 8) {
-                Text("#\(model.tag)").font(.title2.bold())
+                Text(verbatim: "#\(model.tag)").font(.title2.bold())
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if model.isLoggedIn, let details = model.details { actions(details) }
             }
@@ -71,13 +71,13 @@ struct TagView: View {
                 if !details.description.isEmpty {
                     Text(details.description).font(.subheadline).foregroundStyle(.secondary)
                 }
-                Text("Followers: \(details.followers)").font(.caption).foregroundStyle(.secondary)
+                Text(.commonFollowers(details.followers)).font(.caption).foregroundStyle(.secondary)
             } else if model.detailsFailed {
                 HStack {
-                    Label("Could not load the tag.", systemImage: "exclamationmark.triangle")
+                    Label(.tagCouldNotLoadTag, systemImage: "exclamationmark.triangle")
                         .font(.subheadline)
                     Spacer()
-                    Button("Retry") { Task { await model.refresh() } }
+                    Button(.commonRetry) { Task { await model.refresh() } }
                 }
             }
         }
@@ -90,7 +90,7 @@ struct TagView: View {
         }
         .buttonStyle(.bordered)
         .disabled(model.pending.contains(.blacklist))
-        .accessibilityLabel(details.blacklisted ? "Unblock tag" : "Block tag")
+        .accessibilityLabel(details.blacklisted ? .tagUnblockTag : .tagBlockTag)
         .accessibilityIdentifier("tagBlacklist")
         if details.observed {
             Button { model.toggle(.notifications) } label: {
@@ -99,12 +99,12 @@ struct TagView: View {
             .buttonStyle(.bordered)
             .disabled(model.pending.contains(.notifications))
             .accessibilityLabel(details.notificationsEnabled
-                                ? "Disable tag notifications" : "Enable tag notifications")
+                                ? .tagDisableTagNotifications : .tagEnableTagNotifications)
             .accessibilityIdentifier("tagNotifications")
         }
         Button { model.toggle(.observe) } label: {
             if model.pending.contains(.observe) { ProgressView() }
-            else { Text(details.observed ? "Observing" : "Observe") }
+            else { Text(details.observed ? .commonObserving : .commonObserve) }
         }
         .buttonStyle(.borderedProminent)
         .tint(details.observed ? .secondary : ContentTokens.brand)
@@ -115,10 +115,10 @@ struct TagView: View {
     private var controls: some View {
         HStack {
             Menu {
-                Button("All") { model.select(sort: .all) }
-                Button("Best") { model.select(sort: .best) }
+                Button(.commonAll) { model.select(sort: .all) }
+                Button(.commonBest) { model.select(sort: .best) }
             } label: {
-                DropdownLabel(title: model.sort == .all ? String(localized: "All") : String(localized: "Best"))
+                DropdownLabel(title: model.sort == .all ? String(localized: .commonAll) : String(localized: .commonBest))
             }
             .accessibilityIdentifier("tagSort")
             Menu {
@@ -135,7 +135,7 @@ struct TagView: View {
     @ViewBuilder private var gallery: some View {
         let items = model.galleryItems
         if model.pager.phase == .loaded && items.isEmpty {
-            ContentUnavailableView("No images in entries for this tag", systemImage: "photo")
+            ContentUnavailableView(.tagNoImagesInEntries, systemImage: "photo")
         } else if model.pager.phase != .loaded {
             PagedResourceRows(pager: model.pager, tab: tab, dependencies: dependencies)
         } else {
@@ -150,7 +150,7 @@ struct TagView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Open entry")
+                    .accessibilityLabel(.commonOpenEntry)
                     // The gallery is a subset of the stream, so page on its own last cell.
                     .onAppear { if item.id == items.last?.id { model.pager.loadNext() } }
                 }
@@ -161,9 +161,9 @@ struct TagView: View {
 
     private func title(for kind: TagModel.Kind) -> String {
         switch kind {
-        case .all: String(localized: "Everything")
-        case .link: String(localized: "Links")
-        case .entry: String(localized: "Entries")
+        case .all: String(localized: .commonEverything)
+        case .link: String(localized: .commonLinks)
+        case .entry: String(localized: .commonEntries)
         }
     }
 }

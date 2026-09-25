@@ -7,10 +7,10 @@ enum AppTab: String, CaseIterable, Codable, Identifiable {
 
     var title: String {
         switch self {
-        case .links: String(localized: "Links")
-        case .entries: String(localized: "Entries")
-        case .upcoming: String(localized: "Upcoming")
-        case .more: String(localized: "More")
+        case .links: String(localized: .commonLinks)
+        case .entries: String(localized: .commonEntries)
+        case .upcoming: String(localized: .appUpcoming)
+        case .more: String(localized: .appMore)
         }
     }
 

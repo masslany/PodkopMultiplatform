@@ -14,7 +14,7 @@ struct ObservedView: View {
 
     var body: some View {
         CollectionScroll(refresh: model.refresh) {
-            Picker("Type", selection: Binding(get: { model.kind }, set: { model.select($0) })) {
+            Picker(.discoveryType, selection: Binding(get: { model.kind }, set: { model.select($0) })) {
                 ForEach(ObservedModel.Kind.allCases, id: \.self) { Text(title(for: $0)).tag($0) }
             }
             .pickerStyle(.segmented)
@@ -22,7 +22,7 @@ struct ObservedView: View {
         } rows: {
             rows
         }
-        .navigationTitle("Observed")
+        .navigationTitle(.discoveryObserved)
         .task { model.start() }
         .onDisappear { model.stop() }
         .onChange(of: dependencies.resourceUpdates.revision) { _, _ in
@@ -34,12 +34,12 @@ struct ObservedView: View {
         let pager = model.pager
         switch pager.phase {
         case .idle, .loading:
-            ProgressView("Loading…").frame(maxWidth: .infinity, minHeight: 180)
+            ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 180)
         case .failed:
             ContentUnavailableView {
-                Label("Could not load content", systemImage: "wifi.exclamationmark")
+                Label(.commonCouldNotLoadContent, systemImage: "wifi.exclamationmark")
             } actions: {
-                Button("Retry") { pager.retry() }
+                Button(.commonRetry) { pager.retry() }
             }
         case .loaded where pager.items.isEmpty:
             ContentUnavailableView(emptyTitle, systemImage: "tray")
@@ -50,8 +50,8 @@ struct ObservedView: View {
                         if let count = item.newContentCount, count > 0,
                            item.resource.kind == .link || item.resource.kind == .entry {
                             Label(item.resource.kind == .link
-                                  ? String(localized: "\(count) new comments on an observed link")
-                                  : String(localized: "\(count) new comments on an observed entry"),
+                                  ? String(localized: .discoveryNewCommentsObservedLink(count))
+                                  : String(localized: .discoveryNewCommentsObservedEntry(count)),
                                   systemImage: "bell.badge")
                                 .font(.caption.bold())
                                 .foregroundStyle(ContentTokens.brand)
@@ -65,21 +65,21 @@ struct ObservedView: View {
         }
     }
 
-    private var emptyTitle: LocalizedStringKey {
+    private var emptyTitle: LocalizedStringResource {
         switch model.kind {
-        case .all: "Nothing observed yet"
-        case .profiles: "No content from observed profiles"
-        case .discussions: "No observed discussions"
-        case .tags: "No content from observed tags"
+        case .all: .discoveryNothingObservedYet
+        case .profiles: .discoveryNoContentFromObserved
+        case .discussions: .discoveryNoObservedDiscussions
+        case .tags: .discoveryNoContentFromObservedTags
         }
     }
 
     private func title(for kind: ObservedModel.Kind) -> String {
         switch kind {
-        case .all: String(localized: "All")
-        case .profiles: String(localized: "Profiles")
-        case .discussions: String(localized: "Discussions")
-        case .tags: String(localized: "Tags")
+        case .all: String(localized: .commonAll)
+        case .profiles: String(localized: .commonProfiles)
+        case .discussions: String(localized: .discoveryDiscussions)
+        case .tags: String(localized: .commonTags)
         }
     }
 }

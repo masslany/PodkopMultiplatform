@@ -22,12 +22,12 @@ struct ConversationView: View {
         VStack(spacing: 0) {
             switch model.phase {
             case .loading where model.messages.isEmpty:
-                ProgressView("Loading…").frame(maxWidth: .infinity, maxHeight: .infinity)
+                ProgressView(.commonLoading).frame(maxWidth: .infinity, maxHeight: .infinity)
             case .failed:
                 ContentUnavailableView {
-                    Label("Could not load the conversation.", systemImage: "exclamationmark.bubble")
+                    Label(.messagesCouldNotLoadConversation, systemImage: "exclamationmark.bubble")
                 } actions: {
-                    Button("Retry") { model.retry() }
+                    Button(.commonRetry) { model.retry() }
                 }
                 .frame(maxHeight: .infinity)
             default:
@@ -42,7 +42,7 @@ struct ConversationView: View {
         .toolbar {
             if model.isDirty || model.sending {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button { confirmLeave = true } label: { Label("Back", systemImage: "chevron.backward") }
+                    Button { confirmLeave = true } label: { Label(.commonBack, systemImage: "chevron.backward") }
                         .disabled(model.sending)
                 }
             }
@@ -50,15 +50,15 @@ struct ConversationView: View {
                 Button { dependencies.router.navigate(.user(model.username), in: tab) } label: {
                     Image(systemName: "person.crop.circle")
                 }
-                .accessibilityLabel("Profile")
+                .accessibilityLabel(.commonProfile)
             }
         }
-        .alert("Discard your changes?", isPresented: $confirmLeave) {
-            Button("Discard", role: .destructive) {
+        .alert(.commonDiscardChanges, isPresented: $confirmLeave) {
+            Button(.commonDiscard, role: .destructive) {
                 model.discardDraft()
                 dismiss()
             }
-            Button("Keep writing", role: .cancel) {}
+            Button(.commonKeepWriting, role: .cancel) {}
         }
         .onAppear { if active { model.becameVisible() } }
         .onDisappear { model.becameHidden() }
@@ -74,7 +74,7 @@ struct ConversationView: View {
                     if model.hasOlder || model.olderLoading || model.olderFailed {
                         Group {
                             if model.olderFailed {
-                                Button("Retry older messages") { model.retryOlder() }
+                                Button(.messagesRetryOlderMessages) { model.retryOlder() }
                             } else {
                                 ProgressView()
                             }
@@ -83,7 +83,7 @@ struct ConversationView: View {
                         .onAppear { model.loadOlder() }
                     }
                     if model.messages.isEmpty {
-                        Text("No messages in this conversation").foregroundStyle(.secondary).padding()
+                        Text(.messagesNoMessagesInConversation).foregroundStyle(.secondary).padding()
                     }
                     ForEach(model.messages) { message in
                         MessageBubble(message: message, tab: tab, dependencies: dependencies)
@@ -111,17 +111,17 @@ struct ConversationView: View {
         VStack(alignment: .leading, spacing: 8) {
             if model.sendFailed {
                 Label(model.outcomeUnknown
-                      ? "Sending status is unclear. Check the conversation before sending again."
-                      : "Could not send. Your message is kept here.",
+                      ? .messagesSendingStatusUnclearCheck
+                      : .messagesCouldNotSendMessage,
                       systemImage: "exclamationmark.triangle")
                     .font(.caption).foregroundStyle(.red)
                 if model.outcomeUnknown {
-                    Button("I checked; allow retry") { model.acknowledgeUnknownOutcome() }.font(.caption)
+                    Button(.commonICheckedAllowRetry) { model.acknowledgeUnknownOutcome() }.font(.caption)
                 }
             }
             ComposerAttachmentStatus(attachment: model.attachment, disabled: model.sending)
             HStack(alignment: .bottom, spacing: 8) {
-                TextField("Write a message", text: $model.text, axis: .vertical)
+                TextField(String(localized: .messagesWriteMessage), text: $model.text, axis: .vertical)
                     .lineLimit(1...6)
                     .textFieldStyle(.roundedBorder)
                     .disabled(model.sending)
@@ -131,13 +131,13 @@ struct ConversationView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(!model.canSend)
-                .accessibilityLabel("Send")
+                .accessibilityLabel(.commonSend)
                 .accessibilityIdentifier("messageSend")
             }
             HStack {
                 ComposerAttachmentControls(attachment: model.attachment, disabled: model.sending)
                 Spacer()
-                Toggle("Adult content", isOn: $model.adult).fixedSize()
+                Toggle(.commonAdultContent, isOn: $model.adult).fixedSize()
             }
             .font(.caption)
         }
@@ -158,7 +158,7 @@ private struct MessageBubble: View {
             if !message.incoming { Spacer(minLength: 40) }
             VStack(alignment: .leading, spacing: 6) {
                 if message.adult && !adultRevealed {
-                    Button("Show adult content") { adultRevealed = true }.buttonStyle(.bordered)
+                    Button(.commonShowAdultContent) { adultRevealed = true }.buttonStyle(.bordered)
                 } else {
                     if let content = message.content, !content.isEmpty {
                         RichContent(
@@ -173,7 +173,7 @@ private struct MessageBubble: View {
                                         foreground: dependencies.isForeground)
                     }
                     if let raw = message.embedURL, let url = URL(string: raw) {
-                        Button("Open link") { openURL(url) }.font(.caption)
+                        Button(.commonOpenLink) { openURL(url) }.font(.caption)
                     }
                 }
                 Text(message.createdAt.formatted(.relative(presentation: .named))).font(.caption2).foregroundStyle(.secondary)

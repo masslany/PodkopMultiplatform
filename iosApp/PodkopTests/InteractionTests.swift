@@ -115,12 +115,12 @@ final class InteractionTests: XCTestCase {
 
     func testPublishedTimeFollowsAndroidRules() {
         let now = Date(timeIntervalSince1970: 1_800_000_000)
-        XCTAssertEqual(PublishedTime.text(now.addingTimeInterval(-20), now: now), String(localized: "just now"))
-        XCTAssertEqual(PublishedTime.text(now.addingTimeInterval(-5 * 60), now: now), String(localized: "\(5) min ago"))
-        XCTAssertEqual(PublishedTime.text(now.addingTimeInterval(-2 * 3600), now: now), String(localized: "\(2) h ago"))
+        XCTAssertEqual(PublishedTime.text(now.addingTimeInterval(-20), now: now), String(localized: .contentJustNow))
+        XCTAssertEqual(PublishedTime.text(now.addingTimeInterval(-5 * 60), now: now), String(localized: .contentMinutesAgo(5)))
+        XCTAssertEqual(PublishedTime.text(now.addingTimeInterval(-2 * 3600), now: now), String(localized: .contentHoursAgo(2)))
         XCTAssertEqual(PublishedTime.text(now.addingTimeInterval(-(2 * 3600 + 15 * 60)), now: now),
-                       String(localized: "\(2) h \(15) min ago"))
-        XCTAssertEqual(PublishedTime.text(now.addingTimeInterval(-3 * 86400), now: now), String(localized: "\(3) days ago"))
+                       String(localized: .contentHoursMinutesAgo(2, 15)))
+        XCTAssertEqual(PublishedTime.text(now.addingTimeInterval(-3 * 86400), now: now), String(localized: .contentDaysAgo(3)))
         let old = now.addingTimeInterval(-30 * 86400)
         XCTAssertTrue(PublishedTime.text(old, now: now).range(of: #"^\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}$"#,
                                                                options: .regularExpression) != nil)

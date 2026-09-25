@@ -27,21 +27,21 @@ struct MediaView: View {
                     .contentShape(Rectangle())
                     .onTapGesture { viewerBytes = bytes }
                     .accessibilityAddTraits(.isButton)
-                    .accessibilityHint("Opens the image")
+                    .accessibilityHint(.contentOpensImage)
                     .accessibilityIdentifier("mediaImage")
                 if !photo.label.isEmpty {
-                    Text("Source: \(photo.label)")
+                    Text(.contentSource(photo.label))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
                 if photo.isAnimated {
-                    Button((playbackOverride ?? autoplay) ? "Pause animation" : "Play animation") {
+                    Button((playbackOverride ?? autoplay) ? .contentPauseAnimation : .contentPlayAnimation) {
                         playbackOverride = !(playbackOverride ?? autoplay)
                     }
                 }
             } else if loader == nil || loadFailed {
-                Label("Image unavailable", systemImage: "photo")
+                Label(.contentImageUnavailable, systemImage: "photo")
                     .frame(maxWidth: .infinity, minHeight: 120)
                     .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
             } else {

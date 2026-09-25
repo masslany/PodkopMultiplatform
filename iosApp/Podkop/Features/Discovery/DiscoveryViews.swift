@@ -67,7 +67,7 @@ struct ResourceListRow: View {
             open: actions.open
         ) {
             if !item.inlineComments.isEmpty, item.commentCount > item.inlineComments.count, let open = actions.open {
-                ThreadMoreButton(title: String(localized: "Show comments (\(item.commentCount))"), action: open)
+                ThreadMoreButton(title: String(localized: .discoveryShowComments(item.commentCount)), action: open)
             }
         }
     }
@@ -79,15 +79,15 @@ struct PagedResourceRows: View {
     let pager: ListPager<Resource>
     let tab: AppTab
     let dependencies: AppDependencies
-    var emptyTitle: LocalizedStringKey = "Nothing here yet"
+    var emptyTitle: LocalizedStringResource = .commonNothingHereYet
 
     var body: some View {
         LazyVStack(spacing: 12) {
             if pager.refreshError {
                 HStack {
-                    Label("Could not refresh", systemImage: "exclamationmark.triangle")
+                    Label(.commonCouldNotRefresh, systemImage: "exclamationmark.triangle")
                     Spacer()
-                    Button("Retry") { Task { await pager.refresh() } }
+                    Button(.commonRetry) { Task { await pager.refresh() } }
                 }
                 .font(.subheadline)
                 .padding(10)
@@ -95,12 +95,12 @@ struct PagedResourceRows: View {
             }
             switch pager.phase {
             case .idle, .loading:
-                ProgressView("Loading…").frame(maxWidth: .infinity, minHeight: 180)
+                ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 180)
             case .failed:
                 ContentUnavailableView {
-                    Label("Could not load content", systemImage: "wifi.exclamationmark")
+                    Label(.commonCouldNotLoadContent, systemImage: "wifi.exclamationmark")
                 } actions: {
-                    Button("Retry") { pager.retry() }
+                    Button(.commonRetry) { pager.retry() }
                 }
             case .loaded where pager.items.isEmpty:
                 ContentUnavailableView(emptyTitle, systemImage: "tray")
@@ -119,9 +119,9 @@ struct PagerFooter<Item>: View {
     let pager: ListPager<Item>
 
     var body: some View {
-        if pager.nextLoading { ProgressView("Loading…").padding() }
+        if pager.nextLoading { ProgressView(.commonLoading).padding() }
         if pager.nextError {
-            Button("Retry next page") { pager.retry() }.buttonStyle(.bordered)
+            Button(.commonRetryNextPage) { pager.retry() }.buttonStyle(.bordered)
         }
     }
 }

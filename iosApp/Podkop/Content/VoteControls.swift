@@ -34,9 +34,9 @@ struct LinkVoteBadge: View {
             .contentShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture { if enabled { action?() } }
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String(localized: "Votes: \(vote.up)"))
-            .accessibilityValue(voted ? String(localized: "Dug") : "")
-            .accessibilityHint(enabled ? String(localized: voted ? "Removes your vote" : "Digs this link") : "")
+            .accessibilityLabel(String(localized: .commonVotes(vote.up)))
+            .accessibilityValue(voted ? String(localized: .commonDug) : "")
+            .accessibilityHint(enabled ? String(localized: voted ? .contentRemovesVote : .contentDigsLink) : "")
             .accessibilityAddTraits(enabled ? .isButton : [])
             .accessibilityIdentifier("voteBadge")
     }
@@ -55,18 +55,18 @@ struct ScoreVoteControl: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Text(score > 0 ? "+\(score)" : "\(score)")
+            Text(verbatim: score > 0 ? "+\(score)" : "\(score)")
                 .font(.subheadline.weight(.semibold).monospacedDigit())
                 .foregroundStyle(score > 0 ? WykopTheme.votePositive : score < 0 ? WykopTheme.voteNegative : .primary)
-                .accessibilityLabel(String(localized: "Score \(score)"))
+                .accessibilityLabel(String(localized: .contentScore(score)))
             if let up {
                 voteButton(symbol: "plus", color: WykopTheme.votePositive, active: vote.state == "positive",
-                           label: vote.state == "positive" ? "Remove upvote" : "Upvote", action: up)
+                           label: vote.state == "positive" ? .contentRemoveUpvote : .contentUpvote, action: up)
                     .accessibilityIdentifier("voteUp")
             }
             if showsDown, let down {
                 voteButton(symbol: "minus", color: WykopTheme.voteNegative, active: vote.state == "negative",
-                           label: vote.state == "negative" ? "Remove downvote" : "Downvote", action: down)
+                           label: vote.state == "negative" ? .contentRemoveDownvote : .contentDownvote, action: down)
                     .accessibilityIdentifier("voteDown")
             }
         }
@@ -74,7 +74,7 @@ struct ScoreVoteControl: View {
         .disabled(pending)
     }
 
-    private func voteButton(symbol: String, color: Color, active: Bool, label: LocalizedStringKey,
+    private func voteButton(symbol: String, color: Color, active: Bool, label: LocalizedStringResource,
                             action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)

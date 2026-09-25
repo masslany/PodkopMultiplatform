@@ -11,24 +11,24 @@ struct AboutView: View {
                     Image("SplashIcon").resizable().frame(width: 56, height: 56)
                         .accessibilityHidden(true)
                     VStack(alignment: .leading) {
-                        Text("Podkop").font(.title2.bold())
-                        Text("App version: \(AppBuild.version)").foregroundStyle(.secondary)
+                        Text(verbatim: "Podkop").font(.title2.bold())
+                        Text(.settingsAppVersion(AppBuild.version)).foregroundStyle(.secondary)
                     }
                 }
             }
-            Section("Open source libraries") {
+            Section(.settingsOpenSourceLibraries) {
                 if libraries.isEmpty {
-                    Text("No libraries to show.").foregroundStyle(.secondary)
+                    Text(.settingsNoLibrariesShow).foregroundStyle(.secondary)
                 }
                 ForEach(libraries) { library in
                     VStack(alignment: .leading, spacing: 4) {
                         Text(library.name).font(.body.bold())
                         Text(library.artifact).font(.caption.monospaced()).foregroundStyle(.secondary)
-                        Text(library.licenseName ?? String(localized: "The license was not found in the package metadata."))
+                        Text(library.licenseName ?? String(localized: .settingsLicenseWasNotFound))
                             .font(.caption)
                         HStack(spacing: 16) {
-                            if let url = library.licenseURL { Link("Open license", destination: url) }
-                            if let url = library.projectURL { Link("Open project page", destination: url) }
+                            if let url = library.licenseURL { Link(.settingsOpenLicense, destination: url) }
+                            if let url = library.projectURL { Link(.settingsOpenProjectPage, destination: url) }
                         }
                         .font(.caption)
                         .buttonStyle(.borderless)
@@ -37,7 +37,7 @@ struct AboutView: View {
                 }
             }
         }
-        .navigationTitle("About")
+        .navigationTitle(.commonAbout)
         .task { libraries = dependencies.settingsService.libraries() }
     }
 }

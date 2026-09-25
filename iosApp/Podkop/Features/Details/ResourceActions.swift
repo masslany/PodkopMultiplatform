@@ -20,30 +20,30 @@ struct ResourceActionsSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 if resource.kind == .link {
-                    voterRow("Show upvoters", systemImage: "plus", side: "up")
-                    voterRow("Show downvoters", systemImage: "minus", side: "down")
+                    voterRow(.detailsShowUpvoters, systemImage: "plus", side: "up")
+                    voterRow(.detailsShowDownvoters, systemImage: "minus", side: "down")
                 } else if resource.kind == .entry || resource.kind == .entryComment {
-                    voterRow("Show voters", systemImage: "plus", side: "up")
+                    voterRow(.detailsShowVoters, systemImage: "plus", side: "up")
                 }
                 if resource.kind != .link {
-                    row("Share as screenshot", systemImage: "square.and.arrow.up") { screenshot = true }
+                    row(.detailsShareScreenshot, systemImage: "square.and.arrow.up") { screenshot = true }
                 }
                 if let url = ResourceLinkBuilder.url(for: resource, root: root,
                                                      parentCommentID: parent?.sourceID) {
-                    row("Copy link", systemImage: "link") {
+                    row(.detailsCopyLink, systemImage: "link") {
                         UIPasteboard.general.url = url
                         dismiss()
                     }
                 }
                 if resource.kind != .link && !resource.body.isEmpty {
-                    row("Copy text", systemImage: "doc.on.doc") {
+                    row(.detailsCopyText, systemImage: "doc.on.doc") {
                         UIPasteboard.general.string = resource.body
                         dismiss()
                     }
-                    row("Select text", systemImage: "character.cursor.ibeam") { textSelection = true }
+                    row(.detailsSelectText, systemImage: "character.cursor.ibeam") { textSelection = true }
                 }
                 if resource.editable {
-                    row("Edit", systemImage: "pencil") {
+                    row(.commonEdit, systemImage: "pencil") {
                         let intent: ComposerIntent
                         switch resource.kind {
                         case .entry: intent = .editEntry(resource.sourceID)
@@ -60,7 +60,7 @@ struct ResourceActionsSheet: View {
                     }
                 }
                 if resource.deletable && (resource.kind == .entry || resource.kind == .entryComment) {
-                    row("Delete", systemImage: "trash", destructive: true) { confirmDelete = true }
+                    row(.commonDelete, systemImage: "trash", destructive: true) { confirmDelete = true }
                 }
             }
             .padding(.top, 20)
@@ -83,21 +83,21 @@ struct ResourceActionsSheet: View {
                     Text(resource.body).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                 }
-                .navigationTitle("Select text")
+                .navigationTitle(.detailsSelectText)
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("Done") { textSelection = false }
+                        Button(.detailsDone) { textSelection = false }
                     }
                 }
             }
         }
-        .confirmationDialog("Delete this content?", isPresented: $confirmDelete) {
-            Button("Delete", role: .destructive) { delete(); dismiss() }
-            Button("Cancel", role: .cancel) {}
+        .confirmationDialog(.detailsDeleteContent, isPresented: $confirmDelete) {
+            Button(.commonDelete, role: .destructive) { delete(); dismiss() }
+            Button(.commonCancel, role: .cancel) {}
         }
     }
 
-    private func row(_ title: LocalizedStringKey, systemImage: String, destructive: Bool = false,
+    private func row(_ title: LocalizedStringResource, systemImage: String, destructive: Bool = false,
                      action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 20) {
@@ -115,7 +115,7 @@ struct ResourceActionsSheet: View {
         .buttonStyle(.plain)
     }
 
-    private func voterRow(_ title: LocalizedStringKey, systemImage: String, side: String) -> some View {
+    private func voterRow(_ title: LocalizedStringResource, systemImage: String, side: String) -> some View {
         row(title, systemImage: systemImage) {
             voterTarget = VoterTarget(kind: resource.kind.rawValue,
                                       rootID: resource.kind == .link || resource.kind == .entry

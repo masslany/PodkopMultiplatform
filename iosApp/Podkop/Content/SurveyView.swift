@@ -17,7 +17,7 @@ struct SurveyView: View {
                             Text(answer.text)
                             if answer.selected { Image(systemName: "checkmark.circle.fill") }
                             Spacer()
-                            Text("\(percentage(answer.count))%")
+                            Text(verbatim: "\(percentage(answer.count))%")
                         }
                         ProgressView(value: Double(percentage(answer.count)), total: 100)
                     }
@@ -29,10 +29,10 @@ struct SurveyView: View {
                 }
             }
             HStack {
-                Text(String(localized: "Votes") + ": \(survey.count)")
+                Text(String(localized: .contentVotes) + ": \(survey.count)")
                     .font(.caption).foregroundStyle(.secondary)
                 if survey.selectedOption == nil {
-                    Button(showResults ? "Hide results" : "Show results") { showResults.toggle() }
+                    Button(showResults ? .contentHideResults : .contentShowResults) { showResults.toggle() }
                         .font(.caption)
                 }
             }

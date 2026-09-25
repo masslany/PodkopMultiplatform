@@ -13,7 +13,7 @@ struct ContentFixtureGallery: View {
                 .frame(maxWidth: 760)
                 .frame(maxWidth: .infinity)
             }
-            .navigationTitle("Content")
+            .navigationTitle(.commonContent)
         }
     }
 }

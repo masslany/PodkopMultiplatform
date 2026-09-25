@@ -20,18 +20,18 @@ struct MoreView: View {
             VStack(alignment: .leading, spacing: 24) {
                 header
                 if session.isLoggedIn {
-                    MoreMenuSection(title: "Community", items: [
-                        item("notifications", "Notifications", "bell.fill", WykopTheme.voteNegative, .notifications,
+                    MoreMenuSection(title: .moreCommunity, items: [
+                        item("notifications", .commonNotifications, "bell.fill", WykopTheme.voteNegative, .notifications,
                              badge: session.notificationCounts.total - session.notificationCounts.pm),
-                        item("messages", "Messages", "text.bubble.fill", WykopTheme.votePositive, .messages,
+                        item("messages", .commonMessages, "text.bubble.fill", WykopTheme.votePositive, .messages,
                              badge: session.notificationCounts.pm),
-                        item("favorites", "Favorites", "heart.fill", WykopTheme.genderPink, .favorites),
+                        item("favorites", .commonFavorites, "heart.fill", WykopTheme.genderPink, .favorites),
                     ])
                 }
-                MoreMenuSection(title: "Content", items: contentItems)
-                MoreMenuSection(title: "System", items: [
-                    item("settings", "Settings", "gearshape.fill", Color(white: 0.55), .settings),
-                    item("about", "About", "chevron.left.forwardslash.chevron.right",
+                MoreMenuSection(title: .commonContent, items: contentItems)
+                MoreMenuSection(title: .moreSystem, items: [
+                    item("settings", .commonSettings, "gearshape.fill", Color(white: 0.55), .settings),
+                    item("about", .commonAbout, "chevron.left.forwardslash.chevron.right",
                          Color(red: 0.36, green: 0.36, blue: 0.4), .about),
                 ])
                 footer
@@ -73,18 +73,18 @@ struct MoreView: View {
 
     private var contentItems: [MoreItem] {
         var items = [
-            item("hits", "Hits", "flame.fill", WykopTheme.hotOrange, .hits),
-            item("rank", "Rank", "chart.bar.fill", Color(red: 0.55, green: 0.36, blue: 0.86), .rank),
-            item("search", "Search", "magnifyingglass", Color(white: 0.5), .search),
+            item("hits", .commonHits, "flame.fill", WykopTheme.hotOrange, .hits),
+            item("rank", .commonRank, "chart.bar.fill", Color(red: 0.55, green: 0.36, blue: 0.86), .rank),
+            item("search", .commonSearch, "magnifyingglass", Color(white: 0.5), .search),
         ]
         if session.isLoggedIn {
-            items.append(item("observed", "My Wykop", "binoculars.fill", Color(red: 0.19, green: 0.69, blue: 0.78), .observed))
-            items.append(item("addLink", "Add link", "link.badge.plus", WykopTheme.nameGreen, .addLink))
+            items.append(item("observed", .moreMyWykop, "binoculars.fill", Color(red: 0.19, green: 0.69, blue: 0.78), .observed))
+            items.append(item("addLink", .commonAddLink, "link.badge.plus", WykopTheme.nameGreen, .addLink))
         }
         return items
     }
 
-    private func item(_ id: String, _ title: LocalizedStringKey, _ symbol: String, _ tint: Color,
+    private func item(_ id: String, _ title: LocalizedStringResource, _ symbol: String, _ tint: Color,
                       _ route: AppRoute, badge: Int = 0) -> MoreItem {
         MoreItem(id: id, title: title, symbol: symbol, tint: tint, badge: max(0, badge)) {
             router.navigate(route, in: .more)

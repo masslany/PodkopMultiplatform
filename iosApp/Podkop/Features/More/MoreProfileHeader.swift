@@ -44,7 +44,7 @@ struct MoreProfileHeader: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Profile")
+        .accessibilityLabel(.commonProfile)
         .accessibilityValue(profile.username)
         .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier("moreProfile")
@@ -80,6 +80,6 @@ struct MoreProfileHeader: View {
 
     private var joined: String? {
         guard let raw = profile.memberSince, let date = Dates.parse(raw) else { return nil }
-        return String(localized: "Joined \(RelativeDateTimeFormatter().localizedString(for: date, relativeTo: Date()))")
+        return String(localized: .commonJoined(RelativeDateTimeFormatter().localizedString(for: date, relativeTo: Date())))
     }
 }

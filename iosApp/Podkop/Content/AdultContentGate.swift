@@ -18,12 +18,12 @@ struct AdultContentGate<Content: View>: View {
                 .overlay {
                     Button(action: reveal) {
                         VStack(spacing: 8) {
-                            Text("18+")
+                            Text(verbatim: "18+")
                                 .font(.headline.weight(.heavy))
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 10).padding(.vertical, 4)
                                 .background(WykopTheme.adultRed, in: Capsule())
-                            Text("This content is for adults only.\nTap to show.")
+                            Text(.contentContentAdultsOnlyTap)
                                 .font(.subheadline.weight(.semibold))
                                 .multilineTextAlignment(.center)
                                 .foregroundStyle(.primary)
@@ -35,8 +35,8 @@ struct AdultContentGate<Content: View>: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Show adult content")
-                    .accessibilityHint("Reveals sensitive content")
+                    .accessibilityLabel(.commonShowAdultContent)
+                    .accessibilityHint(.contentRevealsSensitiveContent)
                 }
         } else {
             content()

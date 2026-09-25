@@ -12,44 +12,44 @@ struct DebugView: View {
 
     var body: some View {
         Form {
-            Section("Open entry") {
-                TextField("Entry ID", text: $entryID).keyboardType(.numberPad)
-                if entryInvalid { Text("Invalid entry ID").foregroundStyle(.red).font(.caption) }
-                Button("Open") { open(entryID, invalid: $entryInvalid) { .entry($0) } }
+            Section(.commonOpenEntry) {
+                TextField(String(localized: .settingsEntryID), text: $entryID).keyboardType(.numberPad)
+                if entryInvalid { Text(.settingsInvalidEntryID).foregroundStyle(.red).font(.caption) }
+                Button(.settingsOpen) { open(entryID, invalid: $entryInvalid) { .entry($0) } }
             }
-            Section("Open link") {
-                TextField("Link ID", text: $linkID).keyboardType(.numberPad)
-                if linkInvalid { Text("Invalid link ID").foregroundStyle(.red).font(.caption) }
-                Button("Open") { open(linkID, invalid: $linkInvalid) { .link($0) } }
+            Section(.commonOpenLink) {
+                TextField(String(localized: .settingsLinkID), text: $linkID).keyboardType(.numberPad)
+                if linkInvalid { Text(.settingsInvalidLinkID).foregroundStyle(.red).font(.caption) }
+                Button(.settingsOpen) { open(linkID, invalid: $linkInvalid) { .link($0) } }
             }
             Section {
-                Button("Show test notification") {
+                Button(.settingsShowTestNotification) {
                     Task {
                         do {
                             let center = UNUserNotificationCenter.current()
                             guard try await center.requestAuthorization(options: [.alert, .sound]) else {
-                                dependencies.router.banner = String(localized: "Notifications are disabled in Settings.")
+                                dependencies.router.banner = String(localized: .settingsNotificationsDisabled)
                                 return
                             }
                             let content = UNMutableNotificationContent()
-                            content.title = String(localized: "Podkop test notification")
-                            content.body = String(localized: "Notifications are working on this device.")
+                            content.title = String(localized: .settingsTestNotificationTitle)
+                            content.body = String(localized: .settingsNotificationsWorking)
                             let request = UNNotificationRequest(identifier: UUID().uuidString,
                                 content: content, trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false))
                             try await center.add(request)
                         } catch {
-                            dependencies.router.banner = String(localized: "Could not complete this action. Try again.")
+                            dependencies.router.banner = String(localized: .commonCouldNotCompleteAction)
                         }
                     }
                 }
-                Button("Show test banner") {
-                    dependencies.router.banner = String(localized: "Could not complete this action. Try again.")
+                Button(.settingsShowTestBanner) {
+                    dependencies.router.banner = String(localized: .commonCouldNotCompleteAction)
                 }
             } footer: {
-                Text("Test notifications are local. Background private-message delivery still needs a platform decision (D03).")
+                Text(.settingsTestNotificationsLocal)
             }
         }
-        .navigationTitle("Debug tools")
+        .navigationTitle(.settingsDebugTools)
     }
 
     private func open(_ raw: String, invalid: Binding<Bool>, route: (Int) -> AppRoute) {

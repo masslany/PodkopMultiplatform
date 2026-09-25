@@ -13,15 +13,15 @@ struct ComposerAttachmentControls: View {
     var body: some View {
         HStack {
             PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                Label("Choose photo", systemImage: "photo.on.rectangle")
+                Label(.composerChoosePhoto, systemImage: "photo.on.rectangle")
             }
-            Button("Photo URL") { showPhotoURL = true }
+            Button(.composerPhotoURL) { showPhotoURL = true }
         }
         .disabled(disabled || attachment.uploading)
-        .alert("Photo URL", isPresented: $showPhotoURL) {
-            TextField("https://example.com/photo.jpg", text: $photoURLInput)
-            Button("Attach") { attachment.attachURL(photoURLInput) }
-            Button("Cancel", role: .cancel) {}
+        .alert(.composerPhotoURL, isPresented: $showPhotoURL) {
+            TextField(String("https://example.com/photo.jpg"), text: $photoURLInput)
+            Button(.composerAttach) { attachment.attachURL(photoURLInput) }
+            Button(.commonCancel, role: .cancel) {}
         }
         .onChange(of: selectedPhoto) { _, item in
             guard let item else { return }
@@ -62,17 +62,17 @@ struct ComposerAttachmentStatus: View {
     var disabled = false
 
     var body: some View {
-        if attachment.uploading { ProgressView("Uploading photo…") }
+        if attachment.uploading { ProgressView(.composerUploadingPhoto) }
         if attachment.photoKey != nil {
             HStack {
-                Label("Attached photo", systemImage: "photo").foregroundStyle(.secondary)
-                Button("Remove", role: .destructive) { attachment.remove() }
+                Label(.composerAttachedPhoto, systemImage: "photo").foregroundStyle(.secondary)
+                Button(.commonRemove, role: .destructive) { attachment.remove() }
                     .disabled(disabled || attachment.uploading)
                     .accessibilityIdentifier("attachmentRemove")
             }
         }
         if attachment.failed {
-            Label("Could not attach photo. Try again.", systemImage: "exclamationmark.triangle")
+            Label(.composerCouldNotAttachPhoto, systemImage: "exclamationmark.triangle")
                 .foregroundStyle(.red)
         }
     }

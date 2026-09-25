@@ -11,7 +11,7 @@ struct SplashView: View {
             Image("SplashIcon")
                 .resizable()
                 .frame(width: 120, height: 120)
-                .accessibilityLabel("Podkop")
+                .accessibilityLabel(Text(verbatim: "Podkop"))
             // Only a slow start earns a spinner; it sits below the icon without moving it.
             ProgressView()
                 .offset(y: 100)

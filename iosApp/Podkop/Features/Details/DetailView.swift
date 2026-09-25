@@ -24,12 +24,12 @@ struct DetailView: View {
             LazyVStack(alignment: .leading, spacing: 16) {
                 switch model.phase {
                 case .idle, .loading:
-                    ProgressView("Loading…").frame(maxWidth: .infinity, minHeight: 220)
+                    ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 220)
                 case .failed:
                     ContentUnavailableView {
-                        Label("Could not load content", systemImage: "wifi.exclamationmark")
+                        Label(.commonCouldNotLoadContent, systemImage: "wifi.exclamationmark")
                     } actions: {
-                        Button("Retry") { model.reload() }
+                        Button(.commonRetry) { model.reload() }
                     }
                 case .loaded:
                     // Like Android, the resource sits on the page background, not on a card.
@@ -44,7 +44,7 @@ struct DetailView: View {
                     }
                 }
                 if model.actionFailed {
-                    Label("Action failed. Try again.", systemImage: "exclamationmark.triangle")
+                    Label(.detailsActionFailedTryAgain, systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.red)
                         .padding(.horizontal, 16)
                 }
@@ -73,7 +73,7 @@ struct DetailView: View {
                                        dependencies: dependencies,
                                        delete: { model.submit(.delete(target)) })
         }
-        .confirmationDialog("Why downvote this link?", isPresented: Binding(
+        .confirmationDialog(.detailsWhyDownvoteLink, isPresented: Binding(
             get: { downvoteTarget != nil },
             set: { if !$0 { downvoteTarget = nil } }
         )) {
@@ -104,7 +104,7 @@ struct DetailView: View {
     }
 
     private var navigationTitle: String {
-        model.kind == .link ? String(localized: "Link") : String(localized: "Entry")
+        model.kind == .link ? String(localized: .commonLink) : String(localized: .detailsEntry)
     }
 
     /// Direct children of the page's `LazyVStack`, so only visible comment threads are built and
@@ -113,25 +113,25 @@ struct DetailView: View {
         Group {
             if model.kind == .link {
                 Menu {
-                    Button("Best") { model.selectCommentSort("best") }
-                    Button("Newest") { model.selectCommentSort("newest") }
-                    Button("Oldest") { model.selectCommentSort("oldest") }
+                    Button(.commonBest) { model.selectCommentSort("best") }
+                    Button(.commonNewest) { model.selectCommentSort("newest") }
+                    Button(.commonOldest) { model.selectCommentSort("oldest") }
                 } label: {
                     DropdownLabel(title: commentSortTitle)
                 }
                 .accessibilityIdentifier("commentSort")
             } else {
-                Text("Comments").font(.headline).padding(.horizontal, 4)
+                Text(.commonComments).font(.headline).padding(.horizontal, 4)
             }
         }
         .padding(.horizontal, 12)
         Group {
             if model.commentsLoading && model.comments.isEmpty {
-                ProgressView("Loading…").frame(maxWidth: .infinity)
+                ProgressView(.commonLoading).frame(maxWidth: .infinity)
             } else if model.commentsError && model.comments.isEmpty {
-                ThreadMoreButton(title: String(localized: "Retry comments")) { model.retryComments() }
+                ThreadMoreButton(title: String(localized: .detailsRetryComments)) { model.retryComments() }
             } else if model.comments.isEmpty {
-                ContentUnavailableView("Nothing here yet", systemImage: "bubble")
+                ContentUnavailableView(.commonNothingHereYet, systemImage: "bubble")
             } else {
                 ForEach(model.comments) { comment in
                     commentThread(comment)
@@ -139,9 +139,9 @@ struct DetailView: View {
                             if comment.id == model.comments.last?.id { model.loadMoreComments() }
                         }
                 }
-                if model.commentsLoading { ProgressView("Loading…").frame(maxWidth: .infinity) }
+                if model.commentsLoading { ProgressView(.commonLoading).frame(maxWidth: .infinity) }
                 if model.nextCommentsError {
-                    ThreadMoreButton(title: String(localized: "Retry next page")) { model.retryComments() }
+                    ThreadMoreButton(title: String(localized: .commonRetryNextPage)) { model.retryComments() }
                 }
             }
         }
@@ -163,8 +163,8 @@ struct DetailView: View {
         ) {
             if model.kind == .link, !state.exhausted, remaining > 0 || state.loading || state.error {
                 ThreadMoreButton(
-                    title: state.error ? String(localized: "Retry replies")
-                        : String(localized: "Show all (\(remaining))"),
+                    title: state.error ? String(localized: .detailsRetryReplies)
+                        : String(localized: .detailsShowAll(remaining)),
                     loading: state.loading
                 ) {
                     model.loadReplies(for: comment.sourceID)
@@ -175,16 +175,16 @@ struct DetailView: View {
 
     private var commentSortTitle: String {
         switch model.commentSort {
-        case "newest": String(localized: "Newest")
-        case "oldest": String(localized: "Oldest")
-        default: String(localized: "Best")
+        case "newest": String(localized: .commonNewest)
+        case "oldest": String(localized: .commonOldest)
+        default: String(localized: .commonBest)
         }
     }
 
     /// Related links scroll sideways as compact cards, as on Android.
     private var relatedSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Related links").font(.headline).padding(.horizontal, 16)
+            Text(.detailsRelatedLinks).font(.headline).padding(.horizontal, 16)
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 10) {
                     ForEach(model.related) { item in

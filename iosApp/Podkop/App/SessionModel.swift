@@ -111,7 +111,7 @@ final class SessionModel {
             return
         } catch {
             phase = .error
-            banner = String(localized: "Startup failed. Try again.")
+            banner = String(localized: .appStartupFailedTryAgain)
         }
     }
 
@@ -136,7 +136,7 @@ final class SessionModel {
             return
         } catch {
             phase = .error
-            banner = String(localized: "Startup failed. Try again.")
+            banner = String(localized: .appStartupFailedTryAgain)
         }
     }
 
@@ -149,14 +149,14 @@ final class SessionModel {
                 self.dependencies.client.session.loginUrl(completion: $0)
             }
             guard let url = URL(string: raw), url.scheme == "https" else {
-                banner = String(localized: "Unable to open sign in.")
+                banner = String(localized: .appUnableOpenSignIn)
                 return
             }
             loginURL = url
         } catch is CancellationError {
             return
         } catch {
-            banner = String(localized: "Unable to open sign in.")
+            banner = String(localized: .appUnableOpenSignIn)
         }
     }
 
@@ -170,7 +170,7 @@ final class SessionModel {
         await accept(url)
         if !isLoggedIn, dependencies.router.sheet == .login {
             loginURL = nil
-            banner = String(localized: "Sign in failed. Try again.")
+            banner = String(localized: .appSignInFailedTryAgain)
         }
     }
 
@@ -191,7 +191,7 @@ final class SessionModel {
         } catch is CancellationError {
             return
         } catch {
-            banner = String(localized: "Sign out failed. Please retry.")
+            banner = String(localized: .appSignOutFailedRetry)
         }
         // The shared session observation is the source of truth even on a partial failure.
     }
@@ -209,7 +209,7 @@ final class SessionModel {
         } catch is CancellationError {
             return
         } catch {
-            banner = String(localized: "This link cannot be opened.")
+            banner = String(localized: .appLinkCannotOpened)
         }
     }
 
