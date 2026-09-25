@@ -2,6 +2,8 @@ package pl.masslany.podkop.features.search
 
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import pl.masslany.podkop.business.search.domain.models.request.SearchDatePreset
+import pl.masslany.podkop.business.search.domain.models.request.SearchQueryError
 import pl.masslany.podkop.business.search.domain.models.request.SearchSort
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 
@@ -55,18 +57,6 @@ data class AdvancedSearchScreenState(
         get() = datePreset == AdvancedSearchDatePreset.Custom
 }
 
-enum class AdvancedSearchDatePreset {
-    AnyTime,
-    Last24Hours,
-    Last3Days,
-    Last7Days,
-    Last30Days,
-    LastYear,
-    Custom,
-}
+typealias AdvancedSearchDatePreset = SearchDatePreset
 
-enum class AdvancedSearchValidationError {
-    QueryRequired,
-    InvalidCustomDateFormat,
-    InvalidCustomDateRange,
-}
+typealias AdvancedSearchValidationError = SearchQueryError

@@ -177,4 +177,42 @@ final class ShellUITests: XCTestCase {
         adult.tap()
         XCTAssertTrue(app.staticTexts["Treść tylko dla dorosłych z wieloma zdaniami."].exists)
     }
+
+    func testFixtureSearchSuggestionsOpenAdvancedSearch() {
+        let app = launch("authenticated")
+        XCTAssertTrue(app.buttons["Search"].waitForExistence(timeout: 5))
+        app.buttons["Search"].firstMatch.tap()
+        let field = app.searchFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText("tech")
+        XCTAssertTrue(app.staticTexts["#technologia"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Ewa-Żółw"].exists)
+        app.buttons["advancedSearch"].tap()
+        let query = app.textFields["advancedQuery"]
+        XCTAssertTrue(query.waitForExistence(timeout: 5))
+        XCTAssertEqual(query.value as? String, "tech")
+        app.buttons["advancedSubmit"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["resource-link:101"].waitForExistence(timeout: 5))
+    }
+
+    func testFixtureHitsRankAndAccountCollections() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Hits"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["resource-link:101"].waitForExistence(timeout: 5))
+        app.buttons["hitsArchive"].tap()
+        XCTAssertTrue(app.buttons["Show"].waitForExistence(timeout: 5))
+        app.buttons["Cancel"].tap()
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Rank"].tap()
+        XCTAssertTrue(app.staticTexts["Ewa-Żółw"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Favorites"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["resource-entry:102"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Observed"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["resource-link:101"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["3 new comments on an observed link"].exists)
+    }
 }

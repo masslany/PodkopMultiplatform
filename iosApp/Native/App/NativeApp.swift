@@ -156,11 +156,13 @@ private struct TabContent: View {
         if tab == .more {
             List {
                 Section {
+                    if session.isLoggedIn {
+                        routeButton("Favorites", symbol: "star", route: .favorites)
+                        routeButton("Observed", symbol: "eye", route: .observed)
+                    }
                     #if DEBUG
                     if session.isLoggedIn {
                         routeButton("Profile", symbol: "person", route: .profile)
-                        routeButton("Favorites", symbol: "star", route: .favorites)
-                        routeButton("Observed", symbol: "eye", route: .observed)
                         routeButton("Messages", symbol: "envelope", route: .messages)
                         routeButton("Notifications", symbol: "bell", route: .notifications)
                         routeButton("Add link", symbol: "link.badge.plus", route: .addLink)
@@ -172,12 +174,14 @@ private struct TabContent: View {
                         Button("Sign in") { router.sheet = .login }
                     }
                 }
-                #if DEBUG
                 Section {
                     routeButton("Search", symbol: "magnifyingglass", route: .search)
-                    routeButton("Tags", symbol: "number", route: .tags)
                     routeButton("Hits", symbol: "flame", route: .hits)
                     routeButton("Rank", symbol: "chart.bar", route: .rank)
+                }
+                #if DEBUG
+                Section {
+                    routeButton("Tags", symbol: "number", route: .tags)
                     routeButton("Settings", symbol: "gear", route: .settings)
                     routeButton("About", symbol: "info.circle", route: .about)
                 }
@@ -196,11 +200,11 @@ private struct TabContent: View {
 
     @ToolbarContentBuilder private var topActions: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarTrailing) {
-            #if DEBUG
             Button { router.navigate(.search, in: tab) } label: {
                 Image(systemName: "magnifyingglass")
             }
             .accessibilityLabel("Search")
+            #if DEBUG
             if tab != .more {
                 Button { router.presentComposer(.createEntry) } label: {
                     Image(systemName: "square.and.pencil")
@@ -223,17 +227,19 @@ private struct TabContent: View {
         case .entry(let id): NativeDetailView(kind: .entry, id: id, dependencies: dependencies)
         case .messages: DevelopmentView(title: String(localized: "Messages"))
         case .notifications: DevelopmentView(title: String(localized: "Notifications"))
-        case .search: DevelopmentView(title: String(localized: "Search"))
+        case .search: NativeSearchView(tab: tab, dependencies: dependencies)
+        case .advancedSearch(let query):
+            NativeAdvancedSearchView(initialQuery: query, tab: tab, dependencies: dependencies)
         case .tags: DevelopmentView(title: String(localized: "Tags"))
         case .profile: DevelopmentView(title: String(localized: "Profile"))
         case .tag(let name): DevelopmentView(title: "#\(name)")
         case .user(let name): DevelopmentView(title: name)
         case .settings: DevelopmentView(title: String(localized: "Settings"))
-        case .favorites: DevelopmentView(title: String(localized: "Favorites"))
-        case .observed: DevelopmentView(title: String(localized: "Observed"))
-        case .hits: DevelopmentView(title: String(localized: "Hits"))
+        case .favorites: NativeFavouritesView(tab: tab, dependencies: dependencies)
+        case .observed: NativeObservedView(tab: tab, dependencies: dependencies)
+        case .hits: NativeHitsView(tab: tab, dependencies: dependencies)
         case .addLink: NativeLinkSubmissionView(dependencies: dependencies)
-        case .rank: DevelopmentView(title: String(localized: "Rank"))
+        case .rank: NativeRankView(tab: tab, dependencies: dependencies)
         case .about: DevelopmentView(title: String(localized: "About"))
         }
     }

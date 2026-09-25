@@ -190,6 +190,11 @@ class PodkopClient private constructor(
     val composer = ComposerService()
     val media = MediaService()
     val linkDrafts = LinkDraftService()
+    val search = SearchService(this)
+    val hits = HitsService(this)
+    val rank = RankService(this)
+    val favourites = FavouritesService(this)
+    val observed = ObservedService(this)
     val voters = VotersService()
     val embeds = EmbedsService()
 
@@ -202,7 +207,9 @@ class PodkopClient private constructor(
         if (active === this) active = null
     }
 
-    private fun <T : Any> operation(
+    internal val koin get() = app.koin
+
+    internal fun <T : Any> operation(
         completion: (T?, IOSFailure?) -> Unit,
         block: suspend () -> T,
     ): IOSOperation {
@@ -846,14 +853,14 @@ private fun LinkDraftDetails.toIOSLinkDraft() = IOSLinkDraft(
     photoKey, photoUrl, suggestedImages, selectedImageIndex,
 )
 
-private fun PageRequest.toIOS(): IOSPageRequest = when (this) {
+internal fun PageRequest.toIOS(): IOSPageRequest = when (this) {
     PageRequest.Initial -> IOSPageRequest("initial")
     is PageRequest.Number -> IOSPageRequest("number", value.toString())
     is PageRequest.PageCursor -> IOSPageRequest("pageCursor", value)
     is PageRequest.KeyCursor -> IOSPageRequest("keyCursor", value)
 }
 
-private fun IOSPageRequest.toDomain(): PageRequest = when (kind) {
+internal fun IOSPageRequest.toDomain(): PageRequest = when (kind) {
     "initial" -> PageRequest.Initial
     "number" -> PageRequest.Number(value?.toIntOrNull()?.takeIf { it > 0 } ?: error("invalid page"))
     "pageCursor" -> PageRequest.PageCursor(value?.takeIf { it.isNotBlank() } ?: error("invalid cursor"))

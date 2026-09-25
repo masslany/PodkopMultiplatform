@@ -1,4 +1,4 @@
-package pl.masslany.podkop.features.search
+package pl.masslany.podkop.business.search
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -8,8 +8,9 @@ import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.common.domain.models.common.Voted
+import pl.masslany.podkop.business.search.domain.models.request.withSearchFallbackPagination
 
-class AdvancedSearchPaginationExtensionsTest {
+class SearchFallbackPaginationTest {
 
     @Test
     fun `withSearchFallbackPagination synthesizes next page when total is not reached`() {

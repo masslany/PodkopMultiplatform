@@ -60,6 +60,24 @@ final class AppDependencies {
         #endif
         return SharedComposerMedia(client: client, adapter: adapter, forLink: true)
     }()
+    lazy var searchSuggesting: SearchSuggesting = {
+        #if DEBUG
+        if isFixture { return FixtureSearchSuggesting() }
+        #endif
+        return SharedSearchSuggesting(client: client, adapter: adapter)
+    }()
+    lazy var advancedSearching: AdvancedSearching = {
+        #if DEBUG
+        if isFixture { return FixtureAdvancedSearching() }
+        #endif
+        return SharedAdvancedSearching(client: client, adapter: adapter)
+    }()
+    lazy var collectionLoader: CollectionLoading = {
+        #if DEBUG
+        if isFixture { return FixtureCollectionLoader() }
+        #endif
+        return SharedCollectionLoader(client: client, adapter: adapter)
+    }()
     private var isFixture: Bool {
         #if DEBUG
         ProcessInfo.processInfo.arguments.contains("-nativeFixture")

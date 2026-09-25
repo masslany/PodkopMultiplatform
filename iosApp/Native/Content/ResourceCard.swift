@@ -325,7 +325,7 @@ struct NativeEmbedCard: View {
     }
 }
 
-private func authorColor(_ name: String?) -> Color {
+func authorColor(_ name: String?) -> Color {
     switch name {
     case "orange": .orange
     case "burgundy": Color(red: 0.55, green: 0.16, blue: 0.28)

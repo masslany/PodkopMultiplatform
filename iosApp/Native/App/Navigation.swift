@@ -30,6 +30,7 @@ enum AppRoute: Hashable, Codable {
     case messages
     case notifications
     case search
+    case advancedSearch(String)
     case tags
     case tag(String)
     case profile
