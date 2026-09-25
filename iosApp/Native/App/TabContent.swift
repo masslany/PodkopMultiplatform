@@ -128,7 +128,7 @@ struct TabContent: View {
         case .search: NativeSearchView(tab: tab, dependencies: dependencies)
         case .advancedSearch(let query):
             NativeAdvancedSearchView(initialQuery: query, tab: tab, dependencies: dependencies)
-        case .tags: DevelopmentView(title: String(localized: "Tags"))
+        case .tags: NativeSearchView(tab: tab, dependencies: dependencies)
         case .profile: NativeProfileView(username: nil, tab: tab, dependencies: dependencies)
         case .tag(let name): NativeTagView(tag: name, tab: tab, dependencies: dependencies)
         case .user(let name): NativeProfileView(username: name, tab: tab, dependencies: dependencies)
@@ -147,17 +147,5 @@ struct TabContent: View {
             EmptyView()
             #endif
         }
-    }
-}
-
-private struct DevelopmentView: View {
-    let title: String
-    var body: some View {
-        ContentUnavailableView {
-            Label(title, systemImage: "hammer")
-        } description: {
-            Text("This screen is in development.")
-        }
-        .navigationTitle(title)
     }
 }

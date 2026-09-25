@@ -34,7 +34,7 @@ class NotificationTargetTest {
     }
 
     @Test
-    fun `private message notifications open the conversation, falling back to the id`() {
+    fun `private message notifications open the conversation or fall back to the id`() {
         assertEquals(
             NotificationTarget.Conversation("n1"),
             item(group = NotificationGroup.PrivateMessages, linkId = 1).target(),
