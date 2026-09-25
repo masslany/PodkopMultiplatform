@@ -9,6 +9,10 @@ struct LinkVoteBadge: View {
     var pending = false
     var action: (() -> Void)?
 
+    /// Grows with the text size, up to twice the default, like Android's `sp`-sized count.
+    @ScaledMetric(relativeTo: .subheadline) private var width: CGFloat = 46
+    @ScaledMetric(relativeTo: .subheadline) private var height: CGFloat = 32
+
     private var voted: Bool { vote.state != "none" }
     private var enabled: Bool { action != nil && !pending }
 
@@ -18,7 +22,7 @@ struct LinkVoteBadge: View {
             .minimumScaleFactor(0.6)
             .lineLimit(1)
             .foregroundStyle((hot ? WykopTheme.hotOrange : Color.primary).opacity(voted ? 0.6 : 1))
-            .frame(width: 46, height: 32)
+            .frame(width: min(width, 92), height: min(height, 64))
             .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .strokeBorder(Color.secondary.opacity(voted ? 0.6 : 1), lineWidth: 2))
             .overlay(alignment: .bottomTrailing) {

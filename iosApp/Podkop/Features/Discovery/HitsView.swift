@@ -15,7 +15,7 @@ struct HitsView: View {
 
     var body: some View {
         CollectionScroll(refresh: model.refresh) {
-            HStack {
+            AdaptiveControlRow {
                 Menu {
                     ForEach(HitsModel.Sort.allCases, id: \.self) { sort in
                         Button(title(for: sort)) { model.select(sort) }

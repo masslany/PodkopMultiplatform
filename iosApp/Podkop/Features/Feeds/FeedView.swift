@@ -75,7 +75,7 @@ struct FeedView: View {
     }
 
     private var controls: some View {
-        HStack {
+        AdaptiveControlRow {
             Menu {
                 if model.query.tab == .entries {
                     sortItem(.feedsHot, value: "hot")
@@ -103,11 +103,12 @@ struct FeedView: View {
                 }
                 .accessibilityIdentifier("hotPeriod")
             }
-            Spacer()
+        } trailing: {
             Button { model.gallery.toggle() } label: {
                 Image(systemName: model.gallery ? "list.bullet" : "square.grid.2x2")
                     .font(.subheadline.weight(.semibold))
-                    .frame(width: 36, height: 34)
+                    .frame(minWidth: 36, minHeight: 34)
+                    .padding(.horizontal, 4)
                     .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
             .buttonStyle(.plain)
@@ -133,21 +134,17 @@ struct FeedView: View {
 
     private var hitStrip: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Label(.commonHits, systemImage: "flame.fill")
-                    .font(.headline)
-                    .labelStyle(.titleAndIcon)
-                    .foregroundStyle(WykopTheme.hotOrange)
-                Spacer()
-                Button { router.navigate(.hits, in: .links) } label: {
-                    HStack(spacing: 2) {
-                        Text(.feedsSeeAll)
-                        Image(systemName: "chevron.right").font(.caption.weight(.semibold))
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+            // Title and "See all" share a row, or stack when large text needs the width.
+            ViewThatFits(in: .horizontal) {
+                HStack {
+                    hitsTitle
+                    Spacer()
+                    seeAllHits
                 }
-                .buttonStyle(.plain)
+                VStack(alignment: .leading, spacing: 4) {
+                    hitsTitle
+                    seeAllHits
+                }
             }
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 10) {
@@ -158,6 +155,25 @@ struct FeedView: View {
             }
             .scrollIndicators(.hidden)
         }
+    }
+
+    private var hitsTitle: some View {
+        Label(.commonHits, systemImage: "flame.fill")
+            .font(.headline)
+            .labelStyle(.titleAndIcon)
+            .foregroundStyle(WykopTheme.hotOrange)
+    }
+
+    private var seeAllHits: some View {
+        Button { router.navigate(.hits, in: .links) } label: {
+            HStack(spacing: 2) {
+                Text(.feedsSeeAll)
+                Image(systemName: "chevron.right").font(.caption.weight(.semibold))
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+        }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder private var rows: some View {

@@ -379,8 +379,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8D06BDD538C947C1AEA6865F /* Configuration/Config.xcconfig */;
 			buildSettings = {
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -391,6 +389,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				PRODUCT_MODULE_NAME = Podkop;
 				PRODUCT_NAME = Podkop;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -523,8 +523,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8D06BDD538C947C1AEA6865F /* Configuration/Config.xcconfig */;
 			buildSettings = {
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
 				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -535,6 +533,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				PRODUCT_MODULE_NAME = Podkop;
 				PRODUCT_NAME = Podkop;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

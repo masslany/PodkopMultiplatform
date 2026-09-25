@@ -15,7 +15,7 @@ struct FavouritesView: View {
 
     var body: some View {
         CollectionScroll(refresh: model.refresh) {
-            HStack {
+            AdaptiveControlRow {
                 Menu {
                     ForEach(FavouritesModel.Kind.allCases, id: \.self) { kind in
                         Button(title(for: kind)) { model.select(kind: kind) }

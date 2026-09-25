@@ -44,6 +44,9 @@ struct HitTile: View {
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .buttonStyle(.plain)
+        // The tile has a fixed size, so its caption stops growing at the largest regular size;
+        // VoiceOver and the Hits screen still offer the full title.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(resource.title)
         .accessibilityValue(String(localized: .commonVotes(resource.vote.up)))

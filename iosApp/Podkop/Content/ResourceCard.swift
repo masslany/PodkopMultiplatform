@@ -65,9 +65,16 @@ struct ResourceCard: View {
 
     // MARK: Links
 
+    /// Side by side normally; stacked at accessibility text sizes so text keeps the full width.
+    private func adaptiveStack(spacing: CGFloat) -> AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: spacing))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: spacing))
+    }
+
     /// Android's `LinkItem`: badge and title, description with thumbnail, meta, tags and comments.
     @ViewBuilder private var linkListLayout: some View {
-        HStack(alignment: .top, spacing: 12) {
+        (adaptiveStack(spacing: 12)) {
             LinkVoteBadge(vote: resource.vote, hot: resource.hot, pending: actions.pending,
                           action: actions.voteUp)
             Text(resource.title)
@@ -78,7 +85,7 @@ struct ResourceCard: View {
             if resource.deletion != nil {
                 richContent
             } else if !resource.description.isEmpty || resource.photo != nil {
-                HStack(alignment: .top, spacing: 10) {
+                (adaptiveStack(spacing: 10)) {
                     Text(resource.description)
                         .font(.subheadline)
                         .lineLimit(5)
@@ -117,7 +124,7 @@ struct ResourceCard: View {
                 }
                 .accessibilityHidden(true)
             }
-            HStack(alignment: .top, spacing: 12) {
+            (adaptiveStack(spacing: 12)) {
                 VStack(spacing: 4) {
                     LinkVoteBadge(vote: resource.vote, hot: resource.hot, pending: actions.pending,
                                   action: actions.voteUp)

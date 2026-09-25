@@ -113,7 +113,7 @@ struct TagView: View {
     }
 
     private var controls: some View {
-        HStack {
+        AdaptiveControlRow {
             Menu {
                 Button(.commonAll) { model.select(sort: .all) }
                 Button(.commonBest) { model.select(sort: .best) }
