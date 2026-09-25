@@ -2,51 +2,6 @@ import Foundation
 import Observation
 import PodkopShared
 
-struct NativeTagSuggestion: Identifiable, Equatable {
-    let name: String
-    let followers: Int
-    var id: String { name }
-}
-
-struct NativeUserSuggestion: Identifiable, Equatable {
-    let username: String
-    let avatarURL: String
-    let color: String
-    let gender: String
-    var id: String { username }
-}
-
-@MainActor protocol SearchSuggesting {
-    func tags(_ query: String) async throws -> [NativeTagSuggestion]
-    func users(_ query: String) async throws -> [NativeUserSuggestion]
-}
-
-@MainActor
-final class SharedSearchSuggesting: SearchSuggesting {
-    private let client: PodkopClient
-    private let adapter: BridgeAdapter
-
-    init(client: PodkopClient, adapter: BridgeAdapter) {
-        self.client = client
-        self.adapter = adapter
-    }
-
-    func tags(_ query: String) async throws -> [NativeTagSuggestion] {
-        let values: [IOSTagSuggestion] = try await adapter.call {
-            self.client.search.tags(query: query, completion: $0)
-        }
-        return values.map { NativeTagSuggestion(name: $0.name, followers: Int($0.followers)) }
-    }
-
-    func users(_ query: String) async throws -> [NativeUserSuggestion] {
-        let values: [IOSUserSuggestion] = try await adapter.call {
-            self.client.search.users(query: query, completion: $0)
-        }
-        return values.map { NativeUserSuggestion(username: $0.username, avatarURL: $0.avatarUrl,
-                                                  color: $0.color, gender: $0.gender) }
-    }
-}
-
 @MainActor @Observable
 final class NativeSearchModel {
     enum Status { case idle, loading, loaded, failed }
@@ -163,15 +118,3 @@ final class NativeSearchModel {
         usersTask?.cancel()
     }
 }
-
-#if DEBUG
-@MainActor
-final class FixtureSearchSuggesting: SearchSuggesting {
-    func tags(_ query: String) async throws -> [NativeTagSuggestion] {
-        [NativeTagSuggestion(name: "technologia", followers: 42)]
-    }
-    func users(_ query: String) async throws -> [NativeUserSuggestion] {
-        [NativeUserSuggestion(username: "Ewa-Żółw", avatarURL: "", color: "green", gender: "female")]
-    }
-}
-#endif

@@ -1,0 +1,46 @@
+import SwiftUI
+import Observation
+import PodkopShared
+
+@MainActor protocol SettingsServicing {
+    func setAutoplayGifs(_ enabled: Bool) async throws
+    func setTheme(_ theme: ThemeChoice) async throws
+    /// Removes downloaded media only; the session and settings stay intact.
+    func clearMediaCache()
+    func libraries() -> [NativeLibraryNotice]
+}
+
+@MainActor
+final class SharedSettingsService: SettingsServicing {
+    private let client: PodkopClient
+    private let adapter: BridgeAdapter
+    private let media: SharedMediaLoader?
+
+    init(client: PodkopClient, adapter: BridgeAdapter, media: SharedMediaLoader?) {
+        self.client = client
+        self.adapter = adapter
+        self.media = media
+    }
+
+    func setAutoplayGifs(_ enabled: Bool) async throws {
+        let _: IOSSuccess = try await adapter.call { self.client.settings.setAutoplayGifs(enabled: enabled, completion: $0) }
+    }
+
+    func setTheme(_ theme: ThemeChoice) async throws {
+        let _: IOSSuccess = try await adapter.call { self.client.settings.setTheme(name: theme.rawValue, completion: $0) }
+    }
+
+    func clearMediaCache() {
+        client.mediaBytes.clearCache()
+        media?.clearMemory()
+        NativeImageDecoder.shared.clear()
+    }
+
+    func libraries() -> [NativeLibraryNotice] {
+        client.about.libraries().map {
+            NativeLibraryNotice(name: $0.name, artifact: $0.artifact, licenseName: $0.licenseName,
+                                licenseURL: $0.licenseUrl.flatMap(URL.init(string:)),
+                                projectURL: $0.projectUrl.flatMap(URL.init(string:)))
+        }
+    }
+}

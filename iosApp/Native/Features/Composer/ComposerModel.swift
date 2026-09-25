@@ -2,68 +2,6 @@ import Foundation
 import Observation
 import PodkopShared
 
-@MainActor protocol ComposerSubmitting {
-    func submit(intent: ComposerIntent, text: String, adult: Bool,
-                photoKey: String?) async throws -> NativeResource
-}
-
-@MainActor
-final class SharedComposerSubmitter: ComposerSubmitting {
-    private let client: PodkopClient
-    private let adapter: BridgeAdapter
-
-    init(client: PodkopClient, adapter: BridgeAdapter) {
-        self.client = client
-        self.adapter = adapter
-    }
-
-    func submit(intent: ComposerIntent, text: String, adult: Bool,
-                photoKey: String?) async throws -> NativeResource {
-        let target = intent.target
-        let value: IOSResource = try await adapter.call {
-            self.client.composer.submit(kind: target.kind,
-                                        rootId: target.rootID.map { KotlinInt(int: Int32($0)) },
-                                        commentId: target.commentID.map { KotlinInt(int: Int32($0)) },
-                                        content: text, adult: adult, photoKey: photoKey,
-                                        completion: $0)
-        }
-        return NativeResource(value)
-    }
-}
-
-struct ComposerTarget {
-    let kind: String
-    let rootID: Int?
-    let commentID: Int?
-    let replyTarget: String?
-    let isEdit: Bool
-}
-
-extension ComposerIntent {
-    var target: ComposerTarget {
-        switch self {
-        case .createEntry:
-            ComposerTarget(kind: "createEntry", rootID: nil, commentID: nil,
-                           replyTarget: nil, isEdit: false)
-        case .createEntryComment(let id, let replyTarget):
-            ComposerTarget(kind: "createEntryComment", rootID: id, commentID: nil,
-                           replyTarget: replyTarget, isEdit: false)
-        case .createLinkComment(let id, let parentID, let replyTarget):
-            ComposerTarget(kind: "createLinkComment", rootID: id, commentID: parentID,
-                           replyTarget: replyTarget, isEdit: false)
-        case .editEntry(let id):
-            ComposerTarget(kind: "editEntry", rootID: id, commentID: nil,
-                           replyTarget: nil, isEdit: true)
-        case .editEntryComment(let entryID, let commentID):
-            ComposerTarget(kind: "editEntryComment", rootID: entryID, commentID: commentID,
-                           replyTarget: nil, isEdit: true)
-        case .editLinkComment(let linkID, let commentID):
-            ComposerTarget(kind: "editLinkComment", rootID: linkID, commentID: commentID,
-                           replyTarget: nil, isEdit: true)
-        }
-    }
-}
-
 @MainActor @Observable
 final class ComposerModel {
     let intent: ComposerIntent
@@ -192,22 +130,3 @@ final class ComposerModel {
         }
     }
 }
-
-#if DEBUG
-@MainActor
-final class FixtureComposerSubmitter: ComposerSubmitting {
-    func submit(intent: ComposerIntent, text: String, adult: Bool,
-                photoKey: String?) async throws -> NativeResource {
-        let target = intent.target
-        let kind: NativeResourceKind
-        switch target.kind {
-        case "createEntry", "editEntry": kind = .entry
-        case "createEntryComment", "editEntryComment": kind = .entryComment
-        default: kind = .linkComment
-        }
-        return NativeResource(sourceID: target.isEdit ? (target.commentID ?? target.rootID ?? 801) : 801,
-                              kind: kind, body: text, adult: adult,
-                              parentID: kind == .entry ? nil : target.rootID)
-    }
-}
-#endif

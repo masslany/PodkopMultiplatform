@@ -1,43 +1,6 @@
 import Foundation
+import Observation
 import PodkopShared
-
-struct HitsArchive: Hashable {
-    static let startYear = 2007
-    static let startMonth = 12
-    let year: Int
-    let month: Int
-
-    static func isAvailable(year: Int, month: Int, now: Date = Date(),
-                            calendar: Calendar = .current) -> Bool {
-        let current = calendar.dateComponents([.year, .month], from: now)
-        guard let maxYear = current.year, let maxMonth = current.month,
-              (1...12).contains(month), (startYear...maxYear).contains(year) else { return false }
-        if year == startYear && month < startMonth { return false }
-        if year == maxYear && month > maxMonth { return false }
-        return true
-    }
-}
-
-struct NativeRankUser: Identifiable, Equatable {
-    let username: String
-    var avatarURL: String? = nil
-    let color: String
-    let gender: String
-    let memberSince: String?
-    let position: Int
-    let trend: Int
-    let actions: Int
-    let links: Int
-    let entries: Int
-    let followers: Int
-    var id: String { username }
-}
-
-struct NativeObservedItem: Identifiable {
-    let resource: NativeResource
-    let newContentCount: Int?
-    var id: String { "\(resource.id):\(resource.parentID ?? 0)" }
-}
 
 @MainActor protocol CollectionLoading {
     func hitsFirstRequest() -> FeedRequest
@@ -120,29 +83,3 @@ final class SharedCollectionLoader: CollectionLoading {
         }, next: page.next.map(FeedRequest.init), total: page.total?.intValue)
     }
 }
-
-#if DEBUG
-@MainActor
-final class FixtureCollectionLoader: CollectionLoading {
-    private let first = FeedRequest(kind: "number", value: "1")
-    func hitsFirstRequest() -> FeedRequest { first }
-    func hits(sort: String, archive: HitsArchive?, request: FeedRequest, loaded: Int) async throws
-        -> ListPage<NativeResource> { ListPage(items: [ContentFixtures.link], next: nil, total: 1) }
-    func rankFirstRequest() -> FeedRequest { first }
-    func rank(request: FeedRequest, loaded: Int) async throws -> ListPage<NativeRankUser> {
-        ListPage(items: [NativeRankUser(username: "Ewa-Żółw", color: "orange", gender: "female",
-                                        memberSince: "2012-03-01T10:00", position: 1, trend: 2,
-                                        actions: 120, links: 10, entries: 90, followers: 400)],
-                 next: nil, total: 1)
-    }
-    func favouritesFirstRequest(isLoggedIn: Bool) -> FeedRequest { FeedRequest(kind: "initial") }
-    func favourites(sort: String, type: String, request: FeedRequest, loaded: Int) async throws
-        -> ListPage<NativeResource> { ListPage(items: [ContentFixtures.entry], next: nil, total: 1) }
-    func observedFirstRequest() -> FeedRequest { FeedRequest(kind: "initial") }
-    func observed(type: String, request: FeedRequest, loaded: Int) async throws
-        -> ListPage<NativeObservedItem> {
-        ListPage(items: [NativeObservedItem(resource: ContentFixtures.link, newContentCount: 3)],
-                 next: nil, total: 1)
-    }
-}
-#endif

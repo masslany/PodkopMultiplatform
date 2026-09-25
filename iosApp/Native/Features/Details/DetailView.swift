@@ -186,7 +186,6 @@ struct NativeDetailView: View {
     }
 
     private func actions(for resource: NativeResource, replyParentID: Int? = nil) -> ResourceActions {
-        #if DEBUG
         let commentAction: (() -> Void)? = {
             if model.kind == .link {
                 dependencies.router.presentComposer(.createLinkComment(
@@ -197,9 +196,6 @@ struct NativeDetailView: View {
                     entryID: model.id, replyTarget: replyParentID == nil ? nil : resource.author?.name))
             }
         }
-        #else
-        let commentAction: (() -> Void)? = nil
-        #endif
         return ResourceActions(
             openAuthor: { dependencies.router.navigate(.user($0)) },
             openTag: { dependencies.router.navigate(.tag($0)) },

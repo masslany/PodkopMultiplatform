@@ -2,41 +2,6 @@ import SwiftUI
 import Observation
 import PodkopShared
 
-enum ResourceLinkBuilder {
-    static func url(for resource: NativeResource, root: NativeResource,
-                    parentCommentID: Int? = nil) -> URL? {
-        let base: String
-        switch resource.kind {
-        case .entry:
-            base = "https://wykop.pl/wpis/\(resource.sourceID)"
-        case .entryComment:
-            base = "https://wykop.pl/wpis/\(root.sourceID)/#\(resource.sourceID)"
-        case .link:
-            guard !root.slug.isEmpty else { return nil }
-            base = "https://wykop.pl/link/\(root.sourceID)/\(root.slug)"
-        case .linkComment:
-            guard !root.slug.isEmpty else { return nil }
-            let prefix = "https://wykop.pl/link/\(root.sourceID)/\(root.slug)/komentarz/"
-            if let parentCommentID, parentCommentID != resource.sourceID {
-                base = "\(prefix)\(parentCommentID)#\(resource.sourceID)"
-            } else {
-                base = "\(prefix)\(resource.sourceID)"
-            }
-        case .unknown:
-            return nil
-        }
-        return URL(string: base)
-    }
-}
-
-struct VoterTarget: Identifiable {
-    let kind: String
-    let rootID: Int
-    let commentID: Int?
-    let side: String
-    var id: String { "\(kind):\(rootID):\(commentID ?? 0):\(side)" }
-}
-
 struct NativeResourceActionsSheet: View {
     let resource: NativeResource
     let root: NativeResource
@@ -75,7 +40,6 @@ struct NativeResourceActionsSheet: View {
                     }
                     Button("Select text") { textSelection = true }
                 }
-                #if DEBUG
                 if resource.editable {
                     Button("Edit") {
                         let intent: ComposerIntent
@@ -93,7 +57,6 @@ struct NativeResourceActionsSheet: View {
                         dependencies.router.presentComposer(intent, seed: resource)
                     }
                 }
-                #endif
                 if resource.deletable && (resource.kind == .entry || resource.kind == .entryComment) {
                     Button("Delete", role: .destructive) { confirmDelete = true }
                 }
@@ -138,200 +101,5 @@ struct NativeResourceActionsSheet: View {
                                       commentID: resource.kind == .entryComment ? resource.sourceID : nil,
                                       side: side)
         }
-    }
-}
-
-struct NativeScreenshotPreview: View {
-    let resource: NativeResource
-    let parent: NativeResource?
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.mediaLoader) private var loader
-    @State private var includeParent = true
-    @State private var image: UIImage?
-    @State private var photoBytes: [String: Data] = [:]
-    @State private var message: String?
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    if parent != nil {
-                        Toggle("Include parent", isOn: $includeParent)
-                    }
-                    if let image {
-                        Image(uiImage: image).resizable().scaledToFit()
-                            .accessibilityLabel("Screenshot preview")
-                        if let data = image.pngData() {
-                            ImageExportControls(data: data) { message = $0 }
-                        }
-                        if let message {
-                            Text(message).font(.footnote).foregroundStyle(.secondary)
-                        }
-                    } else {
-                        ContentUnavailableView {
-                            Label("Could not create screenshot", systemImage: "photo")
-                        } actions: {
-                            Button("Retry") { render() }
-                        }
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle("Screenshot preview")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } }
-            }
-        }
-        .task { await loadPhotos(); render() }
-        .onChange(of: includeParent) { _, _ in render() }
-    }
-
-    /// Fetches the photos shown in the screenshot so the rendered image includes them.
-    private func loadPhotos() async {
-        guard let loader else { return }
-        for url in [resource.photo?.url, parent?.photo?.url].compactMap({ $0 }) where photoBytes[url] == nil {
-            photoBytes[url] = try? await loader.bytes(for: url)
-        }
-    }
-
-    private func render() {
-        image = NativeScreenshotSurface.render(resource: resource, parent: includeParent ? parent : nil,
-                                               photoBytes: photoBytes)
-    }
-}
-
-struct NativeVoter: Identifiable {
-    let username: String
-    let avatarURL: String
-    let verified: Bool
-    let reason: String?
-    var id: String { username }
-}
-
-struct VoterPage {
-    let items: [NativeVoter]
-    let total: Int?
-}
-
-@MainActor protocol VoterLoading {
-    func load(target: VoterTarget, page: Int) async throws -> VoterPage
-}
-
-@MainActor
-final class SharedVoterLoader: VoterLoading {
-    private let client: PodkopClient
-    private let adapter: BridgeAdapter
-
-    init(client: PodkopClient, adapter: BridgeAdapter) {
-        self.client = client
-        self.adapter = adapter
-    }
-
-    func load(target: VoterTarget, page: Int) async throws -> VoterPage {
-        let value: IOSVoterPage = try await adapter.call {
-            self.client.voters.load(kind: target.kind, rootId: Int32(target.rootID),
-                                    commentId: target.commentID.map { KotlinInt(int: Int32($0)) },
-                                    side: target.side, page: Int32(page), completion: $0)
-        }
-        return VoterPage(items: value.items.map {
-            NativeVoter(username: $0.username, avatarURL: $0.avatarUrl,
-                        verified: $0.verified, reason: $0.reason)
-        }, total: value.total?.intValue)
-    }
-}
-
-#if DEBUG
-@MainActor
-final class FixtureVoterLoader: VoterLoading {
-    func load(target: VoterTarget, page: Int) async throws -> VoterPage {
-        VoterPage(items: page == 1
-            ? [NativeVoter(username: "Ewa-Żółw", avatarURL: "", verified: true, reason: nil)] : [],
-                  total: 1)
-    }
-}
-#endif
-
-@MainActor @Observable
-final class VoterModel {
-    private(set) var voters: [NativeVoter] = []
-    private(set) var loading = false
-    private(set) var failed = false
-    private(set) var exhausted = false
-    private var page = 1
-    private var task: Task<Void, Never>?
-    let target: VoterTarget
-    private let loader: VoterLoading
-
-    init(target: VoterTarget, loader: VoterLoading) {
-        self.target = target
-        self.loader = loader
-    }
-
-    func load() {
-        guard !loading, !exhausted else { return }
-        loading = true
-        failed = false
-        let requestedPage = page
-        task = Task { [weak self] in
-            guard let self else { return }
-            do {
-                let value = try await loader.load(target: target, page: requestedPage)
-                guard !Task.isCancelled else { return }
-                let fresh = value.items.filter { item in !voters.contains { $0.username == item.username } }
-                voters.append(contentsOf: fresh)
-                page += 1
-                exhausted = value.items.isEmpty || fresh.isEmpty ||
-                    value.total.map { voters.count >= $0 } == true
-            } catch is CancellationError {
-                return
-            } catch {
-                failed = true
-            }
-            loading = false
-            task = nil
-        }
-    }
-
-    func stop() { task?.cancel(); task = nil; loading = false }
-}
-
-struct NativeVotersSheet: View {
-    let target: VoterTarget
-    let dependencies: AppDependencies
-    @State private var model: VoterModel
-    @Environment(\.dismiss) private var dismiss
-
-    init(target: VoterTarget, dependencies: AppDependencies) {
-        self.target = target
-        self.dependencies = dependencies
-        _model = State(initialValue: VoterModel(target: target, loader: dependencies.voterLoader))
-    }
-
-    var body: some View {
-        NavigationStack {
-            List {
-                ForEach(model.voters) { voter in
-                    Button { dismiss(); dependencies.router.navigate(.user(voter.username)) } label: {
-                        HStack {
-                            Circle().fill(.blue.opacity(0.15)).frame(width: 32, height: 32)
-                                .overlay(Text(String(voter.username.prefix(1)).uppercased()))
-                            Text(voter.username)
-                            if voter.verified { Image(systemName: "checkmark.seal.fill") }
-                            if let reason = voter.reason { Text(reason).foregroundStyle(.secondary) }
-                        }
-                    }
-                    .onAppear { if voter.username == model.voters.last?.username { model.load() } }
-                }
-                if model.loading { ProgressView() }
-                if model.failed { Button("Retry") { model.load() } }
-                if model.exhausted && model.voters.isEmpty { Text("Nothing here yet") }
-            }
-            .navigationTitle("Voters")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } }
-            }
-        }
-        .task { model.load() }
-        .onDisappear { model.stop() }
     }
 }
