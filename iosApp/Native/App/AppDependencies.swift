@@ -84,6 +84,18 @@ final class AppDependencies {
         #endif
         return SharedTagLoader(client: client, adapter: adapter)
     }()
+    lazy var profileLoader: ProfileLoading = {
+        #if DEBUG
+        if isFixture { return FixtureProfileLoader() }
+        #endif
+        return SharedProfileLoader(client: client, adapter: adapter)
+    }()
+    lazy var blacklistsLoader: BlacklistsLoading = {
+        #if DEBUG
+        if isFixture { return FixtureBlacklistsLoader() }
+        #endif
+        return SharedBlacklistsLoader(client: client, adapter: adapter)
+    }()
     private var isFixture: Bool {
         #if DEBUG
         ProcessInfo.processInfo.arguments.contains("-nativeFixture")

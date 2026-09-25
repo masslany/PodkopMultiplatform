@@ -8,6 +8,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import io.ktor.util.reflect.TypeInfo
 import pl.masslany.podkop.common.network.api.ApiClient
+import pl.masslany.podkop.common.network.api.HttpStatusFailure
 import pl.masslany.podkop.common.network.infrastructure.main.mapper.toHttpRequestBuilder
 import pl.masslany.podkop.common.network.models.request.Request
 import pl.masslany.podkop.common.network.models.response.ApiResponse
@@ -49,7 +50,7 @@ internal class ApiClientImpl(
 internal class ApiHttpException(
     val status: HttpStatusCode,
     val responseBody: String?,
-) : Exception(
+) : HttpStatusFailure, Exception(
     buildString {
         append("HTTP ")
         append(status.value)
@@ -63,6 +64,8 @@ internal class ApiHttpException(
             }
     },
 ) {
+    override val statusCode: Int get() = status.value
+
     private companion object {
         const val MAX_ERROR_BODY_LENGTH = 500
     }

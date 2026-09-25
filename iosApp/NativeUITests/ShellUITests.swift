@@ -233,5 +233,48 @@ final class ShellUITests: XCTestCase {
         app.buttons["tagGallery"].tap()
         XCTAssertFalse(app.descendants(matching: .any)["resource-entry:102"].exists)
     }
+
+    func testFixtureProfileFromRankShowsDetailsAndSections() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Rank"].tap()
+        XCTAssertTrue(app.staticTexts["Ewa-Żółw"].waitForExistence(timeout: 5))
+        app.staticTexts["Ewa-Żółw"].tap()
+        XCTAssertTrue(app.buttons["profileObserve"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["resource-entry:102"].waitForExistence(timeout: 5))
+        app.buttons["profileDetails"].tap()
+        XCTAssertTrue(app.staticTexts["Weteran"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.textFields["profileNote"].exists || app.textViews["profileNote"].exists)
+        app.buttons["profileSummary-following"].tap()
+        XCTAssertTrue(app.staticTexts["#technologia"].waitForExistence(timeout: 5))
+    }
+
+    func testFixtureOwnProfileHasNoViewerActions() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Profile"].tap()
+        XCTAssertTrue(app.buttons["profileDetails"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["profileObserve"].exists)
+        XCTAssertFalse(app.buttons["profileBlacklist"].exists)
+    }
+
+    func testFixtureBlacklistAddAndConfirmedRemove() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Blacklists"].tap()
+        XCTAssertTrue(app.buttons["spamer"].waitForExistence(timeout: 5))
+        app.segmentedControls["blacklistCategory"].buttons.element(boundBy: 1).tap()
+        XCTAssertTrue(app.buttons["#polityka"].waitForExistence(timeout: 5))
+        let input = app.textFields["blacklistInput"]
+        input.tap()
+        input.typeText("#Sport")
+        app.buttons["blacklistAdd"].tap()
+        XCTAssertTrue(app.buttons["#sport"].waitForExistence(timeout: 5))
+        app.buttons["Remove #polityka"].tap()
+        XCTAssertTrue(app.alerts.buttons["Remove"].waitForExistence(timeout: 5))
+        app.alerts.buttons["Remove"].tap()
+        XCTAssertTrue(app.buttons["#polityka"].waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["#sport"].exists)
+    }
 }
 

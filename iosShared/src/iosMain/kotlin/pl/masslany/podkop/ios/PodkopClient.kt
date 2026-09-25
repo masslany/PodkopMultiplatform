@@ -14,6 +14,7 @@ import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.usePinned
 import io.ktor.client.plugins.ResponseException
+import pl.masslany.podkop.common.network.api.HttpStatusFailure
 import org.koin.core.KoinApplication
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -196,6 +197,8 @@ class PodkopClient private constructor(
     val favourites = FavouritesService(this)
     val observed = ObservedService(this)
     val tag = TagService(this)
+    val profile = ProfileService(this)
+    val blacklists = BlacklistsService(this)
     val voters = VotersService()
     val embeds = EmbedsService()
 
@@ -869,19 +872,23 @@ internal fun IOSPageRequest.toDomain(): PageRequest = when (kind) {
     else -> error("invalid request")
 }
 
-private fun Throwable.toIOSFailure(): IOSFailure = when (this) {
+internal fun Throwable.toIOSFailure(): IOSFailure = when (this) {
     is IllegalArgumentException -> IOSFailure("validation")
-    is ResponseException -> IOSFailure(
-        category = when (response.status.value) {
-            400, 422 -> "validation"
-            401 -> "unauthorized"
-            403 -> "forbidden"
-            404 -> "notFound"
-            429 -> "rateLimited"
-            in 500..599 -> "server"
-            else -> "unknown"
-        },
-        code = response.status.value.toString(),
-    )
+    is HttpStatusFailure -> httpFailure(statusCode)
+    is ResponseException -> httpFailure(response.status.value)
     else -> IOSFailure("unknown")
 }
+
+/** The API client reports HTTP errors as [HttpStatusFailure]; Ktor's own exceptions are kept as a fallback. */
+internal fun httpFailure(status: Int): IOSFailure = IOSFailure(
+    category = when (status) {
+        400, 422 -> "validation"
+        401 -> "unauthorized"
+        403 -> "forbidden"
+        404 -> "notFound"
+        429 -> "rateLimited"
+        in 500..599 -> "server"
+        else -> "unknown"
+    },
+    code = status.toString(),
+)

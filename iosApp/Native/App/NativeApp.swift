@@ -157,12 +157,14 @@ private struct TabContent: View {
             List {
                 Section {
                     if session.isLoggedIn {
+                        routeButton("Profile", symbol: "person", route: .profile)
                         routeButton("Favorites", symbol: "star", route: .favorites)
                         routeButton("Observed", symbol: "eye", route: .observed)
+                        // Android reaches blacklists from Settings; this entry moves there with T09.
+                        routeButton("Blacklists", symbol: "hand.raised", route: .blacklists)
                     }
                     #if DEBUG
                     if session.isLoggedIn {
-                        routeButton("Profile", symbol: "person", route: .profile)
                         routeButton("Messages", symbol: "envelope", route: .messages)
                         routeButton("Notifications", symbol: "bell", route: .notifications)
                         routeButton("Add link", symbol: "link.badge.plus", route: .addLink)
@@ -231,10 +233,11 @@ private struct TabContent: View {
         case .advancedSearch(let query):
             NativeAdvancedSearchView(initialQuery: query, tab: tab, dependencies: dependencies)
         case .tags: DevelopmentView(title: String(localized: "Tags"))
-        case .profile: DevelopmentView(title: String(localized: "Profile"))
+        case .profile: NativeProfileView(username: nil, tab: tab, dependencies: dependencies)
         case .tag(let name): NativeTagView(tag: name, tab: tab, dependencies: dependencies)
-        case .user(let name): DevelopmentView(title: name)
+        case .user(let name): NativeProfileView(username: name, tab: tab, dependencies: dependencies)
         case .settings: DevelopmentView(title: String(localized: "Settings"))
+        case .blacklists: NativeBlacklistsView(tab: tab, dependencies: dependencies)
         case .favorites: NativeFavouritesView(tab: tab, dependencies: dependencies)
         case .observed: NativeObservedView(tab: tab, dependencies: dependencies)
         case .hits: NativeHitsView(tab: tab, dependencies: dependencies)

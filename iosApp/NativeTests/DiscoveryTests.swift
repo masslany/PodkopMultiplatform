@@ -3,7 +3,7 @@ import XCTest
 
 /// Suspends each call until the test completes it, so response order is under test control.
 @MainActor
-private final class Pending<Value> {
+final class Pending<Value> {
     private(set) var calls: [(input: String, finish: (Result<Value, Error>) -> Void)] = []
 
     func wait(_ input: String) async throws -> Value {
@@ -16,7 +16,7 @@ private final class Pending<Value> {
 }
 
 @MainActor
-private final class ControlledSuggestions: SearchSuggesting {
+final class ControlledSuggestions: SearchSuggesting {
     let tagCalls = Pending<[NativeTagSuggestion]>()
     let userCalls = Pending<[NativeUserSuggestion]>()
     func tags(_ query: String) async throws -> [NativeTagSuggestion] { try await tagCalls.wait(query) }

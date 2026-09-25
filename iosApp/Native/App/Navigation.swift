@@ -36,6 +36,7 @@ enum AppRoute: Hashable, Codable {
     case profile
     case user(String)
     case settings
+    case blacklists
     case favorites
     case observed
     case hits
@@ -45,7 +46,7 @@ enum AppRoute: Hashable, Codable {
 
     var needsAccount: Bool {
         switch self {
-        case .messages, .notifications, .profile, .favorites, .observed, .addLink: true
+        case .messages, .notifications, .profile, .favorites, .observed, .addLink, .blacklists: true
         default: false
         }
     }
