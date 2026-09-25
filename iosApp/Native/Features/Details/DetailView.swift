@@ -6,6 +6,9 @@ struct NativeDetailView: View {
     let dependencies: AppDependencies
     @State private var actionTarget: NativeResource?
     @State private var downvoteTarget: NativeResource?
+    /// Where the link title ends in the scroll content, and how far the page has scrolled.
+    @State private var titleBottom: CGFloat?
+    @State private var scrolledTop: CGFloat = 0
 
     init(kind: NativeResourceKind, id: Int, dependencies: AppDependencies) {
         _model = State(initialValue: DetailModel(kind: kind, id: id,
@@ -33,7 +36,8 @@ struct NativeDetailView: View {
                         NativeResourceCard(resource: resource, actions: actions(for: resource),
                                            style: .detailHeader,
                                            autoplayGifs: dependencies.session.autoplayGifs,
-                                           isForeground: dependencies.isForeground)
+                                           isForeground: dependencies.isForeground,
+                                           onTitleBottom: { titleBottom = $0 })
                             .padding(.horizontal, resource.kind == .link ? 0 : 16)
                             .padding(.top, resource.kind == .link && resource.photo != nil ? 0 : 12)
                     }
@@ -51,6 +55,10 @@ struct NativeDetailView: View {
             .padding(.bottom, 20)
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
+            .coordinateSpace(name: NativeResourceCard.detailContentSpace)
+        }
+        .onScrollGeometryChange(for: CGFloat.self) { $0.contentOffset.y + $0.contentInsets.top } action: { _, top in
+            scrolledTop = top
         }
         .refreshable { model.reload() }
         .task { model.start() }
@@ -76,9 +84,30 @@ struct NativeDetailView: View {
                 }
             }
         }
-        .navigationTitle(model.kind == .link ? String(localized: "Link") : String(localized: "Entry"))
+        .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            // Links start with an empty bar and show their title once it scrolls under it.
+            if model.kind == .link {
+                ToolbarItem(placement: .principal) {
+                    Text(showsLinkTitle ? model.resource?.title ?? "" : "")
+                        .font(.headline)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .animation(.easeInOut(duration: 0.15), value: showsLinkTitle)
+                }
+            }
+        }
         .accessibilityIdentifier("detail-\(model.kind.rawValue)-\(model.id)")
+    }
+
+    private var navigationTitle: String {
+        model.kind == .link ? String(localized: "Link") : String(localized: "Entry")
+    }
+
+    private var showsLinkTitle: Bool {
+        guard let titleBottom else { return false }
+        return scrolledTop > titleBottom
     }
 
     private var commentsSection: some View {

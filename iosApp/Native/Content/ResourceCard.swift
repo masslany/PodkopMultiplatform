@@ -24,8 +24,13 @@ struct NativeResourceCard: View {
     var isForeground = true
     /// Off when a surrounding thread card carries this resource's identifier.
     var identified = true
+    /// Detail header only: reports the bottom of the title in the `detailContent` coordinate
+    /// space, so the screen can show the title in the navigation bar once it scrolls away.
+    var onTitleBottom: ((CGFloat) -> Void)?
     @State private var adultRevealed = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    static let detailContentSpace = "detailContent"
 
     private var isComment: Bool { resource.kind == .entryComment || resource.kind == .linkComment }
     private var adultHidden: Bool { resource.adult && !adultRevealed && resource.deletion == nil }
@@ -130,6 +135,9 @@ struct NativeResourceCard: View {
                 Text(resource.title)
                     .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .onGeometryChange(for: CGFloat.self) {
+                        $0.frame(in: .named(NativeResourceCard.detailContentSpace)).maxY
+                    } action: { onTitleBottom?($0) }
             }
             .padding(.horizontal, 16)
             if resource.deletion == nil, !resource.description.isEmpty {
