@@ -185,7 +185,7 @@ jobs:
           EOF
 
       - name: Verify KMP shared modules
-        run: ./gradlew --stacktrace :common:allTests :business:allTests :composeApp:allTests :composeApp:checkXcodeProjectConfiguration
+        run: ./gradlew --stacktrace :common:allTests :business:allTests :composeApp:allTests
 
       - name: Upload KMP failure reports
         if: failure()
@@ -199,8 +199,8 @@ jobs:
             build/reports/problems
           if-no-files-found: ignore
 
-  verify-native-ios:
-    name: Build and test native iOS
+  verify-ios:
+    name: Build and test iOS
     runs-on: macos-latest
     timeout-minutes: 60
 
@@ -263,43 +263,43 @@ jobs:
       - name: Compile the device framework
         run: ./gradlew --stacktrace :iosShared:linkDebugFrameworkIosArm64
 
-      - name: Build native Simulator and device targets
+      - name: Build Simulator and device targets
         shell: bash
         run: |
           for configuration in Debug Release; do
-            xcodebuild -project iosApp/iosApp.xcodeproj -scheme PodkopNative \
+            xcodebuild -project iosApp/iosApp.xcodeproj -scheme Podkop \
               -configuration "$configuration" -destination 'generic/platform=iOS Simulator' \
-              -derivedDataPath "$RUNNER_TEMP/podkop-native-derived" \
+              -derivedDataPath "$RUNNER_TEMP/podkop-ios-derived" \
               CODE_SIGNING_ALLOWED=NO build
           done
-          xcodebuild -project iosApp/iosApp.xcodeproj -scheme PodkopNative \
+          xcodebuild -project iosApp/iosApp.xcodeproj -scheme Podkop \
             -configuration Release -destination 'generic/platform=iOS' \
-            -derivedDataPath "$RUNNER_TEMP/podkop-native-derived" \
+            -derivedDataPath "$RUNNER_TEMP/podkop-ios-derived" \
             CODE_SIGNING_ALLOWED=NO build
 
-      - name: Run native unit and fixture UI tests
+      - name: Run unit and fixture UI tests
         shell: bash
         run: |
           set -euo pipefail
-          xcodebuild -project iosApp/iosApp.xcodeproj -scheme PodkopNative \
+          xcodebuild -project iosApp/iosApp.xcodeproj -scheme Podkop \
             -configuration Debug -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' \
-            -derivedDataPath "$RUNNER_TEMP/podkop-native-derived" \
-            -resultBundlePath "$RUNNER_TEMP/podkop-native-tests.xcresult" \
+            -derivedDataPath "$RUNNER_TEMP/podkop-ios-derived" \
+            -resultBundlePath "$RUNNER_TEMP/podkop-ios-tests.xcresult" \
             -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test \
-            2>&1 | tee "$RUNNER_TEMP/podkop-native-tests.log"
-          grep -Fq 'PodkopNativeTests.xctest' "$RUNNER_TEMP/podkop-native-tests.log"
-          grep -Fq 'PodkopNativeUITests.xctest' "$RUNNER_TEMP/podkop-native-tests.log"
-          grep -Eq 'Executed [1-9][0-9]* tests' "$RUNNER_TEMP/podkop-native-tests.log"
-          grep -Fq '** TEST SUCCEEDED **' "$RUNNER_TEMP/podkop-native-tests.log"
+            2>&1 | tee "$RUNNER_TEMP/podkop-ios-tests.log"
+          grep -Fq 'PodkopTests.xctest' "$RUNNER_TEMP/podkop-ios-tests.log"
+          grep -Fq 'PodkopUITests.xctest' "$RUNNER_TEMP/podkop-ios-tests.log"
+          grep -Eq 'Executed [1-9][0-9]* tests' "$RUNNER_TEMP/podkop-ios-tests.log"
+          grep -Fq '** TEST SUCCEEDED **' "$RUNNER_TEMP/podkop-ios-tests.log"
 
-      - name: Upload native test results
+      - name: Upload iOS test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: native-ios-test-results
+          name: ios-test-results
           path: |
-            ${{ runner.temp }}/podkop-native-tests.xcresult
-            ${{ runner.temp }}/podkop-native-tests.log
+            ${{ runner.temp }}/podkop-ios-tests.xcresult
+            ${{ runner.temp }}/podkop-ios-tests.log
           if-no-files-found: ignore
 
   coverage:

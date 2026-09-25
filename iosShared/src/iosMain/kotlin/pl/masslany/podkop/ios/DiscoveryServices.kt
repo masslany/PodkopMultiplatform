@@ -371,7 +371,7 @@ internal fun PaginatedData<*>.nextAfter(mode: PaginationMode, request: PageReque
     nextPageRequest(mode, request, pagination, received = data.size, loaded = loaded)?.toIOS()
 
 /**
- * Mirrors the Android `Paginator` stop rules so native lists page identically: a cursor that did
+ * Mirrors the Android `Paginator` stop rules so Swift lists page identically: a cursor that did
  * not advance, an empty page, a reached total, or a short numbered page ends the list.
  */
 internal fun nextPageRequest(

@@ -17,11 +17,11 @@ import platform.Foundation.NSURLRequestUseProtocolCachePolicy
 import platform.Foundation.create
 import pl.masslany.podkop.common.network.api.HttpStatusFailure
 
-/** Raw image bytes for native decoding; [mimeType] is the server's content type when known. */
+/** Raw image bytes for decoding in Swift; [mimeType] is the server's content type when known. */
 class IOSMediaBytes(val data: NSData, val mimeType: String?)
 
 /**
- * Downloads public media (photos, embed thumbnails, avatars, badges) for native rendering.
+ * Downloads public media (photos, embed thumbnails, avatars, badges) for rendering in Swift.
  *
  * Uses its own unauthenticated client so API tokens are never sent to image hosts, accepts only
  * http(s) URLs, caps each response at [MAX_BYTES], and keeps a bounded on-disk HTTP cache that
