@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct NativeProfileView: View {
+    @Environment(\.openURL) private var openURL
     @State private var model: ProfileModel
     let tab: AppTab
     let dependencies: AppDependencies
@@ -254,7 +255,7 @@ struct NativeProfileView: View {
         switch row {
         case .resource(let item):
             NativeResourceCard(resource: item,
-                               actions: .navigation(for: item, in: tab, dependencies: dependencies),
+                               actions: .navigation(for: item, in: tab, dependencies: dependencies, openURL: openURL),
                                autoplayGifs: dependencies.session.autoplayGifs,
                                isForeground: dependencies.isForeground)
         case .user(let name, let color, let gender, let online, let verified, let avatarURL):

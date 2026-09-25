@@ -4,7 +4,7 @@ extension ResourceActions {
     /// Navigation-only card actions shared by feeds and discovery lists.
     @MainActor
     static func navigation(for item: NativeResource, in tab: AppTab,
-                           dependencies: AppDependencies) -> ResourceActions {
+                           dependencies: AppDependencies, openURL: OpenURLAction) -> ResourceActions {
         let router = dependencies.router
         let open: (() -> Void)? = switch item.kind {
         case .link: { router.navigate(.link(item.sourceID), in: tab) }
@@ -17,7 +17,7 @@ extension ResourceActions {
             open: open,
             openAuthor: { router.navigate(.user($0), in: tab) },
             openTag: { router.navigate(.tag($0), in: tab) },
-            openURL: { UIApplication.shared.open($0) },
+            openURL: { openURL($0) },
             comment: open,
             loadTweet: { try await dependencies.loadTweet($0) }
         )
@@ -26,6 +26,7 @@ extension ResourceActions {
 
 /// Resource rows for a `ListPager`, including empty, failure, and next-page states.
 struct PagedResourceRows: View {
+    @Environment(\.openURL) private var openURL
     let pager: ListPager<NativeResource>
     let tab: AppTab
     let dependencies: AppDependencies
@@ -58,7 +59,7 @@ struct PagedResourceRows: View {
                 ForEach(pager.items) { item in
                     NativeResourceCard(
                         resource: item,
-                        actions: .navigation(for: item, in: tab, dependencies: dependencies),
+                        actions: .navigation(for: item, in: tab, dependencies: dependencies, openURL: openURL),
                         autoplayGifs: dependencies.session.autoplayGifs,
                         isForeground: dependencies.isForeground
                     )

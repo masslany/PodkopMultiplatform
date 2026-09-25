@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct NativeNotificationsView: View {
+    @Environment(\.openURL) private var openURL
     @State private var model: NotificationsModel
     let tab: AppTab
     let dependencies: AppDependencies
@@ -91,7 +92,7 @@ struct NativeNotificationsView: View {
         case .conversation(let name): router.navigate(.conversation(name), in: tab)
         case .profile(let name): router.navigate(.user(name), in: tab)
         case .tag(let name): router.navigate(.tag(name), in: tab)
-        case .external(let url): UIApplication.shared.open(url)
+        case .external(let url): openURL(url)
         case .none: return
         }
         model.opened(row)

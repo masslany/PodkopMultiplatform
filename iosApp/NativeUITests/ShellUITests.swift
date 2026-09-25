@@ -62,6 +62,9 @@ final class ShellUITests: XCTestCase {
         app.buttons["Share as screenshot"].tap()
         XCTAssertTrue(app.switches["Include parent"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.images["Screenshot preview"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["imageSave"].exists)
+        XCTAssertTrue(app.buttons["imageCopy"].exists)
+        XCTAssertTrue(app.buttons["imageShare"].exists)
         app.switches["Include parent"].tap()
         XCTAssertTrue(app.images["Screenshot preview"].exists)
     }
@@ -373,4 +376,3 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["ktor-client-core"].waitForExistence(timeout: 5))
     }
 }
-

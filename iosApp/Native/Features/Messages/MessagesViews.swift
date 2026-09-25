@@ -280,6 +280,7 @@ struct NativeConversationView: View {
 }
 
 private struct MessageBubble: View {
+    @Environment(\.openURL) private var openURL
     let message: NativeMessage
     let tab: AppTab
     let dependencies: AppDependencies
@@ -297,7 +298,7 @@ private struct MessageBubble: View {
                             source: content, deletion: nil, muted: false,
                             onProfile: { dependencies.router.navigate(.user($0), in: tab) },
                             onTag: { dependencies.router.navigate(.tag($0), in: tab) },
-                            onURL: { UIApplication.shared.open($0) }
+                            onURL: { openURL($0) }
                         )
                     }
                     if let photo = message.photo {
@@ -305,7 +306,7 @@ private struct MessageBubble: View {
                                         foreground: dependencies.isForeground)
                     }
                     if let raw = message.embedURL, let url = URL(string: raw) {
-                        Button("Open link") { UIApplication.shared.open(url) }.font(.caption)
+                        Button("Open link") { openURL(url) }.font(.caption)
                     }
                 }
                 Text(message.createdAt.formatted(.relative(presentation: .named))).font(.caption2).foregroundStyle(.secondary)

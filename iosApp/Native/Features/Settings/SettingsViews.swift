@@ -1,4 +1,7 @@
 import SwiftUI
+#if DEBUG
+import UserNotifications
+#endif
 
 struct NativeSettingsView: View {
     @State private var model: SettingsModel
@@ -134,11 +137,30 @@ struct NativeDebugView: View {
                 Button("Open") { open(linkID, invalid: $linkInvalid) { .link($0) } }
             }
             Section {
+                Button("Show test notification") {
+                    Task {
+                        do {
+                            let center = UNUserNotificationCenter.current()
+                            guard try await center.requestAuthorization(options: [.alert, .sound]) else {
+                                dependencies.router.banner = String(localized: "Notifications are disabled in Settings.")
+                                return
+                            }
+                            let content = UNMutableNotificationContent()
+                            content.title = String(localized: "Podkop test notification")
+                            content.body = String(localized: "Notifications are working on this device.")
+                            let request = UNNotificationRequest(identifier: UUID().uuidString,
+                                content: content, trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false))
+                            try await center.add(request)
+                        } catch {
+                            dependencies.router.banner = String(localized: "Could not complete this action. Try again.")
+                        }
+                    }
+                }
                 Button("Show test banner") {
                     dependencies.router.banner = String(localized: "Could not complete this action. Try again.")
                 }
             } footer: {
-                Text("Android's test private-message notification has no iOS counterpart until background delivery is decided (D03).")
+                Text("Test notifications are local. Background private-message delivery still needs a platform decision (D03).")
             }
         }
         .navigationTitle("Debug tools")

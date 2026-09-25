@@ -314,6 +314,7 @@ struct NativeFavouritesView: View {
 }
 
 struct NativeObservedView: View {
+    @Environment(\.openURL) private var openURL
     @State private var model: ObservedModel
     let tab: AppTab
     let dependencies: AppDependencies
@@ -371,7 +372,7 @@ struct NativeObservedView: View {
                         }
                         NativeResourceCard(
                             resource: item.resource,
-                            actions: .navigation(for: item.resource, in: tab, dependencies: dependencies),
+                            actions: .navigation(for: item.resource, in: tab, dependencies: dependencies, openURL: openURL),
                             autoplayGifs: dependencies.session.autoplayGifs,
                             isForeground: dependencies.isForeground
                         )

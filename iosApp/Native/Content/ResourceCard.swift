@@ -29,6 +29,7 @@ struct NativeResourceCard: View {
     let resource: NativeResource
     var actions: ResourceActions = .none
     var photoBytes: Data?
+    var screenshotPhoto: UIImage?
     var embedThumbnailBytes: Data?
     var autoplayGifs = false
     var isForeground = true
@@ -67,8 +68,15 @@ struct NativeResourceCard: View {
                     NativeSurveyView(survey: survey, vote: actions.surveyVote)
                 }
                 if let photo = resource.photo, resource.deletion == nil {
-                    NativeMediaView(photo: photo, bytes: photoBytes,
-                                    autoplay: autoplayGifs, foreground: isForeground)
+                    if let screenshotPhoto {
+                        Image(uiImage: screenshotPhoto.images?.first ?? screenshotPhoto)
+                            .resizable().scaledToFit()
+                            .frame(maxWidth: .infinity)
+                            .frame(height: min(320, max(120, 320 * CGFloat(photo.height) / CGFloat(max(photo.width, 1)))))
+                    } else {
+                        NativeMediaView(photo: photo, bytes: photoBytes,
+                                        autoplay: autoplayGifs, foreground: isForeground)
+                    }
                 }
                 if let embed = resource.embed, resource.deletion == nil {
                     NativeEmbedCard(embed: embed, thumbnailBytes: embedThumbnailBytes,

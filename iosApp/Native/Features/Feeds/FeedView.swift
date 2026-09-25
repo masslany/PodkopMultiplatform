@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct NativeFeedView: View {
+    @Environment(\.openURL) private var openURL
     @State private var model: FeedModel
     let router: AppRouter
     let session: SessionModel
@@ -184,7 +185,7 @@ struct NativeFeedView: View {
             open: open,
             openAuthor: { router.navigate(.user($0), in: model.query.tab) },
             openTag: { router.navigate(.tag($0), in: model.query.tab) },
-            openURL: { UIApplication.shared.open($0) },
+            openURL: { openURL($0) },
             comment: open,
             loadTweet: { try await dependencies.loadTweet($0) }
         )

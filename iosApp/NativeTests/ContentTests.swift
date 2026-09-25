@@ -107,6 +107,34 @@ final class ContentTests: XCTestCase {
         XCTAssertGreaterThan(image?.size.height ?? 0, 200)
     }
 
+    func testExportKeepsSourceImageFormat() {
+        XCTAssertEqual(PlatformExport.fileExtension(for: Data([0x47, 0x49, 0x46, 0x38])), "gif")
+        XCTAssertEqual(PlatformExport.fileExtension(for: Data([0x89, 0x50, 0x4e, 0x47])), "png")
+        XCTAssertEqual(PlatformExport.fileExtension(for: Data([0xff, 0xd8, 0xff])), "jpg")
+        XCTAssertNil(PlatformExport.fileExtension(for: Data([0x00, 0x01])))
+    }
+
+    func testScreenshotRendersLoadedPhotoBytes() {
+        let photo = NativePhoto(url: "fixture://photo", width: 64, height: 40,
+                                mimeType: "image/png", key: "photo")
+        let resource = NativeResource(sourceID: 500, kind: .entry, body: "Photo",
+                                      photo: photo)
+        func imageData(_ color: UIColor) -> Data {
+            UIGraphicsImageRenderer(size: CGSize(width: 64, height: 40)).pngData { context in
+                color.setFill()
+                context.fill(CGRect(x: 0, y: 0, width: 64, height: 40))
+            }
+        }
+        let red = NativeScreenshotSurface.render(resource: resource,
+            photoBytes: [photo.url: imageData(.red)])?.pngData()
+        NativeImageDecoder.shared.clear()
+        let blue = NativeScreenshotSurface.render(resource: resource,
+            photoBytes: [photo.url: imageData(.blue)])?.pngData()
+        NativeImageDecoder.shared.clear()
+        XCTAssertNotNil(red)
+        XCTAssertNotEqual(red, blue, "Screenshot rendering must use the loaded photo, not a loading placeholder")
+    }
+
     func testAnimatedImageFrameCountIsBoundedAndDownsampled() {
         let frames = (0..<30).map { index in
             UIGraphicsImageRenderer(size: CGSize(width: 700, height: 700)).image { context in

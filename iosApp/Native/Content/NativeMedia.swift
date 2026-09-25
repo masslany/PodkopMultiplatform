@@ -130,6 +130,7 @@ struct NativeMediaView: View {
     @State private var visible = true
     @State private var loadedBytes: Data?
     @State private var loadFailed = false
+    @State private var viewerBytes: Data?
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.mediaLoader) private var loader
 
@@ -143,6 +144,11 @@ struct NativeMediaView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: displayHeight)
                     .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                    .contentShape(Rectangle())
+                    .onTapGesture { viewerBytes = bytes }
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityHint("Opens the image")
+                    .accessibilityIdentifier("mediaImage")
                 if photo.isAnimated {
                     Button((playbackOverride ?? autoplay) ? "Pause animation" : "Play animation") {
                         playbackOverride = !(playbackOverride ?? autoplay)
@@ -161,6 +167,9 @@ struct NativeMediaView: View {
         }
         .onAppear { visible = true }
         .onDisappear { visible = false }
+        .fullScreenCover(isPresented: Binding(get: { viewerBytes != nil }, set: { if !$0 { viewerBytes = nil } })) {
+            if let viewerBytes { NativeImageViewerScreen(bytes: viewerBytes, key: photo.url) }
+        }
         .task(id: photo.url) {
             guard bytes == nil, loadedBytes == nil, let loader else { return }
             do { loadedBytes = try await loader.bytes(for: photo.url) }
@@ -201,6 +210,40 @@ struct NativeImageViewer: View {
     }
 }
 
+/// Full-screen zoomable image with save, copy and share, like Android's image viewer.
+struct NativeImageViewerScreen: View {
+    let bytes: Data
+    let key: String
+    @Environment(\.dismiss) private var dismiss
+    @State private var message: String?
+
+    var body: some View {
+        NavigationStack {
+            NativeImageViewer(bytes: bytes, key: key)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.black)
+                .safeAreaInset(edge: .bottom) {
+                    VStack(spacing: 8) {
+                        if let message {
+                            Text(message).font(.footnote).foregroundStyle(.white)
+                                .accessibilityIdentifier("imageMessage")
+                        }
+                        ImageExportControls(data: bytes) { message = $0 }
+                            .tint(.white)
+                    }
+                    .padding()
+                }
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Close") { dismiss() }.tint(.white)
+                    }
+                }
+                .toolbarBackground(.black, for: .navigationBar)
+                .preferredColorScheme(.dark)
+        }
+    }
+}
+
 private struct ZoomableImage: UIViewRepresentable {
     let image: UIImage
 
@@ -236,17 +279,27 @@ private struct ZoomableImage: UIViewRepresentable {
 
 @MainActor
 enum NativeScreenshotSurface {
+    /// Renders synchronously, so remote images must be passed in as bytes keyed by URL.
     static func render(resource: NativeResource, parent: NativeResource? = nil,
+                       photoBytes: [String: Data] = [:],
                        width: CGFloat = 390, scale: CGFloat = 2) -> UIImage? {
         let surface = VStack(spacing: 8) {
-            if let parent { NativeResourceCard(resource: parent) }
-            NativeResourceCard(resource: resource)
+            if let parent {
+                NativeResourceCard(resource: parent, screenshotPhoto: screenshotPhoto(for: parent, bytes: photoBytes))
+            }
+            NativeResourceCard(resource: resource, screenshotPhoto: screenshotPhoto(for: resource, bytes: photoBytes))
         }
+        .environment(\.mediaLoader, nil)
         .padding()
         .frame(width: width)
         .background(Color(uiColor: .systemBackground))
         let renderer = ImageRenderer(content: surface)
         renderer.scale = scale
         return renderer.uiImage
+    }
+
+    private static func screenshotPhoto(for resource: NativeResource, bytes: [String: Data]) -> UIImage? {
+        guard let photo = resource.photo, let data = bytes[photo.url] else { return nil }
+        return NativeImageDecoder.shared.image(from: data, key: photo.url, maxDimension: 1200)
     }
 }

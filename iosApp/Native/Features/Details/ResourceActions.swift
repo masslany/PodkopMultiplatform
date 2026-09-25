@@ -145,8 +145,11 @@ struct NativeScreenshotPreview: View {
     let resource: NativeResource
     let parent: NativeResource?
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.mediaLoader) private var loader
     @State private var includeParent = true
     @State private var image: UIImage?
+    @State private var photoBytes: [String: Data] = [:]
+    @State private var message: String?
 
     var body: some View {
         NavigationStack {
@@ -158,10 +161,12 @@ struct NativeScreenshotPreview: View {
                     if let image {
                         Image(uiImage: image).resizable().scaledToFit()
                             .accessibilityLabel("Screenshot preview")
-                        ShareLink(item: Image(uiImage: image), preview: SharePreview("Screenshot")) {
-                            Label("Share screenshot", systemImage: "square.and.arrow.up")
+                        if let data = image.pngData() {
+                            ImageExportControls(data: data) { message = $0 }
                         }
-                        .buttonStyle(.borderedProminent)
+                        if let message {
+                            Text(message).font(.footnote).foregroundStyle(.secondary)
+                        }
                     } else {
                         ContentUnavailableView {
                             Label("Could not create screenshot", systemImage: "photo")
@@ -177,13 +182,21 @@ struct NativeScreenshotPreview: View {
                 ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } }
             }
         }
-        .onAppear { render() }
+        .task { await loadPhotos(); render() }
         .onChange(of: includeParent) { _, _ in render() }
     }
 
+    /// Fetches the photos shown in the screenshot so the rendered image includes them.
+    private func loadPhotos() async {
+        guard let loader else { return }
+        for url in [resource.photo?.url, parent?.photo?.url].compactMap({ $0 }) where photoBytes[url] == nil {
+            photoBytes[url] = try? await loader.bytes(for: url)
+        }
+    }
+
     private func render() {
-        image = NativeScreenshotSurface.render(resource: resource,
-                                               parent: includeParent ? parent : nil)
+        image = NativeScreenshotSurface.render(resource: resource, parent: includeParent ? parent : nil,
+                                               photoBytes: photoBytes)
     }
 }
 

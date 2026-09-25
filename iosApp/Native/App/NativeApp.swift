@@ -1,18 +1,37 @@
 import SwiftUI
 import PodkopShared
+#if DEBUG
+import UserNotifications
+#endif
 
 @main
 struct PodkopNativeApp: App {
+    #if DEBUG
+    init() { UNUserNotificationCenter.current().delegate = DebugNotificationDelegate.shared }
+    #endif
+
     var body: some Scene {
         WindowGroup { NativeRoot(dependencies: .shared) }
     }
 }
+
+#if DEBUG
+private final class DebugNotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = DebugNotificationDelegate()
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        [.banner, .sound]
+    }
+}
+#endif
 
 private struct NativeRoot: View {
     let dependencies: AppDependencies
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
     @State private var sceneID = UUID()
+    @State private var externalPage: ExternalPage?
 
     private var session: SessionModel { dependencies.session }
     private var router: AppRouter { dependencies.router }
@@ -46,6 +65,13 @@ private struct NativeRoot: View {
             }
         }
         .environment(\.mediaLoader, dependencies.mediaLoader)
+        .environment(\.openURL, OpenURLAction { url in
+            guard ["http", "https"].contains(url.scheme?.lowercased() ?? "") else {
+                return .systemAction(url)
+            }
+            externalPage = ExternalPage(url: url)
+            return .handled
+        })
         .preferredColorScheme(session.theme.colorScheme)
         .animation(.easeOut(duration: 0.25), value: session.phase)
         .task { session.startIfNeeded() }
@@ -80,6 +106,7 @@ private struct NativeRoot: View {
                 }
             }
         }
+        .sheet(item: $externalPage) { page in NativeSafariView(url: page.url) }
         .alert(item: Binding(get: { router.alert }, set: { router.alert = $0 })) { alert in
             Alert(title: Text(alert.title), message: Text(alert.message), dismissButton: .default(Text("OK")))
         }
@@ -118,6 +145,11 @@ private struct NativeRoot: View {
                 .buttonStyle(.borderedProminent)
         }
     }
+}
+
+private struct ExternalPage: Identifiable {
+    let id = UUID()
+    let url: URL
 }
 
 private struct TabContent: View {

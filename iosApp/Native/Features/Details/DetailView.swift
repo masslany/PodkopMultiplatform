@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct NativeDetailView: View {
+    @Environment(\.openURL) private var openURL
     @State private var model: DetailModel
     let dependencies: AppDependencies
     @State private var actionTarget: NativeResource?
@@ -202,7 +203,7 @@ struct NativeDetailView: View {
         return ResourceActions(
             openAuthor: { dependencies.router.navigate(.user($0)) },
             openTag: { dependencies.router.navigate(.tag($0)) },
-            openURL: { UIApplication.shared.open($0) },
+            openURL: { openURL($0) },
             voteUp: resource.vote.canUp || resource.vote.canUndo ? {
                 requireAccount {
                     model.submit(.voteUp(resource, remove: resource.vote.state == "positive"))
