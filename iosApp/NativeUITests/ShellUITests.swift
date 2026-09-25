@@ -172,7 +172,8 @@ final class ShellUITests: XCTestCase {
         spoiler.tap()
         XCTAssertTrue(app.staticTexts["Ukryty tekst ze spoilerem."].exists)
         let adult = app.buttons["Show adult content"]
-        app.swipeUp()
+        // The gallery height varies with text layout, so scroll until the card is reachable.
+        for _ in 0..<4 where !adult.isHittable { app.swipeUp() }
         XCTAssertTrue(adult.waitForExistence(timeout: 5))
         adult.tap()
         XCTAssertTrue(app.staticTexts["Treść tylko dla dorosłych z wieloma zdaniami."].exists)

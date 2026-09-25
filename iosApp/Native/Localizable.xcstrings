@@ -110,7 +110,6 @@
     "Sign in" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zaloguj się" } } } },
     "Sign in to continue" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zaloguj się, aby kontynuować" } } } },
     "Sign out" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wyloguj się" } } } },
-    "Starting Podkop…" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Uruchamianie Podkopu…" } } } },
     "Tags" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Tagi" } } } },
     "This link cannot be opened." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Nie można otworzyć tego odnośnika." } } } },
     "This screen is in development." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Ten ekran jest w przygotowaniu." } } } },

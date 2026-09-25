@@ -21,7 +21,8 @@ private struct NativeRoot: View {
         Group {
             switch session.phase {
             case .initializing:
-                ProgressView(String(localized: "Starting Podkop…"))
+                NativeSplashView()
+                    .transition(.opacity)
             case .missingConfiguration:
                 startupProblem(
                     title: String(localized: "Configuration required"),
@@ -44,6 +45,7 @@ private struct NativeRoot: View {
                 #endif
             }
         }
+        .animation(.easeOut(duration: 0.25), value: session.phase)
         .task { session.startIfNeeded() }
         .onChange(of: scenePhase, initial: true) { _, phase in
             dependencies.scene(sceneID, active: phase == .active)
@@ -98,7 +100,7 @@ private struct NativeRoot: View {
                 TabView(selection: Binding(get: { router.selectedTab }, set: { router.selectedTab = $0 })) {
                     ForEach(AppTab.allCases) { tab in
                         TabContent(tab: tab, dependencies: dependencies)
-                            .tabItem { Label(tab.title, systemImage: tab.symbol) }
+                            .tabItem { Label(tab.title, image: tab.image) }
                             .tag(tab)
                     }
                 }

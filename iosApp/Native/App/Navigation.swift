@@ -14,6 +14,16 @@ enum AppTab: String, CaseIterable, Codable, Identifiable {
         }
     }
 
+    /// Tab bar icons drawn from the Android navigation vectors (home, shovel, "m", more).
+    var image: String {
+        switch self {
+        case .links: "TabHome"
+        case .upcoming: "TabUpcoming"
+        case .entries: "TabEntries"
+        case .more: "TabMore"
+        }
+    }
+
     var symbol: String {
         switch self {
         case .links: "link"
