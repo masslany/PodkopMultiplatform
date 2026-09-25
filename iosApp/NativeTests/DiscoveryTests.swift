@@ -302,4 +302,87 @@ final class DiscoveryTests: XCTestCase {
         XCTAssertNil(model.archive)
         XCTAssertEqual(loader.requests.map(\.archive), [HitsArchive(year: 2020, month: 5), nil])
     }
+
+    // MARK: Tag (P29)
+
+    func testTagTogglesApplyOnlyAfterConfirmationAndUnobserveClearsNotifications() async {
+        let loader = ControlledTag()
+        let model = TagModel(tag: "nauka", isLoggedIn: true, loader: loader)
+        model.start()
+        await settle()
+        loader.detailCalls.succeed(0, NativeTagDetails(name: "nauka", description: "", followers: 1,
+                                                       bannerURL: nil, observed: true,
+                                                       notificationsEnabled: true, blacklisted: false))
+        await settle()
+        model.toggle(.observe)
+        model.toggle(.observe)
+        await settle()
+        XCTAssertEqual(loader.mutations.calls.map(\.input), ["observe:false"], "duplicate taps are ignored")
+        XCTAssertEqual(model.details?.observed, true, "no optimistic change")
+        loader.mutations.succeed(0, ())
+        await settle()
+        XCTAssertEqual(model.details?.observed, false)
+        XCTAssertEqual(model.details?.notificationsEnabled, false)
+        model.toggle(.notifications)
+        await settle()
+        XCTAssertEqual(loader.mutations.calls.count, 1, "notifications need an observed tag")
+    }
+
+    func testTagActionFailureKeepsStateAndGuestsCannotAct() async {
+        let loader = ControlledTag()
+        let model = TagModel(tag: "nauka", isLoggedIn: true, loader: loader)
+        model.start()
+        await settle()
+        loader.detailCalls.succeed(0, NativeTagDetails(name: "nauka", description: "", followers: 1,
+                                                       bannerURL: nil, observed: false,
+                                                       notificationsEnabled: false, blacklisted: false))
+        await settle()
+        model.toggle(.blacklist)
+        await settle()
+        loader.mutations.fail(0)
+        await settle()
+        XCTAssertEqual(model.details?.blacklisted, false)
+        XCTAssertTrue(model.actionFailed)
+        XCTAssertTrue(model.pending.isEmpty)
+        model.setSession(false)
+        model.toggle(.observe)
+        await settle()
+        XCTAssertEqual(loader.mutations.calls.count, 1)
+        XCTAssertNil(model.details, "account-specific tag state is reloaded after a session change")
+        XCTAssertEqual(loader.firstRequests, [true, false])
+    }
+
+    func testTagGalleryShowsOnlyEntriesWithPhotos() async {
+        let loader = ControlledTag()
+        let model = TagModel(tag: "nauka", isLoggedIn: false, loader: loader)
+        model.start()
+        await settle()
+        let photo = NativePhoto(url: "https://example.com/a.jpg", width: 1, height: 1, mimeType: "image/jpeg", key: "k")
+        loader.pages.succeed(0, ListPage(items: [
+            NativeResource(sourceID: 1, kind: .entry, body: "", photo: photo),
+            NativeResource(sourceID: 2, kind: .entry, body: ""),
+            NativeResource(sourceID: 3, kind: .link, body: "", photo: photo),
+        ], next: nil, total: nil))
+        await settle()
+        XCTAssertEqual(model.galleryItems.map(\.sourceID), [1])
+    }
 }
+
+@MainActor
+private final class ControlledTag: TagLoading {
+    let detailCalls = Pending<NativeTagDetails>()
+    let pages = Pending<ListPage<NativeResource>>()
+    let mutations = Pending<Void>()
+    private(set) var firstRequests: [Bool] = []
+    func firstRequest(isLoggedIn: Bool) -> FeedRequest {
+        firstRequests.append(isLoggedIn)
+        return FeedRequest(kind: "initial")
+    }
+    func details(_ tag: String) async throws -> NativeTagDetails { try await detailCalls.wait(tag) }
+    func stream(_ tag: String, sort: String, type: String, request: FeedRequest, loaded: Int) async throws
+        -> ListPage<NativeResource> { try await pages.wait(type) }
+    func setObserved(_ tag: String, _ enabled: Bool) async throws { try await mutations.wait("observe:\(enabled)") }
+    func setNotifications(_ tag: String, _ enabled: Bool) async throws { try await mutations.wait("notify:\(enabled)") }
+    func setBlacklisted(_ tag: String, _ enabled: Bool) async throws { try await mutations.wait("block:\(enabled)") }
+}
+

@@ -219,7 +219,16 @@
     "Use the date format YYYY-MM-DD HH:MM:SS." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Użyj formatu yyyy-MM-dd HH:mm:ss" } } } },
     "Users" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Ludzie" } } } },
     "Week" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Tydzień" } } } },
-    "Year" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Rok" } } } }
+    "Year" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Rok" } } } },
+    "Observe" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Obserwuj" } } } },
+    "Observing" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Obserwujesz" } } } },
+    "Block tag" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zablokuj tag" } } } },
+    "Unblock tag" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Odblokuj tag" } } } },
+    "Enable tag notifications" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Włącz powiadomienia dla tagu" } } } },
+    "Disable tag notifications" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wyłącz powiadomienia dla tagu" } } } },
+    "Could not load the tag." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wystąpił problem podczas wczytywania tagu" } } } },
+    "No images in entries for this tag" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Brak obrazów we wpisach dla tego tagu" } } } },
+    "OK" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "OK" } } } }
   },
   "version" : "1.0"
 }

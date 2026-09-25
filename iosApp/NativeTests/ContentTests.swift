@@ -26,6 +26,7 @@ final class ContentTests: XCTestCase {
         )
         let resource = NativeResource(payload)
         XCTAssertEqual(resource.id, "unknown:77")
+        XCTAssertEqual(resource.description, "Description", "Kotlin exports description as description_")
         XCTAssertEqual(resource.deletion, .moderator)
         XCTAssertEqual(resource.author?.name, "Ewa")
         XCTAssertEqual(resource.author?.color, "green")

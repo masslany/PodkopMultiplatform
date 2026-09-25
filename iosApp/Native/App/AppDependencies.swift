@@ -78,6 +78,12 @@ final class AppDependencies {
         #endif
         return SharedCollectionLoader(client: client, adapter: adapter)
     }()
+    lazy var tagLoader: TagLoading = {
+        #if DEBUG
+        if isFixture { return FixtureTagLoader() }
+        #endif
+        return SharedTagLoader(client: client, adapter: adapter)
+    }()
     private var isFixture: Bool {
         #if DEBUG
         ProcessInfo.processInfo.arguments.contains("-nativeFixture")

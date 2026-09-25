@@ -215,4 +215,23 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["resource-link:101"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["3 new comments on an observed link"].exists)
     }
+
+    func testFixtureTagFromSearchObservesAndShowsGallery() {
+        let app = launch("authenticated")
+        app.buttons["Search"].firstMatch.tap()
+        let field = app.searchFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText("tech")
+        XCTAssertTrue(app.staticTexts["#technologia"].waitForExistence(timeout: 5))
+        app.staticTexts["#technologia"].tap()
+        XCTAssertTrue(app.buttons["tagObserve"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["tagNotifications"].exists)
+        app.buttons["tagObserve"].tap()
+        XCTAssertTrue(app.buttons["tagNotifications"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["resource-entry:102"].waitForExistence(timeout: 5))
+        app.buttons["tagGallery"].tap()
+        XCTAssertFalse(app.descendants(matching: .any)["resource-entry:102"].exists)
+    }
 }
+

@@ -232,7 +232,7 @@ private struct TabContent: View {
             NativeAdvancedSearchView(initialQuery: query, tab: tab, dependencies: dependencies)
         case .tags: DevelopmentView(title: String(localized: "Tags"))
         case .profile: DevelopmentView(title: String(localized: "Profile"))
-        case .tag(let name): DevelopmentView(title: "#\(name)")
+        case .tag(let name): NativeTagView(tag: name, tab: tab, dependencies: dependencies)
         case .user(let name): DevelopmentView(title: name)
         case .settings: DevelopmentView(title: String(localized: "Settings"))
         case .favorites: NativeFavouritesView(tab: tab, dependencies: dependencies)

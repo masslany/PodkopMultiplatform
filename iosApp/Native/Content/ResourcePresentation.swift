@@ -91,7 +91,7 @@ struct NativeResource: Identifiable, Hashable {
         kind = NativeResourceKind(rawValue: value.kind) ?? .unknown
         title = value.title
         body = value.content
-        description = value.description
+        description = value.description_
         author = value.author.map {
             NativeAuthor(name: $0, avatarURL: value.authorAvatarUrl,
                          color: value.authorColor, verified: value.authorVerified,

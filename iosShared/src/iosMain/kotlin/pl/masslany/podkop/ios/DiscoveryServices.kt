@@ -1,6 +1,7 @@
 package pl.masslany.podkop.ios
 
 import pl.masslany.podkop.business.auth.domain.AuthRepository
+import pl.masslany.podkop.business.blacklists.domain.main.BlacklistsRepository
 import pl.masslany.podkop.business.common.domain.models.common.Gender
 import pl.masslany.podkop.business.common.domain.models.common.NameColor
 import pl.masslany.podkop.business.common.domain.models.common.PaginatedData
@@ -23,6 +24,8 @@ import pl.masslany.podkop.business.search.domain.models.request.SearchSort
 import pl.masslany.podkop.business.search.domain.models.request.SearchStreamQuery
 import pl.masslany.podkop.business.search.domain.models.request.withSearchFallbackPagination
 import pl.masslany.podkop.business.tags.domain.main.TagsRepository
+import pl.masslany.podkop.business.tags.domain.models.request.TagsSort
+import pl.masslany.podkop.business.tags.domain.models.request.TagsType
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.PaginationMode
 import pl.masslany.podkop.common.pagination.initialRequest
@@ -50,6 +53,16 @@ class IOSRankUser(
     val followers: Int,
 )
 class IOSRankPage(val items: List<IOSRankUser>, val next: IOSPageRequest?, val total: Int?)
+
+class IOSTagDetails(
+    val name: String,
+    val description: String,
+    val followers: Int,
+    val bannerUrl: String?,
+    val observed: Boolean,
+    val notificationsEnabled: Boolean,
+    val blacklisted: Boolean,
+)
 
 /** Opaque, already validated advanced search request. The date window is fixed when built. */
 class IOSSearchQuery internal constructor(internal val value: SearchStreamQuery)
@@ -261,6 +274,86 @@ class ObservedService internal constructor(private val client: PodkopClient) {
             next = result.nextAfter(PaginationMode.CursorInPage, page, loaded),
             total = result.pagination?.total,
         )
+    }
+}
+
+class TagService internal constructor(private val client: PodkopClient) {
+    private val tagsRepository: TagsRepository = client.koin.get()
+    private val blacklistsRepository: BlacklistsRepository = client.koin.get()
+    private val authRepository: AuthRepository = client.koin.get()
+
+    fun firstRequest(isLoggedIn: Boolean): IOSPageRequest =
+        FeaturePaginationPolicies.tagStream(isLoggedIn).initialRequest().toIOS()
+
+    fun details(tag: String, completion: (IOSTagDetails?, IOSFailure?) -> Unit): IOSOperation =
+        client.operation(completion) {
+            val details = tagsRepository.getTagDetails(tag.normalizedTag()).getOrThrow()
+            IOSTagDetails(
+                name = details.name,
+                description = details.description,
+                followers = details.followers,
+                bannerUrl = (details.media?.photo?.url ?: details.media?.embed?.thumbnail)
+                    ?.takeIf(String::isNotBlank),
+                observed = details.isObserved,
+                notificationsEnabled = details.areNotificationsEnabled,
+                blacklisted = details.isBlacklisted,
+            )
+        }
+
+    /** [sort]: all, best. [type]: all, link, entry. */
+    fun stream(
+        tag: String,
+        sort: String,
+        type: String,
+        request: IOSPageRequest,
+        loaded: Int,
+        completion: (IOSResourceListPage?, IOSFailure?) -> Unit,
+    ): IOSOperation = client.operation(completion) {
+        val sortType = when (sort) {
+            "all" -> TagsSort.All
+            "best" -> TagsSort.Best
+            else -> throw IllegalArgumentException("invalid tag sort")
+        }
+        val streamType = when (type) {
+            "all" -> TagsType.All
+            "link" -> TagsType.Links
+            "entry" -> TagsType.Entries
+            else -> throw IllegalArgumentException("invalid tag type")
+        }
+        val mode = FeaturePaginationPolicies.tagStream(authRepository.isLoggedIn())
+        val page = request.toDomain()
+        tagsRepository.getTagStream(tag.normalizedTag(), page, null, sortType, streamType).getOrThrow()
+            .toResourceListPage(mode, page, loaded)
+    }
+
+    fun setObserved(tag: String, enabled: Boolean, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
+        client.operation(completion) {
+            val name = tag.normalizedTag()
+            (if (enabled) tagsRepository.observeTag(name) else tagsRepository.unobserveTag(name)).getOrThrow()
+            IOSSuccess()
+        }
+
+    fun setNotifications(
+        tag: String,
+        enabled: Boolean,
+        completion: (IOSSuccess?, IOSFailure?) -> Unit,
+    ): IOSOperation = client.operation(completion) {
+        val name = tag.normalizedTag()
+        (if (enabled) tagsRepository.enableTagNotifications(name) else tagsRepository.disableTagNotifications(name))
+            .getOrThrow()
+        IOSSuccess()
+    }
+
+    fun setBlacklisted(tag: String, enabled: Boolean, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
+        client.operation(completion) {
+            val name = tag.normalizedTag()
+            (if (enabled) blacklistsRepository.addBlacklistedTag(name) else blacklistsRepository.removeBlacklistedTag(name))
+                .getOrThrow()
+            IOSSuccess()
+        }
+
+    private fun String.normalizedTag(): String = trim().removePrefix("#").also {
+        require(it.isNotBlank()) { "empty tag" }
     }
 }
 

@@ -195,6 +195,7 @@ class PodkopClient private constructor(
     val rank = RankService(this)
     val favourites = FavouritesService(this)
     val observed = ObservedService(this)
+    val tag = TagService(this)
     val voters = VotersService()
     val embeds = EmbedsService()
 

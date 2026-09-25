@@ -53,6 +53,9 @@ struct NativeResourceCard: View {
                     .buttonStyle(.bordered)
                     .accessibilityHint("Reveals sensitive content")
             } else {
+                if resource.kind == .link, !resource.description.isEmpty, resource.deletion == nil {
+                    Text(resource.description).font(.subheadline).lineLimit(5)
+                }
                 NativeRichContent(
                     source: resource.body, deletion: resource.deletion,
                     muted: resource.vote.state == "negative",
