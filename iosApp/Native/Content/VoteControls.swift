@@ -1,44 +1,44 @@
 import SwiftUI
 
-/// Link vote badge: the outlined count Wykop shows beside a link title, with a flame when hot.
-/// Tapping digs or undigs when the viewer may vote (Android's `Count`).
+/// Link vote badge: the outlined count Wykop shows beside a link title (Android's `Count`).
+/// Three looks, as on Android: regular, hot (orange count with a flame) and voted (both faded to
+/// 60%). When the viewer cannot vote the badge looks the same but ignores taps.
 struct LinkVoteBadge: View {
     let vote: NativeVote
     let hot: Bool
     var pending = false
     var action: (() -> Void)?
 
-    private var voted: Bool { vote.state == "positive" }
+    private var voted: Bool { vote.state != "none" }
     private var enabled: Bool { action != nil && !pending }
 
     var body: some View {
-        Button { action?() } label: {
-            Text(vote.up.formatted())
-                .font(.subheadline.weight(.bold).monospacedDigit())
-                .minimumScaleFactor(0.6)
-                .lineLimit(1)
-                .foregroundStyle(hot ? WykopTheme.hotOrange : .primary)
-                .frame(width: 48, height: 32)
-                .background(voted ? WykopTheme.votePositive.opacity(0.18) : .clear,
-                            in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(voted ? WykopTheme.votePositive : Color.secondary.opacity(0.6), lineWidth: 2))
-                .overlay(alignment: .bottomTrailing) {
-                    if hot {
-                        Image(systemName: "flame.fill")
-                            .font(.system(size: 14))
-                            .foregroundStyle(WykopTheme.hotOrange)
-                            .offset(x: 6, y: 6)
-                    }
+        Text(vote.up.formatted())
+            .font(.subheadline.weight(.semibold).monospacedDigit())
+            .minimumScaleFactor(0.6)
+            .lineLimit(1)
+            .foregroundStyle((hot ? WykopTheme.hotOrange : Color.primary).opacity(voted ? 0.6 : 1))
+            .frame(width: 46, height: 32)
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Color.secondary.opacity(voted ? 0.6 : 1), lineWidth: 2))
+            .overlay(alignment: .bottomTrailing) {
+                if hot {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 18))
+                        .foregroundStyle(WykopTheme.hotOrange)
+                        .offset(x: 7, y: 7)
+                        .accessibilityHidden(true)
                 }
-                .opacity(pending ? 0.5 : 1)
-        }
-        .buttonStyle(.plain)
-        .disabled(!enabled)
-        .accessibilityLabel(String(localized: "Votes: \(vote.up)"))
-        .accessibilityValue(voted ? String(localized: "Dug") : "")
-        .accessibilityHint(enabled ? String(localized: voted ? "Removes your vote" : "Digs this link") : "")
-        .accessibilityIdentifier("voteBadge")
+            }
+            .opacity(pending ? 0.5 : 1)
+            .contentShape(RoundedRectangle(cornerRadius: 12))
+            .onTapGesture { if enabled { action?() } }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(String(localized: "Votes: \(vote.up)"))
+            .accessibilityValue(voted ? String(localized: "Dug") : "")
+            .accessibilityHint(enabled ? String(localized: voted ? "Removes your vote" : "Digs this link") : "")
+            .accessibilityAddTraits(enabled ? .isButton : [])
+            .accessibilityIdentifier("voteBadge")
     }
 }
 

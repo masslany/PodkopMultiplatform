@@ -76,8 +76,7 @@ struct NativeResourceCard: View {
                 HStack(alignment: .top, spacing: 10) {
                     Text(resource.description)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(4)
+                        .lineLimit(5)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     if let photo = resource.photo {
                         RemoteImage(url: photo.url, maxDimension: 240) { WykopTheme.cardInset }
@@ -91,9 +90,9 @@ struct NativeResourceCard: View {
         linkMeta(showsTime: true)
         HStack(alignment: .bottom, spacing: 8) {
             tags.frame(maxWidth: .infinity, alignment: .leading)
-            Label("\(resource.commentCount)", systemImage: "bubble.left")
+            Label("\(resource.commentCount)", systemImage: "text.bubble.fill")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.primary)
                 .accessibilityLabel(resource.kind == .link ? "Open link" : "Open entry")
                 .accessibilityValue(String(localized: "Comments") + ": \(resource.commentCount)")
                 .accessibilityAddTraits(.isButton)
