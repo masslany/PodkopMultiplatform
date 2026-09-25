@@ -349,7 +349,6 @@
     "Community" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Społeczność" } } } },
     "System" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "System" } } } },
     "My Wykop" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Mój wykop" } } } },
-    "Welcome to Wykop" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Witaj na Wykopie" } } } },
     "Sign in to dig, comment and follow people and tags." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zaloguj się, aby wykopywać, komentować i obserwować ludzi oraz tagi." } } } }
   },
   "version" : "1.0"
