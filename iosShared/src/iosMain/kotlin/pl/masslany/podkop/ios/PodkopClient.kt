@@ -207,6 +207,8 @@ class PodkopClient private constructor(
     val profile = ProfileService(this)
     val blacklists = BlacklistsService(this)
     val messages = MessagesService(this)
+    val mediaBytes = MediaBytesService(this)
+    val about = AboutService()
     val voters = VotersService()
     val embeds = EmbedsService()
 
@@ -214,6 +216,7 @@ class PodkopClient private constructor(
         if (closed) return
         closed = true
         scope.cancel()
+        mediaBytes.close()
         notificationsRepository.stopPolling()
         app.close()
         if (active === this) active = null

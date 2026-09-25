@@ -12,6 +12,7 @@ struct BlacklistEntry: Identifiable, Equatable {
     let value: String
     let color: String?
     let gender: String?
+    var avatarURL: String? = nil
     var id: String { "\(category.rawValue):\(value)" }
     var label: String { category == .tags ? "#\(value)" : value }
 }
@@ -48,7 +49,8 @@ final class SharedBlacklistsLoader: BlacklistsLoading {
                                         loaded: Int32(loaded), completion: $0)
         }
         return ListPage(items: page.items.map {
-            BlacklistEntry(category: category, value: $0.value, color: $0.color, gender: $0.gender)
+            BlacklistEntry(category: category, value: $0.value, color: $0.color, gender: $0.gender,
+                           avatarURL: $0.avatarUrl?.nonEmpty)
         }, next: page.next.map(FeedRequest.init), total: page.total?.intValue)
     }
 

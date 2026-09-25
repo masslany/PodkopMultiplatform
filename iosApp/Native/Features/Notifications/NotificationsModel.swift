@@ -35,6 +35,7 @@ struct NativeNotification: Identifiable, Equatable {
     let groupCount: Int
     let createdAt: Date
     let actor: String?
+    var actorAvatarURL: String? = nil
     let actorColor: String?
     let actorGender: String?
     let message: String?
@@ -56,6 +57,7 @@ struct NotificationRow: Identifiable, Equatable {
     let id: String
     let isRead: Bool
     let actor: String?
+    var actorAvatarURL: String? = nil
     let actorColor: String?
     let actorGender: String?
     let createdAt: Date
@@ -111,7 +113,8 @@ struct NotificationRow: Identifiable, Equatable {
 
     private static func single(_ item: NativeNotification) -> NotificationRow {
         NotificationRow(
-            id: item.id, isRead: item.isRead, actor: item.actor, actorColor: item.actorColor,
+            id: item.id, isRead: item.isRead, actor: item.actor, actorAvatarURL: item.actorAvatarURL,
+            actorColor: item.actorColor,
             actorGender: item.actorGender, createdAt: item.createdAt,
             notificationIDs: item.group == .pm ? [] : [item.id],
             headline: [item.message, item.issueTitle, item.badgeName, item.linkTitle, item.entryContent]
@@ -138,7 +141,8 @@ struct NotificationRow: Identifiable, Equatable {
     private static func groupedObserved(_ first: NativeNotification, _ members: [NativeNotification]) -> NotificationRow {
         NotificationRow(
             id: first.groupID.map { "group:\($0)" } ?? first.id, isRead: members.allSatisfy(\.isRead),
-            actor: first.actor, actorColor: first.actorColor, actorGender: first.actorGender,
+            actor: first.actor, actorAvatarURL: first.actorAvatarURL, actorColor: first.actorColor,
+            actorGender: first.actorGender,
             createdAt: first.createdAt, notificationIDs: members.map(\.id), headline: nil,
             groupCount: first.groupCount, tagName: nil, grouped: nil, observed: observedKind(first),
             observedTitle: observedTitle(first), target: first.target
@@ -198,7 +202,8 @@ final class SharedNotificationsLoader: NotificationsLoading {
                 id: value.id, group: NotificationGroupKind(rawValue: value.group) ?? group, isRead: value.isRead,
                 groupID: value.groupId, groupCount: Int(value.groupCount),
                 createdAt: Date(timeIntervalSince1970: Double(value.createdAtEpochMillis) / 1000),
-                actor: value.actorUsername, actorColor: value.actorColor, actorGender: value.actorGender,
+                actor: value.actorUsername, actorAvatarURL: value.actorAvatarUrl, actorColor: value.actorColor,
+                actorGender: value.actorGender,
                 message: value.message, issueTitle: value.issueTitle, badgeName: value.badgeName,
                 tagName: value.tagName, linkID: value.linkId?.intValue, linkTitle: value.linkTitle,
                 entryID: value.entryId?.intValue, entryContent: value.entryContent,

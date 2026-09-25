@@ -75,7 +75,8 @@ struct NativeResourceCard: View {
                                     loadTweet: actions.loadTweet, open: actions.openURL)
                 }
             }
-            if !resource.tags.isEmpty { tags }
+            // Entry hashtags are part of the text; like Android, only links get a separate tag row.
+            if resource.kind == .link, !resource.tags.isEmpty { tags }
             if resource.kind == .link, let source = resource.sourceLabel {
                 if let raw = resource.sourceURL, let url = URL(string: raw),
                    let openURL = actions.openURL {
@@ -113,12 +114,8 @@ struct NativeResourceCard: View {
 
     @ViewBuilder private var authorIdentity: some View {
         if let author = resource.author {
-            Circle().fill(ContentTokens.brand.opacity(0.16))
-                .frame(width: dynamicTypeSize.isAccessibilitySize ? 50 : 32,
-                       height: dynamicTypeSize.isAccessibilitySize ? 50 : 32)
-                .overlay(Text(String(author.name.prefix(1)).uppercased())
-                    .font(.system(size: dynamicTypeSize.isAccessibilitySize ? 24 : 14, weight: .bold)))
-                .accessibilityHidden(true)
+            AvatarView(url: author.avatarURL, name: author.name,
+                       size: dynamicTypeSize.isAccessibilitySize ? 50 : 32)
             if let openAuthor = actions.openAuthor {
                 Button(author.name) { openAuthor(author.name) }
                     .font(.subheadline.bold()).foregroundStyle(authorColor(author.color))
@@ -301,6 +298,8 @@ struct NativeEmbedCard: View {
                 if let bytes = thumbnailBytes, let url = tweet.mediaThumbnailURL {
                     NativeDecodedImage(bytes: bytes, cacheKey: url, maxDimension: 700)
                         .frame(height: 180)
+                } else if let url = tweet.mediaThumbnailURL {
+                    thumbnail(url)
                 }
                 Text("\(tweet.replies) ↩ · \(tweet.reposts) ↻ · \(tweet.likes) ♥")
                     .font(.caption).foregroundStyle(.secondary)
@@ -310,6 +309,8 @@ struct NativeEmbedCard: View {
                 if let bytes = thumbnailBytes {
                     NativeDecodedImage(bytes: bytes, cacheKey: embed.thumbnailURL, maxDimension: 700)
                         .frame(maxHeight: 220)
+                } else if !embed.thumbnailURL.isEmpty {
+                    thumbnail(embed.thumbnailURL)
                 }
             }
             if let url = URL(string: embed.url), let open {
@@ -325,6 +326,16 @@ struct NativeEmbedCard: View {
             catch is CancellationError { return }
             catch { failed = true }
         }
+    }
+
+    private func thumbnail(_ url: String) -> some View {
+        RemoteImage(url: url, maxDimension: 700) {
+            Rectangle().fill(.quaternary).overlay(ProgressView())
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 180)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .accessibilityHidden(true)
     }
 }
 

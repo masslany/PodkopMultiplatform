@@ -66,9 +66,16 @@ struct NativeProfileView: View {
 
     private func header(_ profile: NativeProfile) -> some View {
         VStack(alignment: .leading, spacing: 10) {
+            if let banner = profile.bannerURL {
+                RemoteImage(url: banner, maxDimension: 1200) { Rectangle().fill(.quaternary) }
+                    .frame(height: 120)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .accessibilityHidden(true)
+            }
             HStack(alignment: .top) {
                 UserIdentityRow(username: profile.username, color: profile.color, gender: profile.gender,
-                                detail: joined(profile))
+                                detail: joined(profile), avatarURL: profile.avatarURL)
                 Spacer()
                 if let rank = profile.rankPosition {
                     Text("#\(rank)").font(.headline.monospacedDigit()).foregroundStyle(.secondary)
@@ -250,10 +257,10 @@ struct NativeProfileView: View {
                                actions: .navigation(for: item, in: tab, dependencies: dependencies),
                                autoplayGifs: dependencies.session.autoplayGifs,
                                isForeground: dependencies.isForeground)
-        case .user(let name, let color, let gender, let online, let verified):
+        case .user(let name, let color, let gender, let online, let verified, let avatarURL):
             Button { router.navigate(.user(name), in: tab) } label: {
                 HStack {
-                    UserIdentityRow(username: name, color: color, gender: gender)
+                    UserIdentityRow(username: name, color: color, gender: gender, avatarURL: avatarURL)
                     if verified { Image(systemName: "checkmark.seal.fill").foregroundStyle(ContentTokens.brand)
                         .accessibilityLabel("Verified author") }
                     if online { Circle().fill(.green).frame(width: 7, height: 7).accessibilityLabel("Online") }

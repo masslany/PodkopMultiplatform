@@ -3,6 +3,7 @@ import PodkopShared
 
 struct NativeConversation: Identifiable, Equatable {
     let username: String
+    var avatarURL: String? = nil
     let color: String
     let gender: String
     let lastMessage: String?
@@ -68,7 +69,7 @@ final class SharedMessagesLoader: MessagesLoading {
             self.client.messages.conversations(request: self.bridge(request), loaded: Int32(loaded), completion: $0)
         }
         return ListPage(items: page.items.map {
-            NativeConversation(username: $0.username, color: $0.color, gender: $0.gender,
+            NativeConversation(username: $0.username, avatarURL: $0.avatarUrl, color: $0.color, gender: $0.gender,
                                lastMessage: $0.lastMessage, lastMessageAt: NativeDates.parse($0.lastMessageAt),
                                unread: $0.unread)
         }, next: page.next.map(FeedRequest.init), total: page.total?.intValue)

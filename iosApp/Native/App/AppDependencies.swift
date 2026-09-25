@@ -108,6 +108,18 @@ final class AppDependencies {
         #endif
         return SharedMessagesLoader(client: client, adapter: adapter)
     }()
+    lazy var mediaLoader: MediaLoading = {
+        #if DEBUG
+        if isFixture { return FixtureMediaLoader() }
+        #endif
+        return SharedMediaLoader(client: client, adapter: adapter)
+    }()
+    lazy var settingsService: SettingsServicing = {
+        #if DEBUG
+        if isFixture { return FixtureSettingsService(session: session) }
+        #endif
+        return SharedSettingsService(client: client, adapter: adapter, media: mediaLoader as? SharedMediaLoader)
+    }()
     private var isFixture: Bool {
         #if DEBUG
         ProcessInfo.processInfo.arguments.contains("-nativeFixture")
@@ -166,6 +178,7 @@ final class SessionModel {
     var unreadCount = 0
     var notificationCounts = NotificationCounts()
     var autoplayGifs = true
+    var theme: ThemeChoice = .auto
     var banner: String?
     var loginURL: URL?
     private unowned let dependencies: AppDependencies
@@ -242,6 +255,7 @@ final class SessionModel {
         observationTasks.append(Task {
             for await value in adapter.stream({ client.settings.observe(onChange: $0) }) {
                 autoplayGifs = value.autoplayGifs
+                theme = ThemeChoice(rawValue: value.themeOverride) ?? .auto
             }
         })
         Task { await start() }

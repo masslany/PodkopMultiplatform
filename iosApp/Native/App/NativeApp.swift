@@ -45,6 +45,8 @@ private struct NativeRoot: View {
                 #endif
             }
         }
+        .environment(\.mediaLoader, dependencies.mediaLoader)
+        .preferredColorScheme(session.theme.colorScheme)
         .animation(.easeOut(duration: 0.25), value: session.phase)
         .task { session.startIfNeeded() }
         .onChange(of: scenePhase, initial: true) { _, phase in
@@ -160,24 +162,12 @@ private struct TabContent: View {
                 Section {
                     if session.isLoggedIn {
                         routeButton("Profile", symbol: "person", route: .profile)
-                        routeButton("Favorites", symbol: "star", route: .favorites)
-                        routeButton("Observed", symbol: "eye", route: .observed)
-                        // Android reaches blacklists from Settings; this entry moves there with T09.
-                        routeButton("Blacklists", symbol: "hand.raised", route: .blacklists)
-                    }
-                    if session.isLoggedIn {
                         badgeRouteButton("Messages", symbol: "envelope", route: .messages,
                                          count: session.notificationCounts.pm)
                         badgeRouteButton("Notifications", symbol: "bell", route: .notifications,
                                          count: session.notificationCounts.total - session.notificationCounts.pm)
-                    }
-                    #if DEBUG
-                    if session.isLoggedIn {
-                        routeButton("Add link", symbol: "link.badge.plus", route: .addLink)
-                    }
-                    #endif
-                    if session.isLoggedIn {
-                        Button("Sign out") { Task { await session.logout() } }
+                        routeButton("Favorites", symbol: "star", route: .favorites)
+                        routeButton("Observed", symbol: "eye", route: .observed)
                     } else {
                         Button("Sign in") { router.sheet = .login }
                     }
@@ -188,12 +178,16 @@ private struct TabContent: View {
                     routeButton("Rank", symbol: "chart.bar", route: .rank)
                 }
                 #if DEBUG
+                if session.isLoggedIn {
+                    Section {
+                        routeButton("Add link", symbol: "link.badge.plus", route: .addLink)
+                    }
+                }
+                #endif
                 Section {
-                    routeButton("Tags", symbol: "number", route: .tags)
                     routeButton("Settings", symbol: "gear", route: .settings)
                     routeButton("About", symbol: "info.circle", route: .about)
                 }
-                #endif
             }
         } else {
             NativeFeedView(tab: tab, dependencies: dependencies)
@@ -261,14 +255,20 @@ private struct TabContent: View {
         case .profile: NativeProfileView(username: nil, tab: tab, dependencies: dependencies)
         case .tag(let name): NativeTagView(tag: name, tab: tab, dependencies: dependencies)
         case .user(let name): NativeProfileView(username: name, tab: tab, dependencies: dependencies)
-        case .settings: DevelopmentView(title: String(localized: "Settings"))
+        case .settings: NativeSettingsView(tab: tab, dependencies: dependencies)
         case .blacklists: NativeBlacklistsView(tab: tab, dependencies: dependencies)
         case .favorites: NativeFavouritesView(tab: tab, dependencies: dependencies)
         case .observed: NativeObservedView(tab: tab, dependencies: dependencies)
         case .hits: NativeHitsView(tab: tab, dependencies: dependencies)
         case .addLink: NativeLinkSubmissionView(dependencies: dependencies)
         case .rank: NativeRankView(tab: tab, dependencies: dependencies)
-        case .about: DevelopmentView(title: String(localized: "About"))
+        case .about: NativeAboutView(dependencies: dependencies)
+        case .debug:
+            #if DEBUG
+            NativeDebugView(tab: tab, dependencies: dependencies)
+            #else
+            EmptyView()
+            #endif
         }
     }
 }

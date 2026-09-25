@@ -114,6 +114,9 @@ struct NotificationRowView: View {
         HStack(alignment: .top, spacing: 10) {
             Circle().fill(row.isRead ? Color.clear : Color.red).frame(width: 8, height: 8).padding(.top, 6)
                 .accessibilityHidden(true)
+            if let actor = row.actor {
+                AvatarView(url: row.actorAvatarURL, name: actor, size: 32)
+            }
             VStack(alignment: .leading, spacing: 4) {
                 if let actor = row.actor {
                     Text(actor).font(.subheadline.bold()).foregroundStyle(authorColor(row.actorColor))

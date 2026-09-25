@@ -5,6 +5,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -15,6 +16,19 @@ abstract class GenerateAboutDependenciesMetadataTask : DefaultTask() {
 
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty
+
+    /** Package of the generated file; the Android About screen uses the default. */
+    @get:Input
+    abstract val packageName: Property<String>
+
+    /** Fully qualified notice type with the Android field names (name, artifact, license..., projectUrl). */
+    @get:Input
+    abstract val noticeType: Property<String>
+
+    init {
+        packageName.convention("pl.masslany.podkop.features.about.generated")
+        noticeType.convention("pl.masslany.podkop.features.about.OpenSourceLibraryNotice")
+    }
 
     @TaskAction
     fun generate() {
@@ -35,13 +49,14 @@ abstract class GenerateAboutDependenciesMetadataTask : DefaultTask() {
             .sortedBy { notice -> notice.displayName.lowercase() }
 
         val content = buildString {
-            appendLine("package pl.masslany.podkop.features.about.generated")
+            val typeName = noticeType.get().substringAfterLast('.')
+            appendLine("package ${packageName.get()}")
             appendLine()
-            appendLine("import pl.masslany.podkop.features.about.OpenSourceLibraryNotice")
+            appendLine("import ${noticeType.get()}")
             appendLine()
-            appendLine("internal val GeneratedOpenSourceLibraries: List<OpenSourceLibraryNotice> = listOf(")
+            appendLine("internal val GeneratedOpenSourceLibraries: List<$typeName> = listOf(")
             notices.forEachIndexed { index, notice ->
-                appendLine("    OpenSourceLibraryNotice(")
+                appendLine("    $typeName(")
                 appendLine("        name = ${notice.displayName.asKotlinLiteral()},")
                 appendLine("        artifact = ${notice.artifact.asKotlinLiteral()},")
                 appendLine("        licenseName = ${notice.licenseName.asKotlinLiteral()},")
@@ -57,7 +72,7 @@ abstract class GenerateAboutDependenciesMetadataTask : DefaultTask() {
         }
 
         val generatedFile = outputDirectory.file(
-            "pl/masslany/podkop/features/about/generated/GeneratedOpenSourceLibraries.kt",
+            "${packageName.get().replace('.', '/')}/GeneratedOpenSourceLibraries.kt",
         ).get().asFile
         generatedFile.parentFile.mkdirs()
         generatedFile.writeText(content)

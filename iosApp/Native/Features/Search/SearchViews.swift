@@ -74,7 +74,8 @@ struct NativeSearchView: View {
             case .loaded:
                 ForEach(model.users) { user in
                     Button { router.navigate(.user(user.username), in: tab) } label: {
-                        UserIdentityRow(username: user.username, color: user.color, gender: user.gender)
+                        UserIdentityRow(username: user.username, color: user.color, gender: user.gender,
+                                        avatarURL: user.avatarURL)
                     }
                 }
             }

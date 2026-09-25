@@ -55,6 +55,13 @@ struct NativeTagView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
+            if let banner = model.details?.bannerURL {
+                RemoteImage(url: banner, maxDimension: 1200) { Rectangle().fill(.quaternary) }
+                    .frame(height: 140)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .accessibilityHidden(true)
+            }
             HStack(alignment: .center, spacing: 8) {
                 Text("#\(model.tag)").font(.title2.bold())
                     .frame(maxWidth: .infinity, alignment: .leading)

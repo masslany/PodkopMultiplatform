@@ -49,6 +49,7 @@ enum AppRoute: Hashable, Codable {
     case user(String)
     case settings
     case blacklists
+    case debug
     case favorites
     case observed
     case hits

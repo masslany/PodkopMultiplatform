@@ -89,7 +89,8 @@ struct NativeBlacklistsView: View {
                 Button { category.submit(suggestion.value) } label: {
                     switch suggestion {
                     case .user(let user):
-                        UserIdentityRow(username: user.username, color: user.color, gender: user.gender)
+                        UserIdentityRow(username: user.username, color: user.color, gender: user.gender,
+                                        avatarURL: user.avatarURL)
                     case .tag(let tag):
                         VStack(alignment: .leading) {
                             Text("#\(tag.name)").font(.body.bold())
@@ -122,7 +123,8 @@ struct NativeBlacklistsView: View {
                 HStack {
                     Button { open(entry) } label: {
                         if entry.category == .users {
-                            UserIdentityRow(username: entry.value, color: entry.color, gender: entry.gender)
+                            UserIdentityRow(username: entry.value, color: entry.color, gender: entry.gender,
+                                            avatarURL: entry.avatarURL)
                         } else {
                             Text(entry.label)
                         }

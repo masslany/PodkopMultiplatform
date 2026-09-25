@@ -150,7 +150,12 @@ final class ShellUITests: XCTestCase {
         let app = launch("authenticated")
         app.tabBars.buttons["More"].tap()
         XCTAssertTrue(app.buttons["Profile"].exists)
-        app.buttons["Sign out"].tap()
+        app.buttons["Settings"].tap()
+        app.buttons["settingsSignOut"].tap()
+        XCTAssertTrue(app.alerts.buttons["Sign out"].waitForExistence(timeout: 5))
+        app.alerts.buttons["Sign out"].tap()
+        XCTAssertTrue(app.buttons["settingsSignOut"].waitForNonExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(app.buttons["Sign in"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Profile"].exists)
     }
@@ -262,7 +267,8 @@ final class ShellUITests: XCTestCase {
     func testFixtureBlacklistAddAndConfirmedRemove() {
         let app = launch("authenticated")
         app.tabBars.buttons["More"].tap()
-        app.buttons["Blacklists"].tap()
+        app.buttons["Settings"].tap()
+        app.buttons["Manage blacklists"].tap()
         XCTAssertTrue(app.buttons["spamer"].waitForExistence(timeout: 5))
         app.segmentedControls["blacklistCategory"].buttons.element(boundBy: 1).tap()
         XCTAssertTrue(app.buttons["#polityka"].waitForExistence(timeout: 5))
@@ -351,6 +357,20 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.buttons["profileMessage"].waitForExistence(timeout: 5))
         app.buttons["profileMessage"].tap()
         XCTAssertTrue(app.textFields["messageInput"].waitForExistence(timeout: 5))
+    }
+
+    func testFixtureSettingsThemeCacheAndAbout() {
+        let app = launch("guest")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Settings"].tap()
+        XCTAssertFalse(app.buttons["settingsSignOut"].exists, "account actions need a session")
+        app.segmentedControls["settingsTheme"].buttons["Dark"].tap()
+        XCTAssertTrue(app.segmentedControls["settingsTheme"].buttons["Dark"].isSelected)
+        app.buttons["settingsClearCache"].tap()
+        XCTAssertTrue(app.staticTexts["Cache cleared"].waitForExistence(timeout: 5))
+        app.buttons["Dismiss"].tap()
+        app.buttons["About"].tap()
+        XCTAssertTrue(app.staticTexts["ktor-client-core"].waitForExistence(timeout: 5))
     }
 }
 

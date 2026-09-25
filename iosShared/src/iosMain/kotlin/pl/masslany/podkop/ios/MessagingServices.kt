@@ -28,6 +28,7 @@ class IOSNotification(
     val createdAt: String,
     val createdAtEpochMillis: Long,
     val actorUsername: String?,
+    val actorAvatarUrl: String?,
     val actorColor: String?,
     val actorGender: String?,
     val message: String?,
@@ -45,6 +46,7 @@ class IOSNotificationPage(val items: List<IOSNotification>, val next: IOSPageReq
 
 class IOSConversation(
     val username: String,
+    val avatarUrl: String?,
     val color: String,
     val gender: String,
     val lastMessage: String?,
@@ -89,6 +91,7 @@ class MessagesService internal constructor(private val client: PodkopClient) {
             items = result.data.map {
                 IOSConversation(
                     username = it.username,
+                    avatarUrl = it.avatarUrl,
                     color = it.nameColor.toIOS(),
                     gender = it.gender.toIOS(),
                     lastMessage = it.lastMessageContent,
@@ -196,6 +199,7 @@ internal fun NotificationItem.toIOS(): IOSNotification {
         createdAt = createdAt.toString(),
         createdAtEpochMillis = createdAt.epochMillis(),
         actorUsername = actor?.username,
+        actorAvatarUrl = actor?.avatarUrl,
         actorColor = actor?.nameColor?.toIOS(),
         actorGender = actor?.gender?.toIOS(),
         message = message,

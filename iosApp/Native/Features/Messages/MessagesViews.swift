@@ -36,7 +36,8 @@ struct NativeInboxView: View {
                         HStack(alignment: .top) {
                             UserIdentityRow(username: conversation.username, color: conversation.color,
                                             gender: conversation.gender,
-                                            detail: conversation.lastMessage.map { String($0.prefix(140)) })
+                                            detail: conversation.lastMessage.map { String($0.prefix(140)) },
+                                            avatarURL: conversation.avatarURL)
                             Spacer()
                             VStack(alignment: .trailing, spacing: 4) {
                                 if let date = conversation.lastMessageAt {
@@ -111,7 +112,8 @@ struct NativeNewConversationView: View {
                 case .loaded:
                     ForEach(model.suggestions) { user in
                         Button { open(user.username) } label: {
-                            UserIdentityRow(username: user.username, color: user.color, gender: user.gender)
+                            UserIdentityRow(username: user.username, color: user.color, gender: user.gender,
+                                        avatarURL: user.avatarURL)
                         }
                     }
                 }

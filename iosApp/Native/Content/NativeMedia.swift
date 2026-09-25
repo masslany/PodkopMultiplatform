@@ -91,15 +91,28 @@ struct NativeDecodedImage: View {
     }
 }
 
+/// A UIImageView without an intrinsic size, so large images cannot widen SwiftUI layouts.
+private final class ProposedSizeImageView: UIImageView {
+    override var intrinsicContentSize: CGSize {
+        CGSize(width: UIView.noIntrinsicMetric, height: UIView.noIntrinsicMetric)
+    }
+}
+
 private struct NativeUIImageView: UIViewRepresentable {
     let image: UIImage
     let playing: Bool
 
     func makeUIView(context: Context) -> UIImageView {
-        let view = UIImageView()
+        let view = ProposedSizeImageView()
         view.contentMode = .scaleAspectFit
         view.clipsToBounds = true
         return view
+    }
+
+    /// Takes the size SwiftUI offers instead of the image's pixel size.
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView: UIImageView, context: Context) -> CGSize? {
+        guard let width = proposal.width, let height = proposal.height else { return nil }
+        return CGSize(width: width, height: height)
     }
 
     func updateUIView(_ view: UIImageView, context: Context) {
@@ -115,11 +128,14 @@ struct NativeMediaView: View {
     let foreground: Bool
     @State private var playbackOverride: Bool?
     @State private var visible = true
+    @State private var loadedBytes: Data?
+    @State private var loadFailed = false
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.mediaLoader) private var loader
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            if let bytes {
+            if let bytes = bytes ?? loadedBytes {
                 NativeDecodedImage(bytes: bytes, cacheKey: photo.url,
                                    maxDimension: 1200,
                                    animated: visible && foreground && scenePhase == .active
@@ -132,14 +148,25 @@ struct NativeMediaView: View {
                         playbackOverride = !(playbackOverride ?? autoplay)
                     }
                 }
-            } else {
+            } else if loader == nil || loadFailed {
                 Label("Image unavailable", systemImage: "photo")
                     .frame(maxWidth: .infinity, minHeight: 120)
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: displayHeight)
                     .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
             }
         }
         .onAppear { visible = true }
         .onDisappear { visible = false }
+        .task(id: photo.url) {
+            guard bytes == nil, loadedBytes == nil, let loader else { return }
+            do { loadedBytes = try await loader.bytes(for: photo.url) }
+            catch is CancellationError { return }
+            catch { loadFailed = true }
+        }
     }
 
     private var displayHeight: CGFloat {

@@ -20,6 +20,7 @@ struct HitsArchive: Hashable {
 
 struct NativeRankUser: Identifiable, Equatable {
     let username: String
+    var avatarURL: String? = nil
     let color: String
     let gender: String
     let memberSince: String?
@@ -85,7 +86,7 @@ final class SharedCollectionLoader: CollectionLoading {
             self.client.rank.load(request: self.bridge(request), loaded: Int32(loaded), completion: $0)
         }
         return ListPage(items: page.items.map {
-            NativeRankUser(username: $0.username, color: $0.color, gender: $0.gender,
+            NativeRankUser(username: $0.username, avatarURL: $0.avatarUrl, color: $0.color, gender: $0.gender,
                            memberSince: $0.memberSince, position: Int($0.position), trend: Int($0.trend),
                            actions: Int($0.actions), links: Int($0.links), entries: Int($0.entries),
                            followers: Int($0.followers))

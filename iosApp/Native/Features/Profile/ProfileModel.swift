@@ -4,6 +4,8 @@ import PodkopShared
 
 struct NativeProfile: Equatable {
     var username: String
+    var avatarURL: String? = nil
+    var bannerURL: String? = nil
     var rankPosition: Int?
     var color: String
     var gender: String
@@ -35,13 +37,13 @@ struct NativeBadge: Identifiable, Equatable {
 
 enum ProfileRow: Identifiable {
     case resource(NativeResource)
-    case user(username: String, color: String, gender: String, online: Bool, verified: Bool)
+    case user(username: String, color: String, gender: String, online: Bool, verified: Bool, avatarURL: String? = nil)
     case tag(name: String, pinned: Bool)
 
     var id: String {
         switch self {
         case .resource(let value): "resource:\(value.id):\(value.parentID ?? 0)"
-        case .user(let name, _, _, _, _): "user:\(name)"
+        case .user(let name, _, _, _, _, _): "user:\(name)"
         case .tag(let name, _): "tag:\(name)"
         }
     }
@@ -99,7 +101,8 @@ final class SharedProfileLoader: ProfileLoading {
             self.client.profile.load(username: username, completion: $0)
         }
         return NativeProfile(
-            username: value.username, rankPosition: value.rankPosition?.intValue, color: value.color,
+            username: value.username, avatarURL: value.avatarUrl.nonEmpty,
+            bannerURL: value.backgroundUrl.nonEmpty, rankPosition: value.rankPosition?.intValue, color: value.color,
             gender: value.gender, memberSince: value.memberSince, actions: Int(value.actions),
             links: Int(value.links), entries: Int(value.entries), followers: Int(value.followers),
             following: Int(value.following), observed: value.observed, blacklisted: value.blacklisted,
@@ -152,7 +155,7 @@ final class SharedProfileLoader: ProfileLoading {
         }
         let rows: [ProfileRow] = page.resources.map { .resource(NativeResource($0)) }
             + page.users.map { .user(username: $0.username, color: $0.color, gender: $0.gender,
-                                     online: $0.online, verified: $0.verified) }
+                                     online: $0.online, verified: $0.verified, avatarURL: $0.avatarUrl.nonEmpty) }
             + page.tags.map { .tag(name: $0.name, pinned: $0.pinned) }
         return ListPage(items: rows, next: page.next.map(FeedRequest.init), total: page.total?.intValue)
     }
@@ -441,3 +444,8 @@ final class FixtureProfileLoader: ProfileLoading {
     }
 }
 #endif
+
+extension String {
+    /// Treats blank server strings as absent.
+    var nonEmpty: String? { trimmingCharacters(in: .whitespaces).isEmpty ? nil : self }
+}

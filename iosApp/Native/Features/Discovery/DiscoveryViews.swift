@@ -87,13 +87,12 @@ struct UserIdentityRow: View {
     let color: String?
     let gender: String?
     var detail: String?
+    var avatarURL: String?
 
     var body: some View {
         HStack(spacing: 10) {
             VStack(spacing: 2) {
-                Circle().fill(ContentTokens.brand.opacity(0.16))
-                    .frame(width: 36, height: 36)
-                    .overlay(Text(String(username.prefix(1)).uppercased()).font(.headline))
+                AvatarView(url: avatarURL, name: username, size: 36)
                 if let tint = genderTint {
                     Capsule().fill(tint).frame(width: 24, height: 3)
                 }

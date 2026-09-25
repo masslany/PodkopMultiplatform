@@ -204,7 +204,7 @@ private struct RankRow: View {
             .frame(minWidth: 44)
             VStack(alignment: .leading, spacing: 6) {
                 UserIdentityRow(username: user.username, color: user.color, gender: user.gender,
-                                detail: memberSince)
+                                detail: memberSince, avatarURL: user.avatarURL)
                 ViewThatFits {
                     HStack(spacing: 12) { counts }
                     VStack(alignment: .leading, spacing: 2) { counts }
