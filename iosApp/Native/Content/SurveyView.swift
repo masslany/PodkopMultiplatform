@@ -38,7 +38,7 @@ struct NativeSurveyView: View {
             }
         }
         .padding(10)
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 9))
+        .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
     }
 
     private func percentage(_ count: Int) -> Int {

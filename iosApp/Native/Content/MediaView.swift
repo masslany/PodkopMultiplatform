@@ -23,7 +23,7 @@ struct NativeMediaView: View {
                                        && (playbackOverride ?? autoplay))
                     .frame(maxWidth: .infinity)
                     .frame(height: displayHeight)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                    .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
                     .contentShape(Rectangle())
                     .onTapGesture { viewerBytes = bytes }
                     .accessibilityAddTraits(.isButton)
@@ -37,12 +37,12 @@ struct NativeMediaView: View {
             } else if loader == nil || loadFailed {
                 Label("Image unavailable", systemImage: "photo")
                     .frame(maxWidth: .infinity, minHeight: 120)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                    .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .frame(height: displayHeight)
-                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                    .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
             }
         }
         .onAppear { visible = true }

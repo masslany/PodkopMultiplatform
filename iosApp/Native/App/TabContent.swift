@@ -70,6 +70,7 @@ struct TabContent: View {
             }
         } else {
             NativeFeedView(tab: tab, dependencies: dependencies)
+                .background(WykopTheme.background.ignoresSafeArea())
         }
     }
 
@@ -117,7 +118,12 @@ struct TabContent: View {
         }
     }
 
-    @ViewBuilder private func destination(_ route: AppRoute) -> some View {
+    private func destination(_ route: AppRoute) -> some View {
+        destinationContent(route)
+            .background(WykopTheme.background.ignoresSafeArea())
+    }
+
+    @ViewBuilder private func destinationContent(_ route: AppRoute) -> some View {
         switch route {
         case .link(let id): NativeDetailView(kind: .link, id: id, dependencies: dependencies)
         case .entry(let id): NativeDetailView(kind: .entry, id: id, dependencies: dependencies)

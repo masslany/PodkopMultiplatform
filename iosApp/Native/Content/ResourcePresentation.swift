@@ -16,6 +16,7 @@ struct NativeAuthor: Hashable {
     let verified: Bool
     let online: Bool
     let rank: Int?
+    var gender: String? = nil
 }
 
 struct NativeVote: Hashable {
@@ -69,11 +70,11 @@ struct NativeResource: Identifiable, Hashable {
     let adult: Bool
     let editable: Bool
     let deletable: Bool
-    let favourite: Bool
+    var favourite: Bool
     let parentID: Int?
     let createdAt: String?
     let commentCount: Int
-    let vote: NativeVote
+    var vote: NativeVote
     let tags: [String]
     let photo: NativePhoto?
     let embed: NativeEmbed?
@@ -95,7 +96,8 @@ struct NativeResource: Identifiable, Hashable {
         author = value.author.map {
             NativeAuthor(name: $0, avatarURL: value.authorAvatarUrl,
                          color: value.authorColor, verified: value.authorVerified,
-                         online: value.authorOnline, rank: value.authorRank?.intValue)
+                         online: value.authorOnline, rank: value.authorRank?.intValue,
+                         gender: value.authorGender)
         }
         deletion = value.deleted
             ? value.deletionReason.flatMap(NativeDeletion.init(rawValue:)) ?? .unknown

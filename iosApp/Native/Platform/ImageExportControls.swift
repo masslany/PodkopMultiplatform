@@ -3,11 +3,27 @@ import UIKit
 
 /// Save, copy and share controls for image bytes; feedback goes to a caller-provided message.
 struct ImageExportControls: View {
+    enum Style { case standard, overlay }
     let data: Data
+    var style: Style = .standard
     let onMessage: (String) -> Void
     @State private var sharing = false
 
     var body: some View {
+        switch style {
+        case .standard:
+            buttons.buttonStyle(.bordered)
+        case .overlay:
+            // Over photos: icon buttons with titles on a dark capsule, legible on any image.
+            buttons
+                .buttonStyle(OverlayButtonStyle())
+                .padding(.horizontal, 8).padding(.vertical, 6)
+                .background(.black.opacity(0.6), in: Capsule())
+                .overlay(Capsule().strokeBorder(.white.opacity(0.2)))
+        }
+    }
+
+    private var buttons: some View {
         HStack(spacing: 12) {
             Button {
                 Task {
@@ -37,8 +53,29 @@ struct ImageExportControls: View {
             .accessibilityIdentifier("imageShare")
             .disabled(PlatformExport.fileExtension(for: data) == nil)
         }
-        .buttonStyle(.bordered)
         .sheet(isPresented: $sharing) { ImageShareSheet(data: data, onMessage: onMessage) }
+    }
+}
+
+private struct OverlayButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .labelStyle(OverlayLabelStyle())
+            .foregroundStyle(.white.opacity(isEnabled ? 1 : 0.4))
+            .frame(minWidth: 64, minHeight: 48)
+            .background(.white.opacity(configuration.isPressed ? 0.2 : 0), in: Capsule())
+            .contentShape(Capsule())
+    }
+}
+
+private struct OverlayLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        VStack(spacing: 3) {
+            configuration.icon.font(.system(size: 20, weight: .medium))
+            configuration.title.font(.caption2.weight(.semibold))
+        }
     }
 }
 

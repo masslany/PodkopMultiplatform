@@ -63,7 +63,7 @@ struct NativeEmbedCard: View {
         }
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 9))
+        .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
         .task(id: embed.url) {
             guard embed.type.lowercased() == "twitter", let loadTweet else { return }
             do { tweet = try await loadTweet(embed.url) }

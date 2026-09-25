@@ -32,6 +32,7 @@ struct NativeProfileView: View {
         }
         .navigationTitle(model.profile?.username ?? model.username ?? String(localized: "Profile"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar { if let profile = model.profile, model.phase == .loaded { profileToolbar(profile) } }
         .task { model.start() }
         .onDisappear { model.stop() }
         .onChange(of: dependencies.session.revision) { _, _ in model.setSession() }
@@ -65,51 +66,48 @@ struct NativeProfileView: View {
         .refreshable { await model.refresh() }
     }
 
+    /// Banner with the avatar overlapping its lower edge and the rank on the avatar, as on
+    /// Android and wykop.pl. Observe, message and block live in the toolbar.
     private func header(_ profile: NativeProfile) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            if let banner = profile.bannerURL {
-                RemoteImage(url: banner, maxDimension: 1200) { Rectangle().fill(.quaternary) }
-                    .frame(height: 120)
-                    .frame(maxWidth: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .accessibilityHidden(true)
+            ZStack(alignment: .bottomLeading) {
+                Group {
+                    if let banner = profile.bannerURL {
+                        RemoteImage(url: banner, maxDimension: 1200) { bannerPlaceholder }
+                    } else {
+                        bannerPlaceholder
+                    }
+                }
+                .frame(height: 140)
+                .frame(maxWidth: .infinity)
+                .clipShape(RoundedRectangle(cornerRadius: WykopTheme.cardRadius, style: .continuous))
+                .padding(.bottom, 48)
+                .accessibilityHidden(true)
+                AvatarView(url: profile.avatarURL, name: profile.username, size: 92, gender: profile.gender)
+                    .padding(3)
+                    .background(WykopTheme.background,
+                                in: RoundedRectangle(cornerRadius: 92 * 0.22 + 3, style: .continuous))
+                    .overlay(alignment: .topTrailing) {
+                        if let rank = profile.rankPosition {
+                            Text(verbatim: "#\(rank)")
+                                .font(.caption.weight(.bold).monospacedDigit())
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 7).padding(.vertical, 3)
+                                .background(WykopTheme.tagBlue, in: Capsule())
+                                .offset(x: 10, y: -6)
+                                .accessibilityLabel(String(localized: "Rank position \(rank)"))
+                        }
+                    }
+                    .padding(.leading, 16)
             }
-            HStack(alignment: .top) {
-                UserIdentityRow(username: profile.username, color: profile.color, gender: profile.gender,
-                                detail: joined(profile), avatarURL: profile.avatarURL)
-                Spacer()
-                if let rank = profile.rankPosition {
-                    Text("#\(rank)").font(.headline.monospacedDigit()).foregroundStyle(.secondary)
-                        .accessibilityLabel(String(localized: "Rank position \(rank)"))
-                }
-            }
-            HStack(spacing: 8) {
-                if profile.canManageObservation {
-                    Button { model.toggle(.observe) } label: {
-                        if model.pending.contains(.observe) { ProgressView() }
-                        else { Text(profile.observed ? "Observing" : "Observe") }
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(profile.username)
+                        .font(.title2.bold())
+                        .foregroundStyle(authorColor(profile.color))
+                    if let joined = joined(profile) {
+                        Text(joined).font(.subheadline).foregroundStyle(.secondary)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(profile.observed ? .secondary : ContentTokens.brand)
-                    .disabled(model.pending.contains(.observe))
-                    .accessibilityIdentifier("profileObserve")
-                }
-                if profile.canSendPrivateMessage {
-                    Button { router.navigate(.conversation(profile.username), in: tab) } label: {
-                        Image(systemName: "envelope")
-                    }
-                    .buttonStyle(.bordered)
-                    .accessibilityLabel("Send a private message")
-                    .accessibilityIdentifier("profileMessage")
-                }
-                if profile.canBlacklist {
-                    Button { model.toggle(.blacklist) } label: {
-                        Image(systemName: profile.blacklisted ? "lock.fill" : "lock.open")
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(model.pending.contains(.blacklist))
-                    .accessibilityLabel(profile.blacklisted ? "Unblock user" : "Block user")
-                    .accessibilityIdentifier("profileBlacklist")
                 }
                 Spacer()
                 Button {
@@ -117,12 +115,50 @@ struct NativeProfileView: View {
                 } label: {
                     Label(model.detailsExpanded ? "Hide details" : "Show details",
                           systemImage: model.detailsExpanded ? "chevron.up" : "chevron.down")
+                        .labelStyle(.iconOnly)
+                        .frame(width: 32, height: 32)
+                        .background(WykopTheme.card, in: Circle())
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(.plain)
+                .foregroundStyle(.secondary)
                 .accessibilityIdentifier("profileDetails")
             }
+            .padding(.horizontal, 4)
         }
         .padding(.top, 8)
+    }
+
+    private var bannerPlaceholder: some View {
+        LinearGradient(colors: [WykopTheme.tagBlue, WykopTheme.tagBlue.opacity(0.55)],
+                       startPoint: .topLeading, endPoint: .bottomTrailing)
+    }
+
+    @ToolbarContentBuilder private func profileToolbar(_ profile: NativeProfile) -> some ToolbarContent {
+        ToolbarItemGroup(placement: .topBarTrailing) {
+            if profile.canSendPrivateMessage {
+                Button { router.navigate(.conversation(profile.username), in: tab) } label: {
+                    Image(systemName: "envelope")
+                }
+                .accessibilityLabel("Send a private message")
+                .accessibilityIdentifier("profileMessage")
+            }
+            if profile.canBlacklist {
+                Button { model.toggle(.blacklist) } label: {
+                    Image(systemName: profile.blacklisted ? "lock.fill" : "lock.open")
+                }
+                .disabled(model.pending.contains(.blacklist))
+                .accessibilityLabel(profile.blacklisted ? "Unblock user" : "Block user")
+                .accessibilityIdentifier("profileBlacklist")
+            }
+            if profile.canManageObservation {
+                Button { model.toggle(.observe) } label: {
+                    Image(systemName: profile.observed ? "eye.fill" : "eye")
+                }
+                .disabled(model.pending.contains(.observe))
+                .accessibilityLabel(profile.observed ? "Observing" : "Observe")
+                .accessibilityIdentifier("profileObserve")
+            }
+        }
     }
 
     @ViewBuilder private func details(_ profile: NativeProfile) -> some View {
@@ -160,8 +196,7 @@ struct NativeProfileView: View {
                 }
             }
         }
-        .padding(12)
-        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .wykopCard(padding: 12)
     }
 
     @ViewBuilder private var noteSection: some View {
@@ -192,20 +227,27 @@ struct NativeProfileView: View {
         }
     }
 
+    /// Summary tiles: the label above the number, the selected one outlined (Android's profile summary).
     private func summary(_ profile: NativeProfile) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(ProfileSummary.allCases, id: \.self) { item in
+                    let selected = model.summary == item
                     Button { model.select(summary: item) } label: {
-                        VStack(spacing: 2) {
-                            Text("\(count(item, profile))").font(.headline.monospacedDigit())
-                            Text(title(for: item)).font(.caption)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(title(for: item)).font(.caption).foregroundStyle(.secondary)
+                            Text(count(item, profile).formatted())
+                                .font(.headline.monospacedDigit())
+                                .foregroundStyle(selected ? WykopTheme.tagBlue : .primary)
                         }
-                        .frame(minWidth: 64)
+                        .frame(minWidth: 72, alignment: .leading)
+                        .padding(.horizontal, 12).padding(.vertical, 8)
+                        .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .strokeBorder(selected ? WykopTheme.tagBlue : .clear, lineWidth: 2))
                     }
-                    .buttonStyle(.bordered)
-                    .tint(model.summary == item ? ContentTokens.brand : .secondary)
-                    .accessibilityAddTraits(model.summary == item ? .isSelected : [])
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(selected ? .isSelected : [])
                     .accessibilityIdentifier("profileSummary-\(item.rawValue)")
                 }
             }
@@ -267,8 +309,7 @@ struct NativeProfileView: View {
                     if online { Circle().fill(.green).frame(width: 7, height: 7).accessibilityLabel("Online") }
                     Spacer()
                 }
-                .padding(10)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+                .wykopCard(padding: 10)
             }
             .buttonStyle(.plain)
         case .tag(let name, let pinned):
@@ -278,8 +319,7 @@ struct NativeProfileView: View {
                     if pinned { Image(systemName: "pin.fill").accessibilityLabel("Pinned") }
                     Spacer()
                 }
-                .padding(10)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+                .wykopCard(padding: 10)
             }
             .buttonStyle(.plain)
         }

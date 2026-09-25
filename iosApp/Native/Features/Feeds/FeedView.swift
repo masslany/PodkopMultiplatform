@@ -29,7 +29,7 @@ struct NativeFeedView: View {
                     }
                     .font(.subheadline)
                     .padding(10)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                    .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 if model.phase == .loading && model.items.isEmpty {
                     ProgressView("Loading…").frame(maxWidth: .infinity, minHeight: 180)
@@ -132,27 +132,17 @@ struct NativeFeedView: View {
     private var hitStrip: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Hits").font(.headline)
+                Label("Hits", systemImage: "flame.fill")
+                    .font(.headline)
+                    .labelStyle(.titleAndIcon)
+                    .foregroundStyle(WykopTheme.hotOrange)
                 Spacer()
                 Button("See all") { router.navigate(.hits, in: .links) }
             }
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 10) {
                     ForEach(model.hits) { item in
-                        Button {
-                            router.navigate(.link(item.sourceID), in: .links)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(item.title.isEmpty ? item.body : item.title)
-                                    .font(.subheadline.bold()).lineLimit(2)
-                                Label("\(item.vote.up)", systemImage: "hand.thumbsup")
-                                    .font(.caption)
-                            }
-                            .frame(width: 200, alignment: .leading)
-                            .padding(12)
-                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-                        }
-                        .buttonStyle(.plain)
+                        HitTile(resource: item) { router.navigate(.link(item.sourceID), in: .links) }
                     }
                 }
             }
@@ -179,15 +169,6 @@ struct NativeFeedView: View {
     }
 
     private func actions(for item: NativeResource) -> ResourceActions {
-        let open = { router.navigate(item.kind == .link ? .link(item.sourceID) : .entry(item.sourceID),
-                                     in: model.query.tab) }
-        return ResourceActions(
-            open: open,
-            openAuthor: { router.navigate(.user($0), in: model.query.tab) },
-            openTag: { router.navigate(.tag($0), in: model.query.tab) },
-            openURL: { openURL($0) },
-            comment: open,
-            loadTweet: { try await dependencies.loadTweet($0) }
-        )
+        .navigation(for: item, in: model.query.tab, dependencies: dependencies, openURL: openURL)
     }
 }

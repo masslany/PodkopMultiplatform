@@ -28,21 +28,3 @@ struct RemoteImage<Placeholder: View>: View {
         }
     }
 }
-
-/// Author avatar with the name's initial as the placeholder, as before images were available.
-struct AvatarView: View {
-    let url: String?
-    let name: String
-    var size: CGFloat = 36
-
-    var body: some View {
-        RemoteImage(url: url, maxDimension: Int(size * 3)) {
-            Circle().fill(ContentTokens.brand.opacity(0.16))
-                .overlay(Text(String(name.prefix(1)).uppercased())
-                    .font(.system(size: size * 0.42, weight: .bold)))
-        }
-        .frame(width: size, height: size)
-        .clipShape(Circle())
-        .accessibilityHidden(true)
-    }
-}

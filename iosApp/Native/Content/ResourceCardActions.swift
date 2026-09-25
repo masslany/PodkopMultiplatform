@@ -12,6 +12,8 @@ struct ResourceActions {
     var menu: (() -> Void)?
     var surveyVote: ((Int) -> Void)?
     var loadTweet: ((String) async throws -> NativeTweetPreview)?
+    /// A vote or favourite for this resource is waiting for the server.
+    var pending = false
 
     static let none = ResourceActions()
 }

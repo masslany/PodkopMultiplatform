@@ -80,6 +80,9 @@ struct NativeDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("Comments").font(.title3.bold())
+                if let count = model.resource?.commentCount, count > 0 {
+                    Text("\(count)").font(.title3).foregroundStyle(.secondary)
+                }
                 Spacer()
                 if model.kind == .link {
                     Menu {
@@ -127,22 +130,32 @@ struct NativeDetailView: View {
         }
     }
 
+    /// Replies sit under their comment behind a thread line, as on wykop.pl.
     @ViewBuilder private func replies(for commentID: Int) -> some View {
         let state = model.replies[commentID] ?? DetailModel.ReplyState()
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(state.rows) { reply in
-                NativeResourceCard(resource: reply,
-                                   actions: actions(for: reply, replyParentID: commentID),
-                                   autoplayGifs: dependencies.session.autoplayGifs,
-                                   isForeground: dependencies.isForeground)
-            }
-            if state.loading { ProgressView().padding(.leading, 20) }
-            if !state.exhausted && !state.loading {
-                Button(state.error ? "Retry replies" : "Show replies") {
-                    model.loadReplies(for: commentID)
+        if !state.rows.isEmpty || state.loading || !state.exhausted {
+            HStack(alignment: .top, spacing: 10) {
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(WykopTheme.separator)
+                    .frame(width: 2)
+                    .padding(.leading, 14)
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(state.rows) { reply in
+                        NativeResourceCard(resource: reply,
+                                           actions: actions(for: reply, replyParentID: commentID),
+                                           autoplayGifs: dependencies.session.autoplayGifs,
+                                           isForeground: dependencies.isForeground)
+                    }
+                    if state.loading { ProgressView().padding(.vertical, 6) }
+                    if !state.exhausted && !state.loading {
+                        Button(state.error ? "Retry replies" : "Show replies") {
+                            model.loadReplies(for: commentID)
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(WykopTheme.tagBlue)
+                        .padding(.vertical, 4)
+                    }
                 }
-                .buttonStyle(.bordered)
-                .padding(.leading, 20)
             }
         }
     }
@@ -179,13 +192,13 @@ struct NativeDetailView: View {
                     }
                     .disabled(!(item.vote.canDown || item.vote.canUndo))
                 }
-                .padding(12)
-                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                .wykopCard(padding: 12)
             }
         }
     }
 
     private func actions(for resource: NativeResource, replyParentID: Int? = nil) -> ResourceActions {
+        let loggedIn = dependencies.session.isLoggedIn
         let commentAction: (() -> Void)? = {
             if model.kind == .link {
                 dependencies.router.presentComposer(.createLinkComment(
@@ -200,13 +213,13 @@ struct NativeDetailView: View {
             openAuthor: { dependencies.router.navigate(.user($0)) },
             openTag: { dependencies.router.navigate(.tag($0)) },
             openURL: { openURL($0) },
-            voteUp: resource.vote.canUp || resource.vote.canUndo ? {
+            voteUp: resource.deletion == nil && (!loggedIn || resource.vote.canUp || resource.vote.canUndo) ? {
                 requireAccount {
                     model.submit(.voteUp(resource, remove: resource.vote.state == "positive"))
                 }
             } : nil,
-            voteDown: (resource.kind == .link || resource.kind == .linkComment) &&
-                (resource.vote.canDown || resource.vote.canUndo) ? {
+            voteDown: (resource.kind == .link || resource.kind == .linkComment) && resource.deletion == nil &&
+                (!loggedIn || resource.vote.canDown || resource.vote.canUndo) ? {
                 requireAccount {
                     if resource.kind == .link && resource.vote.state != "negative" {
                         downvoteTarget = resource
@@ -215,7 +228,7 @@ struct NativeDetailView: View {
                     }
                 }
             } : nil,
-            favourite: {
+            favourite: resource.deletion != nil ? nil : {
                 requireAccount { model.submit(.favourite(resource, enabled: !resource.favourite)) }
             },
             comment: commentAction,

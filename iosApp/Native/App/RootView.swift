@@ -97,6 +97,13 @@ struct NativeRoot: View {
                             .tag(tab)
                     }
                 }
+                .tint(WykopTheme.tagBlue)
+                .sheet(item: Binding(get: { dependencies.interactor.actionTarget },
+                                     set: { dependencies.interactor.actionTarget = $0 })) { target in
+                    NativeResourceActionsSheet(resource: target, root: target, parent: nil,
+                                               dependencies: dependencies,
+                                               delete: { dependencies.interactor.delete(target) })
+                }
     }
 
     private func startupProblem(title: String, explanation: String) -> some View {

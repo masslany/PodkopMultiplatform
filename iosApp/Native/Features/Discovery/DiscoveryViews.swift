@@ -1,11 +1,14 @@
 import SwiftUI
 
 extension ResourceActions {
-    /// Navigation-only card actions shared by feeds and discovery lists.
+    /// Card actions shared by feeds and discovery lists: navigation plus voting, favourites and
+    /// the actions sheet through the shared `ResourceInteractor`. Guests are asked to sign in.
     @MainActor
     static func navigation(for item: NativeResource, in tab: AppTab,
                            dependencies: AppDependencies, openURL: OpenURLAction) -> ResourceActions {
         let router = dependencies.router
+        let interactor = dependencies.interactor
+        let loggedIn = dependencies.session.isLoggedIn
         let open: (() -> Void)? = switch item.kind {
         case .link: { router.navigate(.link(item.sourceID), in: tab) }
         case .entry: { router.navigate(.entry(item.sourceID), in: tab) }
@@ -13,13 +16,23 @@ extension ResourceActions {
         case .entryComment: item.parentID.map { id in { router.navigate(.entry(id), in: tab) } }
         case .unknown: nil
         }
+        let signIn = { router.sheet = .login }
+        let canVoteUp = item.vote.canUp || item.vote.canUndo
+        let canVoteDown = item.kind == .linkComment && (item.vote.canDown || item.vote.canUndo)
+        let votable = item.deletion == nil && item.kind != .unknown
         return ResourceActions(
             open: open,
             openAuthor: { router.navigate(.user($0), in: tab) },
             openTag: { router.navigate(.tag($0), in: tab) },
             openURL: { openURL($0) },
+            voteUp: !votable ? nil : !loggedIn ? signIn : canVoteUp ? { interactor.voteUp(item) } : nil,
+            voteDown: !votable || item.kind != .linkComment ? nil
+                : !loggedIn ? signIn : canVoteDown ? { interactor.voteDown(item) } : nil,
+            favourite: !votable ? nil : loggedIn ? { interactor.toggleFavourite(item) } : signIn,
             comment: open,
-            loadTweet: { try await dependencies.loadTweet($0) }
+            menu: item.kind == .link || item.kind == .entry ? { interactor.actionTarget = item } : nil,
+            loadTweet: { try await dependencies.loadTweet($0) },
+            pending: interactor.isPending(item)
         )
     }
 }
@@ -42,7 +55,7 @@ struct PagedResourceRows: View {
                 }
                 .font(.subheadline)
                 .padding(10)
-                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 10))
+                .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
             switch pager.phase {
             case .idle, .loading:
@@ -92,27 +105,13 @@ struct UserIdentityRow: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            VStack(spacing: 2) {
-                AvatarView(url: avatarURL, name: username, size: 36)
-                if let tint = genderTint {
-                    Capsule().fill(tint).frame(width: 24, height: 3)
-                }
-            }
-            .accessibilityHidden(true)
+            AvatarView(url: avatarURL, name: username, size: 36, gender: gender)
             VStack(alignment: .leading, spacing: 2) {
-                Text(username).font(.body.bold()).foregroundStyle(authorColor(color))
+                Text(username).font(.body.weight(.semibold)).foregroundStyle(authorColor(color))
                 if let detail {
                     Text(detail).font(.caption).foregroundStyle(.secondary)
                 }
             }
-        }
-    }
-
-    private var genderTint: Color? {
-        switch gender {
-        case "male": .blue
-        case "female": .pink
-        default: nil
         }
     }
 }

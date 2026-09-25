@@ -66,6 +66,7 @@ class ResourceMappingTest {
         assertEquals("moderator", mapped.deletionReason)
         assertEquals("green", mapped.authorColor)
         assertEquals(4, mapped.authorRank)
+        assertEquals("unspecified", mapped.authorGender)
         assertEquals(42, mapped.parentId)
         assertEquals(7, mapped.commentsCount)
         assertEquals("negative", mapped.voted)

@@ -116,6 +116,8 @@ class IOSResource(
     val authorVerified: Boolean,
     val authorOnline: Boolean,
     val authorRank: Int?,
+    /** male, female or unspecified; drives the gender bar under the avatar. */
+    val authorGender: String?,
     val deletionReason: String?,
     val parentId: Int?,
     val createdAt: String?,
@@ -863,6 +865,7 @@ internal fun ResourceItem.toIOSResource(): IOSResource {
         authorVerified = author?.verified ?: false,
         authorOnline = author?.online ?: false,
         authorRank = author?.rank?.position,
+        authorGender = author?.gender?.toIOS(),
         deletionReason = when (deleted) {
             Deleted.Moderator -> "moderator"
             Deleted.Author -> "author"

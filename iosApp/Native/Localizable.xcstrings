@@ -325,7 +325,23 @@
     "Link ID" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "ID znaleziska" } } } },
     "Invalid link ID" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Niepoprawne ID znaleziska" } } } },
     "Show test banner" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Pokaż testowy komunikat" } } } },
-    "Android's test private-message notification has no iOS counterpart until background delivery is decided (D03)." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Testowe powiadomienie o wiadomości prywatnej nie ma jeszcze odpowiednika na iOS (decyzja D03)." } } } }
+    "Android's test private-message notification has no iOS counterpart until background delivery is decided (D03)." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Testowe powiadomienie o wiadomości prywatnej nie ma jeszcze odpowiednika na iOS (decyzja D03)." } } } },
+    "Reply" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Odpowiedz" } } } },
+    "Bury" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zakop" } } } },
+    "Votes: %lld" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wykopy: %lld" } } } },
+    "Digs this link" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wykopuje to znalezisko" } } } },
+    "Removes your vote" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Cofa twój głos" } } } },
+    "Score %lld" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Wynik %lld" } } } },
+    "Close" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Zamknij" } } } },
+    "Remove downvote" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Cofnij głos przeciw" } } } },
+    "Copy" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Kopiuj" } } } },
+    "Share" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Udostępnij" } } } },
+    "just now" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "chwilę temu" } } } },
+    "%lld min ago" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "%lld min temu" } } } },
+    "%lld h ago" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "%lld godz. temu" } } } },
+    "%lld h %lld min ago" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "%1$lld godz. %2$lld min temu" } } } },
+    "%lld days ago" : { "localizations" : { "pl" : { "variations" : { "plural" : { "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld dzień temu" } }, "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld dni temu" } }, "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld dni temu" } }, "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld dni temu" } } } } }, "en" : { "variations" : { "plural" : { "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld day ago" } }, "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld days ago" } } } } } } },
+    "This content is for adults only.\nTap to show." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Materiał zawiera treści +18.\nKliknij, aby pokazać." } } } }
   },
   "version" : "1.0"
 }
