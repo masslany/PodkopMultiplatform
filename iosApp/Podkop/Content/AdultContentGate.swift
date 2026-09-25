@@ -9,13 +9,14 @@ struct AdultContentGate<Content: View>: View {
 
     var body: some View {
         if hidden {
-            content()
-                .blur(radius: 22, opaque: true)
-                .frame(minHeight: 120)
-                .clipShape(RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
-                .allowsHitTesting(false)
-                .accessibilityHidden(true)
-                .overlay {
+            // A ZStack rather than an overlay: short content grows to fit the notice instead of
+            // clipping it, even at large text sizes.
+            ZStack {
+                content()
+                    .blur(radius: 22, opaque: true)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
                     Button(action: reveal) {
                         VStack(spacing: 8) {
                             Text(verbatim: "18+")
@@ -29,7 +30,7 @@ struct AdultContentGate<Content: View>: View {
                                 .foregroundStyle(.primary)
                         }
                         .padding()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .frame(maxWidth: .infinity, minHeight: 120, maxHeight: .infinity)
                         .background(.ultraThinMaterial,
                                     in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
                         .contentShape(Rectangle())
@@ -37,7 +38,9 @@ struct AdultContentGate<Content: View>: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel(.commonShowAdultContent)
                     .accessibilityHint(.contentRevealsSensitiveContent)
-                }
+            }
+            .frame(minHeight: 120)
+            .clipShape(RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
         } else {
             content()
         }

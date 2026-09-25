@@ -192,7 +192,7 @@ struct ResourceCard: View {
     }
 
     private var separator: some View {
-        Text(verbatim: "•").font(.footnote).foregroundStyle(.tertiary).accessibilityHidden(true)
+        Text(verbatim: "•").font(.footnote).foregroundStyle(.secondary).accessibilityHidden(true)
     }
 
     /// Tags separated by dots, as on Android.

@@ -157,11 +157,15 @@ struct FeedView: View {
         }
     }
 
+    /// The flame carries the brand orange; the word stays in the text color for contrast.
     private var hitsTitle: some View {
-        Label(.commonHits, systemImage: "flame.fill")
-            .font(.headline)
-            .labelStyle(.titleAndIcon)
-            .foregroundStyle(WykopTheme.hotOrange)
+        Label {
+            Text(.commonHits)
+        } icon: {
+            Image(systemName: "flame.fill").foregroundStyle(WykopTheme.hotOrange)
+        }
+        .font(.headline)
+        .labelStyle(.titleAndIcon)
     }
 
     private var seeAllHits: some View {
@@ -172,6 +176,8 @@ struct FeedView: View {
             }
             .font(.subheadline)
             .foregroundStyle(.secondary)
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

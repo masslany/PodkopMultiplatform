@@ -98,10 +98,10 @@ struct MoreView: View {
         return VStack(spacing: 6) {
             Image("TabUpcoming")
                 .renderingMode(.template)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
             Text(verbatim: "Podkop \(version) (\(build))")
                 .font(.caption)
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 8)

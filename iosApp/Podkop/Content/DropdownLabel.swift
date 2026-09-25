@@ -10,7 +10,6 @@ struct DropdownLabel: View {
             if let systemImage { Image(systemName: systemImage).font(.footnote) }
             Text(title).font(.subheadline.weight(.semibold))
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
             Image(systemName: "chevron.down").font(.caption.weight(.bold)).foregroundStyle(.secondary)
         }
         .foregroundStyle(.primary)

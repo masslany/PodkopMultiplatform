@@ -55,6 +55,9 @@ struct ScoreVoteControl: View {
     var up: (() -> Void)?
     var down: (() -> Void)?
 
+    /// The buttons grow with text size up to the 44 pt minimum touch target.
+    @ScaledMetric(relativeTo: .subheadline) private var buttonSize: CGFloat = 26
+
     private var score: Int { vote.up - vote.down }
 
     var body: some View {
@@ -82,9 +85,9 @@ struct ScoreVoteControl: View {
                             action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(size: min(buttonSize, 44) * 0.46, weight: .bold))
                 .foregroundStyle(active ? Color.white : color)
-                .frame(width: 26, height: 26)
+                .frame(width: min(buttonSize, 44), height: min(buttonSize, 44))
                 .background(active ? color : .clear, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(color, lineWidth: 1.5))
                 .contentShape(Rectangle().inset(by: -8))
