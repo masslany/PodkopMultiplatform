@@ -40,6 +40,8 @@ struct NativeRichContent: View {
         }
         .font(.subheadline)
         .textSelection(.enabled)
+        // Mentions, tags and links keep Wykop's blue while controls stay neutral.
+        .tint(WykopTheme.tagBlue)
     }
 
     @ViewBuilder private func blockView(_ block: RichBlock) -> some View {

@@ -8,6 +8,13 @@ final class ShellUITests: XCTestCase {
         return app
     }
 
+    /// Entry cards open on a tap anywhere outside their controls, as on Android.
+    private func openEntry(_ app: XCUIApplication) {
+        let card = app.descendants(matching: .any)["resource-entry:102"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        card.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+    }
+
     func testGuestTabsAndMoreGate() {
         let app = launch("guest")
         XCTAssertTrue(app.tabBars.buttons["Links"].waitForExistence(timeout: 5))
@@ -36,17 +43,17 @@ final class ShellUITests: XCTestCase {
     func testFixtureLinkAndEntryDetailsShowCardsAndActions() {
         let app = launch("guest")
         app.tabBars.buttons["Links"].tap()
-        XCTAssertTrue(app.buttons["Przykładowy link o długim tytule"].firstMatch.waitForExistence(timeout: 5))
-        app.buttons["Przykładowy link o długim tytule"].firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Przykładowy link o długim tytule"].firstMatch.waitForExistence(timeout: 5))
+        app.staticTexts["Przykładowy link o długim tytule"].firstMatch.tap()
         XCTAssertTrue(app.descendants(matching: .any)["detail-link-101"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.descendants(matching: .any)["resource-linkComment:104"].waitForExistence(timeout: 5))
         app.buttons["More actions"].firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["Actions"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["Show upvoters"].exists)
-        app.buttons["Done"].tap()
+        XCTAssertTrue(app.buttons["Show upvoters"].waitForExistence(timeout: 5))
+        // The sheet fits its rows, so tapping the dimmed page above it closes it.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.12)).tap()
+        XCTAssertTrue(app.buttons["Show upvoters"].waitForNonExistence(timeout: 5))
         app.tabBars.buttons["Entries"].tap()
-        XCTAssertTrue(app.buttons["Open entry"].waitForExistence(timeout: 5))
-        app.buttons["Open entry"].tap()
+        openEntry(app)
         XCTAssertTrue(app.descendants(matching: .any)["detail-entry-102"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.descendants(matching: .any)["resource-entryComment:103"].waitForExistence(timeout: 5))
     }
@@ -54,8 +61,7 @@ final class ShellUITests: XCTestCase {
     func testScreenshotPreviewCanExcludeParent() {
         let app = launch("guest")
         app.tabBars.buttons["Entries"].tap()
-        XCTAssertTrue(app.buttons["Open entry"].waitForExistence(timeout: 5))
-        app.buttons["Open entry"].tap()
+        openEntry(app)
         let comment = app.descendants(matching: .any)["resource-entryComment:103"]
         XCTAssertTrue(comment.waitForExistence(timeout: 5))
         comment.buttons["More actions"].tap()

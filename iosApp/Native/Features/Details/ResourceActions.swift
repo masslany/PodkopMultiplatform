@@ -13,35 +13,37 @@ struct NativeResourceActionsSheet: View {
     @State private var screenshot = false
     @State private var textSelection = false
     @State private var confirmDelete = false
+    @State private var contentHeight: CGFloat = 320
 
+    /// Android's actions bottom sheet: neutral rows with a leading glyph, no title bar.
     var body: some View {
-        NavigationStack {
-            List {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
                 if resource.kind == .link {
-                    voterButton("Show upvoters", side: "up")
-                    voterButton("Show downvoters", side: "down")
+                    voterRow("Show upvoters", systemImage: "plus", side: "up")
+                    voterRow("Show downvoters", systemImage: "minus", side: "down")
                 } else if resource.kind == .entry || resource.kind == .entryComment {
-                    voterButton("Show voters", side: "up")
+                    voterRow("Show voters", systemImage: "plus", side: "up")
                 }
                 if resource.kind != .link {
-                    Button("Share as screenshot") { screenshot = true }
+                    row("Share as screenshot", systemImage: "square.and.arrow.up") { screenshot = true }
                 }
                 if let url = ResourceLinkBuilder.url(for: resource, root: root,
                                                      parentCommentID: parent?.sourceID) {
-                    Button("Copy link") {
+                    row("Copy link", systemImage: "link") {
                         UIPasteboard.general.url = url
                         dismiss()
                     }
                 }
                 if resource.kind != .link && !resource.body.isEmpty {
-                    Button("Copy text") {
+                    row("Copy text", systemImage: "doc.on.doc") {
                         UIPasteboard.general.string = resource.body
                         dismiss()
                     }
-                    Button("Select text") { textSelection = true }
+                    row("Select text", systemImage: "character.cursor.ibeam") { textSelection = true }
                 }
                 if resource.editable {
-                    Button("Edit") {
+                    row("Edit", systemImage: "pencil") {
                         let intent: ComposerIntent
                         switch resource.kind {
                         case .entry: intent = .editEntry(resource.sourceID)
@@ -58,17 +60,19 @@ struct NativeResourceActionsSheet: View {
                     }
                 }
                 if resource.deletable && (resource.kind == .entry || resource.kind == .entryComment) {
-                    Button("Delete", role: .destructive) { confirmDelete = true }
+                    row("Delete", systemImage: "trash", destructive: true) { confirmDelete = true }
                 }
             }
-            .navigationTitle("Actions")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
+            .padding(.top, 20)
+            .padding(.bottom, 8)
+            .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { contentHeight = $0 }
         }
-        .presentationDetents([.medium, .large])
+        .scrollBounceBehavior(.basedOnSize)
+        .presentationDragIndicator(.visible)
+        .presentationBackground(WykopTheme.card)
+        .accessibilityIdentifier("resourceActions")
+        // Sized to its rows, like Android's bottom sheet.
+        .presentationDetents([.height(contentHeight + 24)])
         .sheet(item: $voterTarget) { NativeVotersSheet(target: $0, dependencies: dependencies) }
         .sheet(isPresented: $screenshot) {
             NativeScreenshotPreview(resource: resource, parent: parent)
@@ -93,8 +97,26 @@ struct NativeResourceActionsSheet: View {
         }
     }
 
-    private func voterButton(_ title: LocalizedStringKey, side: String) -> some View {
-        Button(title) {
+    private func row(_ title: LocalizedStringKey, systemImage: String, destructive: Bool = false,
+                     action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 20) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 20))
+                    .frame(width: 28)
+                Text(title).font(.body)
+                Spacer(minLength: 0)
+            }
+            .foregroundStyle(destructive ? WykopTheme.voteNegative : .primary)
+            .padding(.horizontal, 24)
+            .frame(minHeight: 56)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func voterRow(_ title: LocalizedStringKey, systemImage: String, side: String) -> some View {
+        row(title, systemImage: systemImage) {
             voterTarget = VoterTarget(kind: resource.kind.rawValue,
                                       rootID: resource.kind == .link || resource.kind == .entry
                                           ? resource.sourceID : root.sourceID,

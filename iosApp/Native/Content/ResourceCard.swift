@@ -1,138 +1,204 @@
 import SwiftUI
 import PodkopShared
 
-/// A link, entry or comment in Wykop's layout (Android's `LinkItem`, `EntryItem` and comment
-/// items): links lead with the vote badge beside the title, entries and comments with the author
-/// and the signed score. When `actions.open` is set the card is a list row that opens its detail.
+/// A link, entry or comment in Wykop's layout (Android's `LinkItem`, `EntryItem`, comment items
+/// and `LinkDetailsHeader`). Links lead with the vote badge beside the title; entries and comments
+/// with the author and the signed score.
 struct NativeResourceCard: View {
+    enum Style {
+        /// A list row on its own card; tapping anywhere opens the detail.
+        case card
+        /// Inside a thread card or a comment list; no background of its own.
+        case embedded
+        /// The top of a detail screen, flush with the background; tapping a link opens its page.
+        case detailHeader
+    }
+
     let resource: NativeResource
     var actions: ResourceActions = .none
+    var style: Style = .card
     var photoBytes: Data?
     var screenshotPhoto: UIImage?
     var embedThumbnailBytes: Data?
     var autoplayGifs = false
     var isForeground = true
+    /// Off when a surrounding thread card carries this resource's identifier.
+    var identified = true
     @State private var adultRevealed = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    private var isListRow: Bool { actions.open != nil }
     private var isComment: Bool { resource.kind == .entryComment || resource.kind == .linkComment }
     private var adultHidden: Bool { resource.adult && !adultRevealed && resource.deletion == nil }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            if resource.kind == .link { linkLayout } else { entryLayout }
-            actionsRow
+        switch style {
+        case .card:
+            content
+                .wykopCard(padding: 14)
+                .contentShape(Rectangle())
+                .onTapGesture { actions.open?() }
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier("resource-\(resource.id)")
+        case .embedded, .detailHeader:
+            content
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityElement(children: .contain)
+                .accessibilityIdentifier(identified ? "resource-\(resource.id)" : "")
         }
-        .wykopCard(padding: 14)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("resource-\(resource.id)")
+    }
+
+    @ViewBuilder private var content: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if resource.kind == .link {
+                if style == .detailHeader { linkDetailLayout } else { linkListLayout }
+            } else {
+                entryLayout
+                actionsRow
+            }
+        }
     }
 
     // MARK: Links
 
-    @ViewBuilder private var linkLayout: some View {
+    /// Android's `LinkItem`: badge and title, description with thumbnail, meta, tags and comments.
+    @ViewBuilder private var linkListLayout: some View {
         HStack(alignment: .top, spacing: 12) {
             LinkVoteBadge(vote: resource.vote, hot: resource.hot, pending: actions.pending,
                           action: actions.voteUp)
-                .padding(.top, 2)
-            title
+            Text(resource.title)
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         AdultContentGate(hidden: adultHidden, reveal: { adultRevealed = true }) {
-            VStack(alignment: .leading, spacing: 10) {
-                if isListRow { linkSummary } else { linkDetailBody }
-            }
-        }
-        linkMeta
-        if !resource.tags.isEmpty { tags }
-    }
-
-    @ViewBuilder private var title: some View {
-        let text = Text(resource.title)
-            .font(isListRow ? .headline : .title3.bold())
-            .multilineTextAlignment(.leading)
-            .foregroundStyle(.primary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-        if let open = actions.open {
-            Button(action: open) { text }.buttonStyle(.plain)
-        } else {
-            text
-        }
-    }
-
-    /// Description beside an 80 pt thumbnail, as in Wykop lists.
-    @ViewBuilder private var linkSummary: some View {
-        if resource.deletion != nil {
-            richContent
-        } else if !resource.description.isEmpty || resource.photo != nil {
-            HStack(alignment: .top, spacing: 12) {
-                Text(resource.description)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(4)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                if let photo = resource.photo {
-                    RemoteImage(url: photo.url, maxDimension: 240) {
-                        WykopTheme.cardInset
+            if resource.deletion != nil {
+                richContent
+            } else if !resource.description.isEmpty || resource.photo != nil {
+                HStack(alignment: .top, spacing: 10) {
+                    Text(resource.description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(4)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if let photo = resource.photo {
+                        RemoteImage(url: photo.url, maxDimension: 240) { WykopTheme.cardInset }
+                            .frame(width: 80, height: 80)
+                            .clipShape(RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
+                            .accessibilityHidden(true)
                     }
-                    .frame(width: 80, height: 80)
-                    .clipShape(RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
-                    .onTapGesture { actions.open?() }
-                    .accessibilityHidden(true)
                 }
             }
         }
+        linkMeta(showsTime: true)
+        HStack(alignment: .bottom, spacing: 8) {
+            tags.frame(maxWidth: .infinity, alignment: .leading)
+            Label("\(resource.commentCount)", systemImage: "bubble.left")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .accessibilityLabel(resource.kind == .link ? "Open link" : "Open entry")
+                .accessibilityValue(String(localized: "Comments") + ": \(resource.commentCount)")
+                .accessibilityAddTraits(.isButton)
+        }
     }
 
-    @ViewBuilder private var linkDetailBody: some View {
-        if resource.deletion == nil {
-            if !resource.description.isEmpty {
-                Text(resource.description).font(.body)
+    /// Android's `LinkDetailsHeader`: a full-width image, then the badge with the bury button
+    /// below it beside the title. The image, title and description open the article.
+    @ViewBuilder private var linkDetailLayout: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            if let photo = resource.photo, resource.deletion == nil {
+                AdultContentGate(hidden: adultHidden, reveal: { adultRevealed = true }) {
+                    RemoteImage(url: photo.url, maxDimension: 1200) { WykopTheme.cardInset }
+                        .frame(height: 200)
+                        .frame(maxWidth: .infinity)
+                        .clipped()
+                }
+                .accessibilityHidden(true)
             }
-            media
+            HStack(alignment: .top, spacing: 12) {
+                VStack(spacing: 4) {
+                    LinkVoteBadge(vote: resource.vote, hot: resource.hot, pending: actions.pending,
+                                  action: actions.voteUp)
+                    if let voteDown = actions.voteDown {
+                        Button(action: voteDown) {
+                            Text(resource.vote.state == "negative" ? "Undo bury" : "Bury")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(resource.vote.state == "negative" ? WykopTheme.voteNegative : .secondary)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(actions.pending)
+                        .accessibilityLabel(resource.vote.state == "negative" ? "Remove downvote" : "Downvote")
+                    }
+                }
+                Text(resource.title)
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.horizontal, 16)
+            if resource.deletion == nil, !resource.description.isEmpty {
+                Text(resource.description)
+                    .font(.subheadline)
+                    .padding(.horizontal, 16)
+            }
         }
-        if !resource.body.isEmpty || resource.deletion != nil { richContent }
+        .contentShape(Rectangle())
+        .onTapGesture { openSource() }
+        VStack(alignment: .leading, spacing: 8) {
+            if !resource.body.isEmpty || resource.deletion != nil { richContent }
+            if resource.deletion == nil, let embed = resource.embed {
+                NativeEmbedCard(embed: embed, thumbnailBytes: embedThumbnailBytes,
+                                loadTweet: actions.loadTweet, open: actions.openURL)
+            }
+            linkMeta(showsTime: false)
+            tags
+            actionsRow
+        }
+        .padding(.horizontal, 16)
+    }
+
+    private func openSource() {
+        guard let raw = resource.sourceURL, let url = URL(string: raw) else { return }
+        actions.openURL?(url)
     }
 
     /// "author • source • time", wrapping like Android's `FlowRow`.
-    private var linkMeta: some View {
-        FlowLayout(spacing: 5) {
-            authorName(font: .subheadline.weight(.semibold))
+    private func linkMeta(showsTime: Bool) -> some View {
+        FlowLayout(spacing: 4) {
+            authorName(font: .footnote.weight(.semibold))
             if let source = resource.sourceLabel {
                 separator
-                if let raw = resource.sourceURL, let url = URL(string: raw), let openURL = actions.openURL {
-                    Button(source) { openURL(url) }
-                        .font(.subheadline)
-                        .foregroundStyle(WykopTheme.tagBlue)
-                        .buttonStyle(.plain)
-                } else {
-                    Text(source).font(.subheadline).foregroundStyle(.secondary)
-                }
+                Button(source) { openSource() }
+                    .buttonStyle(.plain)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
-            if let time = PublishedTime.text(iso: resource.createdAt) {
+            if showsTime, let time = PublishedTime.text(iso: resource.createdAt) {
                 separator
-                Text(time).font(.subheadline).foregroundStyle(.secondary)
+                Text(time).font(.footnote).foregroundStyle(.secondary)
             }
         }
     }
 
     private var separator: some View {
-        Text(verbatim: "•").font(.subheadline).foregroundStyle(.tertiary).accessibilityHidden(true)
+        Text(verbatim: "•").font(.footnote).foregroundStyle(.tertiary).accessibilityHidden(true)
     }
 
-    private var tags: some View {
-        FlowLayout(spacing: 10) {
-            ForEach(resource.tags, id: \.self) { tag in
-                if let open = actions.openTag {
-                    Button("#\(tag)") { open(tag) }
-                        .buttonStyle(.plain)
-                } else {
-                    Text("#\(tag)")
+    /// Tags separated by dots, as on Android.
+    @ViewBuilder private var tags: some View {
+        if !resource.tags.isEmpty {
+            FlowLayout(spacing: 4) {
+                ForEach(Array(resource.tags.enumerated()), id: \.element) { index, tag in
+                    Group {
+                        if let open = actions.openTag {
+                            Button("#\(tag)") { open(tag) }.buttonStyle(.plain)
+                        } else {
+                            Text("#\(tag)")
+                        }
+                    }
+                    .foregroundStyle(WykopTheme.tagBlue)
+                    if index < resource.tags.count - 1 { separator }
                 }
             }
+            .font(.footnote)
         }
-        .font(.footnote.weight(.medium))
-        .foregroundStyle(.secondary)
     }
 
     // MARK: Entries and comments
@@ -152,7 +218,7 @@ struct NativeResourceCard: View {
             richContent
         } else {
             AdultContentGate(hidden: adultHidden, reveal: { adultRevealed = true }) {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 8) {
                     if !resource.body.isEmpty { richContent }
                     if let survey = resource.survey {
                         NativeSurveyView(survey: survey, vote: actions.surveyVote)
@@ -164,23 +230,21 @@ struct NativeResourceCard: View {
     }
 
     private var identity: some View {
-        HStack(alignment: .top, spacing: 10) {
+        HStack(alignment: .top, spacing: 8) {
             if let author = resource.author {
                 let size: CGFloat = dynamicTypeSize.isAccessibilitySize ? 48 : isComment ? 32 : 36
-                Group {
-                    if let openAuthor = actions.openAuthor {
-                        Button { openAuthor(author.name) } label: {
-                            AvatarView(url: author.avatarURL, name: author.name, size: size, gender: author.gender)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityHidden(true)
-                    } else {
+                if let openAuthor = actions.openAuthor {
+                    Button { openAuthor(author.name) } label: {
                         AvatarView(url: author.avatarURL, name: author.name, size: size, gender: author.gender)
                     }
+                    .buttonStyle(.plain)
+                    .accessibilityHidden(true)
+                } else {
+                    AvatarView(url: author.avatarURL, name: author.name, size: size, gender: author.gender)
                 }
             }
-            VStack(alignment: .leading, spacing: 2) {
-                authorName(font: .subheadline.weight(.bold))
+            VStack(alignment: .leading, spacing: 1) {
+                authorName(font: .subheadline.weight(.semibold))
                 if let time = PublishedTime.text(iso: resource.createdAt) {
                     Text(time).font(.caption).foregroundStyle(.secondary)
                 }
@@ -245,59 +309,37 @@ struct NativeResourceCard: View {
         }
     }
 
-    /// Reply or open, bury for links, favourite and more (Android's `ResourceInlineActionsRow`).
+    /// Reply, favourite and more (Android's `ResourceInlineActionsRow`). Unavailable actions
+    /// stay visible but dimmed, as on Android.
     private var actionsRow: some View {
-        HStack(spacing: 18) {
-            if isListRow, let open = actions.open {
-                Button(action: open) {
-                    Label("\(resource.commentCount)", systemImage: "bubble.left")
-                }
-                .accessibilityLabel(resource.kind == .link ? "Open link" : "Open entry")
-                .accessibilityValue(String(localized: "Comments") + ": \(resource.commentCount)")
-            } else {
-                if !isComment {
-                    Label("\(resource.commentCount)", systemImage: "bubble.left")
-                        .accessibilityLabel(String(localized: "Comments") + ": \(resource.commentCount)")
-                }
-                if let comment = actions.comment {
-                    Button(action: comment) {
-                        Label("Reply", systemImage: "arrowshape.turn.up.left")
-                    }
-                }
+        HStack(spacing: 16) {
+            Button { actions.comment?() } label: {
+                Label("Reply", systemImage: "arrowshape.turn.up.left")
+                    .font(.subheadline.weight(.medium))
             }
-            if resource.kind == .link, let voteDown = actions.voteDown {
-                Button(action: voteDown) {
-                    Label("Bury",
-                          systemImage: resource.vote.state == "negative" ? "arrow.down.circle.fill" : "arrow.down.circle")
-                }
-                .foregroundStyle(resource.vote.state == "negative" ? WykopTheme.voteNegative : .secondary)
-                .disabled(actions.pending)
-                .accessibilityLabel(resource.vote.state == "negative" ? "Remove downvote" : "Downvote")
+            .disabled(actions.comment == nil)
+            .opacity(actions.comment == nil ? 0.4 : 1)
+            Button { actions.favourite?() } label: {
+                Image(systemName: resource.favourite ? "star.fill" : "star")
+                    .foregroundStyle(resource.favourite ? WykopTheme.favouriteGold : .secondary)
             }
+            .disabled(actions.favourite == nil || actions.pending)
+            .opacity(actions.favourite == nil ? 0.4 : 1)
+            .accessibilityLabel(resource.favourite ? "Remove favorite" : "Favorite")
             Spacer(minLength: 0)
-            if let favourite = actions.favourite {
-                Button(action: favourite) {
-                    Image(systemName: resource.favourite ? "star.fill" : "star")
-                        .foregroundStyle(resource.favourite ? WykopTheme.favouriteGold : .secondary)
-                }
-                .disabled(actions.pending)
-                .accessibilityLabel(resource.favourite ? "Remove favorite" : "Favorite")
-            } else if resource.favourite {
-                Image(systemName: "star.fill").foregroundStyle(WykopTheme.favouriteGold)
-                    .accessibilityLabel("Favorite")
-            }
             if let menu = actions.menu {
                 Button(action: menu) {
                     Image(systemName: "ellipsis")
-                        .frame(width: 24, height: 20)
+                        .rotationEffect(.degrees(90))
+                        .frame(width: 28, height: 24)
                         .contentShape(Rectangle())
                 }
                 .accessibilityLabel("More actions")
             }
         }
-        .font(.subheadline)
         .labelStyle(.titleAndIcon)
         .buttonStyle(.plain)
-        .foregroundStyle(.secondary)
+        .foregroundStyle(.primary)
+        .padding(.top, 2)
     }
 }

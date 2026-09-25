@@ -9,7 +9,7 @@ import PodkopShared
 final class ContentTests: XCTestCase {
     func testBridgePayloadPreservesUnknownDeletionMediaAndCapabilities() {
         let photo = IOSPhoto(url: "https://example.com/p.png", width: 640, height: 480,
-                             mimeType: "image/png", key: "photo-key")
+                             mimeType: "image/png", key: "photo-key", label: "foto")
         let survey = IOSSurvey(question: "Pytanie?",
                                answers: [IOSSurveyAnswer(id: 2, text: "Tak", count: 3, selected: true)],
                                count: 3, canVote: false, selectedOption: nil)
@@ -22,7 +22,20 @@ final class ContentTests: XCTestCase {
             commentsCount: 9, votesUp: 5, votesDown: 1, voted: "negative",
             canVoteUp: true, canVoteDown: true, canUndoVote: false, canDelete: false,
             tags: ["nauka"], photo: photo, embed: nil, survey: survey,
-            sourceUrl: nil, sourceLabel: nil, hot: false, recommended: true, slug: ""
+            sourceUrl: nil, sourceLabel: nil, hot: false, recommended: true, slug: "",
+            canReply: true, canFavourite: true,
+            inlineComments: [IOSResource(
+                id: 5, kind: "entryComment", title: "", content: "reply", author: "Ola",
+                adult: false, deleted: false, editable: false, favourite: false,
+                description: "", authorAvatarUrl: nil, authorColor: nil,
+                authorVerified: false, authorOnline: false, authorRank: nil, authorGender: nil,
+                deletionReason: nil, parentId: 77, createdAt: nil,
+                commentsCount: 0, votesUp: 0, votesDown: 0, voted: "none",
+                canVoteUp: false, canVoteDown: false, canUndoVote: false, canDelete: false,
+                tags: [], photo: nil, embed: nil, survey: nil,
+                sourceUrl: nil, sourceLabel: nil, hot: false, recommended: false, slug: "",
+                canReply: false, canFavourite: false, inlineComments: []
+            )]
         )
         let resource = NativeResource(payload)
         XCTAssertEqual(resource.id, "unknown:77")
@@ -38,6 +51,9 @@ final class ContentTests: XCTestCase {
         XCTAssertEqual(resource.photo?.key, "photo-key")
         XCTAssertEqual(resource.survey?.answers.first?.selected, true)
         XCTAssertEqual(resource.tags, ["nauka"])
+        XCTAssertEqual(resource.photo?.label, "foto")
+        XCTAssertTrue(resource.canReply)
+        XCTAssertEqual(resource.inlineComments.map(\.id), ["entryComment:5"])
         let unknownDeletion = NativeResource(IOSResource(
             id: 78, kind: "entry", title: "", content: "must stay hidden", author: nil,
             adult: false, deleted: true, editable: false, favourite: false,
@@ -47,7 +63,8 @@ final class ContentTests: XCTestCase {
             commentsCount: 0, votesUp: 0, votesDown: 0, voted: "none",
             canVoteUp: false, canVoteDown: false, canUndoVote: false, canDelete: false,
             tags: [], photo: nil, embed: nil, survey: nil,
-            sourceUrl: nil, sourceLabel: nil, hot: false, recommended: false, slug: ""
+            sourceUrl: nil, sourceLabel: nil, hot: false, recommended: false, slug: "",
+            canReply: false, canFavourite: false, inlineComments: []
         ))
         XCTAssertEqual(unknownDeletion.deletion, .unknown)
     }

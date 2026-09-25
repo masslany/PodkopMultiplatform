@@ -21,12 +21,13 @@ struct NativeHitsView: View {
                         Button(title(for: sort)) { model.select(sort) }
                     }
                 } label: {
-                    Label(title(for: model.sort), systemImage: "line.3.horizontal.decrease")
+                    DropdownLabel(title: title(for: model.sort))
                 }
                 .accessibilityIdentifier("hitsSort")
                 Button { pickingArchive = true } label: {
-                    Label(archiveTitle, systemImage: "calendar")
+                    DropdownLabel(title: archiveTitle, systemImage: "calendar")
                 }
+                .buttonStyle(.plain)
                 .accessibilityIdentifier("hitsArchive")
             }
         } rows: {

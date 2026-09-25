@@ -21,6 +21,8 @@ import org.koin.dsl.module
 import platform.Foundation.NSData
 import platform.posix.memcpy
 import pl.masslany.podkop.business.auth.domain.AuthRepository
+import pl.masslany.podkop.business.common.domain.models.common.Comment
+import pl.masslany.podkop.business.common.domain.models.common.Photo
 import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
@@ -79,7 +81,15 @@ class IOSNotificationStatus(
 class IOSLinkIntent(val kind: String, val id: Int? = null)
 class IOSPageRequest(val kind: String, val value: String? = null)
 class IOSPagePolicy(val kind: String, val initial: IOSPageRequest)
-class IOSPhoto(val url: String, val width: Int, val height: Int, val mimeType: String, val key: String)
+class IOSPhoto(
+    val url: String,
+    val width: Int,
+    val height: Int,
+    val mimeType: String,
+    val key: String,
+    /** Where the image came from, shown as "źródło: …" under it. */
+    val label: String = "",
+)
 class IOSEmbed(val key: String, val url: String, val thumbnailUrl: String, val type: String)
 class IOSSurveyAnswer(val id: Int, val text: String, val count: Int, val selected: Boolean)
 class IOSSurvey(
@@ -138,6 +148,10 @@ class IOSResource(
     val hot: Boolean,
     val recommended: Boolean,
     val slug: String,
+    val canReply: Boolean = false,
+    val canFavourite: Boolean = false,
+    /** The newest comments the API embeds with a resource (entries in lists, link comment replies). */
+    val inlineComments: List<IOSResource> = emptyList(),
 )
 class IOSResourcePage(
     val items: List<IOSResource>,
@@ -887,7 +901,7 @@ internal fun ResourceItem.toIOSResource(): IOSResource {
         canUndoVote = actions?.undoVote ?: false,
         canDelete = deletable && (actions?.delete ?: false),
         tags = tags,
-        photo = media?.photo?.let { IOSPhoto(it.url, it.width, it.height, it.mimeType, it.key) },
+        photo = media?.photo?.toIOS(),
         embed = media?.embed?.let { IOSEmbed(it.key, it.url, it.thumbnail, it.type) },
         survey = media?.survey?.let { survey ->
             IOSSurvey(
@@ -905,8 +919,70 @@ internal fun ResourceItem.toIOSResource(): IOSResource {
         hot = hot,
         recommended = recommended,
         slug = slug,
+        canReply = actions?.create ?: false,
+        canFavourite = actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
+        inlineComments = comments?.items.orEmpty().map { it.toIOSResource() },
     )
 }
+
+private fun Photo.toIOS() = IOSPhoto(url, width, height, mimeType, key, label)
+
+/** An embedded comment, mapped like a full resource so Swift renders both the same way. */
+internal fun Comment.toIOSResource(): IOSResource = IOSResource(
+    id = id,
+    kind = if (resource == Resource.LinkComment) "linkComment" else "entryComment",
+    title = "",
+    content = content,
+    author = author.username,
+    adult = adult,
+    deleted = deleted != Deleted.None,
+    editable = editable,
+    favourite = favourite,
+    description = "",
+    authorAvatarUrl = author.avatar,
+    authorColor = when (author.color) {
+        NameColor.Orange -> "orange"
+        NameColor.Burgundy -> "burgundy"
+        NameColor.Green -> "green"
+        NameColor.Black -> "black"
+    },
+    authorVerified = author.verified,
+    authorOnline = author.online,
+    authorRank = author.rank.position,
+    authorGender = author.gender.toIOS(),
+    deletionReason = when (deleted) {
+        Deleted.Moderator -> "moderator"
+        Deleted.Author -> "author"
+        Deleted.Host -> "entryAuthor"
+        Deleted.None -> null
+    },
+    parentId = parentId,
+    createdAt = createdAt?.toString(),
+    commentsCount = comments?.count ?: 0,
+    votesUp = votes.up,
+    votesDown = votes.down,
+    voted = when (voted) {
+        Voted.Positive -> "positive"
+        Voted.Negative -> "negative"
+        Voted.None -> "none"
+    },
+    canVoteUp = actions.voteUp,
+    canVoteDown = actions.voteDown,
+    canUndoVote = actions.undoVote,
+    canDelete = deletable && actions.delete,
+    tags = tags,
+    photo = media.photo?.toIOS(),
+    embed = media.embed?.let { IOSEmbed(it.key, it.url, it.thumbnail, it.type) },
+    survey = null,
+    sourceUrl = null,
+    sourceLabel = null,
+    hot = false,
+    recommended = false,
+    slug = slug,
+    canReply = actions.create,
+    canFavourite = actions.createFavourite || actions.deleteFavourite,
+    inlineComments = comments?.items.orEmpty().map { it.toIOSResource() },
+)
 
 private fun LinkDraftDetails.toIOSLinkDraft() = IOSLinkDraft(
     key, url, title.orEmpty(), description.orEmpty(), tags, adult,

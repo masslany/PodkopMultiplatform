@@ -17,7 +17,7 @@ struct NativeDetailView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 12) {
+            LazyVStack(alignment: .leading, spacing: 16) {
                 switch model.phase {
                 case .idle, .loading:
                     ProgressView("Loading…").frame(maxWidth: .infinity, minHeight: 220)
@@ -28,24 +28,29 @@ struct NativeDetailView: View {
                         Button("Retry") { model.reload() }
                     }
                 case .loaded:
+                    // Like Android, the resource sits on the page background, not on a card.
                     if let resource = model.resource {
                         NativeResourceCard(resource: resource, actions: actions(for: resource),
+                                           style: .detailHeader,
                                            autoplayGifs: dependencies.session.autoplayGifs,
                                            isForeground: dependencies.isForeground)
+                            .padding(.horizontal, resource.kind == .link ? 0 : 16)
+                            .padding(.top, resource.kind == .link && resource.photo != nil ? 0 : 12)
                     }
                 }
                 if model.actionFailed {
                     Label("Action failed. Try again.", systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.red)
+                        .padding(.horizontal, 16)
                 }
                 if model.phase == .loaded {
-                    commentsSection
                     if model.kind == .link, !model.related.isEmpty { relatedSection }
+                    commentsSection.padding(.horizontal, 12)
                 }
             }
+            .padding(.bottom, 20)
             .frame(maxWidth: 760)
             .frame(maxWidth: .infinity)
-            .padding(12)
         }
         .refreshable { model.reload() }
         .task { model.start() }
@@ -78,45 +83,59 @@ struct NativeDetailView: View {
 
     private var commentsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("Comments").font(.title3.bold())
-                if let count = model.resource?.commentCount, count > 0 {
-                    Text("\(count)").font(.title3).foregroundStyle(.secondary)
+            if model.kind == .link {
+                Menu {
+                    Button("Best") { model.selectCommentSort("best") }
+                    Button("Newest") { model.selectCommentSort("newest") }
+                    Button("Oldest") { model.selectCommentSort("oldest") }
+                } label: {
+                    DropdownLabel(title: commentSortTitle)
                 }
-                Spacer()
-                if model.kind == .link {
-                    Menu {
-                        Button("Best") { model.selectCommentSort("best") }
-                        Button("Newest") { model.selectCommentSort("newest") }
-                        Button("Oldest") { model.selectCommentSort("oldest") }
-                    } label: {
-                        Label(commentSortTitle, systemImage: "line.3.horizontal.decrease")
-                    }
-                    .accessibilityIdentifier("commentSort")
-                }
+                .accessibilityIdentifier("commentSort")
+            } else {
+                Text("Comments").font(.headline).padding(.horizontal, 4)
             }
             if model.commentsLoading && model.comments.isEmpty {
                 ProgressView("Loading…").frame(maxWidth: .infinity)
             } else if model.commentsError && model.comments.isEmpty {
-                Button("Retry comments") { model.retryComments() }
-                    .buttonStyle(.bordered)
+                ThreadMoreButton(title: String(localized: "Retry comments")) { model.retryComments() }
             } else if model.comments.isEmpty {
                 ContentUnavailableView("Nothing here yet", systemImage: "bubble")
             } else {
                 ForEach(model.comments) { comment in
-                    NativeResourceCard(resource: comment,
-                                       actions: actions(for: comment, replyParentID: comment.sourceID),
-                                       autoplayGifs: dependencies.session.autoplayGifs,
-                                       isForeground: dependencies.isForeground)
+                    commentThread(comment)
                         .onAppear {
                             if comment.id == model.comments.last?.id { model.loadMoreComments() }
                         }
-                    if model.kind == .link { replies(for: comment.sourceID) }
                 }
                 if model.commentsLoading { ProgressView("Loading…").frame(maxWidth: .infinity) }
                 if model.nextCommentsError {
-                    Button("Retry next page") { model.retryComments() }
-                        .buttonStyle(.bordered)
+                    ThreadMoreButton(title: String(localized: "Retry next page")) { model.retryComments() }
+                }
+            }
+        }
+    }
+
+    /// A comment card with its replies inside it: the two the API embeds until the reader asks
+    /// for all of them (Android's `LinkDetailsCommentItem`).
+    private func commentThread(_ comment: NativeResource) -> some View {
+        let state = model.replies[comment.sourceID] ?? DetailModel.ReplyState()
+        let replies = state.rows.isEmpty ? comment.inlineComments : state.rows
+        let remaining = max(0, comment.commentCount - replies.count)
+        return ResourceThreadCard(
+            root: comment, rootActions: actions(for: comment, replyParentID: comment.sourceID),
+            children: model.kind == .link ? replies : [],
+            childActions: { actions(for: $0, replyParentID: comment.sourceID) },
+            autoplayGifs: dependencies.session.autoplayGifs,
+            isForeground: dependencies.isForeground
+        ) {
+            if model.kind == .link, !state.exhausted, remaining > 0 || state.loading || state.error {
+                ThreadMoreButton(
+                    title: state.error ? String(localized: "Retry replies")
+                        : String(localized: "Show all (\(remaining))"),
+                    loading: state.loading
+                ) {
+                    model.loadReplies(for: comment.sourceID)
                 }
             }
         }
@@ -130,76 +149,43 @@ struct NativeDetailView: View {
         }
     }
 
-    /// Replies sit under their comment behind a thread line, as on wykop.pl.
-    @ViewBuilder private func replies(for commentID: Int) -> some View {
-        let state = model.replies[commentID] ?? DetailModel.ReplyState()
-        if !state.rows.isEmpty || state.loading || !state.exhausted {
-            HStack(alignment: .top, spacing: 10) {
-                RoundedRectangle(cornerRadius: 1)
-                    .fill(WykopTheme.separator)
-                    .frame(width: 2)
-                    .padding(.leading, 14)
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(state.rows) { reply in
-                        NativeResourceCard(resource: reply,
-                                           actions: actions(for: reply, replyParentID: commentID),
-                                           autoplayGifs: dependencies.session.autoplayGifs,
-                                           isForeground: dependencies.isForeground)
-                    }
-                    if state.loading { ProgressView().padding(.vertical, 6) }
-                    if !state.exhausted && !state.loading {
-                        Button(state.error ? "Retry replies" : "Show replies") {
-                            model.loadReplies(for: commentID)
-                        }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(WykopTheme.tagBlue)
-                        .padding(.vertical, 4)
-                    }
-                }
-            }
-        }
-    }
-
+    /// Related links scroll sideways as compact cards, as on Android.
     private var relatedSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Related links").font(.title3.bold())
-            ForEach(model.related) { item in
-                HStack {
-                    Button {
-                        dependencies.router.navigate(.link(item.sourceID))
-                    } label: {
-                        Text(item.title.isEmpty ? item.body : item.title)
-                            .multilineTextAlignment(.leading)
+            Text("Related links").font(.headline).padding(.horizontal, 16)
+            ScrollView(.horizontal) {
+                LazyHStack(spacing: 10) {
+                    ForEach(model.related) { item in
+                        RelatedLinkCard(
+                            resource: item,
+                            pending: model.mutating.contains(ResourceIdentity(item)),
+                            open: { openRelated(item) },
+                            openAuthor: { dependencies.router.navigate(.user($0)) },
+                            voteUp: item.vote.allowsUp ? {
+                                model.submit(.relatedVote(linkID: model.id, resource: item,
+                                                          remove: item.vote.state == "positive", down: false))
+                            } : nil,
+                            voteDown: item.vote.allowsDown ? {
+                                model.submit(.relatedVote(linkID: model.id, resource: item,
+                                                          remove: item.vote.state == "negative", down: true))
+                            } : nil
+                        )
                     }
-                    .buttonStyle(.plain)
-                    Spacer()
-                    Button {
-                        requireAccount {
-                            model.submit(.relatedVote(linkID: model.id, resource: item,
-                                                      remove: item.vote.state == "positive", down: false))
-                        }
-                    } label: {
-                        Label("\(item.vote.up)", systemImage: "hand.thumbsup")
-                    }
-                    .disabled(!(item.vote.canUp || item.vote.canUndo))
-                    Button {
-                        requireAccount {
-                            model.submit(.relatedVote(linkID: model.id, resource: item,
-                                                      remove: item.vote.state == "negative", down: true))
-                        }
-                    } label: {
-                        Image(systemName: "hand.thumbsdown")
-                    }
-                    .disabled(!(item.vote.canDown || item.vote.canUndo))
                 }
-                .wykopCard(padding: 12)
+                .padding(.horizontal, 12)
             }
+            .scrollIndicators(.hidden)
         }
     }
 
+    private func openRelated(_ item: NativeResource) {
+        if let raw = item.sourceURL, let url = URL(string: raw) { openURL(url) }
+    }
+
+    /// Detail actions follow Android: each is offered only when the API allows it for the viewer.
     private func actions(for resource: NativeResource, replyParentID: Int? = nil) -> ResourceActions {
-        let loggedIn = dependencies.session.isLoggedIn
-        let commentAction: (() -> Void)? = {
+        let live = resource.deletion == nil
+        let commentAction: () -> Void = {
             if model.kind == .link {
                 dependencies.router.presentComposer(.createLinkComment(
                     linkID: model.id, parentCommentID: replyParentID,
@@ -209,35 +195,37 @@ struct NativeDetailView: View {
                     entryID: model.id, replyTarget: replyParentID == nil ? nil : resource.author?.name))
             }
         }
+        let canDown = (resource.kind == .link || resource.kind == .linkComment) && resource.vote.allowsDown
         return ResourceActions(
             openAuthor: { dependencies.router.navigate(.user($0)) },
             openTag: { dependencies.router.navigate(.tag($0)) },
             openURL: { openURL($0) },
-            voteUp: resource.deletion == nil && (!loggedIn || resource.vote.canUp || resource.vote.canUndo) ? {
-                requireAccount {
-                    model.submit(.voteUp(resource, remove: resource.vote.state == "positive"))
+            voteUp: live && resource.vote.allowsUp ? {
+                model.submit(.voteUp(resource, remove: resource.vote.state == "positive"))
+            } : nil,
+            voteDown: live && canDown ? {
+                if resource.kind == .link && resource.vote.state != "negative" {
+                    downvoteTarget = resource
+                } else {
+                    model.submit(.voteDown(resource, remove: resource.vote.state == "negative", reason: nil))
                 }
             } : nil,
-            voteDown: (resource.kind == .link || resource.kind == .linkComment) && resource.deletion == nil &&
-                (!loggedIn || resource.vote.canDown || resource.vote.canUndo) ? {
-                requireAccount {
-                    if resource.kind == .link && resource.vote.state != "negative" {
-                        downvoteTarget = resource
-                    } else {
-                        model.submit(.voteDown(resource, remove: resource.vote.state == "negative", reason: nil))
-                    }
-                }
+            favourite: live && resource.canFavourite ? {
+                model.submit(.favourite(resource, enabled: !resource.favourite))
             } : nil,
-            favourite: resource.deletion != nil ? nil : {
-                requireAccount { model.submit(.favourite(resource, enabled: !resource.favourite)) }
-            },
-            comment: commentAction,
+            comment: live && canReply(resource) ? commentAction : nil,
             menu: { actionTarget = resource },
             surveyVote: resource.kind == .entry && resource.survey?.canVote == true ? { option in
                 requireAccount { model.submit(.survey(entryID: resource.sourceID, option: option)) }
             } : nil,
-            loadTweet: { try await dependencies.loadTweet($0) }
+            loadTweet: { try await dependencies.loadTweet($0) },
+            pending: model.mutating.contains(ResourceIdentity(resource))
         )
+    }
+
+    /// Comments inherit the right to reply from the link or entry being viewed.
+    private func canReply(_ resource: NativeResource) -> Bool {
+        resource.canReply || (dependencies.session.isLoggedIn && (model.resource?.canReply ?? false))
     }
 
     private func requireAccount(_ action: () -> Void) {

@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct NativeFeedView: View {
-    @Environment(\.openURL) private var openURL
     @State private var model: FeedModel
     let router: AppRouter
     let session: SessionModel
@@ -91,7 +90,7 @@ struct NativeFeedView: View {
                     }
                 }
             } label: {
-                Label(sortTitle, systemImage: "line.3.horizontal.decrease")
+                DropdownLabel(title: sortTitle)
             }
             .accessibilityIdentifier("feedSort")
             if model.query.tab == .entries && model.query.sort == "hot" {
@@ -100,18 +99,21 @@ struct NativeFeedView: View {
                         Button("\(hours) h") { model.select(sort: "hot", hotHours: hours) }
                     }
                 } label: {
-                    Label("\(model.query.hotHours) h", systemImage: "clock")
+                    DropdownLabel(title: "\(model.query.hotHours) h", systemImage: "clock")
                 }
                 .accessibilityIdentifier("hotPeriod")
             }
             Spacer()
             Button { model.gallery.toggle() } label: {
                 Image(systemName: model.gallery ? "list.bullet" : "square.grid.2x2")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(width: 36, height: 34)
+                    .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
+            .buttonStyle(.plain)
             .accessibilityLabel(model.gallery ? "List view" : "Gallery view")
             .accessibilityIdentifier("feedGallery")
         }
-        .buttonStyle(.bordered)
         .padding(.top, 8)
     }
 
@@ -137,7 +139,15 @@ struct NativeFeedView: View {
                     .labelStyle(.titleAndIcon)
                     .foregroundStyle(WykopTheme.hotOrange)
                 Spacer()
-                Button("See all") { router.navigate(.hits, in: .links) }
+                Button { router.navigate(.hits, in: .links) } label: {
+                    HStack(spacing: 2) {
+                        Text("See all")
+                        Image(systemName: "chevron.right").font(.caption.weight(.semibold))
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
             }
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 10) {
@@ -152,9 +162,7 @@ struct NativeFeedView: View {
 
     @ViewBuilder private var rows: some View {
         ForEach(model.items) { item in
-            NativeResourceCard(resource: item, actions: actions(for: item),
-                               autoplayGifs: session.autoplayGifs,
-                               isForeground: dependencies.isForeground)
+            ResourceListRow(item: item, tab: model.query.tab, dependencies: dependencies)
                 .onAppear {
                     if item.id == model.items.last?.id { model.loadNext() }
                 }
@@ -166,9 +174,5 @@ struct NativeFeedView: View {
         if model.nextError {
             Button("Retry next page") { model.retry() }.buttonStyle(.bordered)
         }
-    }
-
-    private func actions(for item: NativeResource) -> ResourceActions {
-        .navigation(for: item, in: model.query.tab, dependencies: dependencies, openURL: openURL)
     }
 }

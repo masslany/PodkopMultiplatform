@@ -118,8 +118,7 @@ struct NativeTagView: View {
                 Button("All") { model.select(sort: .all) }
                 Button("Best") { model.select(sort: .best) }
             } label: {
-                Label(model.sort == .all ? String(localized: "All") : String(localized: "Best"),
-                      systemImage: "line.3.horizontal.decrease")
+                DropdownLabel(title: model.sort == .all ? String(localized: "All") : String(localized: "Best"))
             }
             .accessibilityIdentifier("tagSort")
             Menu {
@@ -127,11 +126,10 @@ struct NativeTagView: View {
                     Button(title(for: kind)) { model.select(kind: kind) }
                 }
             } label: {
-                Label(title(for: model.kind), systemImage: "square.stack")
+                DropdownLabel(title: title(for: model.kind))
             }
             .accessibilityIdentifier("tagType")
         }
-        .buttonStyle(.bordered)
     }
 
     @ViewBuilder private var gallery: some View {

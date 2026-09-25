@@ -8,8 +8,15 @@ import Observation
 @MainActor @Observable
 final class ResourceInteractor {
     private(set) var pending = Set<ResourceIdentity>()
-    /// The resource whose actions sheet the scene's modal host presents.
-    var actionTarget: NativeResource?
+    /// A resource whose actions sheet the scene's modal host presents, with the link or entry it
+    /// belongs to when it is a comment.
+    struct ActionTarget: Identifiable {
+        let resource: NativeResource
+        let root: NativeResource
+        var id: String { resource.id }
+    }
+
+    var actionTarget: ActionTarget?
     private let mutator: DetailMutating
     private let updates: ResourceUpdates
     private let onFailure: () -> Void

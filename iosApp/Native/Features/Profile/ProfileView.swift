@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct NativeProfileView: View {
-    @Environment(\.openURL) private var openURL
     @State private var model: ProfileModel
     let tab: AppTab
     let dependencies: AppDependencies
@@ -129,7 +128,7 @@ struct NativeProfileView: View {
     }
 
     private var bannerPlaceholder: some View {
-        LinearGradient(colors: [WykopTheme.tagBlue, WykopTheme.tagBlue.opacity(0.55)],
+        LinearGradient(colors: [WykopTheme.cardInset, WykopTheme.separator],
                        startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
@@ -238,13 +237,13 @@ struct NativeProfileView: View {
                             Text(title(for: item)).font(.caption).foregroundStyle(.secondary)
                             Text(count(item, profile).formatted())
                                 .font(.headline.monospacedDigit())
-                                .foregroundStyle(selected ? WykopTheme.tagBlue : .primary)
+                                .foregroundStyle(.primary)
                         }
                         .frame(minWidth: 72, alignment: .leading)
                         .padding(.horizontal, 12).padding(.vertical, 8)
                         .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .strokeBorder(selected ? WykopTheme.tagBlue : .clear, lineWidth: 2))
+                            .strokeBorder(selected ? Color.primary : .clear, lineWidth: 2))
                     }
                     .buttonStyle(.plain)
                     .accessibilityAddTraits(selected ? .isSelected : [])
@@ -262,9 +261,8 @@ struct NativeProfileView: View {
                     Button(title(for: section)) { model.select(section: section) }
                 }
             } label: {
-                Label(title(for: model.section), systemImage: "line.3.horizontal.decrease")
+                DropdownLabel(title: title(for: model.section))
             }
-            .buttonStyle(.bordered)
             .accessibilityIdentifier("profileSection")
         }
     }
@@ -296,10 +294,7 @@ struct NativeProfileView: View {
     @ViewBuilder private func rowView(_ row: ProfileRow) -> some View {
         switch row {
         case .resource(let item):
-            NativeResourceCard(resource: item,
-                               actions: .navigation(for: item, in: tab, dependencies: dependencies, openURL: openURL),
-                               autoplayGifs: dependencies.session.autoplayGifs,
-                               isForeground: dependencies.isForeground)
+            ResourceListRow(item: item, tab: tab, dependencies: dependencies)
         case .user(let name, let color, let gender, let online, let verified, let avatarURL):
             Button { router.navigate(.user(name), in: tab) } label: {
                 HStack {

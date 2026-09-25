@@ -8,7 +8,7 @@ struct CollectionScroll<Controls: View, Rows: View>: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                controls.buttonStyle(.bordered).padding(.top, 8)
+                controls.padding(.top, 8)
                 rows
             }
             .padding(.horizontal, 12)

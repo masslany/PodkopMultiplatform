@@ -84,6 +84,22 @@ final class InteractionTests: XCTestCase {
         XCTAssertEqual(mutator.mutations.count, 1)
     }
 
+    func testVotesOnEmbeddedCommentsReachTheirParentRow() async {
+        let mutator = GatedMutator()
+        let updates = ResourceUpdates()
+        let interactor = ResourceInteractor(mutator: mutator, updates: updates) {}
+        let comment = NativeResource(sourceID: 3, kind: .entryComment, body: "c", parentID: 7,
+                                     vote: NativeVote(up: 1, down: 0, state: "none", canUp: true,
+                                                      canDown: false, canUndo: false))
+        let parent = NativeResource(sourceID: 7, kind: .entry, body: "e", inlineComments: [comment])
+
+        interactor.voteUp(comment)
+        await settle()
+        mutator.finish?(.success(()))
+        await settle()
+        XCTAssertEqual(updates.reconcile(parent)?.inlineComments.first?.vote.up, 2)
+    }
+
     func testVoteArithmetic() {
         let negative = NativeVote(up: 3, down: 2, state: "negative", canUp: true, canDown: true, canUndo: true)
         let up = negative.upvoted(remove: false)

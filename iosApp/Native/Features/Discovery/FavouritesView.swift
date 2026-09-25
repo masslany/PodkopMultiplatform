@@ -21,15 +21,14 @@ struct NativeFavouritesView: View {
                         Button(title(for: kind)) { model.select(kind: kind) }
                     }
                 } label: {
-                    Label(title(for: model.kind), systemImage: "square.stack")
+                    DropdownLabel(title: title(for: model.kind))
                 }
                 .accessibilityIdentifier("favouritesType")
                 Menu {
                     Button("Newest") { model.select(sort: .newest) }
                     Button("Oldest") { model.select(sort: .oldest) }
                 } label: {
-                    Label(model.sort == .newest ? String(localized: "Newest") : String(localized: "Oldest"),
-                          systemImage: "arrow.up.arrow.down")
+                    DropdownLabel(title: model.sort == .newest ? String(localized: "Newest") : String(localized: "Oldest"))
                 }
                 .accessibilityIdentifier("favouritesSort")
             }

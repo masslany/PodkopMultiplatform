@@ -29,6 +29,12 @@ struct NativeMediaView: View {
                     .accessibilityAddTraits(.isButton)
                     .accessibilityHint("Opens the image")
                     .accessibilityIdentifier("mediaImage")
+                if !photo.label.isEmpty {
+                    Text("Source: \(photo.label)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
                 if photo.isAnimated {
                     Button((playbackOverride ?? autoplay) ? "Pause animation" : "Play animation") {
                         playbackOverride = !(playbackOverride ?? autoplay)

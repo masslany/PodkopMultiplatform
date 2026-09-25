@@ -341,7 +341,11 @@
     "%lld h ago" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "%lld godz. temu" } } } },
     "%lld h %lld min ago" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "%1$lld godz. %2$lld min temu" } } } },
     "%lld days ago" : { "localizations" : { "pl" : { "variations" : { "plural" : { "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld dzień temu" } }, "few" : { "stringUnit" : { "state" : "translated", "value" : "%lld dni temu" } }, "many" : { "stringUnit" : { "state" : "translated", "value" : "%lld dni temu" } }, "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld dni temu" } } } } }, "en" : { "variations" : { "plural" : { "one" : { "stringUnit" : { "state" : "translated", "value" : "%lld day ago" } }, "other" : { "stringUnit" : { "state" : "translated", "value" : "%lld days ago" } } } } } } },
-    "This content is for adults only.\nTap to show." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Materiał zawiera treści +18.\nKliknij, aby pokazać." } } } }
+    "This content is for adults only.\nTap to show." : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Materiał zawiera treści +18.\nKliknij, aby pokazać." } } } },
+    "Show comments (%lld)" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Pokaż komentarze (%lld)" } } } },
+    "Show all (%lld)" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Pokaż wszystkie (%lld)" } } } },
+    "Source: %@" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "źródło: %@" } } } },
+    "Undo bury" : { "localizations" : { "pl" : { "stringUnit" : { "state" : "translated", "value" : "Cofnij zakop" } } } }
   },
   "version" : "1.0"
 }

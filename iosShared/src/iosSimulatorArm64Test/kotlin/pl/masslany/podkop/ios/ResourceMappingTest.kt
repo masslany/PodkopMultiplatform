@@ -7,6 +7,7 @@ import kotlin.test.assertTrue
 import pl.masslany.podkop.business.common.domain.models.common.Actions
 import pl.masslany.podkop.business.common.domain.models.common.Answer
 import pl.masslany.podkop.business.common.domain.models.common.Author
+import pl.masslany.podkop.business.common.domain.models.common.Comment
 import pl.masslany.podkop.business.common.domain.models.common.Comments
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
 import pl.masslany.podkop.business.common.domain.models.common.Embed
@@ -78,5 +79,41 @@ class ResourceMappingTest {
         assertEquals("twitter", mapped.embed?.type)
         assertEquals(1, mapped.survey?.selectedOption)
         assertFalse(mapped.survey?.canVote ?: true)
+        assertEquals("foto", mapped.photo?.label)
+        assertFalse(mapped.canReply)
+        assertFalse(mapped.canFavourite)
+    }
+
+    @Test
+    fun mapsEmbeddedCommentsAsChildResources() {
+        val actions = Actions(
+            create = true, createFavourite = true, delete = false,
+            deleteFavourite = false, finishAma = false, report = true,
+            startAma = false, undoVote = false, update = false,
+            voteDown = true, voteUp = true, vote = true,
+        )
+        val author = Author(
+            avatar = "", blacklist = false, color = NameColor.Burgundy, company = false,
+            follow = false, gender = Gender.Female, note = false, online = false,
+            rank = Rank(position = 0, trend = 0), status = "active", username = "Ola", verified = false,
+        )
+        val comment = Comment(
+            actions = actions, adult = false, archive = false, author = author, blacklist = false,
+            comments = Comments(count = 3, hot = false, items = emptyList()), content = "odpowiedź",
+            createdAt = null, deletable = false, deleted = Deleted.None, device = "", editable = false,
+            favourite = false, id = 5, media = Media(embed = null, photo = null, survey = null),
+            parentId = 9, resource = Resource.LinkComment, slug = "s", tags = emptyList(),
+            voted = Voted.Positive, votes = Votes(count = 4, down = 1, up = 3),
+        )
+
+        val mapped = comment.toIOSResource()
+        assertEquals("linkComment", mapped.kind)
+        assertEquals(9, mapped.parentId)
+        assertEquals("female", mapped.authorGender)
+        assertEquals("burgundy", mapped.authorColor)
+        assertEquals(3, mapped.commentsCount)
+        assertEquals("positive", mapped.voted)
+        assertTrue(mapped.canReply)
+        assertTrue(mapped.canVoteDown)
     }
 }

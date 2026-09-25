@@ -34,6 +34,8 @@ struct NativePhoto: Hashable {
     let height: Int
     let mimeType: String
     let key: String
+    /// The image source Wykop shows under it ("źródło: …").
+    var label: String = ""
     var isAnimated: Bool { mimeType.lowercased().contains("gif") }
 }
 
@@ -84,6 +86,10 @@ struct NativeResource: Identifiable, Hashable {
     let hot: Bool
     let recommended: Bool
     let slug: String
+    let canReply: Bool
+    let canFavourite: Bool
+    /// Newest comments embedded by the API: under entries in lists, and replies under link comments.
+    var inlineComments: [NativeResource]
 
     var id: String { "\(kind.rawValue):\(sourceID)" }
 
@@ -115,7 +121,7 @@ struct NativeResource: Identifiable, Hashable {
         tags = value.tags
         photo = value.photo.map { NativePhoto(url: $0.url, width: Int($0.width),
                                               height: Int($0.height), mimeType: $0.mimeType,
-                                              key: $0.key) }
+                                              key: $0.key, label: $0.label) }
         embed = value.embed.map { NativeEmbed(key: $0.key, url: $0.url,
                                              thumbnailURL: $0.thumbnailUrl, type: $0.type) }
         survey = value.survey.map { survey in
@@ -131,6 +137,9 @@ struct NativeResource: Identifiable, Hashable {
         hot = value.hot
         recommended = value.recommended
         slug = value.slug
+        canReply = value.canReply
+        canFavourite = value.canFavourite
+        inlineComments = value.inlineComments.map(NativeResource.init)
     }
 
     init(sourceID: Int, kind: NativeResourceKind, title: String = "", body: String,
@@ -142,7 +151,8 @@ struct NativeResource: Identifiable, Hashable {
                                        canDown: false, canUndo: false),
          tags: [String] = [], photo: NativePhoto? = nil, embed: NativeEmbed? = nil,
          survey: NativeSurvey? = nil, sourceURL: String? = nil, sourceLabel: String? = nil,
-         hot: Bool = false, recommended: Bool = false, slug: String = "") {
+         hot: Bool = false, recommended: Bool = false, slug: String = "",
+         canReply: Bool = false, canFavourite: Bool = false, inlineComments: [NativeResource] = []) {
         self.sourceID = sourceID
         self.kind = kind
         self.title = title
@@ -167,5 +177,8 @@ struct NativeResource: Identifiable, Hashable {
         self.hot = hot
         self.recommended = recommended
         self.slug = slug
+        self.canReply = canReply
+        self.canFavourite = canFavourite
+        self.inlineComments = inlineComments
     }
 }

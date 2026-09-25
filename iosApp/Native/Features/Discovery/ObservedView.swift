@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct NativeObservedView: View {
-    @Environment(\.openURL) private var openURL
     @State private var model: ObservedModel
     let tab: AppTab
     let dependencies: AppDependencies
@@ -57,12 +56,7 @@ struct NativeObservedView: View {
                                 .font(.caption.bold())
                                 .foregroundStyle(ContentTokens.brand)
                         }
-                        NativeResourceCard(
-                            resource: item.resource,
-                            actions: .navigation(for: item.resource, in: tab, dependencies: dependencies, openURL: openURL),
-                            autoplayGifs: dependencies.session.autoplayGifs,
-                            isForeground: dependencies.isForeground
-                        )
+                        ResourceListRow(item: item.resource, tab: tab, dependencies: dependencies)
                     }
                     .onAppear { pager.loadNextIfNeeded(after: item) }
                 }

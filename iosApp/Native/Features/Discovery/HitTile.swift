@@ -10,7 +10,7 @@ struct HitTile: View {
         Button(action: open) {
             ZStack(alignment: .bottomLeading) {
                 RemoteImage(url: resource.photo?.url, maxDimension: 480) {
-                    LinearGradient(colors: [WykopTheme.tagBlue, WykopTheme.tagBlue.opacity(0.6)],
+                    LinearGradient(colors: [.gray, .gray.opacity(0.6)],
                                    startPoint: .topLeading, endPoint: .bottomTrailing)
                 }
                 .frame(width: 180, height: 124)

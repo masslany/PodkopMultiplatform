@@ -41,12 +41,18 @@ final class ResourceUpdates {
 
     func publishNewResource() { feedRevision += 1 }
 
+    /// The latest confirmed copy, including embedded comments; nil once deleted.
     func reconcile(_ resource: NativeResource) -> NativeResource? {
+        var current: NativeResource
         switch values[ResourceIdentity(resource)]?.change {
-        case .replacement(let value): value
-        case .deleted: nil
-        case .invalidated, .none: resource
+        case .replacement(let value): current = value
+        case .deleted: return nil
+        case .invalidated, .none: current = resource
         }
+        if !current.inlineComments.isEmpty {
+            current.inlineComments = current.inlineComments.compactMap(reconcile)
+        }
+        return current
     }
 
     func needsReload(_ resources: [NativeResource], since revision: Int) -> Bool {

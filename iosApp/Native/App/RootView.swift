@@ -97,12 +97,14 @@ struct NativeRoot: View {
                             .tag(tab)
                     }
                 }
-                .tint(WykopTheme.tagBlue)
+                .tint(.primary)
                 .sheet(item: Binding(get: { dependencies.interactor.actionTarget },
                                      set: { dependencies.interactor.actionTarget = $0 })) { target in
-                    NativeResourceActionsSheet(resource: target, root: target, parent: nil,
+                    NativeResourceActionsSheet(resource: target.resource, root: target.root,
+                                               // Matches the detail: an entry comment's screenshot can include its entry.
+                                               parent: target.resource.kind == .entryComment ? target.root : nil,
                                                dependencies: dependencies,
-                                               delete: { dependencies.interactor.delete(target) })
+                                               delete: { dependencies.interactor.delete(target.resource) })
                 }
     }
 
