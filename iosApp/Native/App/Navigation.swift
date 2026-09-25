@@ -28,6 +28,8 @@ enum AppRoute: Hashable, Codable {
     case link(Int)
     case entry(Int)
     case messages
+    case conversation(String)
+    case newConversation
     case notifications
     case search
     case advancedSearch(String)
@@ -46,7 +48,8 @@ enum AppRoute: Hashable, Codable {
 
     var needsAccount: Bool {
         switch self {
-        case .messages, .notifications, .profile, .favorites, .observed, .addLink, .blacklists: true
+        case .messages, .conversation, .newConversation, .notifications, .profile, .favorites, .observed,
+             .addLink, .blacklists: true
         default: false
         }
     }

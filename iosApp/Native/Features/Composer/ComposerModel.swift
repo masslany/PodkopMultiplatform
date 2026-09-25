@@ -71,29 +71,26 @@ final class ComposerModel {
     var text: String
     var adult: Bool
     var selection: NSRange
-    private(set) var photoKey: String?
-    private(set) var photoURL: String?
-    private(set) var mediaUploading = false
-    private(set) var mediaFailed = false
+    let attachment: ComposerAttachment
+    var photoKey: String? { attachment.photoKey }
+    var photoURL: String? { attachment.photoURL }
+    var mediaUploading: Bool { attachment.uploading }
+    var mediaFailed: Bool { attachment.failed }
     private(set) var submitting = false
     private(set) var failed = false
     private(set) var outcomeUnknown = false
     private(set) var submittedResource: NativeResource?
     private let submitter: ComposerSubmitting
-    private let media: ComposerMediaHandling?
     private let updates: ResourceUpdates
     private let initialText: String
     private let initialAdult: Bool
     private let initialPhotoKey: String?
-    private var ownedPhotoKey: String?
-    private var mediaGeneration = 0
 
     init(intent: ComposerIntent, seed: NativeResource?, submitter: ComposerSubmitting,
          updates: ResourceUpdates, media: ComposerMediaHandling? = nil) {
         self.intent = intent
         self.seed = seed
         self.submitter = submitter
-        self.media = media
         self.updates = updates
         let initialText = seed?.body ?? ""
         let initialAdult = seed?.adult ?? false
@@ -101,8 +98,7 @@ final class ComposerModel {
         text = initialText
         selection = NSRange(location: initialText.utf16.count, length: 0)
         adult = initialAdult
-        photoKey = initialPhotoKey
-        photoURL = seed?.photo?.url
+        attachment = ComposerAttachment(media: media, photoKey: initialPhotoKey, photoURL: seed?.photo?.url)
         self.initialText = initialText
         self.initialAdult = initialAdult
         self.initialPhotoKey = initialPhotoKey
@@ -118,64 +114,23 @@ final class ComposerModel {
     }
 
     func attachURL(_ rawURL: String) {
-        guard let media, !submitting, !mediaUploading,
-              let url = URL(string: rawURL.trimmingCharacters(in: .whitespacesAndNewlines)),
-              ["http", "https"].contains(url.scheme?.lowercased() ?? "") else {
-            mediaFailed = true
-            return
-        }
-        upload(using: { try await media.uploadURL(url.absoluteString) })
+        guard !submitting else { return }
+        attachment.attachURL(rawURL)
     }
 
     func attachDevice(_ data: Data, fileName: String, mimeType: String) {
-        guard let media, !submitting, !mediaUploading else { return }
-        upload(using: { try await media.uploadDevice(data, fileName: fileName, mimeType: mimeType) })
-    }
-
-    private func upload(using operation: @escaping () async throws -> ComposerPhoto) {
-        mediaGeneration += 1
-        let generation = mediaGeneration
-        mediaUploading = true
-        mediaFailed = false
-        Task { [weak self] in
-            guard let self else { return }
-            do {
-                let photo = try await operation()
-                guard generation == mediaGeneration else {
-                    if let media { try? await media.delete(photo.key) }
-                    return
-                }
-                let previousOwned = ownedPhotoKey
-                ownedPhotoKey = photo.key
-                photoKey = photo.key
-                photoURL = photo.url
-                if let previousOwned, previousOwned != photo.key,
-                   let media { try? await media.delete(previousOwned) }
-            } catch {
-                guard generation == mediaGeneration else { return }
-                mediaFailed = true
-            }
-            if generation == mediaGeneration { mediaUploading = false }
-        }
+        guard !submitting else { return }
+        attachment.attachDevice(data, fileName: fileName, mimeType: mimeType)
     }
 
     func removePhoto() {
-        guard !submitting, !mediaUploading else { return }
-        let owned = ownedPhotoKey
-        ownedPhotoKey = nil
-        photoKey = nil
-        photoURL = nil
-        if let owned, let media { Task { try? await media.delete(owned) } }
+        guard !submitting else { return }
+        attachment.remove()
     }
 
-    func photoSelectionFailed() { mediaFailed = true }
+    func photoSelectionFailed() { attachment.selectionFailed() }
 
-    func discard() {
-        mediaGeneration += 1
-        let owned = ownedPhotoKey
-        ownedPhotoKey = nil
-        if let owned, let media { Task { try? await media.delete(owned) } }
-    }
+    func discard() { attachment.discard() }
 
     func insert(prefix: String, suffix: String, placeholder: String) {
         let source = text as NSString

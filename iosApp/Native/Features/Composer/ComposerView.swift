@@ -7,9 +7,6 @@ struct NativeComposerView: View {
     @State private var model: ComposerModel
     let dependencies: AppDependencies
     @State private var showDiscard = false
-    @State private var showPhotoURL = false
-    @State private var photoURLInput = ""
-    @State private var selectedPhoto: PhotosPickerItem?
 
     init(intent: ComposerIntent, seed: NativeResource?, dependencies: AppDependencies) {
         _model = State(initialValue: ComposerModel(intent: intent, seed: seed,
@@ -32,26 +29,8 @@ struct NativeComposerView: View {
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
                         .accessibilityIdentifier("composerEditor")
                     Toggle("Adult content", isOn: $model.adult)
-                    HStack {
-                        PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                            Label("Choose photo", systemImage: "photo.on.rectangle")
-                        }
-                        Button("Photo URL") { showPhotoURL = true }
-                    }
-                    .disabled(model.submitting || model.mediaUploading)
-                    if model.mediaUploading { ProgressView("Uploading photo…") }
-                    if model.photoKey != nil {
-                        HStack {
-                            Label("Attached photo", systemImage: "photo")
-                                .foregroundStyle(.secondary)
-                            Button("Remove", role: .destructive) { model.removePhoto() }
-                                .disabled(model.submitting || model.mediaUploading)
-                        }
-                    }
-                    if model.mediaFailed {
-                        Label("Could not attach photo. Try again.", systemImage: "exclamationmark.triangle")
-                            .foregroundStyle(.red)
-                    }
+                    ComposerAttachmentControls(attachment: model.attachment, disabled: model.submitting)
+                    ComposerAttachmentStatus(attachment: model.attachment, disabled: model.submitting)
                     if model.failed {
                         Label(model.outcomeUnknown
                               ? "Submission status is unclear. Check your content before sending again."
@@ -94,35 +73,6 @@ struct NativeComposerView: View {
                 dependencies.router.dismissSheet()
             }
             Button("Keep writing", role: .cancel) {}
-        }
-        .alert("Photo URL", isPresented: $showPhotoURL) {
-            TextField("https://example.com/photo.jpg", text: $photoURLInput)
-            Button("Attach") { model.attachURL(photoURLInput) }
-            Button("Cancel", role: .cancel) {}
-        }
-        .onChange(of: selectedPhoto) { _, item in
-            guard let item else { return }
-            Task {
-                do {
-                    guard let loaded = try await item.loadTransferable(type: Data.self) else {
-                        model.photoSelectionFailed()
-                        return
-                    }
-                    let type = item.supportedContentTypes.first { $0.conforms(to: .image) }
-                    let originalMime = type?.preferredMIMEType ?? "image/jpeg"
-                    if originalMime == "image/heic" || originalMime == "image/heif" {
-                        guard let jpeg = UIImage(data: loaded)?.jpegData(compressionQuality: 0.85) else {
-                            model.photoSelectionFailed()
-                            return
-                        }
-                        model.attachDevice(jpeg, fileName: "photo.jpg", mimeType: "image/jpeg")
-                    } else {
-                        let ext = type?.preferredFilenameExtension ?? "jpg"
-                        model.attachDevice(loaded, fileName: "photo.\(ext)", mimeType: originalMime)
-                    }
-                } catch { model.photoSelectionFailed() }
-                selectedPhoto = nil
-            }
         }
         .onChange(of: model.submittedResource) { _, value in
             if value != nil { dependencies.router.dismissSheet() }

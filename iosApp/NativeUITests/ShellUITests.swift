@@ -276,5 +276,80 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.buttons["#polityka"].waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.buttons["#sport"].exists)
     }
+
+    func testFixtureNotificationsGroupsAndTargets() {
+        let app = launch("authenticated")
+        XCTAssertTrue(app.buttons["toolbarNotifications"].waitForExistence(timeout: 5))
+        app.buttons["toolbarNotifications"].tap()
+        XCTAssertTrue(app.buttons["notificationsMarkAll"].waitForExistence(timeout: 5))
+        app.buttons["notificationGroup-tags"].tap()
+        let grouped = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "#technologia")).firstMatch
+        XCTAssertTrue(grouped.waitForExistence(timeout: 5))
+        grouped.tap()
+        XCTAssertTrue(app.buttons["tagObserve"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["notificationGroup-pm"].tap()
+        XCTAssertFalse(app.buttons["notificationsMarkAll"].exists)
+        let pm = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ewa-Żółw")).firstMatch
+        XCTAssertTrue(pm.waitForExistence(timeout: 5))
+        pm.tap()
+        XCTAssertTrue(app.textFields["messageInput"].waitForExistence(timeout: 5))
+    }
+
+    func testFixtureInboxConversationSendAndNewConversation() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Messages"].tap()
+        let conversation = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ewa-Żółw")).firstMatch
+        XCTAssertTrue(conversation.waitForExistence(timeout: 5))
+        conversation.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["message-m1"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["messageSend"].isEnabled)
+        let input = app.textFields["messageInput"]
+        input.tap()
+        input.typeText("Nowa wiadomość")
+        app.buttons["messageSend"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["message-sent-0"].waitForExistence(timeout: 5))
+        XCTAssertNotEqual(input.value as? String, "Nowa wiadomość", "a sent message clears the input")
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["newConversation"].tap()
+        let username = app.textFields["newConversationUsername"]
+        XCTAssertTrue(username.waitForExistence(timeout: 5))
+        username.tap()
+        username.typeText("ewa")
+        XCTAssertTrue(app.staticTexts["Ewa-Żółw"].waitForExistence(timeout: 5))
+        app.staticTexts["Ewa-Żółw"].tap()
+        XCTAssertTrue(app.textFields["messageInput"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.buttons["newConversation"].waitForExistence(timeout: 5), "new conversation was replaced")
+    }
+
+    func testFixtureDirtyConversationAsksBeforeLeaving() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Messages"].tap()
+        let conversation = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ewa-Żółw")).firstMatch
+        XCTAssertTrue(conversation.waitForExistence(timeout: 5))
+        conversation.tap()
+        let input = app.textFields["messageInput"]
+        XCTAssertTrue(input.waitForExistence(timeout: 5))
+        input.tap()
+        input.typeText("szkic")
+        app.navigationBars.buttons["Back"].tap()
+        XCTAssertTrue(app.buttons["Keep writing"].waitForExistence(timeout: 5))
+        app.buttons["Keep writing"].tap()
+        XCTAssertEqual(input.value as? String, "szkic")
+    }
+
+    func testFixtureProfileOpensConversation() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Rank"].tap()
+        XCTAssertTrue(app.staticTexts["Ewa-Żółw"].waitForExistence(timeout: 5))
+        app.staticTexts["Ewa-Żółw"].tap()
+        XCTAssertTrue(app.buttons["profileMessage"].waitForExistence(timeout: 5))
+        app.buttons["profileMessage"].tap()
+        XCTAssertTrue(app.textFields["messageInput"].waitForExistence(timeout: 5))
+    }
 }
 

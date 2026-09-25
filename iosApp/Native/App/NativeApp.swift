@@ -163,10 +163,14 @@ private struct TabContent: View {
                         // Android reaches blacklists from Settings; this entry moves there with T09.
                         routeButton("Blacklists", symbol: "hand.raised", route: .blacklists)
                     }
+                    if session.isLoggedIn {
+                        badgeRouteButton("Messages", symbol: "envelope", route: .messages,
+                                         count: session.notificationCounts.pm)
+                        badgeRouteButton("Notifications", symbol: "bell", route: .notifications,
+                                         count: session.notificationCounts.total - session.notificationCounts.pm)
+                    }
                     #if DEBUG
                     if session.isLoggedIn {
-                        routeButton("Messages", symbol: "envelope", route: .messages)
-                        routeButton("Notifications", symbol: "bell", route: .notifications)
                         routeButton("Add link", symbol: "link.badge.plus", route: .addLink)
                     }
                     #endif
@@ -194,6 +198,21 @@ private struct TabContent: View {
         }
     }
 
+    private func badgeRouteButton(_ title: LocalizedStringKey, symbol: String, route: AppRoute,
+                                  count: Int) -> some View {
+        Button { router.navigate(route, in: tab) } label: {
+            HStack {
+                Label(title, systemImage: symbol)
+                Spacer()
+                if count > 0 {
+                    Text("\(count)").font(.caption.bold()).padding(.horizontal, 7).padding(.vertical, 2)
+                        .background(.red, in: Capsule()).foregroundStyle(.white)
+                        .accessibilityLabel(String(localized: "Unread: \(count)"))
+                }
+            }
+        }
+    }
+
     private func routeButton(_ title: LocalizedStringKey, symbol: String, route: AppRoute) -> some View {
         Button { router.navigate(route, in: tab) } label: {
             Label(title, systemImage: symbol)
@@ -213,13 +232,15 @@ private struct TabContent: View {
                 }
                 .accessibilityLabel("Write a post")
             }
+            #endif
             if session.isLoggedIn {
                 Button { router.navigate(.notifications, in: tab) } label: {
-                    Image(systemName: "bell")
+                    Image(systemName: session.unreadCount > 0 ? "bell.badge" : "bell")
                 }
                 .accessibilityLabel("Notifications")
+                .accessibilityValue(session.unreadCount > 0 ? String(localized: "Unread: \(session.unreadCount)") : "")
+                .accessibilityIdentifier("toolbarNotifications")
             }
-            #endif
         }
     }
 
@@ -227,8 +248,10 @@ private struct TabContent: View {
         switch route {
         case .link(let id): NativeDetailView(kind: .link, id: id, dependencies: dependencies)
         case .entry(let id): NativeDetailView(kind: .entry, id: id, dependencies: dependencies)
-        case .messages: DevelopmentView(title: String(localized: "Messages"))
-        case .notifications: DevelopmentView(title: String(localized: "Notifications"))
+        case .messages: NativeInboxView(tab: tab, dependencies: dependencies)
+        case .conversation(let name): NativeConversationView(username: name, tab: tab, dependencies: dependencies)
+        case .newConversation: NativeNewConversationView(tab: tab, dependencies: dependencies)
+        case .notifications: NativeNotificationsView(tab: tab, dependencies: dependencies)
         case .search: NativeSearchView(tab: tab, dependencies: dependencies)
         case .advancedSearch(let query):
             NativeAdvancedSearchView(initialQuery: query, tab: tab, dependencies: dependencies)

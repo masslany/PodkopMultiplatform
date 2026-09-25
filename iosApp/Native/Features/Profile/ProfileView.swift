@@ -86,6 +86,14 @@ struct NativeProfileView: View {
                     .disabled(model.pending.contains(.observe))
                     .accessibilityIdentifier("profileObserve")
                 }
+                if profile.canSendPrivateMessage {
+                    Button { router.navigate(.conversation(profile.username), in: tab) } label: {
+                        Image(systemName: "envelope")
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityLabel("Send a private message")
+                    .accessibilityIdentifier("profileMessage")
+                }
                 if profile.canBlacklist {
                     Button { model.toggle(.blacklist) } label: {
                         Image(systemName: profile.blacklisted ? "lock.fill" : "lock.open")

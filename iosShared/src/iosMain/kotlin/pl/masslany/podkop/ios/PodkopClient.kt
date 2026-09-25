@@ -47,6 +47,7 @@ import pl.masslany.podkop.business.media.domain.main.MediaRepository
 import pl.masslany.podkop.business.tags.domain.main.TagsRepository
 import pl.masslany.podkop.business.links.domain.models.request.CommentsSortType
 import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
+import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.deeplink.AppDeepLink
@@ -68,7 +69,13 @@ class IOSSuccess(val completed: Boolean = true)
 class IOSStartupState(val phase: String)
 class IOSSessionState(val isLoggedIn: Boolean, val revision: Int)
 class IOSSettings(val autoplayGifs: Boolean, val themeOverride: String, val dynamicColorsEnabled: Boolean)
-class IOSNotificationStatus(val totalUnreadCount: Int, val privateMessagesUnreadCount: Int)
+class IOSNotificationStatus(
+    val totalUnreadCount: Int,
+    val privateMessagesUnreadCount: Int,
+    val entriesUnreadCount: Int = 0,
+    val tagsUnreadCount: Int = 0,
+    val observedDiscussionsUnreadCount: Int = 0,
+)
 class IOSLinkIntent(val kind: String, val id: Int? = null)
 class IOSPageRequest(val kind: String, val value: String? = null)
 class IOSPagePolicy(val kind: String, val initial: IOSPageRequest)
@@ -199,6 +206,7 @@ class PodkopClient private constructor(
     val tag = TagService(this)
     val profile = ProfileService(this)
     val blacklists = BlacklistsService(this)
+    val messages = MessagesService(this)
     val voters = VotersService()
     val embeds = EmbedsService()
 
@@ -338,15 +346,54 @@ class PodkopClient private constructor(
         fun stopPolling() { notificationsRepository.stopPolling() }
 
         fun observeStatus(onChange: (IOSNotificationStatus) -> Unit): IOSObservation = observe(onChange) { emit ->
-            notificationsRepository.status.collect { status ->
-                emit(IOSNotificationStatus(status.totalUnreadCount, status.privateMessagesUnreadCount))
-            }
+            notificationsRepository.status.collect { status -> emit(status.toIOS()) }
         }
 
         fun refreshStatus(completion: (IOSNotificationStatus?, IOSFailure?) -> Unit): IOSOperation = operation(completion) {
-            val status = notificationsRepository.refreshStatus().getOrThrow()
-            IOSNotificationStatus(status.totalUnreadCount, status.privateMessagesUnreadCount)
+            notificationsRepository.refreshStatus().getOrThrow().toIOS()
         }
+
+        /** Android's rule: a signed-in session refreshes counts, a signed-out one clears them. */
+        fun onSessionChanged(completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation = operation(completion) {
+            if (authRepository.isLoggedIn()) notificationsRepository.refreshStatus().getOrThrow()
+            else notificationsRepository.clearUnreadCount()
+            IOSSuccess()
+        }
+
+        /** [group]: entries, pm, tags, observedDiscussions. */
+        fun firstRequest(group: String): IOSPageRequest =
+            FeaturePaginationPolicies.notifications(group.toNotificationGroup()).initialRequest().toIOS()
+
+        fun load(
+            group: String,
+            request: IOSPageRequest,
+            loaded: Int,
+            completion: (IOSNotificationPage?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            val notificationGroup = group.toNotificationGroup()
+            val page = request.toDomain()
+            val result = notificationsRepository.getNotifications(notificationGroup, page).getOrThrow()
+            IOSNotificationPage(
+                items = result.data.map { it.toIOS() },
+                next = result.nextAfter(FeaturePaginationPolicies.notifications(notificationGroup), page, loaded),
+                total = result.pagination?.total,
+            )
+        }
+
+        fun markAsRead(group: String, id: String, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) {
+                require(id.isNotBlank()) { "empty notification id" }
+                notificationsRepository.markAsRead(group.toNotificationGroup(), id).getOrThrow()
+                IOSSuccess()
+            }
+
+        fun markAllAsRead(group: String, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) {
+                val notificationGroup = group.toNotificationGroup()
+                require(notificationGroup != NotificationGroup.PrivateMessages) { "use messages.readAll" }
+                notificationsRepository.markAllAsRead(notificationGroup).getOrThrow()
+                IOSSuccess()
+            }
     }
 
     inner class LinksService {

@@ -96,6 +96,18 @@ final class AppDependencies {
         #endif
         return SharedBlacklistsLoader(client: client, adapter: adapter)
     }()
+    lazy var notificationsLoader: NotificationsLoading = {
+        #if DEBUG
+        if isFixture { return FixtureNotificationsLoader() }
+        #endif
+        return SharedNotificationsLoader(client: client, adapter: adapter)
+    }()
+    lazy var messagesLoader: MessagesLoading = {
+        #if DEBUG
+        if isFixture { return FixtureMessagesLoader() }
+        #endif
+        return SharedMessagesLoader(client: client, adapter: adapter)
+    }()
     private var isFixture: Bool {
         #if DEBUG
         ProcessInfo.processInfo.arguments.contains("-nativeFixture")
@@ -152,6 +164,7 @@ final class SessionModel {
     var isLoggedIn = false
     var revision = 0
     var unreadCount = 0
+    var notificationCounts = NotificationCounts()
     var autoplayGifs = true
     var banner: String?
     var loginURL: URL?
@@ -209,11 +222,21 @@ final class SessionModel {
                 revision = Int(value.revision)
                 dependencies.resourceUpdates.reset(for: revision)
                 dependencies.router.applySession(isLoggedIn: value.isLoggedIn, revision: Int(value.revision))
+                // Android refreshes counts for a signed-in session and clears them otherwise.
+                if value.revision > 0 {
+                    let _: IOSSuccess? = try? await adapter.call {
+                        client.notifications.onSessionChanged(completion: $0)
+                    }
+                }
             }
         })
         observationTasks.append(Task {
             for await value in adapter.stream({ client.notifications.observeStatus(onChange: $0) }) {
                 unreadCount = Int(value.totalUnreadCount)
+                notificationCounts = NotificationCounts(
+                    entries: Int(value.entriesUnreadCount), pm: Int(value.privateMessagesUnreadCount),
+                    tags: Int(value.tagsUnreadCount),
+                    observedDiscussions: Int(value.observedDiscussionsUnreadCount))
             }
         })
         observationTasks.append(Task {
