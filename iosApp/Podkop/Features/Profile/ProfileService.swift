@@ -51,7 +51,8 @@ final class SharedProfileLoader: ProfileLoading {
         }
         return values.map {
             Badge(label: $0.label, slug: $0.slug, description: $0.description_, colorHex: $0.colorHex,
-                        level: $0.level?.intValue, progress: $0.progress?.intValue, achievedAt: $0.achievedAt)
+                  colorHexDark: $0.colorHexDark, iconURL: $0.iconUrl,
+                  level: $0.level?.intValue, progress: $0.progress?.intValue, achievedAt: $0.achievedAt)
         }
     }
 

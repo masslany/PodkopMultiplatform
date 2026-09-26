@@ -29,6 +29,8 @@ struct Badge: Identifiable, Equatable {
     let slug: String
     let description: String
     let colorHex: String
+    var colorHexDark: String = ""
+    var iconURL: String = ""
     let level: Int?
     let progress: Int?
     let achievedAt: String?

@@ -92,7 +92,7 @@ struct ProfileView: View {
                                 .font(.caption.weight(.bold).monospacedDigit())
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 7).padding(.vertical, 3)
-                                .background(WykopTheme.tagBlue, in: Capsule())
+                                .background(WykopTheme.hotOrange, in: Capsule())
                                 .offset(x: 10, y: -6)
                                 .accessibilityLabel(String(localized: .profileRankPosition(rank)))
                         }
@@ -175,23 +175,9 @@ struct ProfileView: View {
             } else if model.badges.isEmpty {
                 Text(.profileNoAchievementsShow).foregroundStyle(.secondary)
             } else {
-                ForEach(model.badges) { badge in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(badge.label).font(.subheadline.bold())
-                            .foregroundStyle(Color(hex: badge.colorHex) ?? .primary)
-                        if !badge.description.isEmpty {
-                            Text(badge.description).font(.caption)
-                        }
-                        HStack(spacing: 8) {
-                            if let level = badge.level { Text(.profileLevel(level)) }
-                            if let progress = badge.progress { Text(.profileProgress(progress)) }
-                            if let date = badge.achievedAt.flatMap(Dates.parse) {
-                                Text(.profileAchieved(date.formatted(date: .numeric, time: .omitted)))
-                            }
-                        }
-                        .font(.caption2).foregroundStyle(.secondary)
-                    }
-                    .accessibilityElement(children: .combine)
+                // Android's FlowRow of badge tiles; tap one for its details.
+                FlowLayout(spacing: 8, lineSpacing: 8) {
+                    ForEach(model.badges) { AchievementBadge(badge: $0) }
                 }
             }
         }
