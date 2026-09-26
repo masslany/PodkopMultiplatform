@@ -113,7 +113,16 @@ final class DetailTests: XCTestCase {
         let entry = Resource(sourceID: 30, kind: .entry, body: "")
         let comment = Resource(sourceID: 31, kind: .entryComment, body: "", parentID: 30)
         XCTAssertEqual(ResourceLinkBuilder.url(for: comment, root: entry)?.absoluteString,
-                       "https://wykop.pl/wpis/30/#31")
+                       "https://wykop.pl/wpis/30/komentarz/31")
+    }
+
+    func testResourceLinksWithoutSlugFallBackToRootInsteadOfInvalidCommentRoute() {
+        let link = Resource(sourceID: 10, kind: .link, body: "")
+        let reply = Resource(sourceID: 22, kind: .linkComment, body: "reply", parentID: 21)
+        XCTAssertEqual(ResourceLinkBuilder.url(for: link, root: link)?.absoluteString,
+                       "https://wykop.pl/link/10")
+        XCTAssertEqual(ResourceLinkBuilder.url(for: reply, root: link, parentCommentID: 21)?.absoluteString,
+                       "https://wykop.pl/link/10")
     }
 
     func testResourceUpdatesReconcileMatchingIdentityOnly() {

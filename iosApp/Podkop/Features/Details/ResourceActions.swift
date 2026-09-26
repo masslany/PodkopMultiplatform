@@ -11,6 +11,7 @@ struct ResourceActionsSheet: View {
     @Environment(\.dismiss) private var dismiss
     @State private var voterTarget: VoterTarget?
     @State private var screenshot = false
+    @State private var report = false
     @State private var textSelection = false
     @State private var confirmDelete = false
     @State private var contentHeight: CGFloat = 320
@@ -30,6 +31,7 @@ struct ResourceActionsSheet: View {
                 }
                 if let url = ResourceLinkBuilder.url(for: resource, root: root,
                                                      parentCommentID: parent?.sourceID) {
+                    row(.reportTitle, systemImage: "flag") { report = true }
                     row(.detailsCopyLink, systemImage: "link") {
                         UIPasteboard.general.url = url
                         dismiss()
@@ -74,6 +76,14 @@ struct ResourceActionsSheet: View {
         // Sized to its rows, like Android's bottom sheet.
         .presentationDetents([.height(contentHeight + 24)])
         .sheet(item: $voterTarget) { VotersSheet(target: $0, dependencies: dependencies) }
+        .sheet(isPresented: $report) {
+            if let url = ResourceLinkBuilder.url(for: resource, root: root,
+                                                 parentCommentID: parent?.sourceID) {
+                WebsiteReportView(contentURL: url,
+                                  missingCommentID: resource.kind == .linkComment && root.slug.isEmpty
+                                      ? resource.sourceID : nil)
+            }
+        }
         .sheet(isPresented: $screenshot) {
             ScreenshotPreview(resource: resource, parent: parent)
         }

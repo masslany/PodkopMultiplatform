@@ -8,13 +8,13 @@ enum ResourceLinkBuilder {
         case .entry:
             base = "https://wykop.pl/wpis/\(resource.sourceID)"
         case .entryComment:
-            base = "https://wykop.pl/wpis/\(root.sourceID)/#\(resource.sourceID)"
+            base = "https://wykop.pl/wpis/\(root.sourceID)/komentarz/\(resource.sourceID)"
         case .link:
-            guard !root.slug.isEmpty else { return nil }
-            base = "https://wykop.pl/link/\(root.sourceID)/\(root.slug)"
+            base = linkBase(root)
         case .linkComment:
-            guard !root.slug.isEmpty else { return nil }
-            let prefix = "https://wykop.pl/link/\(root.sourceID)/\(root.slug)/komentarz/"
+            // Wykop redirects a slugless link, but rejects a slugless comment route.
+            guard !root.slug.isEmpty else { return URL(string: linkBase(root)) }
+            let prefix = "\(linkBase(root))/komentarz/"
             if let parentCommentID, parentCommentID != resource.sourceID {
                 base = "\(prefix)\(parentCommentID)#\(resource.sourceID)"
             } else {
@@ -24,5 +24,9 @@ enum ResourceLinkBuilder {
             return nil
         }
         return URL(string: base)
+    }
+    private static func linkBase(_ root: Resource) -> String {
+        let base = "https://wykop.pl/link/\(root.sourceID)"
+        return root.slug.isEmpty ? base : "\(base)/\(root.slug)"
     }
 }
