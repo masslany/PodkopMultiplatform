@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FeedView: View {
     @State private var model: FeedModel
+    @State private var canShowGallery = false
     let router: AppRouter
     let session: SessionModel
     let dependencies: AppDependencies
@@ -41,7 +42,7 @@ struct FeedView: View {
                 } else if model.items.isEmpty && model.phase == .loaded {
                     ContentUnavailableView(.commonNothingHereYet, systemImage: "tray")
                 } else {
-                    if model.gallery {
+                    if model.gallery && canShowGallery {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 12)], spacing: 12) {
                             rows
                         }
@@ -51,6 +52,11 @@ struct FeedView: View {
                     pageFooter
                 }
             }
+            .onGeometryChange(for: Bool.self) { geometry in
+                // Two 260-point cards and the 12-point gap must fit in the feed itself,
+                // including when it occupies a narrow iPad split-view column.
+                geometry.size.width >= 260 * 2 + 12
+            } action: { canShowGallery = $0 }
             .padding(.horizontal, 12)
             .padding(.bottom, 20)
             .frame(maxWidth: 900)
@@ -104,16 +110,18 @@ struct FeedView: View {
                 .accessibilityIdentifier("hotPeriod")
             }
         } trailing: {
-            Button { model.gallery.toggle() } label: {
-                Image(systemName: model.gallery ? "list.bullet" : "square.grid.2x2")
-                    .font(.subheadline.weight(.semibold))
-                    .frame(minWidth: 36, minHeight: 34)
-                    .padding(.horizontal, 4)
-                    .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            if canShowGallery {
+                Button { model.gallery.toggle() } label: {
+                    Image(systemName: model.gallery ? "list.bullet" : "square.grid.2x2")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(minWidth: 36, minHeight: 34)
+                        .padding(.horizontal, 4)
+                        .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(model.gallery ? .commonListView : .commonGalleryView)
+                .accessibilityIdentifier("feedGallery")
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel(model.gallery ? .commonListView : .commonGalleryView)
-            .accessibilityIdentifier("feedGallery")
         }
         .padding(.top, 8)
     }
