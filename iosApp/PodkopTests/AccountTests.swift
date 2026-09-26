@@ -192,26 +192,33 @@ final class AccountTests: XCTestCase {
         XCTAssertEqual(loader.pages.calls.count, 2, "the list reloads after a confirmed add")
     }
 
-    func testBlacklistRemoveOnlyAfterConfirmationAndFailureKeepsRow() async {
+    func testBlacklistRemoveOnlyAfterConfirmationAndFailureKeepsRow() async throws {
         let loader = ControlledBlacklists()
         let model = BlacklistCategoryModel(category: .domains, loader: loader, suggester: ControlledSuggestions())
+        defer { model.stop() }
         model.start()
-        await settle()
+        try await waitUntil("initial blacklist request") { loader.pages.calls.count == 1 }
         let a = BlacklistEntry(category: .domains, value: "a.pl", color: nil, gender: nil)
         let b = BlacklistEntry(category: .domains, value: "b.pl", color: nil, gender: nil)
         loader.pages.succeed(0, ListPage(items: [a, b], next: nil, total: 2))
-        await settle()
+        try await waitUntil("loaded blacklist") { model.pager.phase == .loaded }
         model.remove(a)
-        await settle()
-        XCTAssertEqual(model.pager.items.count, 2)
+        try await waitUntil("remove request") { loader.mutations.calls.count == 1 }
+        XCTAssertTrue(model.busy)
+        XCTAssertEqual(model.pager.items.map(\.value), ["a.pl", "b.pl"])
+        XCTAssertEqual(model.total, 2)
         loader.mutations.fail(0)
-        await settle()
-        XCTAssertEqual(model.pager.items.count, 2)
+        try await waitUntil("failed remove completion") { !model.busy }
+        XCTAssertEqual(model.pager.items.map(\.value), ["a.pl", "b.pl"])
+        XCTAssertEqual(model.total, 2)
         XCTAssertTrue(model.failed)
         model.remove(a)
-        await settle()
+        try await waitUntil("retry remove request") { loader.mutations.calls.count >= 2 }
+        XCTAssertEqual(loader.mutations.calls.map(\.input), ["remove:a.pl", "remove:a.pl"])
+        XCTAssertEqual(model.pager.items.count, 2, "keep the row until the retry succeeds")
         loader.mutations.succeed(1, ())
-        await settle()
+        try await waitUntil("successful remove completion") { !model.busy }
+        XCTAssertFalse(model.failed)
         XCTAssertEqual(model.pager.items.map(\.value), ["b.pl"])
         XCTAssertEqual(model.total, 1)
     }
