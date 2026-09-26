@@ -15,7 +15,7 @@ struct ScreenshotPreview: View {
             ScrollView {
                 VStack(spacing: 16) {
                     if parent != nil {
-                        Toggle(.detailsIncludeParent, isOn: $includeParent)
+                        Toggle(.detailsIncludeParent, isOn: $includeParent).wykopSwitch()
                     }
                     if let image {
                         Image(uiImage: image).resizable().scaledToFit()

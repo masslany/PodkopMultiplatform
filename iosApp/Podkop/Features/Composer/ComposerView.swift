@@ -28,7 +28,7 @@ struct ComposerView: View {
                         .frame(minHeight: 230)
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
                         .accessibilityIdentifier("composerEditor")
-                    Toggle(.commonAdultContent, isOn: $model.adult)
+                    Toggle(.commonAdultContent, isOn: $model.adult).wykopSwitch()
                     ComposerAttachmentControls(attachment: model.attachment, disabled: model.submitting)
                     ComposerAttachmentStatus(attachment: model.attachment, disabled: model.submitting)
                     if model.failed {

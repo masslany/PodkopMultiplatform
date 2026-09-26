@@ -166,7 +166,7 @@ struct LinkSubmissionView: View {
             ForEach(model.tagSuggestions, id: \.self) { tag in
                 Button("#" + tag) { model.selectTag(tag) }
             }
-            Toggle(.commonAdultContent, isOn: $model.adult)
+            Toggle(.commonAdultContent, isOn: $model.adult).wykopSwitch()
         }
         if !model.suggestedImages.isEmpty {
             Section(.composerSuggestedImage) {

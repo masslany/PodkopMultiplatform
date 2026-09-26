@@ -26,6 +26,7 @@ struct SettingsView: View {
             }
             Section(.settingsMedia) {
                 Toggle(.settingsAutoplayGIFs, isOn: Binding(get: { session.autoplayGifs }, set: { model.setAutoplay($0) }))
+                    .wykopSwitch()
                     .accessibilityIdentifier("settingsAutoplay")
             }
             Section(.settingsData) {

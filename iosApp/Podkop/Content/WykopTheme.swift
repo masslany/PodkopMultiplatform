@@ -25,6 +25,10 @@ enum WykopTheme {
     static let parentAuthorAccent = dynamic(light: 0x3A3A3A, dark: 0xE5E5E5)
     static let currentUserAccent = nameGreen
 
+    /// The "on" track of switches. The app's neutral tint is white in dark mode, which would
+    /// hide the white thumb, so switches use the brand green, like iOS's own switches.
+    static let switchOn = nameGreen
+
     static let cardRadius: CGFloat = 16
     static let smallRadius: CGFloat = 8
 
@@ -41,6 +45,11 @@ enum WykopTheme {
 }
 
 extension View {
+    /// A switch-style toggle with a visible "on" state in both light and dark mode.
+    func wykopSwitch() -> some View {
+        toggleStyle(.switch).tint(WykopTheme.switchOn)
+    }
+
     /// The standard Wykop card surface.
     func wykopCard(padding: CGFloat = 16) -> some View {
         self.padding(padding)

@@ -137,7 +137,7 @@ struct ConversationView: View {
             HStack {
                 ComposerAttachmentControls(attachment: model.attachment, disabled: model.sending)
                 Spacer()
-                Toggle(.commonAdultContent, isOn: $model.adult).fixedSize()
+                Toggle(.commonAdultContent, isOn: $model.adult).wykopSwitch().fixedSize()
             }
             .font(.caption)
         }
