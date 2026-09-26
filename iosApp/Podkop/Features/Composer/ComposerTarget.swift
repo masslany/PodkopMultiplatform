@@ -11,6 +11,22 @@ struct ComposerTarget {
 }
 
 extension ComposerIntent {
+    var title: LocalizedStringResource {
+        switch self {
+        case .createEntry: .commonWritePost
+        case .createEntryComment, .createLinkComment: .composerAddComment
+        case .editEntry: .composerEditEntry
+        case .editEntryComment, .editLinkComment: .composerEditComment
+        }
+    }
+
+    var replyPrefix: String {
+        guard !target.isEdit, let author = target.replyTarget else { return "" }
+        let nickname = author.trimmingCharacters(in: .whitespacesAndNewlines)
+            .drop(while: { $0 == "@" })
+        return nickname.isEmpty ? "" : "@\(nickname): "
+    }
+
     var target: ComposerTarget {
         switch self {
         case .createEntry:

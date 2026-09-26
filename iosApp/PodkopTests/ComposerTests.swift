@@ -66,6 +66,37 @@ private final class LinkDraftFixture: LinkDrafting {
 final class ComposerTests: XCTestCase {
     private func settle() async { for _ in 0..<30 { await Task.yield() } }
 
+    func testRepliesStartWithMentionAndCursorAtEnd() {
+        for intent in [ComposerIntent.createEntryComment(entryID: 1, replyTarget: "test"),
+                       .createLinkComment(linkID: 2, parentCommentID: 3, replyTarget: " @test ")] {
+            let model = ComposerModel(intent: intent, seed: nil,
+                                      submitter: FixtureComposerSubmitter(), updates: ResourceUpdates())
+            XCTAssertEqual(model.text, "@test: ")
+            XCTAssertEqual(model.selection, NSRange(location: 7, length: 0))
+            XCTAssertFalse(model.isDirty)
+            model.text += "My reply"
+            XCTAssertTrue(model.isDirty)
+        }
+    }
+
+    func testNewCommentsStayEmptyAndEditsPreserveExistingMentions() {
+        for intent in [ComposerIntent.createEntry, .createEntryComment(entryID: 1, replyTarget: nil),
+                       .createLinkComment(linkID: 2, parentCommentID: nil, replyTarget: " ")] {
+            let model = ComposerModel(intent: intent, seed: nil,
+                                      submitter: FixtureComposerSubmitter(), updates: ResourceUpdates())
+            XCTAssertEqual(model.text, "")
+        }
+        let seed = Resource(sourceID: 3, kind: .entryComment, body: "@other: existing reply")
+        let model = ComposerModel(intent: .editEntryComment(entryID: 1, commentID: 3), seed: seed,
+                                  submitter: FixtureComposerSubmitter(), updates: ResourceUpdates())
+        XCTAssertEqual(model.text, seed.body)
+        XCTAssertFalse(model.isDirty)
+        XCTAssertEqual(String(localized: ComposerIntent.createEntry.title), String(localized: .commonWritePost))
+        XCTAssertEqual(String(localized: ComposerIntent.createEntryComment(entryID: 1, replyTarget: nil).title),
+                       String(localized: .composerAddComment))
+        XCTAssertEqual(String(localized: model.intent.title), String(localized: .composerEditComment))
+    }
+
     func testSelectedUnicodeTextIsWrappedAndRetainsSelection() {
         let model = ComposerModel(intent: .createEntry, seed: nil,
                                   submitter: FixtureComposerSubmitter(), updates: ResourceUpdates())

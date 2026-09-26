@@ -59,7 +59,7 @@ struct ComposerView: View {
             .scrollDismissesKeyboard(.interactively)
             .background(WykopTheme.card)
             .background(KeyboardDismissArea())
-            .navigationTitle(model.intent.target.isEdit ? .commonEdit : .commonWritePost)
+            .navigationTitle(model.intent.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {

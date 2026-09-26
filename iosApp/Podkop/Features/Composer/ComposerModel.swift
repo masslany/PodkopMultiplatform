@@ -30,7 +30,7 @@ final class ComposerModel {
         self.seed = seed
         self.submitter = submitter
         self.updates = updates
-        let initialText = seed?.body ?? ""
+        let initialText = intent.target.isEdit ? (seed?.body ?? "") : intent.replyPrefix
         let initialAdult = seed?.adult ?? false
         let initialPhotoKey = seed?.photo?.key
         text = initialText

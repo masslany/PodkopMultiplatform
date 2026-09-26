@@ -257,7 +257,7 @@ struct DetailView: View {
                     replyTarget: replyParentID == nil ? nil : resource.author?.name))
             } else {
                 dependencies.router.presentComposer(.createEntryComment(
-                    entryID: model.id, replyTarget: replyParentID == nil ? nil : resource.author?.name))
+                    entryID: model.id, replyTarget: resource.author?.name))
             }
         }
         let canDown = (resource.kind == .link || resource.kind == .linkComment) && resource.vote.allowsDown
