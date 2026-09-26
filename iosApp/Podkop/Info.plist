@@ -17,13 +17,9 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Podkop needs access to save screenshots to your photo library.</string>
 	<key>WYKOP_KEY</key>
 	<string>$(WYKOP_KEY)</string>
-    <key>WYKOP_SECRET</key>
-    <string>$(WYKOP_SECRET)</string>
+	<key>WYKOP_SECRET</key>
+	<string>$(WYKOP_SECRET)</string>
 </dict>
 </plist>

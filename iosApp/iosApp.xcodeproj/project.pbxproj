@@ -386,6 +386,8 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Podkop/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Podkop needs access to save screenshots to your photo library.";
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				PRODUCT_MODULE_NAME = Podkop;
 				PRODUCT_NAME = Podkop;
@@ -530,6 +532,8 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Podkop/Info.plist;
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Podkop needs access to save screenshots to your photo library.";
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				PRODUCT_MODULE_NAME = Podkop;
 				PRODUCT_NAME = Podkop;
