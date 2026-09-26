@@ -59,6 +59,22 @@ private final class ControlledMessages: MessagesLoading {
 final class MessagingTests: XCTestCase {
     private func settle() async { for _ in 0..<20 { await Task.yield() } }
 
+    private enum WaitFailure: Error { case timedOut }
+
+    /// A yield count cannot guarantee that a resumed continuation has reached the model.
+    private func waitUntil(_ description: String, file: StaticString = #filePath, line: UInt = #line,
+                           _ condition: () -> Bool) async throws {
+        let clock = ContinuousClock()
+        let deadline = clock.now.advanced(by: .seconds(5))
+        while !condition() {
+            guard clock.now < deadline else {
+                XCTFail("Timed out waiting for \(description)", file: file, line: line)
+                throw WaitFailure.timedOut
+            }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+    }
+
     private func notification(_ id: String, group: NotificationGroupKind = .tags, read: Bool = false,
                               groupID: String? = nil, count: Int = 1, entry: Int? = nil, link: Int? = nil,
                               tag: String? = "nauka") -> AppNotification {
@@ -225,45 +241,56 @@ final class MessagingTests: XCTestCase {
         XCTAssertFalse(model.hasOlder, "a page with nothing new ends paging")
     }
 
-    func testSendGuardsDuplicatesKeepsDraftOnFailureAndBlocksUnclearOutcome() async {
+    func testSendGuardsDuplicatesKeepsDraftOnFailureAndBlocksUnclearOutcome() async throws {
         let loader = ControlledMessages()
-        let model = ConversationModel(username: "ewa", loader: loader, media: nil, clock: ManualClock())
+        let clock = ManualClock()
+        let model = ConversationModel(username: "ewa", loader: loader, media: nil, clock: clock)
+        defer { model.becameHidden(); clock.tick() }
         model.becameVisible()
-        await settle()
+        try await waitUntil("initial thread request") { loader.threads.calls.count == 1 }
         loader.threads.succeed(0, ListPage(items: [], next: nil, total: 0))
-        await settle()
+        try await waitUntil("loaded conversation") { model.phase == .loaded }
         XCTAssertFalse(model.canSend)
         model.text = "Cześć 👋"
         model.send()
         model.send()
-        await settle()
+        try await waitUntil("send request") { !loader.sends.calls.isEmpty }
         XCTAssertEqual(loader.sends.calls.count, 1)
         loader.sends.calls[0].finish(.failure(BridgeFailure(category: "unknown", code: nil)))
-        await settle()
+        try await waitUntil("failed send completion") { !model.sending }
         XCTAssertEqual(model.text, "Cześć 👋")
         XCTAssertTrue(model.sendFailed)
         XCTAssertTrue(model.outcomeUnknown, "a transport failure may have been delivered")
         XCTAssertFalse(model.canSend)
         model.acknowledgeUnknownOutcome()
         model.send()
-        await settle()
+        try await waitUntil("retry send request") { loader.sends.calls.count >= 2 }
+        XCTAssertEqual(loader.sends.calls.count, 2)
         loader.sends.succeed(1, message("sent", 10, incoming: false))
-        await settle()
+        try await waitUntil("successful send completion") { !model.sending }
         XCTAssertEqual(model.text, "")
         XCTAssertEqual(model.messages.map(\.key), ["sent"])
         XCTAssertEqual(model.scrollToLatest, 1)
     }
 
-    func testRejectedSendCanBeRetriedImmediately() async {
+    func testRejectedSendCanBeRetriedImmediately() async throws {
         let loader = ControlledMessages()
         let model = ConversationModel(username: "ewa", loader: loader, media: nil, clock: ManualClock())
         model.text = "hej"
         model.send()
-        await settle()
+        try await waitUntil("send request") { loader.sends.calls.count == 1 }
         loader.sends.calls[0].finish(.failure(BridgeFailure(category: "validation", code: "400")))
-        await settle()
+        try await waitUntil("rejected send completion") { !model.sending }
+        XCTAssertTrue(model.sendFailed)
+        XCTAssertEqual(model.text, "hej")
         XCTAssertFalse(model.outcomeUnknown)
         XCTAssertTrue(model.canSend)
+        model.send()
+        try await waitUntil("retry send request") { loader.sends.calls.count >= 2 }
+        XCTAssertEqual(loader.sends.calls.count, 2)
+        loader.sends.succeed(1, message("sent", 10, incoming: false))
+        try await waitUntil("retry send completion") { !model.sending }
+        XCTAssertEqual(model.text, "")
     }
 
     // MARK: New conversation (P33)
@@ -286,18 +313,22 @@ final class MessagingTests: XCTestCase {
         XCTAssertEqual(model.suggestions.map(\.username), ["ewa-z"])
     }
 
-    func testUnknownUsernameShowsRetryableFailure() async {
+    func testUnknownUsernameShowsRetryableFailure() async throws {
         let loader = ControlledMessages()
-        let model = ConversationModel(username: "nieistnieje", loader: loader, media: nil, clock: ManualClock())
+        let clock = ManualClock()
+        let model = ConversationModel(username: "nieistnieje", loader: loader, media: nil, clock: clock)
+        defer { model.becameHidden(); clock.tick() }
         model.becameVisible()
-        await settle()
+        try await waitUntil("initial thread request") { loader.threads.calls.count == 1 }
         loader.threads.calls[0].finish(.failure(BridgeFailure(category: "notFound", code: "404")))
-        await settle()
+        try await waitUntil("failed thread load") { model.phase == .failed }
         XCTAssertEqual(model.phase, .failed)
         XCTAssertFalse(model.isPolling, "no polling for a thread that never loaded")
         model.retry()
-        await settle()
+        try await waitUntil("retry thread request") { loader.threads.calls.count >= 2 }
         XCTAssertEqual(loader.threads.calls.count, 2)
+        loader.threads.succeed(1, ListPage(items: [], next: nil, total: 0))
+        try await waitUntil("retry thread completion") { model.phase == .loaded }
     }
 }
 
