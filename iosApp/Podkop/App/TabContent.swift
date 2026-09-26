@@ -49,24 +49,36 @@ struct TabContent: View {
     }
 
     @ToolbarContentBuilder private var topActions: some ToolbarContent {
-        ToolbarItemGroup(placement: .topBarTrailing) {
-            Button { router.navigate(.search, in: tab) } label: {
-                Image(systemName: "magnifyingglass")
-            }
-            .accessibilityLabel(.commonSearch)
-            if tab != .more {
-                Button { router.presentComposer(.createEntry) } label: {
-                    Image(systemName: "square.and.pencil")
+        if tab != .more {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                if session.isLoggedIn {
+                    if tab == .entries {
+                        Button { router.presentComposer(.createEntry) } label: {
+                            Image(systemName: "plus")
+                        }
+                        .accessibilityLabel(.commonWritePost)
+                        .accessibilityIdentifier("toolbarAddEntry")
+                    } else if tab == .upcoming {
+                        Button { router.navigate(.addLink, in: tab) } label: {
+                            Image(systemName: "plus")
+                        }
+                        .accessibilityLabel(.commonAddLink)
+                        .accessibilityIdentifier("toolbarAddLink")
+                    }
                 }
-                .accessibilityLabel(.commonWritePost)
-            }
-            if session.isLoggedIn {
-                Button { router.navigate(.notifications, in: tab) } label: {
-                    Image(systemName: session.unreadCount > 0 ? "bell.badge" : "bell")
+                Button { router.navigate(.search, in: tab) } label: {
+                    Image(systemName: "magnifyingglass")
                 }
-                .accessibilityLabel(.commonNotifications)
-                .accessibilityValue(session.unreadCount > 0 ? String(localized: .commonUnread2(session.unreadCount)) : "")
-                .accessibilityIdentifier("toolbarNotifications")
+                .accessibilityLabel(.commonSearch)
+                .accessibilityIdentifier("toolbarSearch")
+                if session.isLoggedIn {
+                    Button { router.navigate(.notifications, in: tab) } label: {
+                        Image(systemName: session.unreadCount > 0 ? "bell.badge" : "bell")
+                    }
+                    .accessibilityLabel(.commonNotifications)
+                    .accessibilityValue(session.unreadCount > 0 ? String(localized: .commonUnread2(session.unreadCount)) : "")
+                    .accessibilityIdentifier("toolbarNotifications")
+                }
             }
         }
     }
