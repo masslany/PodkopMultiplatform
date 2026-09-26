@@ -3,6 +3,7 @@ import SwiftUI
 struct ConversationView: View {
     @State private var model: ConversationModel
     @State private var confirmLeave = false
+    @State private var selection = NSRange(location: 0, length: 0)
     @Environment(\.dismiss) private var dismiss
     let tab: AppTab
     let dependencies: AppDependencies
@@ -36,6 +37,7 @@ struct ConversationView: View {
             Divider()
             composer
         }
+        .toolbar(.hidden, for: .tabBar)
         .navigationTitle(model.username)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(model.isDirty || model.sending)
@@ -62,6 +64,12 @@ struct ConversationView: View {
         }
         .onAppear { if active { model.becameVisible() } }
         .onDisappear { model.becameHidden() }
+        .onChange(of: model.text) { _, text in
+            let length = text.utf16.count
+            if selection.location > length || selection.length > length - selection.location {
+                selection = NSRange(location: length, length: 0)
+            }
+        }
         .onChange(of: active) { _, value in
             if value { model.becameVisible() } else { model.becameHidden() }
         }
@@ -120,29 +128,48 @@ struct ConversationView: View {
                 }
             }
             ComposerAttachmentStatus(attachment: model.attachment, disabled: model.sending)
-            HStack(alignment: .bottom, spacing: 8) {
-                TextField(String(localized: .messagesWriteMessage), text: $model.text, axis: .vertical)
-                    .lineLimit(1...6)
-                    .textFieldStyle(.roundedBorder)
+            MessageFormattingBar(text: $model.text, selection: $selection, disabled: model.sending)
+            ZStack(alignment: .topLeading) {
+                if model.text.isEmpty {
+                    Text(.messagesWriteMessage)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 12).padding(.vertical, 12)
+                        .allowsHitTesting(false)
+                }
+                ComposerEditor(text: $model.text, selection: $selection)
                     .disabled(model.sending)
                     .accessibilityIdentifier("messageInput")
+                    .accessibilityLabel(.messagesWriteMessage)
+            }
+            .frame(height: 110)
+            .background(WykopTheme.background, in: RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.primary.opacity(0.4), lineWidth: 1.5))
+            AdaptiveControlRow {
+                Toggle("18+", isOn: $model.adult)
+                    .wykopSwitch()
+                    .fixedSize()
+                    .accessibilityLabel(.commonAdultContent)
+                ComposerAttachmentControls(attachment: model.attachment, disabled: model.sending, compact: true)
+            } trailing: {
                 Button { model.send() } label: {
-                    if model.sending { ProgressView() } else { Image(systemName: "paperplane.fill") }
+                    Group {
+                        if model.sending { ProgressView() }
+                        else { Text(.commonSend).font(.subheadline.weight(.semibold)) }
+                    }
+                    .frame(minWidth: 64, minHeight: 32)
                 }
                 .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+                .tint(.primary)
+                .foregroundStyle(WykopTheme.background)
                 .disabled(!model.canSend)
                 .accessibilityLabel(.commonSend)
                 .accessibilityIdentifier("messageSend")
             }
-            HStack {
-                ComposerAttachmentControls(attachment: model.attachment, disabled: model.sending)
-                Spacer()
-                Toggle(.commonAdultContent, isOn: $model.adult).wykopSwitch().fixedSize()
-            }
-            .font(.caption)
+
         }
         .padding(12)
-        .background(.bar)
+        .background(WykopTheme.card)
     }
 }
 

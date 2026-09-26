@@ -315,7 +315,7 @@ final class ShellUITests: XCTestCase {
         let pm = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ewa-Żółw")).firstMatch
         XCTAssertTrue(pm.waitForExistence(timeout: 5))
         pm.tap()
-        XCTAssertTrue(app.textFields["messageInput"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.textViews["messageInput"].waitForExistence(timeout: 5))
     }
 
     func testFixtureInboxConversationSendAndNewConversation() {
@@ -327,7 +327,7 @@ final class ShellUITests: XCTestCase {
         conversation.tap()
         XCTAssertTrue(app.descendants(matching: .any)["message-m1"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["messageSend"].isEnabled)
-        let input = app.textFields["messageInput"]
+        let input = app.textViews["messageInput"]
         input.tap()
         input.typeText("Nowa wiadomość")
         app.buttons["messageSend"].tap()
@@ -341,7 +341,7 @@ final class ShellUITests: XCTestCase {
         username.typeText("ewa")
         XCTAssertTrue(app.staticTexts["Ewa-Żółw"].waitForExistence(timeout: 5))
         app.staticTexts["Ewa-Żółw"].tap()
-        XCTAssertTrue(app.textFields["messageInput"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.textViews["messageInput"].waitForExistence(timeout: 5))
         app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(app.buttons["newConversation"].waitForExistence(timeout: 5), "new conversation was replaced")
     }
@@ -353,7 +353,7 @@ final class ShellUITests: XCTestCase {
         let conversation = app.buttons.matching(NSPredicate(format: "label CONTAINS %@", "Ewa-Żółw")).firstMatch
         XCTAssertTrue(conversation.waitForExistence(timeout: 5))
         conversation.tap()
-        let input = app.textFields["messageInput"]
+        let input = app.textViews["messageInput"]
         XCTAssertTrue(input.waitForExistence(timeout: 5))
         input.tap()
         input.typeText("szkic")
@@ -371,7 +371,7 @@ final class ShellUITests: XCTestCase {
         app.staticTexts["Ewa-Żółw"].tap()
         XCTAssertTrue(app.buttons["profileMessage"].waitForExistence(timeout: 5))
         app.buttons["profileMessage"].tap()
-        XCTAssertTrue(app.textFields["messageInput"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.textViews["messageInput"].waitForExistence(timeout: 5))
     }
 
     func testFixtureSettingsThemeCacheAndAbout() {

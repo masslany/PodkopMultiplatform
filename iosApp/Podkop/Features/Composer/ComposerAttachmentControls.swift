@@ -6,6 +6,7 @@ import UniformTypeIdentifiers
 struct ComposerAttachmentControls: View {
     let attachment: ComposerAttachment
     var disabled = false
+    var compact = false
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showPhotoURL = false
     @State private var photoURLInput = ""
@@ -13,9 +14,15 @@ struct ComposerAttachmentControls: View {
     var body: some View {
         HStack {
             PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                Label(.composerChoosePhoto, systemImage: "photo.on.rectangle")
+                if compact { Image(systemName: "photo.badge.plus").frame(minWidth: 44, minHeight: 44) }
+                else { Label(.composerChoosePhoto, systemImage: "photo.on.rectangle") }
             }
-            Button(.composerPhotoURL) { showPhotoURL = true }
+            .accessibilityLabel(.composerChoosePhoto)
+            Button { showPhotoURL = true } label: {
+                if compact { Image(systemName: "link").frame(minWidth: 44, minHeight: 44) }
+                else { Text(.composerPhotoURL) }
+            }
+            .accessibilityLabel(.composerPhotoURL)
         }
         .disabled(disabled || attachment.uploading)
         .alert(.composerPhotoURL, isPresented: $showPhotoURL) {
