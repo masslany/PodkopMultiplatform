@@ -30,7 +30,13 @@ struct SurveyView: View {
                 if pending { ProgressView().controlSize(.small) }
             } trailing: {
                 if survey.selectedOption == nil {
-                    Button(showResults ? .contentHideResults : .contentShowResults) { showResults.toggle() }
+                    Button { showResults.toggle() } label: {
+                        ZStack {
+                            Text(.contentShowResults).hidden()
+                            Text(.contentHideResults).hidden()
+                            Text(showResults ? .contentHideResults : .contentShowResults)
+                        }
+                    }
                         .font(.caption.weight(.medium))
                         .buttonStyle(.plain)
                         .frame(minHeight: 44)
@@ -48,17 +54,29 @@ struct SurveyView: View {
                 .font(.subheadline)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            if resultsVisible {
-                if selected {
-                    Image(systemName: "checkmark.circle.fill").foregroundStyle(WykopTheme.votePositive)
-                        .accessibilityAddTraits(.isSelected)
+            ZStack(alignment: .trailing) {
+                // Keep the same width and font height in both modes, including multiline answers.
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill").font(.system(size: 22))
+                    Text(verbatim: "100%").font(.subheadline.weight(.semibold)).monospacedDigit()
                 }
-                Text(verbatim: "\(percentage(answer.count))%")
-                    .font(.subheadline.weight(.semibold)).monospacedDigit()
-            } else if survey.canVote, vote != nil {
-                Image(systemName: "circle").font(.system(size: 22))
-                    .foregroundStyle(.secondary).accessibilityHidden(true)
+                .hidden()
+                if resultsVisible {
+                    HStack(spacing: 8) {
+                        if selected {
+                            Image(systemName: "checkmark.circle.fill").font(.system(size: 22))
+                                .foregroundStyle(WykopTheme.votePositive)
+                                .accessibilityAddTraits(.isSelected)
+                        }
+                        Text(verbatim: "\(percentage(answer.count))%")
+                            .font(.subheadline.weight(.semibold)).monospacedDigit()
+                    }
+                } else if survey.canVote, vote != nil {
+                    Image(systemName: "circle").font(.system(size: 22))
+                        .foregroundStyle(.secondary).accessibilityHidden(true)
+                }
             }
+
         }
         .foregroundStyle(.primary)
         .padding(.horizontal, 12).padding(.vertical, 12)
