@@ -53,13 +53,15 @@ struct TagView: View {
         }
     }
 
+    /// Android's tag header: a full-width 160 pt banner, then the tag name with its actions.
+    /// Like Android, the tag description is not shown.
     private var header: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             if let banner = model.details?.bannerURL {
-                RemoteImage(url: banner, maxDimension: 1200) { Rectangle().fill(.quaternary) }
-                    .frame(height: 140)
+                RemoteImage(url: banner, maxDimension: 1200) { WykopTheme.cardInset }
+                    .frame(height: 160)
                     .frame(maxWidth: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .padding(.horizontal, -12)
                     .accessibilityHidden(true)
             }
             HStack(alignment: .center, spacing: 8) {
@@ -67,12 +69,8 @@ struct TagView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if model.isLoggedIn, let details = model.details { actions(details) }
             }
-            if let details = model.details {
-                if !details.description.isEmpty {
-                    Text(details.description).font(.subheadline).foregroundStyle(.secondary)
-                }
-                Text(.commonFollowers(details.followers)).font(.caption).foregroundStyle(.secondary)
-            } else if model.detailsFailed {
+            .padding(.top, model.details?.bannerURL == nil ? 8 : 0)
+            if model.details == nil, model.detailsFailed {
                 HStack {
                     Label(.tagCouldNotLoadTag, systemImage: "exclamationmark.triangle")
                         .font(.subheadline)
@@ -81,7 +79,6 @@ struct TagView: View {
                 }
             }
         }
-        .padding(.top, 8)
     }
 
     @ViewBuilder private func actions(_ details: TagDetails) -> some View {
@@ -139,22 +136,10 @@ struct TagView: View {
         } else if model.pager.phase != .loaded {
             PagedResourceRows(pager: model.pager, tab: tab, dependencies: dependencies)
         } else {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 8)], spacing: 8) {
-                ForEach(items) { item in
-                    Button { dependencies.router.navigate(.entry(item.sourceID), in: tab) } label: {
-                        if let photo = item.photo {
-                            MediaView(photo: photo, bytes: nil, autoplay: session.autoplayGifs,
-                                            foreground: dependencies.isForeground)
-                                .blur(radius: item.adult ? 20 : 0)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(.commonOpenEntry)
-                    // The gallery is a subset of the stream, so page on its own last cell.
-                    .onAppear { if item.id == items.last?.id { model.pager.loadNext() } }
-                }
-            }
+            TagGallery(items: items,
+                       open: { dependencies.router.navigate(.entry($0.sourceID), in: tab) },
+                       // The gallery is a subset of the stream, so page on its own last cell.
+                       loadMore: { model.pager.loadNext() })
             PagerFooter(pager: model.pager)
         }
     }

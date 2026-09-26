@@ -37,8 +37,13 @@ private final class ControlledFeedLoader: FeedLoading {
 
 @MainActor
 final class FeedTests: XCTestCase {
+    /// Waits up to two seconds of real time: the test host is the app, whose own startup can
+    /// keep the main actor busy for longer than a fixed number of yields.
     private func waitForCalls(_ loader: ControlledFeedLoader, _ count: Int) async {
-        for _ in 0..<100 where loader.calls.count < count { await Task.yield() }
+        let deadline = Date().addingTimeInterval(2)
+        while loader.calls.count < count && Date() < deadline {
+            try? await Task.sleep(for: .milliseconds(5))
+        }
         XCTAssertGreaterThanOrEqual(loader.calls.count, count)
     }
     private func settle() async {

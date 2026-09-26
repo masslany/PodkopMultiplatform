@@ -12,7 +12,15 @@ struct RemoteImage<Placeholder: View>: View {
     var body: some View {
         Group {
             if let image {
-                Image(uiImage: image).resizable().aspectRatio(contentMode: contentMode)
+                if contentMode == .fill {
+                    // A filling image takes exactly the offered space and crops; sized by its own
+                    // aspect ratio it would push its container wider than the screen.
+                    Color.clear
+                        .overlay { Image(uiImage: image).resizable().scaledToFill() }
+                        .clipped()
+                } else {
+                    Image(uiImage: image).resizable().scaledToFit()
+                }
             } else {
                 placeholder()
             }
