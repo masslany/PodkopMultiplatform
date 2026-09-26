@@ -921,14 +921,16 @@ internal fun ResourceItem.toIOSResource(): IOSResource {
         slug = slug,
         canReply = actions?.create ?: false,
         canFavourite = actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
-        inlineComments = comments?.items.orEmpty().map { it.toIOSResource() },
+        inlineComments = comments?.items.orEmpty().map {
+            it.toIOSResource(rootId = if (resource == Resource.Entry || resource == Resource.Link) id else parentId ?: parent?.id)
+        },
     )
 }
 
 private fun Photo.toIOS() = IOSPhoto(url, width, height, mimeType, key, label)
 
 /** An embedded comment, mapped like a full resource so Swift renders both the same way. */
-internal fun Comment.toIOSResource(): IOSResource = IOSResource(
+internal fun Comment.toIOSResource(rootId: Int? = null): IOSResource = IOSResource(
     id = id,
     kind = if (resource == Resource.LinkComment) "linkComment" else "entryComment",
     title = "",
@@ -956,7 +958,7 @@ internal fun Comment.toIOSResource(): IOSResource = IOSResource(
         Deleted.Host -> "entryAuthor"
         Deleted.None -> null
     },
-    parentId = parentId,
+    parentId = rootId ?: parentId.takeIf { it > 0 },
     createdAt = createdAt?.toString(),
     commentsCount = comments?.count ?: 0,
     votesUp = votes.up,
@@ -981,7 +983,7 @@ internal fun Comment.toIOSResource(): IOSResource = IOSResource(
     slug = slug,
     canReply = actions.create,
     canFavourite = actions.createFavourite || actions.deleteFavourite,
-    inlineComments = comments?.items.orEmpty().map { it.toIOSResource() },
+    inlineComments = comments?.items.orEmpty().map { it.toIOSResource(rootId = rootId ?: parentId.takeIf { it > 0 }) },
 )
 
 private fun LinkDraftDetails.toIOSLinkDraft() = IOSLinkDraft(

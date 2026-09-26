@@ -115,5 +115,23 @@ class ResourceMappingTest {
         assertEquals("positive", mapped.voted)
         assertTrue(mapped.canReply)
         assertTrue(mapped.canVoteDown)
+
+        // Feed previews omit parent_id; the domain mapper represents that as -1.
+        val preview = comment.copy(parentId = -1, resource = Resource.EntryComment)
+        val entry = ResourceItem(
+            actions = actions, adult = false, archive = false, author = author,
+            comments = Comments(count = 1, hot = false, items = listOf(preview)),
+            content = "entry", createdAt = null, deleted = Deleted.None, deletable = false,
+            description = "", editable = false, hot = false, id = 42, media = null,
+            name = "", parent = null, publishedAt = null, recommended = false,
+            resource = Resource.Entry, slug = "", source = null, tags = emptyList(),
+            title = "", voted = Voted.None, votes = null, favourite = false,
+        )
+        assertEquals(42, entry.toIOSResource().inlineComments.single().parentId)
+        assertEquals("entryComment", entry.toIOSResource().inlineComments.single().kind)
+        assertEquals(42, entry.copy(comments = entry.comments?.copy(items = listOf(
+            preview.copy(parentId = 99),
+        ))).toIOSResource().inlineComments.single().parentId)
+        assertEquals(null, preview.toIOSResource().parentId)
     }
 }

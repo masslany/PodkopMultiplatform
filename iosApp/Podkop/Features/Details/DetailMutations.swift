@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import PodkopShared
 
 enum DetailMutation {
@@ -27,6 +28,7 @@ enum DetailMutation {
 
 @MainActor
 final class SharedDetailMutator: DetailMutating {
+    private let logger = Logger(subsystem: "pl.masslany.podkop", category: "CommentVoting")
     private let client: PodkopClient
     private let adapter: BridgeAdapter
 
@@ -36,6 +38,25 @@ final class SharedDetailMutator: DetailMutating {
     }
 
     func apply(_ mutation: DetailMutation) async throws {
+        if case .voteUp(let value, let remove) = mutation {
+            logger.info("Vote up kind=\(value.kind.rawValue, privacy: .public) id=\(value.sourceID) parent=\(value.parentID ?? -1) remove=\(remove)")
+        }
+        do {
+            try await perform(mutation)
+            if case .voteUp = mutation { logger.info("Vote up succeeded") }
+        } catch {
+            if case .voteUp = mutation {
+                if let failure = error as? BridgeFailure {
+                    logger.error("Vote up failed category=\(failure.category, privacy: .public) code=\(failure.code ?? "none", privacy: .public)")
+                } else {
+                    logger.error("Vote up failed type=\(String(describing: type(of: error)), privacy: .public)")
+                }
+            }
+            throw error
+        }
+    }
+
+    private func perform(_ mutation: DetailMutation) async throws {
         switch mutation {
         case .voteUp(let value, let remove):
             let _: IOSSuccess = try await adapter.call {
