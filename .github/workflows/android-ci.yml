@@ -37,6 +37,8 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Accept Android SDK licenses
         run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
@@ -169,6 +171,8 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Accept Android SDK licenses
         run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
@@ -240,6 +244,8 @@ jobs:
 
       - name: Set up Android SDK for Gradle configuration
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Install Android SDK packages
         run: |
@@ -385,6 +391,8 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       - name: Accept Android SDK licenses
         run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
