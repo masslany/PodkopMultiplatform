@@ -3,17 +3,12 @@ import SwiftUI
 struct SettingsView: View {
     @State private var model: SettingsModel
     @State private var confirmLogout = false
-    /// The segment moves as soon as it is tapped. Bound to the saved theme, it would snap back
-    /// while the shared layer saves and then move with the whole window's color change, which
-    /// breaks the thumb's glass animation.
-    @State private var themeSelection: ThemeChoice
     let tab: AppTab
     let dependencies: AppDependencies
     private var session: SessionModel { dependencies.session }
 
     init(tab: AppTab, dependencies: AppDependencies) {
-        _model = State(initialValue: SettingsModel(service: dependencies.settingsService))
-        _themeSelection = State(initialValue: dependencies.session.theme)
+        _model = State(initialValue: SettingsModel(service: dependencies.settingsService, state: dependencies.session))
         self.tab = tab
         self.dependencies = dependencies
     }
@@ -21,17 +16,13 @@ struct SettingsView: View {
     var body: some View {
         WykopList {
             Section(.settingsTheme) {
-                Picker(.settingsTheme, selection: $themeSelection) {
+                Picker(.settingsTheme, selection: Binding(get: { session.theme }, set: { model.setTheme($0) })) {
                     Text(.settingsAuto).tag(ThemeChoice.auto)
                     Text(.settingsLight).tag(ThemeChoice.light)
                     Text(.settingsDark).tag(ThemeChoice.dark)
                 }
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("settingsTheme")
-                .onChange(of: themeSelection) { _, theme in
-                    if theme != session.theme { model.setTheme(theme) }
-                }
-                .onChange(of: session.theme) { _, theme in themeSelection = theme }
             }
             Section(.settingsMedia) {
                 Toggle(.settingsAutoplayGIFs, isOn: Binding(get: { session.autoplayGifs }, set: { model.setAutoplay($0) }))

@@ -3,7 +3,7 @@ import Observation
 import PodkopShared
 
 @MainActor @Observable
-final class SessionModel {
+final class SessionModel: SettingsState {
     enum Phase { case initializing, ready, error, missingConfiguration }
     var phase: Phase = .initializing
     var isLoggedIn = false { didSet { if isLoggedIn != oldValue { refreshUsername() } } }

@@ -2,16 +2,33 @@ import SwiftUI
 import Observation
 import PodkopShared
 
+/// The settings the app reads while they are being saved; `SessionModel` holds them.
+@MainActor protocol SettingsState: AnyObject {
+    var theme: ThemeChoice { get set }
+    var autoplayGifs: Bool { get set }
+}
+
 @MainActor @Observable
 final class SettingsModel {
     private(set) var failed = false
     private(set) var confirmation: String?
     private let service: SettingsServicing
+    private let state: SettingsState
 
-    init(service: SettingsServicing) { self.service = service }
+    init(service: SettingsServicing, state: SettingsState) {
+        self.service = service
+        self.state = state
+    }
 
-    func setAutoplay(_ enabled: Bool) { run { try await $0.setAutoplayGifs(enabled) } }
-    func setTheme(_ theme: ThemeChoice) { run { try await $0.setTheme(theme) } }
+    /// Controls bound to these values must see the change at once, or they snap back while the
+    /// shared layer saves it. The previous value returns if the save fails.
+    func setAutoplay(_ enabled: Bool) {
+        update(\.autoplayGifs, to: enabled) { try await $0.setAutoplayGifs(enabled) }
+    }
+
+    func setTheme(_ theme: ThemeChoice) {
+        update(\.theme, to: theme) { try await $0.setTheme(theme) }
+    }
 
     func clearCache() {
         service.clearMediaCache()
@@ -37,10 +54,21 @@ final class SettingsModel {
         confirmation = nil
     }
 
-    private func run(_ action: @escaping (SettingsServicing) async throws -> Void) {
+    private func update<Value: Equatable>(_ keyPath: ReferenceWritableKeyPath<SettingsState, Value>, to value: Value,
+                                          save: @escaping (SettingsServicing) async throws -> Void) {
+        let state = state
+        let previous = state[keyPath: keyPath]
+        guard value != previous else { return }
+        state[keyPath: keyPath] = value
         let service = service
         Task { [weak self] in
-            do { try await action(service) } catch { self?.failed = true }
+            do {
+                try await save(service)
+            } catch {
+                // A later choice may already have replaced this one; only undo our own.
+                if state[keyPath: keyPath] == value { state[keyPath: keyPath] = previous }
+                self?.failed = true
+            }
         }
     }
 }
