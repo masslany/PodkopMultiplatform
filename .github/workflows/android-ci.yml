@@ -39,7 +39,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses >/dev/null
+        run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
 
       - name: Install Android SDK packages
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
@@ -141,12 +141,22 @@ jobs:
 
   verify-kmp:
     name: Verify KMP shared modules
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 45
+
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
 
     steps:
       - name: Check out sources
         uses: actions/checkout@v4
+
+      - name: Verify pinned Apple Silicon toolchain
+        shell: bash
+        run: |
+          test "$(uname -m)" = arm64
+          test -d "$DEVELOPER_DIR"
+          xcodebuild -version
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -161,7 +171,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses >/dev/null
+        run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
 
       - name: Install Android SDK packages
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
@@ -185,7 +195,7 @@ jobs:
           EOF
 
       - name: Verify KMP shared modules
-        run: ./gradlew --stacktrace :common:allTests :business:allTests :composeApp:allTests
+        run: ./gradlew --stacktrace :common:allTests :business:allTests :composeApp:allTests :iosShared:iosSimulatorArm64Test
 
       - name: Upload KMP failure reports
         if: failure()
@@ -196,17 +206,28 @@ jobs:
             common/build/reports
             business/build/reports
             composeApp/build/reports
+            iosShared/build/reports
             build/reports/problems
           if-no-files-found: ignore
 
   verify-ios:
     name: Build and test iOS
-    runs-on: macos-latest
+    runs-on: macos-26
     timeout-minutes: 60
+
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
 
     steps:
       - name: Check out sources
         uses: actions/checkout@v4
+
+      - name: Verify pinned Apple Silicon toolchain
+        shell: bash
+        run: |
+          test "$(uname -m)" = arm64
+          test -d "$DEVELOPER_DIR"
+          xcodebuild -version
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -222,7 +243,7 @@ jobs:
 
       - name: Install Android SDK packages
         run: |
-          yes | sdkmanager --licenses >/dev/null
+          sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
           sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
       - name: Create CI-only API keys
@@ -250,11 +271,19 @@ jobs:
           import sys
 
           devices = json.load(open(sys.argv[1], encoding="utf-8"))["devices"]
+          import re
+          import subprocess
+
+          sdk = tuple(map(int, subprocess.check_output(
+              ["xcrun", "--sdk", "iphonesimulator", "--show-sdk-version"], text=True).strip().split(".")))
+          def version(runtime):
+              return tuple(map(int, re.search(r"iOS-(\d+(?:-\d+)*)$", runtime).group(1).split("-")))
           phones = [(runtime, device) for runtime, entries in devices.items()
+                    if re.search(r"iOS-(\d+(?:-\d+)*)$", runtime) and version(runtime) <= sdk
                     for device in entries if device.get("isAvailable") and device["name"].startswith("iPhone")]
           if not phones:
               raise SystemExit("No available iPhone simulator")
-          runtime, device = max(phones, key=lambda item: item[0])
+          runtime, device = max(phones, key=lambda item: (version(item[0]), item[1]["name"]))
           with open(sys.argv[2], "a", encoding="utf-8") as output:
               output.write(f"id={device['udid']}\n")
           print(f"Selected {device['name']} ({runtime})")
@@ -277,20 +306,52 @@ jobs:
             -derivedDataPath "$RUNNER_TEMP/podkop-ios-derived" \
             CODE_SIGNING_ALLOWED=NO build
 
-      - name: Run unit and fixture UI tests
+      - name: Verify built iOS bundle metadata
+        run: |
+          python3 scripts/ci/verify_ios_bundle.py \
+            "$RUNNER_TEMP/podkop-ios-derived/Build/Products/Debug-iphonesimulator/Podkop.app" --configuration Debug
+          python3 scripts/ci/verify_ios_bundle.py \
+            "$RUNNER_TEMP/podkop-ios-derived/Build/Products/Release-iphonesimulator/Podkop.app" --configuration Release
+          python3 scripts/ci/verify_ios_bundle.py \
+            "$RUNNER_TEMP/podkop-ios-derived/Build/Products/Release-iphoneos/Podkop.app" --configuration Release
+
+      - name: Run iOS unit tests
+        id: unit_tests
+        timeout-minutes: 15
         shell: bash
         run: |
           set -euo pipefail
           xcodebuild -project iosApp/iosApp.xcodeproj -scheme Podkop \
             -configuration Debug -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' \
             -derivedDataPath "$RUNNER_TEMP/podkop-ios-derived" \
-            -resultBundlePath "$RUNNER_TEMP/podkop-ios-tests.xcresult" \
-            -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test \
-            2>&1 | tee "$RUNNER_TEMP/podkop-ios-tests.log"
-          grep -Fq 'PodkopTests.xctest' "$RUNNER_TEMP/podkop-ios-tests.log"
-          grep -Fq 'PodkopUITests.xctest' "$RUNNER_TEMP/podkop-ios-tests.log"
-          grep -Eq 'Executed [1-9][0-9]* tests' "$RUNNER_TEMP/podkop-ios-tests.log"
-          grep -Fq '** TEST SUCCEEDED **' "$RUNNER_TEMP/podkop-ios-tests.log"
+            -resultBundlePath "$RUNNER_TEMP/podkop-ios-unit-tests.xcresult" \
+            -only-testing:PodkopTests -parallel-testing-enabled NO \
+            -test-timeouts-enabled YES -default-test-execution-time-allowance 30 \
+            -maximum-test-execution-time-allowance 30 \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test \
+            2>&1 | tee "$RUNNER_TEMP/podkop-ios-unit-tests.log"
+          grep -Fq 'PodkopTests.xctest' "$RUNNER_TEMP/podkop-ios-unit-tests.log"
+          grep -Eq 'Executed [1-9][0-9]* tests' "$RUNNER_TEMP/podkop-ios-unit-tests.log"
+          grep -Fq '** TEST SUCCEEDED **' "$RUNNER_TEMP/podkop-ios-unit-tests.log"
+
+      - name: Run iOS fixture UI tests
+        if: ${{ !cancelled() && steps.unit_tests.outcome != 'skipped' }}
+        timeout-minutes: 20
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -project iosApp/iosApp.xcodeproj -scheme Podkop \
+            -configuration Debug -destination 'platform=iOS Simulator,id=${{ steps.simulator.outputs.id }}' \
+            -derivedDataPath "$RUNNER_TEMP/podkop-ios-derived" \
+            -resultBundlePath "$RUNNER_TEMP/podkop-ios-ui-tests.xcresult" \
+            -only-testing:PodkopUITests -parallel-testing-enabled NO \
+            -test-timeouts-enabled YES -default-test-execution-time-allowance 120 \
+            -maximum-test-execution-time-allowance 120 \
+            CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test \
+            2>&1 | tee "$RUNNER_TEMP/podkop-ios-ui-tests.log"
+          grep -Fq 'PodkopUITests.xctest' "$RUNNER_TEMP/podkop-ios-ui-tests.log"
+          grep -Eq 'Executed [1-9][0-9]* tests' "$RUNNER_TEMP/podkop-ios-ui-tests.log"
+          grep -Fq '** TEST SUCCEEDED **' "$RUNNER_TEMP/podkop-ios-ui-tests.log"
 
       - name: Upload iOS test results
         if: always()
@@ -298,8 +359,10 @@ jobs:
         with:
           name: ios-test-results
           path: |
-            ${{ runner.temp }}/podkop-ios-tests.xcresult
-            ${{ runner.temp }}/podkop-ios-tests.log
+            ${{ runner.temp }}/podkop-ios-unit-tests.xcresult
+            ${{ runner.temp }}/podkop-ios-unit-tests.log
+            ${{ runner.temp }}/podkop-ios-ui-tests.xcresult
+            ${{ runner.temp }}/podkop-ios-ui-tests.log
           if-no-files-found: ignore
 
   coverage:
@@ -324,7 +387,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses >/dev/null
+        run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
 
       - name: Install Android SDK packages
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
