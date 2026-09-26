@@ -76,3 +76,20 @@ If Firebase config files are missing, the Android build will fail during Google 
 ### iOS
 1. Open `iosApp/iosApp.xcodeproj` in Xcode.
 2. Select the `Podkop` scheme and your device or simulator, then click Run. The build compiles the shared Kotlin framework first.
+
+
+Unit tests that verify session persistence need a signed simulator host for Keychain access.
+Run all unit tests (without UI tests) with a local signature and execution deadlines:
+
+```sh
+xcodebuild -project iosApp/iosApp.xcodeproj -scheme Podkop \
+  -destination 'platform=iOS Simulator,name=iPhone 16e' \
+  -only-testing:PodkopTests -parallel-testing-enabled NO \
+  -test-timeouts-enabled YES -default-test-execution-time-allowance 30 \
+  -maximum-test-execution-time-allowance 30 \
+  CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test
+```
+
+`SessionPersistenceTests` also has a five-second callback deadline and owns its shared
+client and adapter. It must not use `AppDependencies.shared`: other bridge tests close
+the singleton client, leaving the host app's cached client reference closed.
