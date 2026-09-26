@@ -29,15 +29,17 @@ final class ShellUITests: XCTestCase {
         let app = launch("guest")
         app.tabBars.buttons["Links"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["resource-link:101"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["feedSort"].exists)
-        app.buttons["feedGallery"].tap()
+        // SwiftUI menus can be exposed as either buttons or pop-up buttons.
+        XCTAssertTrue(app.descendants(matching: .any)["feedSort"].exists)
+        // CI runs on an iPhone: two gallery columns cannot fit in this layout.
+        XCTAssertFalse(app.buttons["feedGallery"].exists)
         app.tabBars.buttons["Upcoming"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["resource-link:101"].waitForExistence(timeout: 5))
         app.tabBars.buttons["Entries"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["resource-entry:102"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["hotPeriod"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["hotPeriod"].exists)
         app.tabBars.buttons["Links"].tap()
-        XCTAssertEqual(app.buttons["feedGallery"].label, "List view")
+        XCTAssertFalse(app.buttons["feedGallery"].exists)
     }
 
     func testFixtureLinkAndEntryDetailsShowCardsAndActions() {
@@ -77,15 +79,23 @@ final class ShellUITests: XCTestCase {
 
     func testFixtureComposerKeepsDraftWhenDiscardCancelled() {
         let app = launch("authenticated")
-        app.buttons["Write a post"].tap()
+        XCTAssertFalse(app.buttons["toolbarAddEntry"].exists)
+        app.tabBars.buttons["Entries"].tap()
+        let addEntry = app.buttons["toolbarAddEntry"]
+        XCTAssertTrue(addEntry.waitForExistence(timeout: 5))
+        addEntry.tap()
         let editor = app.textViews.firstMatch
         XCTAssertTrue(editor.waitForExistence(timeout: 5))
         editor.tap()
-        editor.typeText("Hello 👩🏽‍💻")
+        let draft = "Hello 👩🏽‍💻"
+        editor.typeText(draft)
+        XCTAssertEqual(editor.value as? String, draft)
         app.buttons["Cancel"].tap()
-        XCTAssertTrue(app.buttons["Keep writing"].waitForExistence(timeout: 5))
-        app.buttons["Keep writing"].tap()
+        let keepWriting = app.alerts.buttons["Keep writing"]
+        XCTAssertTrue(keepWriting.waitForExistence(timeout: 5))
+        keepWriting.tap()
         XCTAssertTrue(editor.exists)
+        XCTAssertEqual(editor.value as? String, draft)
         XCTAssertTrue(app.buttons["composerSubmit"].isEnabled)
     }
 
