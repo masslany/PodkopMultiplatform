@@ -21,7 +21,8 @@ struct DetailView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 16) {
+            // No stack spacing: entry comments draw one continuous line, so gaps are explicit.
+            LazyVStack(alignment: .leading, spacing: 0) {
                 switch model.phase {
                 case .idle, .loading:
                     ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 220)
@@ -32,24 +33,35 @@ struct DetailView: View {
                         Button(.commonRetry) { model.reload() }
                     }
                 case .loaded:
-                    // Like Android, the resource sits on the page background, not on a card.
+                    // Like Android, a link sits on the page background and an entry on a card.
                     if let resource = model.resource {
-                        ResourceCard(resource: resource, actions: actions(for: resource),
-                                           style: .detailHeader,
-                                           autoplayGifs: dependencies.session.autoplayGifs,
-                                           isForeground: dependencies.isForeground,
-                                           onTitleBottom: { titleBottom = $0 })
-                            .padding(.horizontal, resource.kind == .link ? 0 : 16)
-                            .padding(.top, resource.kind == .link && resource.photo != nil ? 0 : 12)
+                        if resource.kind == .link {
+                            ResourceCard(resource: resource, actions: actions(for: resource),
+                                         style: .detailHeader,
+                                         autoplayGifs: dependencies.session.autoplayGifs,
+                                         isForeground: dependencies.isForeground,
+                                         onTitleBottom: { titleBottom = $0 })
+                                .padding(.top, resource.photo != nil ? 0 : 12)
+                                .padding(.bottom, 16)
+                        } else {
+                            ResourceCard(resource: resource, actions: actions(for: resource),
+                                         style: .card,
+                                         autoplayGifs: dependencies.session.autoplayGifs,
+                                         isForeground: dependencies.isForeground)
+                                .padding(.horizontal, 12)
+                                .padding(.top, 12)
+                                .padding(.bottom, 16)
+                        }
                     }
                 }
                 if model.actionFailed {
                     Label(.detailsActionFailedTryAgain, systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.red)
                         .padding(.horizontal, 16)
+                        .padding(.bottom, 16)
                 }
                 if model.phase == .loaded {
-                    if model.kind == .link, !model.related.isEmpty { relatedSection }
+                    if model.kind == .link, !model.related.isEmpty { relatedSection.padding(.bottom, 16) }
                     commentsSection
                 }
             }
@@ -110,42 +122,62 @@ struct DetailView: View {
     /// Direct children of the page's `LazyVStack`, so only visible comment threads are built and
     /// the next page loads when the last thread appears, not all at once.
     @ViewBuilder private var commentsSection: some View {
-        Group {
-            if model.kind == .link {
-                Menu {
-                    Button(.commonBest) { model.selectCommentSort("best") }
-                    Button(.commonNewest) { model.selectCommentSort("newest") }
-                    Button(.commonOldest) { model.selectCommentSort("oldest") }
-                } label: {
-                    DropdownLabel(title: commentSortTitle)
+        if model.kind == .link {
+            Menu {
+                Button(.commonBest) { model.selectCommentSort("best") }
+                Button(.commonNewest) { model.selectCommentSort("newest") }
+                Button(.commonOldest) { model.selectCommentSort("oldest") }
+            } label: {
+                DropdownLabel(title: commentSortTitle)
+            }
+            .accessibilityIdentifier("commentSort")
+            .padding(.horizontal, 12)
+            .padding(.bottom, 12)
+        }
+        if model.commentsLoading && model.comments.isEmpty {
+            ProgressView(.commonLoading).frame(maxWidth: .infinity).padding(.vertical, 12)
+        } else if model.commentsError && model.comments.isEmpty {
+            ThreadMoreButton(title: String(localized: .detailsRetryComments)) { model.retryComments() }
+                .padding(.vertical, 12)
+        } else if model.comments.isEmpty {
+            ContentUnavailableView(.commonNothingHereYet, systemImage: "bubble")
+        } else {
+            ForEach(model.comments) { comment in
+                Group {
+                    if model.kind == .link {
+                        commentThread(comment)
+                            .padding(.horizontal, 12)
+                            .padding(.bottom, 12)
+                    } else {
+                        EntryCommentRow(comment: comment,
+                                        actions: actions(for: comment, replyParentID: comment.sourceID),
+                                        isOwn: isOwn(comment),
+                                        isLast: comment.id == model.comments.last?.id,
+                                        autoplayGifs: dependencies.session.autoplayGifs,
+                                        isForeground: dependencies.isForeground)
+                    }
                 }
-                .accessibilityIdentifier("commentSort")
-            } else {
-                Text(.commonComments).font(.headline).padding(.horizontal, 4)
+                .onAppear {
+                    if comment.id == model.comments.last?.id { model.loadMoreComments() }
+                }
+            }
+            if model.commentsLoading { ProgressView(.commonLoading).frame(maxWidth: .infinity).padding(.vertical, 12) }
+            if model.nextCommentsError {
+                ThreadMoreButton(title: String(localized: .commonRetryNextPage)) { model.retryComments() }
+                    .padding(.vertical, 12)
             }
         }
-        .padding(.horizontal, 12)
-        Group {
-            if model.commentsLoading && model.comments.isEmpty {
-                ProgressView(.commonLoading).frame(maxWidth: .infinity)
-            } else if model.commentsError && model.comments.isEmpty {
-                ThreadMoreButton(title: String(localized: .detailsRetryComments)) { model.retryComments() }
-            } else if model.comments.isEmpty {
-                ContentUnavailableView(.commonNothingHereYet, systemImage: "bubble")
-            } else {
-                ForEach(model.comments) { comment in
-                    commentThread(comment)
-                        .onAppear {
-                            if comment.id == model.comments.last?.id { model.loadMoreComments() }
-                        }
-                }
-                if model.commentsLoading { ProgressView(.commonLoading).frame(maxWidth: .infinity) }
-                if model.nextCommentsError {
-                    ThreadMoreButton(title: String(localized: .commonRetryNextPage)) { model.retryComments() }
-                }
-            }
-        }
-        .padding(.horizontal, 12)
+    }
+
+    private func isOwn(_ resource: Resource) -> Bool {
+        guard let me = dependencies.session.username, let author = resource.author?.name else { return false }
+        return author == me
+    }
+
+    private func linkCommentAccent(_ comment: Resource, parent: Resource?) -> Color? {
+        CommentAccent.resolve(author: comment.author?.name, linkAuthor: model.resource?.author?.name,
+                              parentAuthor: parent?.author?.name,
+                              currentUser: dependencies.session.username)?.color
     }
 
     /// A comment card with its replies inside it: the two the API embeds until the reader asks
@@ -159,7 +191,8 @@ struct DetailView: View {
             children: model.kind == .link ? replies : [],
             childActions: { actions(for: $0, replyParentID: comment.sourceID) },
             autoplayGifs: dependencies.session.autoplayGifs,
-            isForeground: dependencies.isForeground
+            isForeground: dependencies.isForeground,
+            accent: { linkCommentAccent($0, parent: $1) }
         ) {
             if model.kind == .link, !state.exhausted, remaining > 0 || state.loading || state.error {
                 ThreadMoreButton(

@@ -11,14 +11,19 @@ struct ResourceThreadCard<Footer: View>: View {
     var autoplayGifs = false
     var isForeground = true
     var open: (() -> Void)?
+    /// An optional accent line beside a comment, given the comment and the one it replies to
+    /// (Android's `LinkCommentAccentLayout`).
+    var accent: (Resource, Resource?) -> Color? = { _, _ in nil }
     @ViewBuilder var footer: () -> Footer
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             card(root, actions: rootActions, identified: false)
+                .background(alignment: .leading) { accentLine(accent(root, nil)) }
             ForEach(children) { child in
                 Divider().overlay(WykopTheme.separator)
                 card(child, actions: childActions(child))
+                    .background(alignment: .leading) { accentLine(accent(child, root)) }
                     .padding(.leading, 16)
             }
             footer()
@@ -28,6 +33,17 @@ struct ResourceThreadCard<Footer: View>: View {
         .onTapGesture { open?() }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("resource-\(root.id)")
+    }
+
+    /// A 3 pt rounded line just left of the content, inset 6 pt at both ends.
+    @ViewBuilder private func accentLine(_ color: Color?) -> some View {
+        if let color {
+            Capsule().fill(color)
+                .frame(width: 3)
+                .padding(.vertical, 6)
+                .offset(x: -8)
+                .accessibilityHidden(true)
+        }
     }
 
     private func card(_ resource: Resource, actions: ResourceActions, identified: Bool = true) -> some View {

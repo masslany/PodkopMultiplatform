@@ -126,4 +126,15 @@ final class InteractionTests: XCTestCase {
                                                                options: .regularExpression) != nil)
         XCTAssertNil(PublishedTime.text(iso: nil, now: now))
     }
+
+    func testLinkCommentAccentFollowsAndroidPriority() {
+        XCTAssertEqual(CommentAccent.resolve(author: "Ja", linkAuthor: "Ja", parentAuthor: "Ja", currentUser: "Ja"),
+                       .currentUser)
+        XCTAssertEqual(CommentAccent.resolve(author: "Ewa", linkAuthor: "Ewa", parentAuthor: "Ewa", currentUser: "Ja"),
+                       .linkAuthor)
+        XCTAssertEqual(CommentAccent.resolve(author: "Ola", linkAuthor: "Ewa", parentAuthor: "Ola", currentUser: nil),
+                       .parentAuthor)
+        XCTAssertNil(CommentAccent.resolve(author: "Ola", linkAuthor: "Ewa", parentAuthor: nil, currentUser: "Ja"))
+        XCTAssertNil(CommentAccent.resolve(author: "", linkAuthor: "", parentAuthor: "", currentUser: ""))
+    }
 }

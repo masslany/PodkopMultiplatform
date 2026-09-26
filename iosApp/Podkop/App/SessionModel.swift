@@ -6,8 +6,11 @@ import PodkopShared
 final class SessionModel {
     enum Phase { case initializing, ready, error, missingConfiguration }
     var phase: Phase = .initializing
-    var isLoggedIn = false
-    var revision = 0
+    var isLoggedIn = false { didSet { if isLoggedIn != oldValue { refreshUsername() } } }
+    var revision = 0 { didSet { if revision != oldValue { refreshUsername() } } }
+    /// The signed-in user's name, used to highlight their own comments; nil while unknown.
+    private(set) var username: String?
+    private var usernameTask: Task<Void, Never>?
     var unreadCount = 0
     var notificationCounts = NotificationCounts()
     var autoplayGifs = true
@@ -20,6 +23,18 @@ final class SessionModel {
     private var observationTasks: [Task<Void, Never>] = []
 
     init(dependencies: AppDependencies) { self.dependencies = dependencies }
+
+    /// Another account's name must never stay behind, so it is cleared before each lookup.
+    private func refreshUsername() {
+        usernameTask?.cancel()
+        username = nil
+        guard isLoggedIn else { return }
+        let loader = dependencies.profileLoader
+        usernameTask = Task { [weak self] in
+            guard let name = try? await loader.ownUsername(), !Task.isCancelled else { return }
+            self?.username = name
+        }
+    }
 
     func startIfNeeded() {
         guard !started else { return }

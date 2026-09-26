@@ -20,6 +20,10 @@ enum WykopTheme {
     static let favouriteGold = rgb(0xFFC107)
     static let votePositive = rgb(0x74BD74)
     static let voteNegative = rgb(0xE7625A)
+    /// Comment accent lines (Android's `linkAuthor`, `commentAuthor`, `currentUserAuthor`).
+    static let linkAuthorAccent = rgb(0x3D83CC)
+    static let parentAuthorAccent = dynamic(light: 0x3A3A3A, dark: 0xE5E5E5)
+    static let currentUserAccent = nameGreen
 
     static let cardRadius: CGFloat = 16
     static let smallRadius: CGFloat = 8

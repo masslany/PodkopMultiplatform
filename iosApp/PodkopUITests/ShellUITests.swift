@@ -258,7 +258,12 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.buttons["profileObserve"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.descendants(matching: .any)["resource-entry:102"].waitForExistence(timeout: 5))
         app.buttons["profileDetails"].tap()
-        XCTAssertTrue(app.staticTexts["Weteran"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Weteran"].waitForExistence(timeout: 5))
+        app.buttons["Weteran"].tap()
+        XCTAssertTrue(app.staticTexts["10 lat na Wykopie"].waitForExistence(timeout: 5))
+        // The details popover closes on a tap outside it.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.95)).tap()
+        XCTAssertTrue(app.staticTexts["10 lat na Wykopie"].waitForNonExistence(timeout: 5))
         XCTAssertTrue(app.textFields["profileNote"].exists || app.textViews["profileNote"].exists)
         app.buttons["profileSummary-following"].tap()
         XCTAssertTrue(app.staticTexts["#technologia"].waitForExistence(timeout: 5))
