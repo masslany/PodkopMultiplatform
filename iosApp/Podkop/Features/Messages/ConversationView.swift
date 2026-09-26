@@ -15,6 +15,8 @@ struct ConversationView: View {
         self.dependencies = dependencies
     }
 
+    private var protectsDraft: Bool { model.isDirty || model.sending || model.attachment.uploading }
+
     private var active: Bool {
         dependencies.isForeground && dependencies.session.isLoggedIn
     }
@@ -40,12 +42,13 @@ struct ConversationView: View {
         .toolbar(.hidden, for: .tabBar)
         .navigationTitle(model.username)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(model.isDirty || model.sending)
+        .background(KeyboardDismissArea())
+        .navigationBarBackButtonHidden(protectsDraft)
         .toolbar {
-            if model.isDirty || model.sending {
+            if protectsDraft {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { confirmLeave = true } label: { Label(.commonBack, systemImage: "chevron.backward") }
-                        .disabled(model.sending)
+                        .disabled(model.sending || model.attachment.uploading)
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -100,6 +103,7 @@ struct ConversationView: View {
                 }
                 .padding(12)
             }
+            .scrollDismissesKeyboard(.interactively)
             .refreshable { await model.refresh() }
             .onChange(of: model.scrollToLatest) { _, _ in
                 if let last = model.messages.last { proxy.scrollTo(last.id, anchor: .bottom) }
@@ -128,7 +132,7 @@ struct ConversationView: View {
                 }
             }
             ComposerAttachmentStatus(attachment: model.attachment, disabled: model.sending)
-            MessageFormattingBar(text: $model.text, selection: $selection, disabled: model.sending)
+            ComposerFormattingBar(text: $model.text, selection: $selection, disabled: model.sending)
             ZStack(alignment: .topLeading) {
                 if model.text.isEmpty {
                     Text(.messagesWriteMessage)
@@ -149,6 +153,7 @@ struct ConversationView: View {
                     .wykopSwitch()
                     .fixedSize()
                     .accessibilityLabel(.commonAdultContent)
+                    .disabled(model.sending)
                 ComposerAttachmentControls(attachment: model.attachment, disabled: model.sending, compact: true)
             } trailing: {
                 Button { model.send() } label: {

@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Compact Markdown tools that operate on the text editor's current selection.
-struct MessageFormattingBar: View {
+struct ComposerFormattingBar: View {
     @Binding var text: String
     @Binding var selection: NSRange
     var disabled = false

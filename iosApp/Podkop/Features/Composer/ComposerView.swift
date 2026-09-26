@@ -23,13 +23,20 @@ struct ComposerView: View {
                     if let target = model.intent.target.replyTarget {
                         Text(.composerReplyTo(target)).font(.subheadline).foregroundStyle(.secondary)
                     }
-                    formatBar
+                    ComposerFormattingBar(text: $model.text, selection: $model.selection, disabled: model.submitting)
                     ComposerEditor(text: $model.text, selection: $model.selection)
                         .frame(minHeight: 230)
-                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                        .background(WykopTheme.background, in: RoundedRectangle(cornerRadius: 12))
+                        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.primary.opacity(0.4), lineWidth: 1.5))
+                        .disabled(model.submitting)
                         .accessibilityIdentifier("composerEditor")
-                    Toggle(.commonAdultContent, isOn: $model.adult).wykopSwitch()
-                    ComposerAttachmentControls(attachment: model.attachment, disabled: model.submitting)
+                    AdaptiveControlRow {
+                        Toggle("18+", isOn: $model.adult).wykopSwitch().fixedSize()
+                            .accessibilityLabel(.commonAdultContent)
+                            .disabled(model.submitting)
+                    } trailing: {
+                        ComposerAttachmentControls(attachment: model.attachment, disabled: model.submitting, compact: true)
+                    }
                     ComposerAttachmentStatus(attachment: model.attachment, disabled: model.submitting)
                     if model.failed {
                         Label(model.outcomeUnknown
@@ -41,19 +48,17 @@ struct ComposerView: View {
                     if model.outcomeUnknown {
                         Button(.commonICheckedAllowRetry) { model.acknowledgeUnknownOutcome() }
                     }
-                    Button { model.submit() } label: {
-                        if model.submitting { ProgressView().frame(maxWidth: .infinity) }
-                        else { Text(model.intent.target.isEdit ? .composerSaveChanges : .commonSend)
-                                .frame(maxWidth: .infinity) }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(!model.canSubmit)
-                    .accessibilityIdentifier("composerSubmit")
                 }
                 .padding()
                 .frame(maxWidth: 760)
                 .frame(maxWidth: .infinity)
             }
+            .safeAreaInset(edge: .bottom) {
+                submitButton.padding(16).background(WykopTheme.card)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .background(WykopTheme.card)
+            .background(KeyboardDismissArea())
             .navigationTitle(model.intent.target.isEdit ? .commonEdit : .commonWritePost)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -79,32 +84,19 @@ struct ComposerView: View {
         }
     }
 
-    private var formatBar: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 8) {
-                formatButton(.composerBold, symbol: "bold", prefix: "**", suffix: "**", placeholder: "bold")
-                formatButton(.composerItalic, symbol: "italic", prefix: "__", suffix: "__", placeholder: "italic")
-                formatButton(.composerCode, symbol: "chevron.left.forwardslash.chevron.right",
-                             prefix: "`", suffix: "`", placeholder: "code")
-                formatButton(.commonLink, symbol: "link", prefix: "[", suffix: "](url)",
-                             placeholder: "description")
-                formatButton(.composerQuote, symbol: "text.quote", prefix: ">", suffix: "", placeholder: "quote")
-                Button { model.insertSpoilerAtLineStart() } label: {
-                    Label(.composerSpoiler, systemImage: "eye.slash")
-                }
-                .buttonStyle(.bordered)
-                .disabled(model.submitting)
-            }
+    private var submitButton: some View {
+        Button { model.submit() } label: {
+            if model.submitting { ProgressView().frame(maxWidth: .infinity) }
+            else { Text(model.intent.target.isEdit ? .composerSaveChanges : .commonSend)
+                    .frame(maxWidth: .infinity) }
         }
-    }
-
-    private func formatButton(_ title: LocalizedStringResource, symbol: String,
-                              prefix: String, suffix: String, placeholder: String) -> some View {
-        Button { model.insert(prefix: prefix, suffix: suffix, placeholder: placeholder) } label: {
-            Label(title, systemImage: symbol)
-        }
-        .buttonStyle(.bordered)
-        .disabled(model.submitting)
+        .buttonStyle(.borderedProminent)
+        .buttonBorderShape(.capsule)
+        .tint(.primary)
+        .foregroundStyle(WykopTheme.background)
+        .controlSize(.large)
+        .disabled(!model.canSubmit)
+        .accessibilityIdentifier("composerSubmit")
     }
 }
 
@@ -118,6 +110,7 @@ struct ComposerEditor: UIViewRepresentable {
         view.font = .preferredFont(forTextStyle: .body)
         view.adjustsFontForContentSizeCategory = true
         view.backgroundColor = .clear
+        view.isEditable = context.environment.isEnabled
         view.textContainerInset = UIEdgeInsets(top: 12, left: 8, bottom: 12, right: 8)
         view.text = text
         view.selectedRange = selection
@@ -126,6 +119,7 @@ struct ComposerEditor: UIViewRepresentable {
 
     func updateUIView(_ view: UITextView, context: Context) {
         context.coordinator.parent = self
+        view.isEditable = context.environment.isEnabled
         if view.text != text { view.text = text }
         let length = (view.text as NSString).length
         if selection.location <= length,
