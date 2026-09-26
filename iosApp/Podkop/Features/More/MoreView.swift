@@ -42,7 +42,11 @@ struct MoreView: View {
         }
         .ignoresSafeArea(edges: showsProfile ? .top : [])
         .background(WykopTheme.background.ignoresSafeArea())
-        .toolbar(.hidden, for: .navigationBar)
+        // An empty, transparent bar instead of a hidden one: toggling the bar's visibility makes
+        // the pushed screen's title vanish and reappear during the back swipe.
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
         .animation(.easeInOut(duration: 0.25), value: showsProfile)
         .onChange(of: session.revision, initial: true) { _, revision in
             model.update(loggedIn: session.isLoggedIn, revision: revision)

@@ -40,6 +40,10 @@ struct SearchView: View {
         .autocorrectionDisabled()
         .textInputAutocapitalization(.never)
         .navigationTitle(.commonSearch)
+        // An inline title and a bar that stays while typing: a large title would collapse and
+        // expand around every focus change, making the whole screen jump.
+        .navigationBarTitleDisplayMode(.inline)
+        .searchPresentationToolbarBehavior(.avoidHidingContent)
         .onChange(of: session.isLoggedIn) { _, value in model.setSession(value) }
         .onAppear { model.resume() }
         .onDisappear { model.stop() }
