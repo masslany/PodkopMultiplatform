@@ -6374,6 +6374,295 @@
           }
         }
       }
+    },
+    "privacy.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy policy"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Polityka prywatności"
+          }
+        }
+      }
+    },
+    "privacy.intro" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podkop is an independent client for Wykop. This policy describes the iOS app. Updated 26 September 2026."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podkop jest niezależnym klientem serwisu Wykop. Ta polityka dotyczy aplikacji na iOS. Aktualizacja: 26 września 2026."
+          }
+        }
+      }
+    },
+    "privacy.serviceTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data sent to Wykop"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dane przekazywane do Wykopu"
+          }
+        }
+      }
+    },
+    "privacy.serviceBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The app communicates with Wykop over HTTPS to sign in, read content and perform actions you request. Wykop receives your account identifier, authentication tokens, posts, comments, votes, favourites, messages and media you submit, as applicable. Private messages are sent to Wykop and their recipients. Server retention, account deletion and your data rights are governed by Wykop’s privacy policy. Signing out of Podkop does not delete content or your Wykop account."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplikacja łączy się z Wykopem przez HTTPS, aby zalogować się, wyświetlać treści i wykonywać wybrane przez Ciebie działania. W zależności od działania Wykop otrzymuje identyfikator konta, tokeny logowania, wpisy, komentarze, głosy, ulubione, wiadomości i przesyłane multimedia. Wiadomości prywatne trafiają do Wykopu i ich odbiorców. Przechowywanie danych na serwerze, usunięcie konta i Twoje prawa opisuje polityka prywatności Wykopu. Wylogowanie z Podkopu nie usuwa treści ani konta Wykop."
+          }
+        }
+      }
+    },
+    "privacy.deviceTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data on your device"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dane na Twoim urządzeniu"
+          }
+        }
+      }
+    },
+    "privacy.deviceBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication credentials are stored in the iOS Keychain. Preferences and navigation state are stored locally. The app also caches content and images. Signing out removes the app’s saved session credentials. Copies you save to Photos or share with other apps remain under your control. Podkop does not operate a separate server for your posts or messages."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dane uwierzytelniające są przechowywane w pęku kluczy iOS. Ustawienia i stan nawigacji są zapisywane lokalnie. Aplikacja przechowuje też treści i obrazy w pamięci podręcznej. Wylogowanie usuwa zapisane dane sesji aplikacji. Kopie zapisane w Zdjęciach lub udostępnione innym aplikacjom pozostają pod Twoją kontrolą. Podkop nie prowadzi osobnego serwera dla Twoich wpisów ani wiadomości."
+          }
+        }
+      }
+    },
+    "privacy.permissionsTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photos and sharing"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zdjęcia i udostępnianie"
+          }
+        }
+      }
+    },
+    "privacy.permissionsBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The system photo picker gives the app access to the items you choose. Uploads send those items to Wykop. Saving a screenshot requests permission to add an image to Photos. Copying or sharing content happens when you choose that action."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemowy wybór zdjęć udostępnia aplikacji wskazane przez Ciebie pliki. Przesyłanie wysyła te pliki do Wykopu. Zapis zrzutu wymaga uprawnienia do dodawania obrazów do Zdjęć. Kopiowanie i udostępnianie treści odbywa się po wybraniu odpowiedniej akcji."
+          }
+        }
+      }
+    },
+    "privacy.trackingTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analytics and external services"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analityka i usługi zewnętrzne"
+          }
+        }
+      }
+    },
+    "privacy.trackingBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The iOS app includes no advertising, analytics or automatic crash-reporting SDK and does not track you across other companies’ apps or websites. Network request and response bodies are not logged. Diagnostics are copied only when you request them. Images, embeds, sign-in pages and external links may contact Wykop or other providers, which receive normal network information such as your IP address and apply their own privacy policies."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplikacja na iOS nie zawiera reklam ani narzędzi analitycznych lub automatycznego raportowania awarii i nie śledzi Cię między aplikacjami i witrynami innych firm. Treści żądań i odpowiedzi sieciowych nie są zapisywane w logach. Dane diagnostyczne są kopiowane tylko na Twoje żądanie. Obrazy, osadzone treści, strony logowania i linki zewnętrzne mogą łączyć się z Wykopem lub innymi dostawcami, którzy otrzymują zwykłe dane połączenia, np. adres IP, i stosują własne polityki prywatności."
+          }
+        }
+      }
+    },
+    "privacy.wykopPolicy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wykop privacy policy"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Polityka prywatności Wykopu"
+          }
+        }
+      }
+    },
+    "report.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report on Wykop"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zgłoś na Wykopie"
+          }
+        }
+      }
+    },
+    "report.instructions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open this content on Wykop, choose “Report” from its menu and complete the report there. You may need to sign in on the website separately. Podkop does not submit a report automatically."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz tę treść na Wykopie, wybierz „Zgłoś” z jej menu i dokończ zgłoszenie na stronie. Może być konieczne osobne zalogowanie w serwisie. Podkop nie wysyła zgłoszenia automatycznie."
+          }
+        }
+      }
+    },
+    "report.openContent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open content on Wykop"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz treść na Wykopie"
+          }
+        }
+      }
+    },
+    "report.fallback" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If the report option is unavailable, copy the content link and include it in Wykop’s contact form."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeśli opcja zgłoszenia jest niedostępna, skopiuj link do treści i dołącz go do formularza kontaktowego Wykopu."
+          }
+        }
+      }
+    },
+    "report.contact" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact Wykop moderation"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Formularz kontaktowy Wykopu"
+          }
+        }
+      }
+    },
+    "report.missingComment" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This link opens the discussion. Find the comment there, or include this comment number in the contact form:"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ten link otwiera dyskusję. Znajdź w niej komentarz lub podaj ten numer komentarza w formularzu kontaktowym:"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

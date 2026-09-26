@@ -16,6 +16,9 @@ struct AboutView: View {
                     }
                 }
             }
+            Section {
+                NavigationLink { PrivacyPolicyView() } label: { Text(.privacyTitle) }
+            }
             Section(.settingsOpenSourceLibraries) {
                 if libraries.isEmpty {
                     Text(.settingsNoLibrariesShow).foregroundStyle(.secondary)

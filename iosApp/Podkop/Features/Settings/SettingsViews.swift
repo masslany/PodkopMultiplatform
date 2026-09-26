@@ -47,6 +47,7 @@ struct SettingsView: View {
             }
             #endif
             Section {
+                NavigationLink { PrivacyPolicyView() } label: { Text(.privacyTitle) }
                 Button(.commonAbout) { dependencies.router.navigate(.about, in: tab) }
             } footer: {
                 Text(.settingsAppVersion(AppBuild.version))
