@@ -14,7 +14,7 @@ struct VotersSheet: View {
 
     var body: some View {
         NavigationStack {
-            List {
+            WykopList {
                 ForEach(model.voters) { voter in
                     Button { dismiss(); dependencies.router.navigate(.user(voter.username)) } label: {
                         HStack {

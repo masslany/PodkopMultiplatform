@@ -14,7 +14,7 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        Form {
+        WykopList {
             Section(.settingsTheme) {
                 Picker(.settingsTheme, selection: Binding(get: { session.theme }, set: { model.setTheme($0) })) {
                     Text(.settingsAuto).tag(ThemeChoice.auto)

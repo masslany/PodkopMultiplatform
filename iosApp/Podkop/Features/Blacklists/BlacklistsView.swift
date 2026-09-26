@@ -15,7 +15,7 @@ struct BlacklistsView: View {
 
     var body: some View {
         let current = model.current
-        List {
+        WykopList {
             Section {
                 Text(.blacklistsIfDontWantSee)
                     .font(.subheadline).foregroundStyle(.secondary)

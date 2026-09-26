@@ -12,7 +12,7 @@ struct InboxView: View {
     }
 
     var body: some View {
-        List {
+        WykopList {
             let pager = model.pager
             switch pager.phase {
             case .idle, .loading:

@@ -19,7 +19,7 @@ struct LinkSubmissionView: View {
     @State private var selectedPhoto: PhotosPickerItem?
 
     var body: some View {
-        Form {
+        WykopList {
             switch model.stage {
             case .start: startSections
             case .similar: similarSections

@@ -15,7 +15,7 @@ struct SearchView: View {
     }
 
     var body: some View {
-        List {
+        WykopList {
             Section {
                 Button {
                     router.navigate(.advancedSearch(model.normalizedQuery), in: tab)

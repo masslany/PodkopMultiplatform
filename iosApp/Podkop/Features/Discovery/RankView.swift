@@ -12,7 +12,7 @@ struct RankView: View {
     }
 
     var body: some View {
-        List {
+        WykopList {
             switch model.pager.phase {
             case .idle, .loading:
                 ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 180)

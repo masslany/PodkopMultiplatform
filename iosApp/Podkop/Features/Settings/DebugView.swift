@@ -11,7 +11,7 @@ struct DebugView: View {
     @State private var linkInvalid = false
 
     var body: some View {
-        Form {
+        WykopList {
             Section(.commonOpenEntry) {
                 TextField(String(localized: .settingsEntryID), text: $entryID).keyboardType(.numberPad)
                 if entryInvalid { Text(.settingsInvalidEntryID).foregroundStyle(.red).font(.caption) }
