@@ -1,42 +1,107 @@
 import SwiftUI
 
+/// Who plussed an entry or comment, or dug or buried a link (Android's
+/// `ResourceVotesBottomSheet`): a sheet with a drag handle and one card per voter, with the
+/// avatar and gender bar and the name in its rank color. Buried links also show the reason.
 struct VotersSheet: View {
     let target: VoterTarget
     let dependencies: AppDependencies
+    /// Opens a voter's profile; the presenter closes its own sheets first.
+    let openProfile: (String) -> Void
     @State private var model: VoterModel
-    @Environment(\.dismiss) private var dismiss
 
-    init(target: VoterTarget, dependencies: AppDependencies) {
+    init(target: VoterTarget, dependencies: AppDependencies, openProfile: @escaping (String) -> Void) {
         self.target = target
         self.dependencies = dependencies
+        self.openProfile = openProfile
         _model = State(initialValue: VoterModel(target: target, loader: dependencies.voterLoader))
     }
 
     var body: some View {
-        NavigationStack {
-            WykopList {
+        ScrollView {
+            LazyVStack(spacing: 8) {
                 ForEach(model.voters) { voter in
-                    Button { dismiss(); dependencies.router.navigate(.user(voter.username)) } label: {
-                        HStack {
-                            Circle().fill(.blue.opacity(0.15)).frame(width: 32, height: 32)
-                                .overlay(Text(String(voter.username.prefix(1)).uppercased()))
-                            Text(voter.username)
-                            if voter.verified { Image(systemName: "checkmark.seal.fill") }
-                            if let reason = voter.reason { Text(reason).foregroundStyle(.secondary) }
-                        }
+                    Button { openProfile(voter.username) } label: {
+                        row(voter)
                     }
+                    .buttonStyle(.plain)
                     .onAppear { if voter.username == model.voters.last?.username { model.load() } }
                 }
-                if model.loading { ProgressView() }
-                if model.failed { Button(.commonRetry) { model.load() } }
-                if model.exhausted && model.voters.isEmpty { Text(.commonNothingHereYet) }
+                if model.loading {
+                    ProgressView().frame(maxWidth: .infinity).padding(.vertical, 12)
+                }
+                if model.failed {
+                    ThreadMoreButton(title: String(localized: .commonRetry)) { model.load() }
+                        .padding(.vertical, 8)
+                }
+                if model.exhausted && model.voters.isEmpty {
+                    Text(emptyTitle)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .wykopCard(padding: 16)
+                }
             }
-            .navigationTitle(.detailsVoters)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) { Button(.detailsDone) { dismiss() } }
-            }
+            .padding(.horizontal, 16)
+            .padding(.top, 28)
+            .padding(.bottom, 16)
         }
+        .background(WykopTheme.background.ignoresSafeArea())
+        .presentationDragIndicator(.visible)
+        .presentationDetents([.medium, .large])
+        .presentationBackground(WykopTheme.background)
         .task { model.load() }
         .onDisappear { model.stop() }
+        .accessibilityIdentifier("votersSheet")
+    }
+
+    private func row(_ voter: Voter) -> some View {
+        HStack(spacing: 14) {
+            AvatarView(url: voter.avatarURL, name: voter.username, size: 40, gender: voter.gender)
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Text(voter.username)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(authorColor(voter.color))
+                    if voter.verified {
+                        Image(systemName: "checkmark.seal.fill")
+                            .font(.caption)
+                            .foregroundStyle(WykopTheme.tagBlue)
+                            .accessibilityLabel(.commonVerifiedAuthor)
+                    }
+                }
+                if let reason = voter.reason.flatMap(Self.reasonTitle) {
+                    Text(reason).font(.caption).foregroundStyle(.secondary)
+                }
+            }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: WykopTheme.cardRadius, style: .continuous))
+        .contentShape(Rectangle())
+    }
+
+    private var emptyTitle: LocalizedStringResource {
+        switch (target.kind, target.side) {
+        case ("link", "down"): .detailsLinkDownvotesEmpty
+        case ("link", _): .detailsLinkUpvotesEmpty
+        default: .detailsVotesEmpty
+        }
+    }
+
+    /// The API's reason names, worded like Android's `vote_reason_*` strings.
+    static func reasonTitle(_ raw: String) -> String? {
+        switch raw.lowercased() {
+        case "duplicate": String(localized: .detailsVoteReasonDuplicate)
+        case "spam": String(localized: .detailsVoteReasonSpam)
+        case "fake": String(localized: .detailsVoteReasonFake)
+        case "wrong": String(localized: .detailsVoteReasonWrong)
+        case "invalid": String(localized: .detailsVoteReasonInvalid)
+        default: nil
+        }
     }
 }

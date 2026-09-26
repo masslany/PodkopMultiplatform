@@ -21,8 +21,8 @@ struct ResourceActionsSheet: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 if resource.kind == .link {
-                    voterRow(.detailsShowUpvoters, systemImage: "plus", side: "up")
-                    voterRow(.detailsShowDownvoters, systemImage: "minus", side: "down")
+                    voterRow(.detailsShowLinkUpvoters, systemImage: "plus", side: "up")
+                    voterRow(.detailsShowLinkDownvoters, systemImage: "minus", side: "down")
                 } else if resource.kind == .entry || resource.kind == .entryComment {
                     voterRow(.detailsShowVoters, systemImage: "plus", side: "up")
                 }
@@ -75,7 +75,14 @@ struct ResourceActionsSheet: View {
         .accessibilityIdentifier("resourceActions")
         // Sized to its rows, like Android's bottom sheet.
         .presentationDetents([.height(contentHeight + 24)])
-        .sheet(item: $voterTarget) { VotersSheet(target: $0, dependencies: dependencies) }
+        .sheet(item: $voterTarget) {
+            VotersSheet(target: $0, dependencies: dependencies) { username in
+                // Close both sheets, then open the profile in the screen underneath.
+                voterTarget = nil
+                dismiss()
+                dependencies.router.navigate(.user(username))
+            }
+        }
         .sheet(isPresented: $report) {
             if let url = ResourceLinkBuilder.url(for: resource, root: root,
                                                  parentCommentID: parent?.sourceID) {

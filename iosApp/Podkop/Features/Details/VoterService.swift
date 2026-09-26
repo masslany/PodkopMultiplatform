@@ -22,7 +22,7 @@ final class SharedVoterLoader: VoterLoading {
         }
         return VoterPage(items: value.items.map {
             Voter(username: $0.username, avatarURL: $0.avatarUrl,
-                        verified: $0.verified, reason: $0.reason)
+                  verified: $0.verified, reason: $0.reason, color: $0.color, gender: $0.gender)
         }, total: value.total?.intValue)
     }
 }

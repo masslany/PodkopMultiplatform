@@ -3063,6 +3063,142 @@
         }
       }
     },
+    "details.linkDownvotesEmpty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No buriers"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak zakopujących"
+          }
+        }
+      }
+    },
+    "details.linkUpvotesEmpty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No diggers"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak wykopujących"
+          }
+        }
+      }
+    },
+    "details.votesEmpty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No upvoters"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak plusujących"
+          }
+        }
+      }
+    },
+    "details.voteReasonDuplicate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "duplicate"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "duplikat"
+          }
+        }
+      }
+    },
+    "details.voteReasonFake" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "false information"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "informacja nieprawdziwa"
+          }
+        }
+      }
+    },
+    "details.voteReasonInvalid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "not suitable"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nie nadaje się"
+          }
+        }
+      }
+    },
+    "details.voteReasonSpam" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "spam"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "spam"
+          }
+        }
+      }
+    },
+    "details.voteReasonWrong" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "inappropriate content"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "treść nieodpowiednia"
+          }
+        }
+      }
+    },
     "details.relatedLinks" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3182,24 +3318,41 @@
         }
       }
     },
-    "details.showDownvoters" : {
+    "details.showLinkDownvoters" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show downvoters"
+            "value" : "Show buriers"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pokaż głosy przeciw"
+            "value" : "Pokaż zakopujących"
           }
         }
       }
     },
-    "details.showUpvoters" : {
+    "details.showLinkUpvoters" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show diggers"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż wykopujących"
+          }
+        }
+      }
+    },
+    "details.showVoters" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -3211,41 +3364,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pokaż głosy za"
-          }
-        }
-      }
-    },
-    "details.showVoters" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show voters"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pokaż głosujących"
-          }
-        }
-      }
-    },
-    "details.voters" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voters"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Głosujący"
+            "value" : "Pokaż plusujących"
           }
         }
       }

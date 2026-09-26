@@ -50,10 +50,10 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["detail-link-101"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.descendants(matching: .any)["resource-linkComment:104"].waitForExistence(timeout: 5))
         app.buttons["More actions"].firstMatch.tap()
-        XCTAssertTrue(app.buttons["Show upvoters"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Show diggers"].waitForExistence(timeout: 5))
         // The sheet fits its rows, so tapping the dimmed page above it closes it.
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.12)).tap()
-        XCTAssertTrue(app.buttons["Show upvoters"].waitForNonExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Show diggers"].waitForNonExistence(timeout: 5))
         app.tabBars.buttons["Entries"].tap()
         openEntry(app)
         XCTAssertTrue(app.descendants(matching: .any)["detail-entry-102"].waitForExistence(timeout: 5))

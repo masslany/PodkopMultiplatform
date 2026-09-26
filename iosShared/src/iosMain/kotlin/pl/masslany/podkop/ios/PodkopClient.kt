@@ -158,7 +158,16 @@ class IOSResourcePage(
     val next: String?,
     val total: Int?,
 )
-class IOSVoter(val username: String, val avatarUrl: String, val verified: Boolean, val reason: String?)
+class IOSVoter(
+    val username: String,
+    val avatarUrl: String,
+    val verified: Boolean,
+    val reason: String?,
+    /** orange, burgundy, green or black. */
+    val color: String? = null,
+    /** male, female or unspecified. */
+    val gender: String? = null,
+)
 class IOSVoterPage(val items: List<IOSVoter>, val next: String?, val total: Int?)
 class IOSUploadedPhoto(val key: String, val url: String, val mimeType: String)
 class IOSLinkDraftCheck(val key: String, val duplicate: Boolean, val similar: List<IOSResource>)
@@ -802,7 +811,9 @@ class PodkopClient private constructor(
                 else -> throw IllegalArgumentException("voters unavailable")
             }.getOrThrow()
             IOSVoterPage(
-                result.data.map { IOSVoter(it.username, it.avatar, it.verified, it.reason?.name) },
+                result.data.map {
+                    IOSVoter(it.username, it.avatar, it.verified, it.reason?.name, it.color.toIOS(), it.gender.toIOS())
+                },
                 result.pagination?.next,
                 result.pagination?.total,
             )
