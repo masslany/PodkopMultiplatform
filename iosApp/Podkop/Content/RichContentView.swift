@@ -15,14 +15,24 @@ struct RichContent: View {
                 Text(deletionLabel(deletion))
                     .foregroundStyle(.secondary)
             } else {
-                let shown = expanded || source.count <= 1000
-                    ? source : String(source.prefix(1000)) + "…"
-                VStack(alignment: .leading, spacing: 3) {
-                    ForEach(Array(RichContentParser.parse(shown).enumerated()), id: \.offset) { item in
+                let blocks = RichContentParser.parse(source)
+                let preview = expanded ? nil : RichContentParser.preview(blocks)
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(Array((preview ?? blocks).enumerated()), id: \.offset) { item in
                         blockView(item.element)
                     }
-                    if source.count > 1000 && !expanded {
-                        Button(.contentShowMore) { expanded = true }
+                    if preview != nil {
+                        Button { expanded = true } label: {
+                            HStack(spacing: 4) {
+                                Text(.contentShowMore)
+                                Image(systemName: "chevron.down").font(.caption.weight(.bold))
+                            }
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(WykopTheme.tagBlue)
+                            .frame(minHeight: 32)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .foregroundStyle(muted ? .secondary : .primary)
@@ -55,7 +65,16 @@ struct RichContent: View {
             (Text(verbatim: "\(number). ") + Text(RichContentParser.attributed(text)))
                 .padding(.leading, CGFloat(indent) * 18)
         case .quote(let text):
-            Text(verbatim: "▏ ") + Text(RichContentParser.attributed(text))
+            // A bar the full height of the quote, with the text indented (Android's block quote).
+            Text(RichContentParser.attributed(text))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 12)
+                .overlay(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(Color.secondary)
+                        .frame(width: 2)
+                        .accessibilityHidden(true)
+                }
         case .code(let text):
             Text(verbatim: text).font(.system(.subheadline, design: .monospaced))
                 .padding(8).background(.quaternary, in: RoundedRectangle(cornerRadius: 6))

@@ -9,6 +9,14 @@ enum RichBlock: Equatable {
     case code(String)
     case spoiler(String)
     case empty
+
+    var textLength: Int {
+        switch self {
+        case .paragraph(let text), .quote(let text), .code(let text), .spoiler(let text): text.count
+        case .bullet(_, let text), .numbered(_, _, let text): text.count
+        case .empty: 0
+        }
+    }
 }
 
 enum RichContentParser {
@@ -31,7 +39,13 @@ enum RichContentParser {
             if trimmed.hasPrefix("!") {
                 blocks.append(.spoiler(String(trimmed.dropFirst())))
             } else if trimmed.hasPrefix(">") {
-                blocks.append(.quote(String(trimmed.dropFirst()).trimmingCharacters(in: .whitespaces)))
+                // Consecutive quote lines form one quote, as in Markdown.
+                let text = String(trimmed.dropFirst()).trimmingCharacters(in: .whitespaces)
+                if case .quote(let previous)? = blocks.last {
+                    blocks[blocks.count - 1] = .quote(previous + "\n" + text)
+                } else {
+                    blocks.append(.quote(text))
+                }
             } else if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") {
                 blocks.append(.bullet(indent, String(trimmed.dropFirst(2))))
             } else if let dot = trimmed.firstIndex(of: "."),
@@ -47,6 +61,28 @@ enum RichContentParser {
         }
         if inFence { blocks.append(.code(code.joined(separator: "\n"))) }
         return blocks
+    }
+
+    /// The blocks to show before "Show more": whole blocks up to about `limit` characters, so
+    /// a cut never lands inside a quote or list item. The first block is cut only when it alone
+    /// is longer than the limit. Returns nil when everything fits.
+    static func preview(_ blocks: [RichBlock], limit: Int = 1000) -> [RichBlock]? {
+        var used = 0
+        var shown: [RichBlock] = []
+        for block in blocks {
+            let length = block.textLength
+            if used + length > limit {
+                if shown.isEmpty, case .paragraph(let text) = block {
+                    shown.append(.paragraph(String(text.prefix(limit)) + "…"))
+                } else if shown.isEmpty {
+                    shown.append(block)
+                }
+                return shown
+            }
+            used += length
+            shown.append(block)
+        }
+        return nil
     }
 
     static func attributed(_ source: String) -> AttributedString {

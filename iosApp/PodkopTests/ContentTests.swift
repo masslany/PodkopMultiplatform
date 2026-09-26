@@ -69,12 +69,22 @@ final class ContentTests: XCTestCase {
         XCTAssertEqual(unknownDeletion.deletion, .unknown)
     }
 
+    func testLongContentPreviewCutsBetweenBlocks() {
+        let quote = RichBlock.quote(String(repeating: "q", count: 600))
+        let blocks: [RichBlock] = [.paragraph(String(repeating: "p", count: 500)), quote, .paragraph("end")]
+        XCTAssertEqual(RichContentParser.preview(blocks), [blocks[0]], "never cuts inside the quote")
+        XCTAssertNil(RichContentParser.preview([.paragraph("short")]))
+        let long = RichContentParser.preview([.paragraph(String(repeating: "x", count: 1500))])
+        XCTAssertEqual(long?.first?.textLength, 1001, "a single long paragraph is cut with an ellipsis")
+    }
+
     func testRichCorpusKeepsSpoilerListsCodeUnicodeAndLiteralDashes() {
         let blocks = RichContentParser.parse(ContentFixtures.entry.body + "\n-------------")
         XCTAssertTrue(blocks.contains(.spoiler("Ukryty tekst ze spoilerem.")))
         XCTAssertTrue(blocks.contains(.bullet(0, "Pierwszy punkt")))
         XCTAssertTrue(RichContentParser.parse("- A\n  - B").contains(.bullet(1, "B")))
         XCTAssertTrue(blocks.contains(.quote("Cytat")))
+        XCTAssertEqual(RichContentParser.parse("> a\n> b\n\n> c"), [.quote("a\nb"), .empty, .quote("c")])
         XCTAssertTrue(blocks.contains(.code("let a = 1")))
         XCTAssertTrue(blocks.contains(.paragraph("-------------")))
         XCTAssertTrue(ContentFixtures.entry.body.contains("👩🏽‍💻"))
