@@ -4,12 +4,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.accept
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -19,7 +15,6 @@ internal class HttpClientFactory(
     private val configStorage: ConfigStorage,
     private val tokenRefreshCoordinator: TokenRefreshCoordinator,
     private val json: Json,
-    private val logger: Logger,
 ) {
     fun create(): HttpClient {
         return HttpClient(HttpClientEngineProvider.provide()) {
@@ -40,17 +35,6 @@ internal class HttpClientFactory(
             install(bearerTokenInterceptor) {
                 this.configStorage = this@HttpClientFactory.configStorage
                 this.tokenRefreshCoordinator = this@HttpClientFactory.tokenRefreshCoordinator
-            }
-
-            install(Logging) {
-                logger = this@HttpClientFactory.logger
-                level = LogLevel.ALL
-                sanitizeHeader { header ->
-                    header == HttpHeaders.Authorization ||
-                        header == HttpHeaders.ProxyAuthorization ||
-                        header == HttpHeaders.Cookie ||
-                        header == HttpHeaders.SetCookie
-                }
             }
         }
     }
