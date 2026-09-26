@@ -100,6 +100,56 @@ final class InteractionTests: XCTestCase {
         XCTAssertEqual(updates.reconcile(parent)?.inlineComments.first?.vote.up, 2)
     }
 
+    func testFeedSurveyVoteUsesOneBasedOptionAndReloadsAfterConfirmation() async {
+        let mutator = GatedMutator()
+        let updates = ResourceUpdates()
+        let interactor = ResourceInteractor(mutator: mutator, updates: updates) {}
+        let survey = Survey(question: "Question", answers: [
+            Survey.Answer(id: 40, text: "First", count: 0, selected: false),
+            Survey.Answer(id: 80, text: "Second", count: 0, selected: false),
+        ], count: 0, canVote: true, selectedOption: nil)
+        let resource = Resource(sourceID: 7, kind: .entry, body: "", survey: survey)
+        interactor.voteSurvey(resource, option: 0)
+        interactor.voteSurvey(resource, option: 2)
+        interactor.voteSurvey(resource, option: 1)
+        await settle()
+        XCTAssertEqual(mutator.mutations.count, 1)
+        guard let mutation = mutator.mutations.first, case .survey(let entryID, let option) = mutation else {
+            return XCTFail("expected survey mutation")
+        }
+        XCTAssertEqual(entryID, 7)
+        XCTAssertEqual(option, 2, "API expects the one-based position, not answer id")
+        XCTAssertTrue(interactor.isPending(resource))
+        XCTAssertFalse(updates.needsReload([resource], since: 0))
+        mutator.finish?(.success(()))
+        await settle()
+        XCTAssertFalse(interactor.isPending(resource))
+        XCTAssertTrue(updates.needsReload([resource], since: 0))
+    }
+
+    func testFailedFeedSurveyVoteKeepsResultsAndAllowsRetry() async {
+        let mutator = GatedMutator()
+        let updates = ResourceUpdates()
+        var failures = 0
+        let interactor = ResourceInteractor(mutator: mutator, updates: updates) { failures += 1 }
+        let survey = Survey(question: "Question", answers: [
+            Survey.Answer(id: 40, text: "First", count: 0, selected: false),
+        ], count: 0, canVote: true, selectedOption: nil)
+        let resource = Resource(sourceID: 7, kind: .entry, body: "", survey: survey)
+        interactor.voteSurvey(resource, option: 1)
+        await settle()
+        mutator.finish?(.failure(NSError(domain: "test", code: 1)))
+        await settle()
+        XCTAssertEqual(failures, 1)
+        XCTAssertFalse(interactor.isPending(resource))
+        XCTAssertFalse(updates.needsReload([resource], since: 0))
+        interactor.voteSurvey(resource, option: 1)
+        await settle()
+        XCTAssertEqual(mutator.mutations.count, 2)
+        mutator.finish?(.success(()))
+        await settle()
+    }
+
     func testVoteArithmetic() {
         let negative = Vote(up: 3, down: 2, state: "negative", canUp: true, canDown: true, canUndo: true)
         let up = negative.upvoted(remove: false)

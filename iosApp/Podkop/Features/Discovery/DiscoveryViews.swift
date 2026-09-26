@@ -44,6 +44,8 @@ extension ResourceActions {
             // Comments need their link or entry for links and voters, so only embedded ones get a menu.
             menu: item.kind == .link || item.kind == .entry || root != nil
                 ? { interactor.actionTarget = .init(resource: item, root: root ?? item) } : nil,
+            surveyVote: live && dependencies.session.isLoggedIn && item.kind == .entry && item.survey?.canVote == true
+                ? { interactor.voteSurvey(item, option: $0) } : nil,
             loadTweet: { try await dependencies.loadTweet($0) },
             pending: interactor.isPending(item)
         )

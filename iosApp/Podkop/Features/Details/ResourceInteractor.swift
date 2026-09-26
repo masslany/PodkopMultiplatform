@@ -46,6 +46,26 @@ final class ResourceInteractor {
         run(.favourite(resource, enabled: enabled), resource) { $0.favourite = enabled }
     }
 
+    func voteSurvey(_ resource: Resource, option: Int) {
+        guard resource.kind == .entry, let survey = resource.survey, survey.canVote,
+              survey.selectedOption == nil, survey.answers.indices.contains(option - 1) else { return }
+        let identity = ResourceIdentity(resource)
+        guard !pending.contains(identity) else { return }
+        pending.insert(identity)
+        let session = updates.sessionRevision
+        Task { [weak self] in
+            guard let self else { return }
+            defer { self.pending.remove(identity) }
+            do {
+                try await self.mutator.apply(.survey(entryID: resource.sourceID, option: option))
+                guard session == self.updates.sessionRevision else { return }
+                self.updates.publish(.invalidated, for: identity)
+            } catch {
+                if session == self.updates.sessionRevision && !(error is CancellationError) { self.onFailure() }
+            }
+        }
+    }
+
     func delete(_ resource: Resource) {
         let identity = ResourceIdentity(resource)
         guard !pending.contains(identity) else { return }

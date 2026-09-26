@@ -236,7 +236,7 @@ struct ResourceCard: View {
                 VStack(alignment: .leading, spacing: 8) {
                     if !resource.body.isEmpty { richContent }
                     if let survey = resource.survey {
-                        SurveyView(survey: survey, vote: actions.surveyVote)
+                        SurveyView(survey: survey, vote: actions.surveyVote, pending: actions.pending)
                     }
                     media
                 }
