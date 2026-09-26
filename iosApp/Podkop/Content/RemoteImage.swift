@@ -8,10 +8,11 @@ struct RemoteImage<Placeholder: View>: View {
     @ViewBuilder var placeholder: () -> Placeholder
     @Environment(\.mediaLoader) private var loader
     @State private var image: UIImage?
+    @Environment(\.screenshotImages) private var screenshotImages
 
     var body: some View {
         Group {
-            if let image {
+            if let image = screenshotImages[url ?? ""] ?? image {
                 if contentMode == .fill {
                     // A filling image takes exactly the offered space and crops; sized by its own
                     // aspect ratio it would push its container wider than the screen.
@@ -34,5 +35,17 @@ struct RemoteImage<Placeholder: View>: View {
             }.value
             if !Task.isCancelled { image = decoded?.images?.first ?? decoded }
         }
+    }
+}
+
+/// Already decoded images for synchronous screenshot rendering; ordinary views use their loader.
+private struct ScreenshotImagesKey: EnvironmentKey {
+    static let defaultValue: [String: UIImage] = [:]
+}
+
+extension EnvironmentValues {
+    var screenshotImages: [String: UIImage] {
+        get { self[ScreenshotImagesKey.self] }
+        set { self[ScreenshotImagesKey.self] = newValue }
     }
 }

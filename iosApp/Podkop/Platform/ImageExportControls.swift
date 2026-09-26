@@ -3,57 +3,88 @@ import UIKit
 
 /// Save, copy and share controls for image bytes; feedback goes to a caller-provided message.
 struct ImageExportControls: View {
-    enum Style { case standard, overlay }
+    enum Style { case standard, overlay, screenshot }
     let data: Data
     var style: Style = .standard
     let onMessage: (String) -> Void
     @State private var sharing = false
 
     var body: some View {
-        switch style {
-        case .standard:
-            buttons.buttonStyle(.bordered)
-        case .overlay:
-            // Over photos: icon buttons with titles on a dark capsule, legible on any image.
-            buttons
-                .buttonStyle(OverlayButtonStyle())
-                .padding(.horizontal, 8).padding(.vertical, 6)
-                .background(.black.opacity(0.6), in: Capsule())
-                .overlay(Capsule().strokeBorder(.white.opacity(0.2)))
+        Group {
+            switch style {
+            case .standard:
+                buttons.buttonStyle(.bordered)
+            case .overlay:
+                buttons
+                    .buttonStyle(OverlayButtonStyle())
+                    .padding(.horizontal, 8).padding(.vertical, 6)
+                    .background(.black.opacity(0.6), in: Capsule())
+                    .overlay(Capsule().strokeBorder(.white.opacity(0.2)))
+            case .screenshot:
+                VStack(spacing: 12) {
+                    shareButton.buttonStyle(ScreenshotExportButtonStyle(prominent: true))
+                    HStack(spacing: 12) {
+                        copyButton
+                        saveButton
+                    }
+                    .buttonStyle(ScreenshotExportButtonStyle(prominent: false))
+                }
+            }
         }
+        .sheet(isPresented: $sharing) { ImageShareSheet(data: data, onMessage: onMessage) }
     }
 
     private var buttons: some View {
-        HStack(spacing: 12) {
-            Button {
-                Task {
-                    switch await PlatformExport.saveToPhotos(data) {
-                    case .saved: onMessage(String(localized: .platformSavedToPhotos))
-                    case .denied: onMessage(String(localized: .platformAllowAddingPhotos))
-                    case .failed: onMessage(String(localized: .commonCouldNotCompleteAction))
-                    }
+        HStack(spacing: 12) { saveButton; copyButton; shareButton }
+    }
+
+    private var saveButton: some View {
+        Button {
+            Task {
+                switch await PlatformExport.saveToPhotos(data) {
+                case .saved: onMessage(String(localized: .platformSavedToPhotos))
+                case .denied: onMessage(String(localized: .platformAllowAddingPhotos))
+                case .failed: onMessage(String(localized: .commonCouldNotCompleteAction))
                 }
-            } label: {
-                Label(.commonSave, systemImage: "square.and.arrow.down")
             }
-            .accessibilityIdentifier("imageSave")
-            Button {
-                onMessage(PlatformExport.copyImage(data)
-                          ? String(localized: .platformImageCopied)
-                          : String(localized: .commonCouldNotCompleteAction))
-            } label: {
-                Label(.platformCopy, systemImage: "doc.on.doc")
-            }
-            .accessibilityIdentifier("imageCopy")
-            Button {
-                sharing = true
-            } label: {
-                Label(.platformShare, systemImage: "square.and.arrow.up")
-            }
-            .accessibilityIdentifier("imageShare")
-            .disabled(PlatformExport.fileExtension(for: data) == nil)
+        } label: {
+            Label(.commonSave, systemImage: "square.and.arrow.down")
         }
-        .sheet(isPresented: $sharing) { ImageShareSheet(data: data, onMessage: onMessage) }
+        .accessibilityIdentifier("imageSave")
+    }
+
+    private var copyButton: some View {
+        Button {
+            onMessage(PlatformExport.copyImage(data)
+                      ? String(localized: .platformImageCopied)
+                      : String(localized: .commonCouldNotCompleteAction))
+        } label: {
+            Label(.platformCopy, systemImage: "doc.on.doc")
+        }
+        .accessibilityIdentifier("imageCopy")
+    }
+
+    private var shareButton: some View {
+        Button { sharing = true } label: {
+            Label(.platformShare, systemImage: "square.and.arrow.up")
+        }
+        .accessibilityIdentifier("imageShare")
+        .disabled(PlatformExport.fileExtension(for: data) == nil)
+    }
+}
+
+private struct ScreenshotExportButtonStyle: ButtonStyle {
+    let prominent: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.subheadline.weight(.semibold))
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .foregroundStyle(prominent ? WykopTheme.background : Color.primary)
+            .background(prominent ? Color.primary : WykopTheme.cardInset, in: Capsule())
+            .overlay(Capsule().strokeBorder(prominent ? .clear : WykopTheme.separator))
+            .opacity(configuration.isPressed ? 0.75 : 1)
+            .contentShape(Capsule())
     }
 }
 

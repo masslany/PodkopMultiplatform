@@ -5,18 +5,29 @@ import UIKit
 enum ScreenshotSurface {
     /// Renders synchronously, so remote images must be passed in as bytes keyed by URL.
     static func render(resource: Resource, parent: Resource? = nil,
-                       photoBytes: [String: Data] = [:],
+                       photoBytes: [String: Data] = [:], colorScheme: ColorScheme = .light,
                        width: CGFloat = 390, scale: CGFloat = 2) -> UIImage? {
-        let surface = VStack(spacing: 8) {
-            if let parent {
-                ResourceCard(resource: parent, screenshotPhoto: screenshotPhoto(for: parent, bytes: photoBytes))
+        let images = photoBytes.reduce(into: [String: UIImage]()) { result, item in
+            if let image = ImageDecoder.shared.image(from: item.value, key: item.key, maxDimension: 1200) {
+                result[item.key] = image.images?.first ?? image
             }
-            ResourceCard(resource: resource, screenshotPhoto: screenshotPhoto(for: resource, bytes: photoBytes))
         }
-        .environment(\.mediaLoader, nil)
-        .padding()
+        let surface = VStack(alignment: .leading, spacing: 14) {
+            if let parent {
+                ResourceCard(resource: parent, style: .embedded,
+                             screenshotPhoto: screenshotPhoto(for: parent, bytes: photoBytes), showsActions: false)
+                Divider().overlay(WykopTheme.separator)
+            }
+            ResourceCard(resource: resource, style: .embedded,
+                         screenshotPhoto: screenshotPhoto(for: resource, bytes: photoBytes), showsActions: false)
+        }
+        .wykopCard(padding: 18)
+        .padding(14)
         .frame(width: width)
-        .background(Color(uiColor: .systemBackground))
+        .background(WykopTheme.background)
+        .environment(\.mediaLoader, nil)
+        .environment(\.screenshotImages, images)
+        .environment(\.colorScheme, colorScheme)
         let renderer = ImageRenderer(content: surface)
         renderer.scale = scale
         return renderer.uiImage

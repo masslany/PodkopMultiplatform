@@ -134,6 +134,24 @@ final class ContentTests: XCTestCase {
         XCTAssertGreaterThan(image?.size.height ?? 0, 200)
     }
 
+    func testScreenshotIncludesLoadedAvatarAndUsesSelectedTheme() {
+        let url = "fixture://screenshot-avatar"
+        let resource = Resource(sourceID: 501, kind: .entry, body: "Screenshot",
+            author: Author(name: "Author", avatarURL: url, color: "orange",
+                           verified: false, online: false, rank: nil, gender: "male"))
+        let bytes = UIGraphicsImageRenderer(size: CGSize(width: 40, height: 40)).pngData { context in
+            UIColor.red.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: 40, height: 40))
+        }
+        let placeholder = ScreenshotSurface.render(resource: resource, colorScheme: .dark)?.pngData()
+        let dark = ScreenshotSurface.render(resource: resource, photoBytes: [url: bytes], colorScheme: .dark)?.pngData()
+        let light = ScreenshotSurface.render(resource: resource, photoBytes: [url: bytes], colorScheme: .light)?.pngData()
+        XCTAssertNotNil(dark)
+        XCTAssertNotNil(light)
+        XCTAssertNotEqual(placeholder, dark, "The export must include the loaded avatar")
+        XCTAssertNotEqual(dark, light, "The export must follow the selected theme")
+    }
+
     func testExportKeepsSourceImageFormat() {
         XCTAssertEqual(PlatformExport.fileExtension(for: Data([0x47, 0x49, 0x46, 0x38])), "gif")
         XCTAssertEqual(PlatformExport.fileExtension(for: Data([0x89, 0x50, 0x4e, 0x47])), "png")

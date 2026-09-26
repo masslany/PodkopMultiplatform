@@ -24,6 +24,7 @@ struct ResourceCard: View {
     var isForeground = true
     /// Off when a surrounding thread card carries this resource's identifier.
     var identified = true
+    var showsActions = true
     /// Detail header only: reports the bottom of the title in the `detailContent` coordinate
     /// space, so the screen can show the title in the navigation bar once it scrolls away.
     var onTitleBottom: ((CGFloat) -> Void)?
@@ -58,7 +59,7 @@ struct ResourceCard: View {
                 if style == .detailHeader { linkDetailLayout } else { linkListLayout }
             } else {
                 entryLayout
-                actionsRow
+                if showsActions { actionsRow }
             }
         }
     }
@@ -163,7 +164,7 @@ struct ResourceCard: View {
             }
             linkMeta(showsTime: false)
             tags
-            actionsRow
+            if showsActions { actionsRow }
         }
         .padding(.horizontal, 16)
     }
