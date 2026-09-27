@@ -20,8 +20,11 @@ final class ResourceInteractor {
     private let mutator: DetailMutating
     private let updates: ResourceUpdates
     private let onFailure: () -> Void
+    private let onDeleted: (ResourceKind) -> Void
 
-    init(mutator: DetailMutating, updates: ResourceUpdates, onFailure: @escaping () -> Void) {
+    init(mutator: DetailMutating, updates: ResourceUpdates, onFailure: @escaping () -> Void,
+         onDeleted: @escaping (ResourceKind) -> Void = { _ in }) {
+        self.onDeleted = onDeleted
         self.mutator = mutator
         self.updates = updates
         self.onFailure = onFailure
@@ -75,7 +78,10 @@ final class ResourceInteractor {
             guard let self else { return }
             do {
                 try await self.mutator.apply(.delete(resource))
-                if session == self.updates.sessionRevision { self.updates.publish(.deleted, for: identity) }
+                if session == self.updates.sessionRevision {
+                    self.updates.publish(.deleted, for: identity)
+                    self.onDeleted(resource.kind)
+                }
             } catch {
                 if !(error is CancellationError) { self.onFailure() }
             }

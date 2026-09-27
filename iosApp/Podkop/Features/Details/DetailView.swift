@@ -73,6 +73,11 @@ struct DetailView: View {
         .onChange(of: dependencies.resourceUpdates.revision) { _, _ in model.reconcileUpdates() }
         .onChange(of: dependencies.session.revision) { _, _ in model.sessionChanged() }
         // Failed votes and favourites show the app banner, like the lists' ResourceInteractor.
+        .onChange(of: model.deletedKind) { _, kind in
+            guard let kind else { return }
+            dependencies.router.banner = kind.deletedMessage
+            model.acknowledgeDeletion()
+        }
         .onChange(of: model.actionFailed) { _, failed in
             guard failed else { return }
             dependencies.router.banner = String(localized: .commonCouldNotCompleteAction)

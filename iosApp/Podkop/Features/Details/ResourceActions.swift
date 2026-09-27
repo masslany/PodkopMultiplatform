@@ -34,12 +34,14 @@ struct ResourceActionsSheet: View {
                     row(.reportTitle, systemImage: "flag") { report = true }
                     row(.detailsCopyLink, systemImage: "link") {
                         UIPasteboard.general.url = url
+                        dependencies.router.banner = String(localized: .detailsSnackbarLinkCopied)
                         dismiss()
                     }
                 }
                 if resource.kind != .link && !resource.body.isEmpty {
                     row(.detailsCopyText, systemImage: "doc.on.doc") {
                         UIPasteboard.general.string = resource.body
+                        dependencies.router.banner = String(localized: .detailsSnackbarTextCopied)
                         dismiss()
                     }
                     row(.detailsSelectText, systemImage: "character.cursor.ibeam") { textSelection = true }
@@ -141,5 +143,12 @@ struct ResourceActionsSheet: View {
                                       commentID: resource.kind == .entryComment ? resource.sourceID : nil,
                                       side: side)
         }
+    }
+}
+
+extension ResourceKind {
+    /// Android's snackbar after a delete succeeds.
+    var deletedMessage: String {
+        String(localized: self == .entry ? .detailsSnackbarEntryDeleted : .detailsSnackbarEntryCommentDeleted)
     }
 }

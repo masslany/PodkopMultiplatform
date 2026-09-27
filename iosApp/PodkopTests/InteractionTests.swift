@@ -61,6 +61,19 @@ final class InteractionTests: XCTestCase {
         XCTAssertFalse(interactor.isPending(item))
     }
 
+    func testSuccessfulDeleteIsConfirmedOnlyAfterTheServerAccepts() async {
+        let mutator = GatedMutator()
+        var deleted: [ResourceKind] = []
+        let interactor = ResourceInteractor(mutator: mutator, updates: ResourceUpdates(),
+                                            onFailure: {}, onDeleted: { deleted.append($0) })
+        interactor.delete(entry())
+        await settle()
+        XCTAssertTrue(deleted.isEmpty)
+        mutator.finish?(.success(()))
+        await settle()
+        XCTAssertEqual(deleted, [.entry])
+    }
+
     func testSignOutDuringMutationDropsTheResult() async {
         let mutator = GatedMutator()
         let updates = ResourceUpdates()

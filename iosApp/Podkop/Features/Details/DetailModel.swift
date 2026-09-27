@@ -30,6 +30,8 @@ final class DetailModel {
     private(set) var commentSort = "best"
     private(set) var mutating = Set<ResourceIdentity>()
     private(set) var actionFailed = false
+    /// Set when a delete succeeds, so the screen can confirm it like Android's snackbar.
+    private(set) var deletedKind: ResourceKind?
 
     private let loader: DetailLoading
     private let updates: ResourceUpdates
@@ -240,6 +242,7 @@ final class DetailModel {
                 guard !Task.isCancelled, currentSession == updates.sessionRevision else { return }
                 if case .delete = mutation {
                     updates.publish(.deleted, for: identity)
+                    deletedKind = identity.kind
                 } else if let confirmed = mutation.confirmedUpdate {
                     // Build on the latest confirmed copy, in case another screen changed it meanwhile.
                     var updated = updates.reconcile(confirmed.resource) ?? confirmed.resource
@@ -261,6 +264,7 @@ final class DetailModel {
 
     /// The banner has shown the failure; the next one needs a fresh change to show.
     func acknowledgeFailure() { actionFailed = false }
+    func acknowledgeDeletion() { deletedKind = nil }
 
     func sessionChanged() {
         for task in mutationTasks.values { task.cancel() }

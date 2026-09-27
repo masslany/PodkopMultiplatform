@@ -31,9 +31,11 @@ final class AppDependencies {
         #endif
         return SharedDetailMutator(client: client, adapter: adapter)
     }()
-    lazy var interactor = ResourceInteractor(mutator: detailMutator, updates: resourceUpdates) { [router] in
+    lazy var interactor = ResourceInteractor(mutator: detailMutator, updates: resourceUpdates, onFailure: { [router] in
         router.banner = String(localized: .commonCouldNotCompleteAction)
-    }
+    }, onDeleted: { [router] kind in
+        router.banner = kind.deletedMessage
+    })
     lazy var voterLoader: VoterLoading = {
         #if DEBUG
         if isFixture { return FixtureVoterLoader() }

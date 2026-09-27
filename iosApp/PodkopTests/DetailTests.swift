@@ -124,6 +124,23 @@ final class DetailTests: XCTestCase {
         XCTAssertEqual(updates.reconcile(resource)?.favourite, resource.favourite)
     }
 
+    func testDeleteReportsItsKindForTheConfirmation() async throws {
+        let loader = DetailFixtureLoader()
+        let mutator = ControlledDetailMutator()
+        let model = DetailModel(kind: .link, id: 101, loader: loader, mutator: mutator, updates: ResourceUpdates())
+        model.start()
+        await settle()
+        let comment = try XCTUnwrap(model.comments.first)
+        model.submit(.delete(comment))
+        await settle()
+        XCTAssertNil(model.deletedKind)
+        mutator.finish?(.success(()))
+        await settle()
+        XCTAssertEqual(model.deletedKind, .linkComment)
+        model.acknowledgeDeletion()
+        XCTAssertNil(model.deletedKind)
+    }
+
     func testVoteOnALoadedReplyUpdatesThatRowWithoutReloading() async throws {
         let loader = DetailFixtureLoader()
         let mutator = ControlledDetailMutator()
