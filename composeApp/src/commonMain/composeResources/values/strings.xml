@@ -452,6 +452,11 @@
     <string name="snackbar_entry_comment_deleted">Usunięto komentarz</string>
 
     <!-- Resource actions -->
+    <string name="resource_actions_report">Zgłoś na Wykopie</string>
+    <string name="resource_report_dialog_instructions">Otwórz tę treść na Wykopie, wybierz „Zgłoś” z jej menu i dokończ zgłoszenie na stronie. Może być konieczne osobne zalogowanie w serwisie. Podkop nie wysyła zgłoszenia automatycznie.</string>
+    <string name="resource_report_dialog_open_content">Otwórz treść na Wykopie</string>
+    <string name="resource_report_dialog_fallback">Jeśli opcja zgłoszenia jest niedostępna, skopiuj link do treści i dołącz go do formularza kontaktowego Wykopu.</string>
+    <string name="resource_report_dialog_contact">Formularz kontaktowy Wykopu</string>
     <string name="resource_actions_copy_as_link">Kopiuj link</string>
     <string name="resource_actions_copy_text">Kopiuj treść</string>
     <string name="resource_actions_select_text">Zaznacz tekst</string>

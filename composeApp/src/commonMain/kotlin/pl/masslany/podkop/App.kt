@@ -97,6 +97,8 @@ import pl.masslany.podkop.features.rank.RankScreen
 import pl.masslany.podkop.features.rank.RankScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreen
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScreenRoot
+import pl.masslany.podkop.features.resourceactions.ResourceReportDialogScreen
+import pl.masslany.podkop.features.resourceactions.ResourceReportDialogScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogScreen
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogScreenRoot
 import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogScreen
@@ -388,6 +390,22 @@ fun App() {
                         ) {
                             SetDialogDestinationToEdgeToEdge()
                             ResourceTextSelectionDialogScreenRoot(
+                                modifier = Modifier
+                                    .padding(safeDrawingPaddingValues)
+                                    .widthIn(max = DefaultDialogMaxWidth),
+                                screen = it,
+                            )
+                        }
+
+                        entry<ResourceReportDialogScreen>(
+                            metadata = DialogSceneStrategy.dialog(
+                                DialogProperties(
+                                    usePlatformDefaultWidth = false,
+                                ),
+                            ),
+                        ) {
+                            SetDialogDestinationToEdgeToEdge()
+                            ResourceReportDialogScreenRoot(
                                 modifier = Modifier
                                     .padding(safeDrawingPaddingValues)
                                     .widthIn(max = DefaultDialogMaxWidth),
