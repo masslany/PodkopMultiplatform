@@ -12,15 +12,24 @@ struct ImageViewerScreen: View {
     @State private var chromeVisible = true
     /// 0 at rest, 1 when the drag has gone far enough to close.
     @State private var dragProgress: CGFloat = 0
+    /// Set when a swipe closes the viewer: the backdrop fades while the image flies out.
+    @State private var closing = false
 
     var body: some View {
         ZStack {
-            Color.black.opacity(1 - dragProgress * 0.7).ignoresSafeArea()
+            Color.black.opacity(closing ? 0 : 1 - dragProgress * 0.7).ignoresSafeArea()
             if let image {
                 ZoomableImage(image: image,
                               onTap: { withAnimation(.easeInOut(duration: 0.2)) { chromeVisible.toggle() } },
                               onDrag: { dragProgress = $0 },
-                              onDismiss: { dismiss() })
+                              onClosing: { withAnimation(.easeOut(duration: 0.2)) { closing = true } },
+                              onDismiss: {
+                                  // Everything has already faded, so the cover's own slide-down
+                                  // would only move an empty backdrop across the screen.
+                                  var transaction = Transaction()
+                                  transaction.disablesAnimations = true
+                                  withTransaction(transaction) { dismiss() }
+                              })
                     .ignoresSafeArea()
                     .accessibilityLabel(.commonImage)
             } else {
@@ -28,7 +37,7 @@ struct ImageViewerScreen: View {
             }
         }
         .overlay(alignment: .topLeading) {
-            if chromeVisible && dragProgress == 0 {
+            if chromeVisible && dragProgress == 0 && !closing {
                 Button { dismiss() } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 17, weight: .semibold))
@@ -44,7 +53,7 @@ struct ImageViewerScreen: View {
             }
         }
         .overlay(alignment: .bottom) {
-            if chromeVisible && dragProgress == 0 {
+            if chromeVisible && dragProgress == 0 && !closing {
                 VStack(spacing: 10) {
                     if let message {
                         Text(message)
@@ -78,6 +87,7 @@ private struct ZoomableImage: UIViewRepresentable {
     let image: UIImage
     let onTap: () -> Void
     let onDrag: (CGFloat) -> Void
+    let onClosing: () -> Void
     let onDismiss: () -> Void
 
     func makeCoordinator() -> Coordinator { Coordinator(self) }
@@ -167,12 +177,12 @@ private struct ZoomableImage: UIViewRepresentable {
             case .ended, .cancelled, .failed:
                 let velocity = gesture.velocity(in: scroll).y
                 if gesture.state == .ended && (abs(translation.y) > 120 || abs(velocity) > 900) {
+                    parent.onClosing()
                     UIView.animate(withDuration: 0.2, animations: {
                         imageView.transform = CGAffineTransform(translationX: translation.x,
                                                                 y: translation.y > 0 ? scroll.bounds.height : -scroll.bounds.height)
                         imageView.alpha = 0
                     }, completion: { _ in self.parent.onDismiss() })
-                    parent.onDrag(1)
                 } else {
                     UIView.animate(withDuration: 0.25, delay: 0, usingSpringWithDamping: 0.85,
                                    initialSpringVelocity: 0) {
