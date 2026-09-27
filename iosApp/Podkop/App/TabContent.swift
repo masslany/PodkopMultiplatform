@@ -5,13 +5,23 @@ struct TabContent: View {
     let tab: AppTab
     let dependencies: AppDependencies
     @Environment(\.horizontalSizeClass) private var width
+    /// The window's width in points; the split layout needs Android's expanded width.
+    @State private var availableWidth: CGFloat = 0
+
+    /// Android shows list and detail side by side only from 840 dp ("expanded"). Narrower
+    /// regular-width windows, like the unfolded iPhone Duo or iPad split screen, stay a larger
+    /// phone layout instead of an overlaid sidebar.
+    static let splitMinimumWidth: CGFloat = 840
+    private var usesSplitLayout: Bool {
+        tab != .more && width == .regular && availableWidth >= Self.splitMinimumWidth
+    }
 
     private var router: AppRouter { dependencies.router }
     private var session: SessionModel { dependencies.session }
 
     var body: some View {
         Group {
-            if tab != .more && width == .regular {
+            if usesSplitLayout {
                 NavigationSplitView {
                     listContent
                         .navigationTitle(tab.title)
@@ -37,6 +47,7 @@ struct TabContent: View {
                 }
             }
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { availableWidth = $0 }
     }
 
     @ViewBuilder private var listContent: some View {
