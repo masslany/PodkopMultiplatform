@@ -115,13 +115,13 @@ final class AppDependencies {
         #if DEBUG
         if isFixture { return FixtureMediaLoader() }
         #endif
-        return SharedMediaLoader(client: client, adapter: adapter)
+        return MediaStore()
     }()
     lazy var settingsService: SettingsServicing = {
         #if DEBUG
         if isFixture { return FixtureSettingsService(session: session) }
         #endif
-        return SharedSettingsService(client: client, adapter: adapter, media: mediaLoader as? SharedMediaLoader)
+        return SharedSettingsService(client: client, adapter: adapter, media: mediaLoader as? MediaStore)
     }()
     private var isFixture: Bool {
         #if DEBUG

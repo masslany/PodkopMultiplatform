@@ -55,6 +55,9 @@ struct MoreView: View {
             model.update(loggedIn: loggedIn, revision: session.revision)
         }
         .onAppear { model.refresh() }
+        .refreshable {
+            if session.isLoggedIn { await model.forceRefresh(media: dependencies.mediaLoader) }
+        }
         .accessibilityIdentifier("moreMenu")
     }
 
@@ -63,6 +66,7 @@ struct MoreView: View {
     @ViewBuilder private var header: some View {
         if let profile = model.profile, session.isLoggedIn {
             MoreProfileHeader(profile: profile) { router.navigate(.profile, in: .more) }
+                .id(model.imageRevision)
                 .transition(.opacity)
         } else if session.isLoggedIn {
             // The preview is loading or failed; keep the space calm instead of flashing a card.

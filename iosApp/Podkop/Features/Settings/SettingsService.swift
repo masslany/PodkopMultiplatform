@@ -14,9 +14,9 @@ import PodkopShared
 final class SharedSettingsService: SettingsServicing {
     private let client: PodkopClient
     private let adapter: BridgeAdapter
-    private let media: SharedMediaLoader?
+    private let media: MediaStore?
 
-    init(client: PodkopClient, adapter: BridgeAdapter, media: SharedMediaLoader?) {
+    init(client: PodkopClient, adapter: BridgeAdapter, media: MediaStore?) {
         self.client = client
         self.adapter = adapter
         self.media = media
@@ -31,8 +31,7 @@ final class SharedSettingsService: SettingsServicing {
     }
 
     func clearMediaCache() {
-        client.mediaBytes.clearCache()
-        media?.clearMemory()
+        Task { [media] in await media?.clear() }
         ImageDecoder.shared.clear()
     }
 

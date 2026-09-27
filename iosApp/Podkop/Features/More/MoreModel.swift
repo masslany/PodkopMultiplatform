@@ -7,6 +7,8 @@ import Observation
 final class MoreModel {
     private(set) var profile: Profile?
     private(set) var loading = false
+    /// Changes after a pull to refresh, so the header's images load again.
+    private(set) var imageRevision = 0
     private let loader: ProfileLoading
     private var loadedRevision: Int?
     private var task: Task<Void, Never>?
@@ -35,6 +37,29 @@ final class MoreModel {
     func refresh() {
         guard loadedRevision != nil, !loading else { return }
         reload()
+    }
+
+    /// Pull to refresh: reloads the profile and downloads the avatar and banner again, which
+    /// otherwise stay cached on disk.
+    func forceRefresh(media: MediaLoading?) async {
+        guard loadedRevision != nil else { return }
+        task?.cancel()
+        loading = true
+        var urls = profile.map(Self.imageURLs) ?? []
+        if let username = try? await loader.ownUsername(), let value = try? await loader.profile(username),
+           !Task.isCancelled {
+            urls += Self.imageURLs(value)
+            await media?.evict(urls)
+            profile = value
+        } else {
+            await media?.evict(urls)
+        }
+        imageRevision += 1
+        loading = false
+    }
+
+    private static func imageURLs(_ profile: Profile) -> [String] {
+        [profile.avatarURL, profile.bannerURL].compactMap { $0 }
     }
 
     private func reload() {
