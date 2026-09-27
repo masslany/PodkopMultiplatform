@@ -12,6 +12,19 @@ struct TweetPreview: Hashable {
     let mediaThumbnailURL: String?
     let mediaAspectRatio: Float?
 
+    init(authorName: String, handle: String, avatarURL: String?, text: String, replies: Int, reposts: Int,
+         likes: Int, mediaThumbnailURL: String? = nil, mediaAspectRatio: Float? = nil) {
+        self.authorName = authorName
+        self.handle = handle
+        self.avatarURL = avatarURL
+        self.text = text
+        self.replies = replies
+        self.reposts = reposts
+        self.likes = likes
+        self.mediaThumbnailURL = mediaThumbnailURL
+        self.mediaAspectRatio = mediaAspectRatio
+    }
+
     init(_ value: IOSTweetPreview) {
         authorName = value.authorName
         handle = value.authorHandle
@@ -33,29 +46,36 @@ struct EmbedCard: View {
     @State private var tweet: TweetPreview?
     @State private var failed = false
 
+    private var isTweet: Bool { embed.type.lowercased() == "twitter" }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let tweet {
-                Text(tweet.authorName).font(.subheadline.bold())
-                Text(tweet.handle).font(.caption).foregroundStyle(.secondary)
-                Text(tweet.text).font(.subheadline)
-                if let bytes = thumbnailBytes, let url = tweet.mediaThumbnailURL {
-                    DecodedImage(bytes: bytes, cacheKey: url, maxDimension: 700)
-                        .frame(height: 180)
-                } else if let url = tweet.mediaThumbnailURL {
-                    thumbnail(url)
+        Group {
+            if isTweet {
+                if let tweet {
+                    TweetCard(tweet: tweet, url: URL(string: embed.url), open: open)
+                } else {
+                    TweetPlaceholderCard(failed: failed || loadTweet == nil, url: URL(string: embed.url), open: open)
                 }
-                Text(verbatim: "\(tweet.replies) ↩ · \(tweet.reposts) ↻ · \(tweet.likes) ♥")
-                    .font(.caption).foregroundStyle(.secondary)
             } else {
-                Label(failed ? String(localized: .contentPreviewUnavailable) : embed.type.capitalized,
-                      systemImage: failed ? "exclamationmark.triangle" : "play.rectangle")
-                if let bytes = thumbnailBytes {
-                    DecodedImage(bytes: bytes, cacheKey: embed.thumbnailURL, maxDimension: 700)
-                        .frame(maxHeight: 220)
-                } else if !embed.thumbnailURL.isEmpty {
-                    thumbnail(embed.thumbnailURL)
-                }
+                otherEmbed
+            }
+        }
+        .task(id: embed.url) {
+            guard isTweet, let loadTweet else { return }
+            do { tweet = try await loadTweet(embed.url) }
+            catch is CancellationError { return }
+            catch { failed = true }
+        }
+    }
+
+    private var otherEmbed: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label(embed.type.capitalized, systemImage: "play.rectangle")
+            if let bytes = thumbnailBytes {
+                DecodedImage(bytes: bytes, cacheKey: embed.thumbnailURL, maxDimension: 700)
+                    .frame(maxHeight: 220)
+            } else if !embed.thumbnailURL.isEmpty {
+                thumbnail(embed.thumbnailURL)
             }
             if let url = URL(string: embed.url), let open {
                 Button(.contentOpenSource) { open(url) }.font(.caption)
@@ -64,12 +84,6 @@ struct EmbedCard: View {
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(PodkopTheme.cardInset, in: RoundedRectangle(cornerRadius: PodkopTheme.smallRadius, style: .continuous))
-        .task(id: embed.url) {
-            guard embed.type.lowercased() == "twitter", let loadTweet else { return }
-            do { tweet = try await loadTweet(embed.url) }
-            catch is CancellationError { return }
-            catch { failed = true }
-        }
     }
 
     private func thumbnail(_ url: String) -> some View {
