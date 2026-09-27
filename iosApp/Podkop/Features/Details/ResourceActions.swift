@@ -108,7 +108,8 @@ struct ResourceActionsSheet: View {
                 }
             }
         }
-        .confirmationDialog(.detailsDeleteContent, isPresented: $confirmDelete) {
+        .confirmationDialog(resource.kind == .entry ? .detailsDialogTitleDeleteEntry : .detailsDialogTitleDeleteEntryComment,
+                            isPresented: $confirmDelete, titleVisibility: .visible) {
             Button(.commonDelete, role: .destructive) { delete(); dismiss() }
             Button(.commonCancel, role: .cancel) {}
         }

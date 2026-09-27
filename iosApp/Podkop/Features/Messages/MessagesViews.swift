@@ -56,7 +56,7 @@ struct InboxView: View {
             }
         }
         .refreshable { await model.refresh() }
-        .navigationTitle(.commonMessages)
+        .navigationTitle(.notificationsPrivateMessages)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { dependencies.router.navigate(.newConversation, in: tab) } label: {

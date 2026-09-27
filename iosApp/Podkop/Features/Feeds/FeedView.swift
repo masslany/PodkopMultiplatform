@@ -129,10 +129,10 @@ struct FeedView: View {
             if model.query.tab == .entries && model.query.sort == "hot" {
                 Menu {
                     ForEach([2, 6, 12, 24], id: \.self) { hours in
-                        Button { model.select(sort: "hot", hotHours: hours) } label: { Text(verbatim: "\(hours) h") }
+                        Button { model.select(sort: "hot", hotHours: hours) } label: { Text(verbatim: "\(hours)h") }
                     }
                 } label: {
-                    DropdownLabel(title: "\(model.query.hotHours) h", systemImage: "clock")
+                    DropdownLabel(title: "\(model.query.hotHours)h", systemImage: "clock")
                 }
                 .accessibilityIdentifier("hotPeriod")
             }

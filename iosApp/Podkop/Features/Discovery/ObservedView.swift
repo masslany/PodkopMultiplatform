@@ -22,7 +22,7 @@ struct ObservedView: View {
         } rows: {
             rows
         }
-        .navigationTitle(.discoveryObserved)
+        .navigationTitle(.moreMyWykop)
         .task { model.start() }
         .onDisappear { model.stop() }
         .onChange(of: dependencies.resourceUpdates.revision) { _, _ in
