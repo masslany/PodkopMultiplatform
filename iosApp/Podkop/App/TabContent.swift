@@ -28,7 +28,8 @@ struct TabContent: View {
                         .toolbar { topActions }
                 } detail: {
                     if let route = router.detail(for: tab) {
-                        destination(route)
+                        // Screens keep their model in @State, so a new route needs a new identity.
+                        destination(route).id(route)
                     } else {
                         ContentUnavailableView(.appSelectItem, systemImage: tab.symbol)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
