@@ -29,6 +29,23 @@ struct SettingsView: View {
                     .podkopSwitch()
                     .accessibilityIdentifier("settingsAutoplay")
             }
+            if session.isLoggedIn {
+                // Android's private-message notifications switch, with its explanation below.
+                Section {
+                    Toggle(.settingsSettingsBodyPmNotificationsToggle, isOn: Binding(
+                        get: { dependencies.messageNotifications.enabled },
+                        set: { value in Task { await dependencies.messageNotifications.setEnabled(value) } }
+                    ))
+                    .podkopSwitch()
+                    .accessibilityIdentifier("settingsMessageNotifications")
+                } header: {
+                    Text(.settingsSettingsHeadlineNotifications)
+                } footer: {
+                    Text(dependencies.messageNotifications.systemAllowed
+                         ? .settingsSettingsBodyPmNotificationsEnabled
+                         : .settingsSettingsBodyPmNotificationsDisabled)
+                }
+            }
             Section(.settingsData) {
                 Button(.settingsClearCache) { model.clearCache() }
                     .accessibilityIdentifier("settingsClearCache")
@@ -54,6 +71,7 @@ struct SettingsView: View {
             }
         }
         .navigationTitle(.commonSettings)
+        .task { await dependencies.messageNotifications.refreshSystemPermission() }
         .alert(.settingsSureWantSignOut, isPresented: $confirmLogout) {
             Button(.settingsSignOut, role: .destructive) { Task { await session.logout() } }
             Button(.commonCancel, role: .cancel) {}

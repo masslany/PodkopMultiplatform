@@ -6,7 +6,13 @@ import PodkopShared
 final class SessionModel: SettingsState {
     enum Phase { case initializing, ready, error, missingConfiguration }
     var phase: Phase = .initializing
-    var isLoggedIn = false { didSet { if isLoggedIn != oldValue { refreshUsername() } } }
+    var isLoggedIn = false {
+        didSet {
+            guard isLoggedIn != oldValue else { return }
+            refreshUsername()
+            if !isLoggedIn { dependencies.messageNotifications.loggedOut() }
+        }
+    }
     var revision = 0 { didSet { if revision != oldValue { refreshUsername() } } }
     /// The signed-in user's name, used to highlight their own comments; nil while unknown.
     private(set) var username: String?
@@ -99,6 +105,7 @@ final class SessionModel: SettingsState {
                     entries: Int(value.entriesUnreadCount), pm: Int(value.privateMessagesUnreadCount),
                     tags: Int(value.tagsUnreadCount),
                     observedDiscussions: Int(value.observedDiscussionsUnreadCount))
+                dependencies.messageNotifications.observed(unread: notificationCounts.pm)
             }
         })
         observationTasks.append(Task {

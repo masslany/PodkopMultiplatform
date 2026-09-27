@@ -6613,6 +6613,142 @@
         }
       }
     },
+    "settings.pmNotificationBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to open"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dotknij, aby otworzyć"
+          }
+        }
+      }
+    },
+    "settings.pmNotificationTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have a new private message"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masz nową prywatną wiadomość"
+          }
+        }
+      }
+    },
+    "settings.pmNotificationTitlePlural" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have new private messages"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masz nowe prywatne wiadomości"
+          }
+        }
+      }
+    },
+    "settings.settingsBodyPmNotificationsDisabled" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To use this, allow the app to send system notifications."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby włączyć tę funkcję, zezwól aplikacji na systemowe powiadomienia."
+          }
+        }
+      }
+    },
+    "settings.settingsBodyPmNotificationsEnabled" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System notifications are available and the app can check for new messages."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemowe powiadomienia są dostępne, a aplikacja może monitorować nowe wiadomości."
+          }
+        }
+      }
+    },
+    "settings.settingsBodyPmNotificationsToggle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private message notifications"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia o prywatnych wiadomościach"
+          }
+        }
+      }
+    },
+    "settings.settingsHeadlineNotifications" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia"
+          }
+        }
+      }
+    },
+    "settings.settingsSnackbarNotificationsPermissionRequired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To turn on notifications, allow the app to send them."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby włączyć powiadomienia, zezwól aplikacji na wysyłanie powiadomień."
+          }
+        }
+      }
+    },
     "settings.showTestBanner" : {
       "extractionState" : "manual",
       "localizations" : {

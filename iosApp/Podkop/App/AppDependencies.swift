@@ -10,6 +10,7 @@ final class AppDependencies {
     let router = AppRouter()
     lazy var ingress = LinkIngress(router: router)
     lazy var session = SessionModel(dependencies: self)
+    lazy var messageNotifications = MessageNotifications(dependencies: self)
     let sceneActivity = SceneActivity()
     let resourceUpdates = ResourceUpdates()
     lazy var feedLoader: FeedLoading = {

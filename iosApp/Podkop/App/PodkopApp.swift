@@ -1,27 +1,20 @@
 import SwiftUI
 import PodkopShared
-#if DEBUG
-import UserNotifications
-#endif
 
 @main
 struct PodkopApp: App {
-    #if DEBUG
-    init() { UNUserNotificationCenter.current().delegate = DebugNotificationDelegate.shared }
-    #endif
+    @Environment(\.scenePhase) private var scenePhase
+
+    init() {
+        // Background refresh handlers must be registered before launch finishes.
+        AppDependencies.shared.messageNotifications.register()
+    }
 
     var body: some Scene {
         WindowGroup { RootView(dependencies: .shared) }
+            .onChange(of: scenePhase) { _, phase in
+                // Leaving the app asks iOS for the next message check.
+                if phase == .background { AppDependencies.shared.messageNotifications.schedule() }
+            }
     }
 }
-
-#if DEBUG
-private final class DebugNotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
-    static let shared = DebugNotificationDelegate()
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-        [.banner, .sound]
-    }
-}
-#endif

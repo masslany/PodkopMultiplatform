@@ -186,10 +186,13 @@ final class ShellUITests: XCTestCase {
         app.tabBars.buttons["More"].tap()
         XCTAssertTrue(app.buttons["Profile"].waitForExistence(timeout: 5))
         app.buttons["Settings"].tap()
+        // Like Android, the private-message notifications switch is for signed-in users only.
+        XCTAssertTrue(app.switches["settingsMessageNotifications"].waitForExistence(timeout: 5))
         app.buttons["settingsSignOut"].tap()
         XCTAssertTrue(app.alerts.buttons["Sign out"].waitForExistence(timeout: 5))
         app.alerts.buttons["Sign out"].tap()
         XCTAssertTrue(app.buttons["settingsSignOut"].waitForNonExistence(timeout: 5))
+        XCTAssertFalse(app.switches["settingsMessageNotifications"].exists)
         app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(app.buttons["Sign in"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Profile"].exists)
