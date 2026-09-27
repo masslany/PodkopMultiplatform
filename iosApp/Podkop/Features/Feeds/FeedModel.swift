@@ -14,6 +14,11 @@ final class FeedModel {
     private(set) var exhausted = false
     private(set) var query: FeedQuery
     var gallery = false
+    /// Android's stale-feed prompt: shown when the feed comes back after more than
+    /// `staleThreshold` since it was last opened; any reload hides it.
+    private(set) var showsRefreshPrompt = false
+    static let staleThreshold: TimeInterval = 3 * 60 * 60
+    private var lastOpenedAt: Date?
 
     private let loader: FeedLoading
     private let updates: ResourceUpdates?
@@ -67,12 +72,20 @@ final class FeedModel {
 
     func refresh() async { await reload(preservingPagination: true).value }
 
+    /// Called when the feed appears or the app returns to it, like Android's `onScreenOpened`.
+    func screenOpened(at now: Date = .now) {
+        let previous = lastOpenedAt
+        lastOpenedAt = now
+        showsRefreshPrompt = phase != .idle && previous.map { now.timeIntervalSince($0) > Self.staleThreshold } == true
+    }
+
     @discardableResult private func reload(preservingPagination: Bool = false) -> Task<Void, Never> {
         let backup = preservingPagination
             ? PageState(next: next, nextNumber: nextNumber, seen: seenRequests, exhausted: exhausted)
             : nil
         generation += 1
         active?.cancel()
+        showsRefreshPrompt = false
         next = nil
         nextError = false
         refreshError = false

@@ -1,8 +1,11 @@
 import SwiftUI
 
 struct FeedView: View {
+    private static let top = "feedTop"
     @State private var model: FeedModel
     @State private var canShowGallery = false
+    @State private var visible = false
+    @Environment(\.scenePhase) private var scenePhase
     let router: AppRouter
     let session: SessionModel
     let dependencies: AppDependencies
@@ -17,8 +20,10 @@ struct FeedView: View {
     }
 
     var body: some View {
+        ScrollViewReader { proxy in
         ScrollView {
             LazyVStack(spacing: 12) {
+                Color.clear.frame(height: 0).id(Self.top)
                 if model.query.tab == .links, !model.hits.isEmpty { hitStrip }
                 controls
                 if model.refreshError {
@@ -63,8 +68,30 @@ struct FeedView: View {
             .frame(maxWidth: .infinity)
         }
         .refreshable { await model.refresh() }
+        .overlay(alignment: .top) {
+            if model.showsRefreshPrompt {
+                StaleRefreshPill {
+                    withAnimation { proxy.scrollTo(Self.top, anchor: .top) }
+                    Task { await model.refresh() }
+                }
+                .padding(.top, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.spring(duration: 0.3), value: model.showsRefreshPrompt)
+        }
         .task { model.start() }
-        .onDisappear { model.stop() }
+        .onAppear {
+            visible = true
+            model.screenOpened()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active && visible { model.screenOpened() }
+        }
+        .onDisappear {
+            visible = false
+            model.stop()
+        }
         .onChange(of: session.revision) { _, value in
             model.setSession(session.isLoggedIn, revision: value)
         }

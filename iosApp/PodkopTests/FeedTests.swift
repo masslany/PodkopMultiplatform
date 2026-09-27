@@ -143,4 +143,27 @@ final class FeedTests: XCTestCase {
         await settle()
         XCTAssertEqual(model.items.map(\.sourceID), [1, 2])
     }
+
+    func testStaleFeedShowsRefreshPromptUntilItReloads() async {
+        let loader = ControlledFeedLoader()
+        let model = FeedModel(tab: .entries, loggedIn: false, loader: loader)
+        let start = Date(timeIntervalSince1970: 1_000_000)
+        model.screenOpened(at: start) // before the first load, like Android's hasBeenInitialized
+        XCTAssertFalse(model.showsRefreshPrompt)
+        model.start()
+        await waitForCalls(loader, 1)
+        loader.complete(0, items: [row(1)], next: nil)
+        await settle()
+
+        model.screenOpened(at: start.addingTimeInterval(2 * 60 * 60))
+        XCTAssertFalse(model.showsRefreshPrompt, "two hours is not stale yet")
+        model.screenOpened(at: start.addingTimeInterval(2 * 60 * 60 + FeedModel.staleThreshold + 1))
+        XCTAssertTrue(model.showsRefreshPrompt)
+
+        let refresh = Task { await model.refresh() }
+        await waitForCalls(loader, 2)
+        XCTAssertFalse(model.showsRefreshPrompt, "any reload hides the prompt")
+        loader.complete(1, items: [row(1)], next: nil)
+        await refresh.value
+    }
 }
