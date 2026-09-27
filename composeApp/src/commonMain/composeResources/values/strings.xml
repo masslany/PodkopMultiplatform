@@ -516,7 +516,7 @@
 
     <!-- Composer -->
     <string name="composer_button_send">Wyślij</string>
-    <string name="composer_bold_placeholder">treść progrubiona</string>
+    <string name="composer_bold_placeholder">treść pogrubiona</string>
     <string name="composer_italic_placeholder">treść pochylona</string>
     <string name="composer_link_description_placeholder">opis odnośnika</string>
     <string name="composer_link_url_placeholder">url</string>
