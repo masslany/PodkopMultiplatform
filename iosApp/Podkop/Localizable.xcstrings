@@ -2927,23 +2927,6 @@
         }
       }
     },
-    "details.actionFailedTryAgain" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Action failed. Try again."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nie udało się wykonać akcji. Spróbuj ponownie."
-          }
-        }
-      }
-    },
     "details.copyLink" : {
       "extractionState" : "manual",
       "localizations" : {

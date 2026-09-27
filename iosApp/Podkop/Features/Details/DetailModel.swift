@@ -262,6 +262,9 @@ final class DetailModel {
         }
     }
 
+    /// The banner has shown the failure; the next one needs a fresh change to show.
+    func acknowledgeFailure() { actionFailed = false }
+
     func sessionChanged() {
         for task in mutationTasks.values { task.cancel() }
         mutationTasks.removeAll()

@@ -64,6 +64,9 @@ struct ScoreVoteControl: View {
             Text(verbatim: score > 0 ? "+\(score)" : "\(score)")
                 .font(.subheadline.weight(.semibold).monospacedDigit())
                 .foregroundStyle(score > 0 ? PodkopTheme.votePositive : score < 0 ? PodkopTheme.voteNegative : .primary)
+                // Narrow cards (related links) must not break "+308" over two lines.
+                .lineLimit(1)
+                .fixedSize()
                 .accessibilityLabel(String(localized: .contentScore(score)))
             if let up {
                 voteButton(symbol: "plus", color: PodkopTheme.votePositive, active: vote.state == "positive",

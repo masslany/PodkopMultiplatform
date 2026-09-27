@@ -549,7 +549,13 @@ class PodkopClient private constructor(
         ): IOSOperation = operation(completion) {
             require(page > 0) { "invalid page" }
             val result = linksRepository.getSubComments(linkId, commentId, page).getOrThrow()
-            IOSResourcePage(result.data.map(ResourceItem::toIOSResource), result.pagination?.next, result.pagination?.total)
+            // The API names the parent comment as a reply's parent, but votes and other actions
+            // on a link comment address it under its link, like the replies embedded in a page.
+            IOSResourcePage(
+                result.data.map { it.copy(parentId = linkId).toIOSResource() },
+                result.pagination?.next,
+                result.pagination?.total,
+            )
         }
 
         fun relatedLinks(linkId: Int, completion: (IOSResourcePage?, IOSFailure?) -> Unit): IOSOperation =

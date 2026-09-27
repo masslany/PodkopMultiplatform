@@ -53,12 +53,6 @@ struct DetailView: View {
                         }
                     }
                 }
-                if model.actionFailed {
-                    Label(.detailsActionFailedTryAgain, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.red)
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 16)
-                }
                 if model.phase == .loaded {
                     if model.kind == .link, !model.related.isEmpty { relatedSection.padding(.bottom, 16) }
                     commentsSection
@@ -78,6 +72,12 @@ struct DetailView: View {
         .onDisappear { model.stop() }
         .onChange(of: dependencies.resourceUpdates.revision) { _, _ in model.reconcileUpdates() }
         .onChange(of: dependencies.session.revision) { _, _ in model.sessionChanged() }
+        // Failed votes and favourites show the app banner, like the lists' ResourceInteractor.
+        .onChange(of: model.actionFailed) { _, failed in
+            guard failed else { return }
+            dependencies.router.banner = String(localized: .commonCouldNotCompleteAction)
+            model.acknowledgeFailure()
+        }
         .sheet(item: $actionTarget) { target in
             ResourceActionsSheet(resource: target, root: model.resource ?? target,
                                        parent: screenshotParent(for: target),
@@ -290,7 +290,11 @@ struct DetailView: View {
         switch resource.kind {
         case .entryComment: model.resource
         case .linkComment:
-            model.comments.first { $0.sourceID == resource.parentID }
+            // A reply's parentID is its link (actions need it), so find the comment holding it.
+            model.comments.first { comment in
+                comment.inlineComments.contains { $0.sourceID == resource.sourceID }
+                    || model.replies[comment.sourceID]?.rows.contains { $0.sourceID == resource.sourceID } == true
+            }
         default: nil
         }
     }
