@@ -5185,6 +5185,40 @@
         }
       }
     },
+    "privacy.notificationsBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Private message notifications are off until you turn them on in Settings, and turning them on asks for the system notification permission. While they are on and you are signed in, iOS may occasionally let the app check in the background how many private messages are unread. Only that number is fetched from Wykop and stored on the device, to tell whether a new message has arrived; message contents are not downloaded in the background. Notifications are created on the device and do not go through Apple’s or Podkop’s push servers. Turning the setting off or signing out stops the checks."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia o wiadomościach prywatnych są wyłączone, dopóki nie włączysz ich w Ustawieniach, a włączenie prosi o systemową zgodę na powiadomienia. Gdy są włączone i jesteś zalogowany, iOS może co jakiś czas pozwolić aplikacji sprawdzić w tle liczbę nieprzeczytanych wiadomości prywatnych. Z Wykopu pobierana jest tylko ta liczba i zapisywana na urządzeniu, aby rozpoznać nową wiadomość; treść wiadomości nie jest pobierana w tle. Powiadomienia powstają na urządzeniu i nie przechodzą przez serwery push Apple ani Podkopu. Wyłączenie tej opcji lub wylogowanie zatrzymuje sprawdzanie."
+          }
+        }
+      }
+    },
+    "privacy.notificationsTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia"
+          }
+        }
+      }
+    },
     "profile.achieved" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7061,13 +7095,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Podkop is an independent client for Wykop. This policy describes the iOS app. Updated 26 September 2026."
+            "value" : "Podkop is an independent client for Wykop. This policy describes the iOS app. Updated 27 September 2026."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Podkop jest niezależnym klientem serwisu Wykop. Ta polityka dotyczy aplikacji na iOS. Aktualizacja: 26 września 2026."
+            "value" : "Podkop jest niezależnym klientem serwisu Wykop. Ta polityka dotyczy aplikacji na iOS. Aktualizacja: 27 września 2026."
           }
         }
       }

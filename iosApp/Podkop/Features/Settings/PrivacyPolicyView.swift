@@ -11,6 +11,7 @@ struct PrivacyPolicyView: View {
             }
             Section(.privacyDeviceTitle) { Text(.privacyDeviceBody) }
             Section(.privacyPermissionsTitle) { Text(.privacyPermissionsBody) }
+            Section(.privacyNotificationsTitle) { Text(.privacyNotificationsBody) }
             Section(.privacyTrackingTitle) { Text(.privacyTrackingBody) }
         }
         .navigationTitle(.privacyTitle)
