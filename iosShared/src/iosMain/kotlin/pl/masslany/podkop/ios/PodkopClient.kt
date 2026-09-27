@@ -152,6 +152,8 @@ class IOSResource(
     val canFavourite: Boolean = false,
     /** The newest comments the API embeds with a resource (entries in lists, link comment replies). */
     val inlineComments: List<IOSResource> = emptyList(),
+    /** The author (or, for comments, the comment itself) is on the reader's blacklist. */
+    val blacklisted: Boolean = false,
 )
 class IOSResourcePage(
     val items: List<IOSResource>,
@@ -936,6 +938,7 @@ internal fun ResourceItem.toIOSResource(): IOSResource {
         slug = slug,
         canReply = actions?.create ?: false,
         canFavourite = actions?.let { it.createFavourite || it.deleteFavourite } ?: false,
+        blacklisted = author?.blacklist == true,
         inlineComments = comments?.items.orEmpty().map {
             it.toIOSResource(rootId = if (resource == Resource.Entry || resource == Resource.Link) id else parentId ?: parent?.id)
         },
@@ -998,6 +1001,7 @@ internal fun Comment.toIOSResource(rootId: Int? = null): IOSResource = IOSResour
     slug = slug,
     canReply = actions.create,
     canFavourite = actions.createFavourite || actions.deleteFavourite,
+    blacklisted = blacklist || author.blacklist,
     inlineComments = comments?.items.orEmpty().map { it.toIOSResource(rootId = rootId ?: parentId.takeIf { it > 0 }) },
 )
 

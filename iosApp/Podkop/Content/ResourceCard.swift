@@ -29,6 +29,7 @@ struct ResourceCard: View {
     /// space, so the screen can show the title in the navigation bar once it scrolls away.
     var onTitleBottom: ((CGFloat) -> Void)?
     @State private var adultRevealed = false
+    @State private var blacklistRevealed = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     static let detailContentSpace = "detailContent"
@@ -253,6 +254,8 @@ struct ResourceCard: View {
         }
         if resource.deletion != nil {
             richContent
+        } else if resource.blacklisted && !blacklistRevealed {
+            BlacklistedContentNotice { blacklistRevealed = true }
         } else {
             AdultContentGate(hidden: adultHidden, reveal: { adultRevealed = true }) {
                 VStack(alignment: .leading, spacing: 8) {

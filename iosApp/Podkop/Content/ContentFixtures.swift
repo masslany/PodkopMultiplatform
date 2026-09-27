@@ -42,5 +42,11 @@ enum ContentFixtures {
         embed: Embed(key: "preview", url: "https://example.com/video",
                            thumbnailURL: "", type: "other"))
 
-    static let all = [link, entry, entryComment, linkComment, embed]
+    static let blacklisted: Resource = {
+        var value = Resource(sourceID: 106, kind: .entry, body: "Wpis od autora z czarnej listy.", author: author)
+        value.blacklisted = true
+        return value
+    }()
+
+    static let all = [link, entry, entryComment, linkComment, embed, blacklisted]
 }

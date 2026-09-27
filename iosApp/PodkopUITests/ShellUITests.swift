@@ -217,6 +217,13 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(adult.waitForExistence(timeout: 5))
         adult.tap()
         XCTAssertTrue(app.staticTexts["Treść tylko dla dorosłych z wieloma zdaniami."].exists)
+        // Like Android, a blacklisted author's body stays hidden until the reader asks.
+        let blacklisted = app.buttons["showBlacklistedContent"]
+        for _ in 0..<4 where !blacklisted.isHittable { app.swipeUp() }
+        XCTAssertTrue(blacklisted.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["Wpis od autora z czarnej listy."].exists)
+        blacklisted.tap()
+        XCTAssertTrue(app.staticTexts["Wpis od autora z czarnej listy."].waitForExistence(timeout: 5))
     }
 
     func testFixtureSearchSuggestionsOpenAdvancedSearch() {

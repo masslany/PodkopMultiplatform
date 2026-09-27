@@ -2279,6 +2279,40 @@
         }
       }
     },
+    "content.commentButtonShowBlacklistedContent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show content"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż treść"
+          }
+        }
+      }
+    },
+    "content.commentLabelBlacklistedUser" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment from a blacklisted user"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Komentarz od użytkownika z czarnej listy"
+          }
+        }
+      }
+    },
     "content.contentAdultsOnlyTap" : {
       "extractionState" : "manual",
       "localizations" : {

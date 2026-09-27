@@ -34,10 +34,13 @@ final class ContentTests: XCTestCase {
                 canVoteUp: false, canVoteDown: false, canUndoVote: false, canDelete: false,
                 tags: [], photo: nil, embed: nil, survey: nil,
                 sourceUrl: nil, sourceLabel: nil, hot: false, recommended: false, slug: "",
-                canReply: false, canFavourite: false, inlineComments: []
-            )]
+                canReply: false, canFavourite: false, inlineComments: [], blacklisted: true
+            )],
+            blacklisted: false
         )
         let resource = Resource(payload)
+        XCTAssertFalse(resource.blacklisted)
+        XCTAssertEqual(resource.inlineComments.first?.blacklisted, true)
         XCTAssertEqual(resource.id, "unknown:77")
         XCTAssertEqual(resource.description, "Description", "Kotlin exports description as description_")
         XCTAssertEqual(resource.deletion, .moderator)
@@ -64,7 +67,7 @@ final class ContentTests: XCTestCase {
             canVoteUp: false, canVoteDown: false, canUndoVote: false, canDelete: false,
             tags: [], photo: nil, embed: nil, survey: nil,
             sourceUrl: nil, sourceLabel: nil, hot: false, recommended: false, slug: "",
-            canReply: false, canFavourite: false, inlineComments: []
+            canReply: false, canFavourite: false, inlineComments: [], blacklisted: false
         ))
         XCTAssertEqual(unknownDeletion.deletion, .unknown)
     }

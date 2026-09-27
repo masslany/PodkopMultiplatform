@@ -90,6 +90,9 @@ struct Resource: Identifiable, Hashable {
     let canFavourite: Bool
     /// Newest comments embedded by the API: under entries in lists, and replies under link comments.
     var inlineComments: [Resource]
+    /// From a blacklisted author (or, for comments, blacklisted itself): the body stays hidden
+    /// until the reader asks, like Android's `BlacklistedContentGate`.
+    var blacklisted = false
 
     var id: String { "\(kind.rawValue):\(sourceID)" }
 
@@ -140,6 +143,7 @@ struct Resource: Identifiable, Hashable {
         canReply = value.canReply
         canFavourite = value.canFavourite
         inlineComments = value.inlineComments.map(Resource.init)
+        blacklisted = value.blacklisted
     }
 
     init(sourceID: Int, kind: ResourceKind, title: String = "", body: String,
