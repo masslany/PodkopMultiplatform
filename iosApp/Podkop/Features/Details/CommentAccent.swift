@@ -16,9 +16,9 @@ enum CommentAccent: Equatable {
 
     var color: Color {
         switch self {
-        case .currentUser: WykopTheme.currentUserAccent
-        case .linkAuthor: WykopTheme.linkAuthorAccent
-        case .parentAuthor: WykopTheme.parentAuthorAccent
+        case .currentUser: PodkopTheme.currentUserAccent
+        case .linkAuthor: PodkopTheme.linkAuthorAccent
+        case .parentAuthor: PodkopTheme.parentAuthorAccent
         }
     }
 }

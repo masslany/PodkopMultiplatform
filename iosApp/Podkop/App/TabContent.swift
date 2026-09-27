@@ -22,7 +22,7 @@ struct TabContent: View {
                     } else {
                         ContentUnavailableView(.appSelectItem, systemImage: tab.symbol)
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(WykopTheme.background.ignoresSafeArea())
+                            .background(PodkopTheme.background.ignoresSafeArea())
                     }
                 }
             } else {
@@ -44,7 +44,7 @@ struct TabContent: View {
             MoreView(dependencies: dependencies)
         } else {
             FeedView(tab: tab, dependencies: dependencies)
-                .background(WykopTheme.background.ignoresSafeArea())
+                .background(PodkopTheme.background.ignoresSafeArea())
         }
     }
 
@@ -85,7 +85,7 @@ struct TabContent: View {
 
     private func destination(_ route: AppRoute) -> some View {
         destinationContent(route)
-            .background(WykopTheme.background.ignoresSafeArea())
+            .background(PodkopTheme.background.ignoresSafeArea())
     }
 
     @ViewBuilder private func destinationContent(_ route: AppRoute) -> some View {

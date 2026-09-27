@@ -44,7 +44,7 @@ struct SurveyView: View {
             }
         }
         .padding(12)
-        .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .background(PodkopTheme.cardInset, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func answerRow(_ answer: Survey.Answer) -> some View {
@@ -65,7 +65,7 @@ struct SurveyView: View {
                     HStack(spacing: 8) {
                         if selected {
                             Image(systemName: "checkmark.circle.fill").font(.system(size: 22))
-                                .foregroundStyle(WykopTheme.votePositive)
+                                .foregroundStyle(PodkopTheme.votePositive)
                                 .accessibilityAddTraits(.isSelected)
                         }
                         Text(verbatim: "\(percentage(answer.count))%")
@@ -84,16 +84,16 @@ struct SurveyView: View {
         .background {
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
-                    WykopTheme.background
+                    PodkopTheme.background
                     if resultsVisible {
-                        (selected ? WykopTheme.votePositive.opacity(0.25) : Color.primary.opacity(0.08))
+                        (selected ? PodkopTheme.votePositive.opacity(0.25) : Color.primary.opacity(0.08))
                             .frame(width: geometry.size.width * CGFloat(percentage(answer.count)) / 100)
                     }
                 }
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 9).strokeBorder(selected ? WykopTheme.votePositive : .clear))
+        .overlay(RoundedRectangle(cornerRadius: 9).strokeBorder(selected ? PodkopTheme.votePositive : .clear))
         .contentShape(RoundedRectangle(cornerRadius: 9))
     }
 

@@ -146,11 +146,11 @@ struct ConversationView: View {
                     .accessibilityLabel(.messagesWriteMessage)
             }
             .frame(height: 110)
-            .background(WykopTheme.background, in: RoundedRectangle(cornerRadius: 12))
+            .background(PodkopTheme.background, in: RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.primary.opacity(0.4), lineWidth: 1.5))
             AdaptiveControlRow {
                 Toggle("18+", isOn: $model.adult)
-                    .wykopSwitch()
+                    .podkopSwitch()
                     .fixedSize()
                     .accessibilityLabel(.commonAdultContent)
                     .disabled(model.sending)
@@ -166,7 +166,7 @@ struct ConversationView: View {
                 .buttonStyle(.borderedProminent)
                 .buttonBorderShape(.capsule)
                 .tint(.primary)
-                .foregroundStyle(WykopTheme.background)
+                .foregroundStyle(PodkopTheme.background)
                 .disabled(!model.canSend)
                 .accessibilityLabel(.commonSend)
                 .accessibilityIdentifier("messageSend")
@@ -174,7 +174,7 @@ struct ConversationView: View {
 
         }
         .padding(12)
-        .background(WykopTheme.card)
+        .background(PodkopTheme.card)
     }
 }
 
@@ -211,7 +211,7 @@ private struct MessageBubble: View {
                 Text(message.createdAt.formatted(.relative(presentation: .named))).font(.caption2).foregroundStyle(.secondary)
             }
             .padding(10)
-            .background(message.incoming ? AnyShapeStyle(WykopTheme.card) : AnyShapeStyle(ContentTokens.brand.opacity(0.15)),
+            .background(message.incoming ? AnyShapeStyle(PodkopTheme.card) : AnyShapeStyle(ContentTokens.brand.opacity(0.15)),
                         in: RoundedRectangle(cornerRadius: 14))
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("message-\(message.key)")

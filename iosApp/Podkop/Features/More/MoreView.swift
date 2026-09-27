@@ -21,11 +21,11 @@ struct MoreView: View {
                 header
                 if session.isLoggedIn {
                     MoreMenuSection(title: .moreCommunity, items: [
-                        item("notifications", .commonNotifications, "bell.fill", WykopTheme.voteNegative, .notifications,
+                        item("notifications", .commonNotifications, "bell.fill", PodkopTheme.voteNegative, .notifications,
                              badge: session.notificationCounts.total - session.notificationCounts.pm),
-                        item("messages", .commonMessages, "text.bubble.fill", WykopTheme.votePositive, .messages,
+                        item("messages", .commonMessages, "text.bubble.fill", PodkopTheme.votePositive, .messages,
                              badge: session.notificationCounts.pm),
-                        item("favorites", .commonFavorites, "heart.fill", WykopTheme.genderPink, .favorites),
+                        item("favorites", .commonFavorites, "heart.fill", PodkopTheme.genderPink, .favorites),
                     ])
                 }
                 MoreMenuSection(title: .commonContent, items: contentItems)
@@ -41,7 +41,7 @@ struct MoreView: View {
             .frame(maxWidth: .infinity)
         }
         .ignoresSafeArea(edges: showsProfile ? .top : [])
-        .background(WykopTheme.background.ignoresSafeArea())
+        .background(PodkopTheme.background.ignoresSafeArea())
         // An empty, transparent bar instead of a hidden one: toggling the bar's visibility makes
         // the pushed screen's title vanish and reappear during the back swipe.
         .navigationTitle("")
@@ -77,13 +77,13 @@ struct MoreView: View {
 
     private var contentItems: [MoreItem] {
         var items = [
-            item("hits", .commonHits, "flame.fill", WykopTheme.hotOrange, .hits),
+            item("hits", .commonHits, "flame.fill", PodkopTheme.hotOrange, .hits),
             item("rank", .commonRank, "chart.bar.fill", Color(red: 0.55, green: 0.36, blue: 0.86), .rank),
             item("search", .commonSearch, "magnifyingglass", Color(white: 0.5), .search),
         ]
         if session.isLoggedIn {
             items.append(item("observed", .moreMyWykop, "binoculars.fill", Color(red: 0.19, green: 0.69, blue: 0.78), .observed))
-            items.append(item("addLink", .commonAddLink, "link.badge.plus", WykopTheme.nameGreen, .addLink))
+            items.append(item("addLink", .commonAddLink, "link.badge.plus", PodkopTheme.nameGreen, .addLink))
         }
         return items
     }

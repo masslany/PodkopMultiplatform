@@ -29,7 +29,7 @@ struct FeedView: View {
                     }
                     .font(.subheadline)
                     .padding(10)
-                    .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .background(PodkopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 if model.phase == .loading && model.items.isEmpty {
                     ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 180)
@@ -116,7 +116,7 @@ struct FeedView: View {
                         .font(.subheadline.weight(.semibold))
                         .frame(minWidth: 36, minHeight: 34)
                         .padding(.horizontal, 4)
-                        .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .background(PodkopTheme.cardInset, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(model.gallery ? .commonListView : .commonGalleryView)
@@ -170,7 +170,7 @@ struct FeedView: View {
         Label {
             Text(.commonHits)
         } icon: {
-            Image(systemName: "flame.fill").foregroundStyle(WykopTheme.hotOrange)
+            Image(systemName: "flame.fill").foregroundStyle(PodkopTheme.hotOrange)
         }
         .font(.headline)
         .labelStyle(.titleAndIcon)

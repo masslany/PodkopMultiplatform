@@ -93,7 +93,7 @@ struct PagedResourceRows: View {
                 }
                 .font(.subheadline)
                 .padding(10)
-                .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .background(PodkopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
             switch pager.phase {
             case .idle, .loading:

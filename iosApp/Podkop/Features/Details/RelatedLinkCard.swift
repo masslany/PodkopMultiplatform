@@ -13,7 +13,7 @@ struct RelatedLinkCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             RemoteImage(url: resource.photo?.url, maxDimension: 360) {
-                WykopTheme.cardInset.overlay(Image(systemName: "link").foregroundStyle(.secondary))
+                PodkopTheme.cardInset.overlay(Image(systemName: "link").foregroundStyle(.secondary))
             }
             .frame(width: 96)
             .frame(maxHeight: .infinity)
@@ -46,7 +46,7 @@ struct RelatedLinkCard: View {
             .padding(.trailing, 10)
         }
         .frame(width: 300, height: 112)
-        .background(WykopTheme.card)
+        .background(PodkopTheme.card)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .contentShape(Rectangle())
         .onTapGesture(perform: open)

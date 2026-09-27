@@ -21,7 +21,7 @@ struct LinkVoteBadge: View {
             .font(.subheadline.weight(.semibold).monospacedDigit())
             .minimumScaleFactor(0.6)
             .lineLimit(1)
-            .foregroundStyle((hot ? WykopTheme.hotOrange : Color.primary).opacity(voted ? 0.6 : 1))
+            .foregroundStyle((hot ? PodkopTheme.hotOrange : Color.primary).opacity(voted ? 0.6 : 1))
             .frame(width: min(width, 92), height: min(height, 64))
             .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .strokeBorder(Color.secondary.opacity(voted ? 0.6 : 1), lineWidth: 2))
@@ -29,7 +29,7 @@ struct LinkVoteBadge: View {
                 if hot {
                     Image(systemName: "flame.fill")
                         .font(.system(size: 18))
-                        .foregroundStyle(WykopTheme.hotOrange)
+                        .foregroundStyle(PodkopTheme.hotOrange)
                         .offset(x: 7, y: 7)
                         .accessibilityHidden(true)
                 }
@@ -64,15 +64,15 @@ struct ScoreVoteControl: View {
         HStack(spacing: 8) {
             Text(verbatim: score > 0 ? "+\(score)" : "\(score)")
                 .font(.subheadline.weight(.semibold).monospacedDigit())
-                .foregroundStyle(score > 0 ? WykopTheme.votePositive : score < 0 ? WykopTheme.voteNegative : .primary)
+                .foregroundStyle(score > 0 ? PodkopTheme.votePositive : score < 0 ? PodkopTheme.voteNegative : .primary)
                 .accessibilityLabel(String(localized: .contentScore(score)))
             if let up {
-                voteButton(symbol: "plus", color: WykopTheme.votePositive, active: vote.state == "positive",
+                voteButton(symbol: "plus", color: PodkopTheme.votePositive, active: vote.state == "positive",
                            label: vote.state == "positive" ? .contentRemoveUpvote : .contentUpvote, action: up)
                     .accessibilityIdentifier("voteUp")
             }
             if showsDown, let down {
-                voteButton(symbol: "minus", color: WykopTheme.voteNegative, active: vote.state == "negative",
+                voteButton(symbol: "minus", color: PodkopTheme.voteNegative, active: vote.state == "negative",
                            label: vote.state == "negative" ? .contentRemoveDownvote : .contentDownvote, action: down)
                     .accessibilityIdentifier("voteDown")
             }

@@ -17,14 +17,14 @@ struct ScreenshotPreview: View {
             ScrollView {
                 VStack(spacing: 16) {
                     if parent != nil {
-                        Toggle(.detailsIncludeParent, isOn: $includeParent).wykopSwitch()
+                        Toggle(.detailsIncludeParent, isOn: $includeParent).podkopSwitch()
                     }
                     if loading {
                         ProgressView(.commonLoading).frame(maxWidth: .infinity, minHeight: 180)
                     } else if let image {
                         Image(uiImage: image).resizable().scaledToFit()
                             .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-                            .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(WykopTheme.separator))
+                            .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(PodkopTheme.separator))
                             .accessibilityLabel(.detailsScreenshotPreview)
                         if let data = image.pngData() {
                             ImageExportControls(data: data, style: .screenshot) { message = $0 }
@@ -42,7 +42,7 @@ struct ScreenshotPreview: View {
                 }
                 .padding()
             }
-            .background(WykopTheme.background)
+            .background(PodkopTheme.background)
             .navigationTitle(.detailsScreenshotPreview)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

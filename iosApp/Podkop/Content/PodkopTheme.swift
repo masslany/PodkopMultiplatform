@@ -1,9 +1,9 @@
 import SwiftUI
 import UIKit
 
-/// Wykop brand colors, taken from the Android `ColorsPalette`, plus the app's surfaces.
-/// Surfaces follow Wykop's charcoal dark theme and iOS grouped backgrounds in light mode.
-enum WykopTheme {
+/// The brand colors, taken from the Android `ColorsPalette`, plus the app's surfaces.
+/// Surfaces follow the charcoal dark theme and iOS grouped backgrounds in light mode.
+enum PodkopTheme {
     static let background = dynamic(light: 0xF2F2F5, dark: 0x1C1B1D)
     static let card = dynamic(light: 0xFFFFFF, dark: 0x28272B)
     static let cardInset = dynamic(light: 0xF0EFF3, dark: 0x323136)
@@ -46,14 +46,14 @@ enum WykopTheme {
 
 extension View {
     /// A switch-style toggle with a visible "on" state in both light and dark mode.
-    func wykopSwitch() -> some View {
-        toggleStyle(.switch).tint(WykopTheme.switchOn)
+    func podkopSwitch() -> some View {
+        toggleStyle(.switch).tint(PodkopTheme.switchOn)
     }
 
-    /// The standard Wykop card surface.
-    func wykopCard(padding: CGFloat = 16) -> some View {
+    /// The standard card surface.
+    func podkopCard(padding: CGFloat = 16) -> some View {
         self.padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: WykopTheme.cardRadius))
+            .background(PodkopTheme.card, in: RoundedRectangle(cornerRadius: PodkopTheme.cardRadius))
     }
 }

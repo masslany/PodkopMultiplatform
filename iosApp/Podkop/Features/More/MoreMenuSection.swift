@@ -31,11 +31,11 @@ struct MoreMenuSection: View {
                         .accessibilityIdentifier("more-\(item.id)")
                         .accessibilityValue(item.badge > 0 ? String(localized: .commonUnread2(item.badge)) : "")
                     if index < items.count - 1 {
-                        Divider().overlay(WykopTheme.separator).padding(.leading, 60)
+                        Divider().overlay(PodkopTheme.separator).padding(.leading, 60)
                     }
                 }
             }
-            .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .background(PodkopTheme.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .padding(.horizontal, 16)
         }
@@ -57,7 +57,7 @@ struct MoreMenuSection: View {
                     .font(.footnote.weight(.bold).monospacedDigit())
                     .foregroundStyle(.white)
                     .padding(.horizontal, 8).padding(.vertical, 3)
-                    .background(WykopTheme.voteNegative, in: Capsule())
+                    .background(PodkopTheme.voteNegative, in: Capsule())
             }
             Image(systemName: "chevron.right")
                 .font(.footnote.weight(.semibold))
@@ -73,6 +73,6 @@ struct MoreMenuSection: View {
 private struct MoreRowStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .background(configuration.isPressed ? WykopTheme.cardInset : .clear)
+            .background(configuration.isPressed ? PodkopTheme.cardInset : .clear)
     }
 }

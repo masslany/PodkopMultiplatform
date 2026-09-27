@@ -18,7 +18,7 @@ struct EntryCommentRow: View {
                 .padding(.leading, 18)
                 .padding(.top, 16)
             if !isLast {
-                Divider().overlay(WykopTheme.separator)
+                Divider().overlay(PodkopTheme.separator)
                     .padding(.leading, 18)
                     .padding(.top, 16)
             } else {
@@ -27,7 +27,7 @@ struct EntryCommentRow: View {
         }
         .background(alignment: .leading) {
             Rectangle()
-                .fill(isOwn ? WykopTheme.currentUserAccent : WykopTheme.separator)
+                .fill(isOwn ? PodkopTheme.currentUserAccent : PodkopTheme.separator)
                 .frame(width: 2)
                 .accessibilityHidden(true)
         }

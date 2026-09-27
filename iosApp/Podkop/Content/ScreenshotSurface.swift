@@ -16,15 +16,15 @@ enum ScreenshotSurface {
             if let parent {
                 ResourceCard(resource: parent, style: .embedded,
                              screenshotPhoto: screenshotPhoto(for: parent, bytes: photoBytes), showsActions: false)
-                Divider().overlay(WykopTheme.separator)
+                Divider().overlay(PodkopTheme.separator)
             }
             ResourceCard(resource: resource, style: .embedded,
                          screenshotPhoto: screenshotPhoto(for: resource, bytes: photoBytes), showsActions: false)
         }
-        .wykopCard(padding: 18)
+        .podkopCard(padding: 18)
         .padding(14)
         .frame(width: width)
-        .background(WykopTheme.background)
+        .background(PodkopTheme.background)
         .environment(\.mediaLoader, nil)
         .environment(\.screenshotImages, images)
         .environment(\.colorScheme, colorScheme)

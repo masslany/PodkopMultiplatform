@@ -16,7 +16,7 @@ struct MoreProfileHeader: View {
                     AvatarView(url: profile.avatarURL, name: profile.username, size: avatarSize,
                                gender: profile.gender)
                         .padding(3)
-                        .background(WykopTheme.background,
+                        .background(PodkopTheme.background,
                                     in: RoundedRectangle(cornerRadius: avatarSize * 0.22 + 3, style: .continuous))
                     VStack(alignment: .leading, spacing: 3) {
                         Text(profile.username)
@@ -34,7 +34,7 @@ struct MoreProfileHeader: View {
                         .font(.footnote.weight(.bold))
                         .foregroundStyle(.secondary)
                         .frame(width: 30, height: 30)
-                        .background(WykopTheme.card, in: Circle())
+                        .background(PodkopTheme.card, in: Circle())
                         .padding(.bottom, 16)
                 }
                 .padding(.horizontal, 20)
@@ -66,7 +66,7 @@ struct MoreProfileHeader: View {
                 .frame(height: 100)
         }
         .overlay(alignment: .bottom) {
-            LinearGradient(colors: [.clear, WykopTheme.background], startPoint: .top, endPoint: .bottom)
+            LinearGradient(colors: [.clear, PodkopTheme.background], startPoint: .top, endPoint: .bottom)
                 .frame(height: 70)
         }
         .clipped()

@@ -80,9 +80,9 @@ private struct ScreenshotExportButtonStyle: ButtonStyle {
         configuration.label
             .font(.subheadline.weight(.semibold))
             .frame(maxWidth: .infinity, minHeight: 48)
-            .foregroundStyle(prominent ? WykopTheme.background : Color.primary)
-            .background(prominent ? Color.primary : WykopTheme.cardInset, in: Capsule())
-            .overlay(Capsule().strokeBorder(prominent ? .clear : WykopTheme.separator))
+            .foregroundStyle(prominent ? PodkopTheme.background : Color.primary)
+            .background(prominent ? Color.primary : PodkopTheme.cardInset, in: Capsule())
+            .overlay(Capsule().strokeBorder(prominent ? .clear : PodkopTheme.separator))
             .opacity(configuration.isPressed ? 0.75 : 1)
             .contentShape(Capsule())
     }

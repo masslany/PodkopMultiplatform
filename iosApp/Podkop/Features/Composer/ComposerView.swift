@@ -26,12 +26,12 @@ struct ComposerView: View {
                     ComposerFormattingBar(text: $model.text, selection: $model.selection, disabled: model.submitting)
                     ComposerEditor(text: $model.text, selection: $model.selection)
                         .frame(minHeight: 230)
-                        .background(WykopTheme.background, in: RoundedRectangle(cornerRadius: 12))
+                        .background(PodkopTheme.background, in: RoundedRectangle(cornerRadius: 12))
                         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.primary.opacity(0.4), lineWidth: 1.5))
                         .disabled(model.submitting)
                         .accessibilityIdentifier("composerEditor")
                     AdaptiveControlRow {
-                        Toggle("18+", isOn: $model.adult).wykopSwitch().fixedSize()
+                        Toggle("18+", isOn: $model.adult).podkopSwitch().fixedSize()
                             .accessibilityLabel(.commonAdultContent)
                             .disabled(model.submitting)
                     } trailing: {
@@ -54,10 +54,10 @@ struct ComposerView: View {
                 .frame(maxWidth: .infinity)
             }
             .safeAreaInset(edge: .bottom) {
-                submitButton.padding(16).background(WykopTheme.card)
+                submitButton.padding(16).background(PodkopTheme.card)
             }
             .scrollDismissesKeyboard(.interactively)
-            .background(WykopTheme.card)
+            .background(PodkopTheme.card)
             .background(KeyboardDismissArea())
             .navigationTitle(model.intent.title)
             .navigationBarTitleDisplayMode(.inline)
@@ -93,7 +93,7 @@ struct ComposerView: View {
         .buttonStyle(.borderedProminent)
         .buttonBorderShape(.capsule)
         .tint(.primary)
-        .foregroundStyle(WykopTheme.background)
+        .foregroundStyle(PodkopTheme.background)
         .controlSize(.large)
         .disabled(!model.canSubmit)
         .accessibilityIdentifier("composerSubmit")

@@ -58,7 +58,7 @@ struct TagView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 12) {
             if let banner = model.details?.bannerURL {
-                RemoteImage(url: banner, maxDimension: 1200) { WykopTheme.cardInset }
+                RemoteImage(url: banner, maxDimension: 1200) { PodkopTheme.cardInset }
                     .frame(height: 160)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, -12)

@@ -14,7 +14,7 @@ struct NotificationsView: View {
     }
 
     var body: some View {
-        WykopList {
+        PodkopList {
             Section {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {

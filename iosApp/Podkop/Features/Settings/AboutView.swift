@@ -5,7 +5,7 @@ struct AboutView: View {
     @State private var libraries: [LibraryNotice] = []
 
     var body: some View {
-        WykopList {
+        PodkopList {
             Section {
                 HStack(spacing: 14) {
                     Image("SplashIcon").resizable().frame(width: 56, height: 56)

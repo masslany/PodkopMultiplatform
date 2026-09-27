@@ -19,7 +19,7 @@ struct LinkSubmissionView: View {
     @State private var selectedPhoto: PhotosPickerItem?
 
     var body: some View {
-        WykopList {
+        PodkopList {
             switch model.stage {
             case .start: startSections
             case .similar: similarSections
@@ -166,7 +166,7 @@ struct LinkSubmissionView: View {
             ForEach(model.tagSuggestions, id: \.self) { tag in
                 Button("#" + tag) { model.selectTag(tag) }
             }
-            Toggle(.commonAdultContent, isOn: $model.adult).wykopSwitch()
+            Toggle(.commonAdultContent, isOn: $model.adult).podkopSwitch()
         }
         if !model.suggestedImages.isEmpty {
             Section(.composerSuggestedImage) {

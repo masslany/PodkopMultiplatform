@@ -23,7 +23,7 @@ struct MediaView: View {
                                        && (playbackOverride ?? autoplay))
                     .frame(maxWidth: .infinity)
                     .frame(height: displayHeight)
-                    .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
+                    .background(PodkopTheme.cardInset, in: RoundedRectangle(cornerRadius: PodkopTheme.smallRadius, style: .continuous))
                     .contentShape(Rectangle())
                     .onTapGesture { viewerBytes = bytes }
                     .accessibilityAddTraits(.isButton)
@@ -43,12 +43,12 @@ struct MediaView: View {
             } else if loader == nil || loadFailed {
                 Label(.contentImageUnavailable, systemImage: "photo")
                     .frame(maxWidth: .infinity, minHeight: 120)
-                    .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
+                    .background(PodkopTheme.cardInset, in: RoundedRectangle(cornerRadius: PodkopTheme.smallRadius, style: .continuous))
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .frame(height: displayHeight)
-                    .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
+                    .background(PodkopTheme.cardInset, in: RoundedRectangle(cornerRadius: PodkopTheme.smallRadius, style: .continuous))
             }
         }
         .onAppear { visible = true }

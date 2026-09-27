@@ -21,14 +21,14 @@ struct ResourceThreadCard<Footer: View>: View {
             card(root, actions: rootActions, identified: false)
                 .background(alignment: .leading) { accentLine(accent(root, nil)) }
             ForEach(children) { child in
-                Divider().overlay(WykopTheme.separator)
+                Divider().overlay(PodkopTheme.separator)
                 card(child, actions: childActions(child))
                     .background(alignment: .leading) { accentLine(accent(child, root)) }
                     .padding(.leading, 16)
             }
             footer()
         }
-        .wykopCard(padding: 14)
+        .podkopCard(padding: 14)
         .contentShape(Rectangle())
         .onTapGesture { open?() }
         .accessibilityElement(children: .contain)
@@ -66,7 +66,7 @@ struct ThreadMoreButton: View {
             }
             .foregroundStyle(.primary)
             .padding(.horizontal, 18).padding(.vertical, 9)
-            .overlay(Capsule().strokeBorder(WykopTheme.separator, lineWidth: 1))
+            .overlay(Capsule().strokeBorder(PodkopTheme.separator, lineWidth: 1))
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct PrivacyPolicyView: View {
     var body: some View {
-        WykopList {
+        PodkopList {
             Section { Text(.privacyIntro) }
             Section(.privacyServiceTitle) {
                 Text(.privacyServiceBody)

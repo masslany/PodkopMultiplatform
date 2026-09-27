@@ -40,7 +40,7 @@ struct ResourceCard: View {
         switch style {
         case .card:
             content
-                .wykopCard(padding: 14)
+                .podkopCard(padding: 14)
                 .contentShape(Rectangle())
                 .onTapGesture { actions.open?() }
                 .accessibilityElement(children: .contain)
@@ -92,9 +92,9 @@ struct ResourceCard: View {
                         .lineLimit(5)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     if let photo = resource.photo {
-                        RemoteImage(url: photo.url, maxDimension: 240) { WykopTheme.cardInset }
+                        RemoteImage(url: photo.url, maxDimension: 240) { PodkopTheme.cardInset }
                             .frame(width: 80, height: 80)
-                            .clipShape(RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: PodkopTheme.smallRadius, style: .continuous))
                             .accessibilityHidden(true)
                     }
                 }
@@ -118,7 +118,7 @@ struct ResourceCard: View {
         VStack(alignment: .leading, spacing: 10) {
             if let photo = resource.photo, resource.deletion == nil {
                 AdultContentGate(hidden: adultHidden, reveal: { adultRevealed = true }) {
-                    RemoteImage(url: photo.url, maxDimension: 1200) { WykopTheme.cardInset }
+                    RemoteImage(url: photo.url, maxDimension: 1200) { PodkopTheme.cardInset }
                         .frame(height: 200)
                         .frame(maxWidth: .infinity)
                         .clipped()
@@ -133,7 +133,7 @@ struct ResourceCard: View {
                         Button(action: voteDown) {
                             Text(resource.vote.state == "negative" ? .contentUndoBury : .contentBury)
                                 .font(.caption.weight(.medium))
-                                .foregroundStyle(resource.vote.state == "negative" ? WykopTheme.voteNegative : .secondary)
+                                .foregroundStyle(resource.vote.state == "negative" ? PodkopTheme.voteNegative : .secondary)
                         }
                         .buttonStyle(.plain)
                         .disabled(actions.pending)
@@ -208,7 +208,7 @@ struct ResourceCard: View {
                             Text(verbatim: "#\(tag)")
                         }
                     }
-                    .foregroundStyle(WykopTheme.tagBlue)
+                    .foregroundStyle(PodkopTheme.tagBlue)
                     if index < resource.tags.count - 1 { separator }
                 }
             }
@@ -286,7 +286,7 @@ struct ResourceCard: View {
                 if author.verified {
                     Image(systemName: "checkmark.seal.fill")
                         .font(.caption)
-                        .foregroundStyle(WykopTheme.tagBlue)
+                        .foregroundStyle(PodkopTheme.tagBlue)
                         .accessibilityLabel(.commonVerifiedAuthor)
                 }
             }
@@ -336,7 +336,7 @@ struct ResourceCard: View {
             .opacity(actions.comment == nil ? 0.4 : 1)
             Button { actions.favourite?() } label: {
                 Image(systemName: resource.favourite ? "star.fill" : "star")
-                    .foregroundStyle(resource.favourite ? WykopTheme.favouriteGold : .secondary)
+                    .foregroundStyle(resource.favourite ? PodkopTheme.favouriteGold : .secondary)
             }
             .disabled(actions.favourite == nil || actions.pending)
             .opacity(actions.favourite == nil ? 0.4 : 1)

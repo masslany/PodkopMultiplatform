@@ -30,13 +30,13 @@ struct HitTile: View {
                         .font(.caption.weight(.bold).monospacedDigit())
                         .foregroundStyle(.white)
                         .padding(.horizontal, 7).padding(.vertical, 3)
-                        .background(WykopTheme.hotOrange, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                        .background(PodkopTheme.hotOrange, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
                     if resource.adult {
                         Text(verbatim: "18+")
                             .font(.caption2.weight(.heavy))
                             .foregroundStyle(.white)
                             .padding(.horizontal, 5).padding(.vertical, 3)
-                            .background(WykopTheme.adultRed, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                            .background(PodkopTheme.adultRed, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
                     }
                 }
                 .padding(8)

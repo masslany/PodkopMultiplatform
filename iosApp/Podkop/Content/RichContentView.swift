@@ -28,7 +28,7 @@ struct RichContent: View {
                                 Image(systemName: "chevron.down").font(.caption.weight(.bold))
                             }
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(WykopTheme.tagBlue)
+                            .foregroundStyle(PodkopTheme.tagBlue)
                             .frame(minHeight: 32)
                             .contentShape(Rectangle())
                         }
@@ -51,7 +51,7 @@ struct RichContent: View {
         .font(.subheadline)
         .textSelection(.enabled)
         // Mentions, tags and links keep Wykop's blue while controls stay neutral.
-        .tint(WykopTheme.tagBlue)
+        .tint(PodkopTheme.tagBlue)
     }
 
     @ViewBuilder private func blockView(_ block: RichBlock) -> some View {

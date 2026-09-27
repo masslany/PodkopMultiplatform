@@ -38,17 +38,17 @@ struct VotersSheet: View {
                     Text(emptyTitle)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .wykopCard(padding: 16)
+                        .podkopCard(padding: 16)
                 }
             }
             .padding(.horizontal, 16)
             .padding(.top, 28)
             .padding(.bottom, 16)
         }
-        .background(WykopTheme.background.ignoresSafeArea())
+        .background(PodkopTheme.background.ignoresSafeArea())
         .presentationDragIndicator(.visible)
         .presentationDetents([.medium, .large])
-        .presentationBackground(WykopTheme.background)
+        .presentationBackground(PodkopTheme.background)
         .task { model.load() }
         .onDisappear { model.stop() }
         .accessibilityIdentifier("votersSheet")
@@ -65,7 +65,7 @@ struct VotersSheet: View {
                     if voter.verified {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.caption)
-                            .foregroundStyle(WykopTheme.tagBlue)
+                            .foregroundStyle(PodkopTheme.tagBlue)
                             .accessibilityLabel(.commonVerifiedAuthor)
                     }
                 }
@@ -81,7 +81,7 @@ struct VotersSheet: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: WykopTheme.cardRadius, style: .continuous))
+        .background(PodkopTheme.card, in: RoundedRectangle(cornerRadius: PodkopTheme.cardRadius, style: .continuous))
         .contentShape(Rectangle())
     }
 

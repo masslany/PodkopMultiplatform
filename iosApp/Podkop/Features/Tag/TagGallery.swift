@@ -81,7 +81,7 @@ private struct TagGalleryTile: View {
             .aspectRatio(ratio, contentMode: .fit)
             .frame(minHeight: 120)
             .overlay {
-                RemoteImage(url: item.photo?.url, maxDimension: 700) { WykopTheme.cardInset }
+                RemoteImage(url: item.photo?.url, maxDimension: 700) { PodkopTheme.cardInset }
             }
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -115,6 +115,6 @@ private struct TagGalleryTile: View {
             .font(.caption.weight(.bold))
             .foregroundStyle(.primary)
             .padding(.horizontal, 6).padding(.vertical, 2)
-            .background(WykopTheme.card.opacity(0.88), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+            .background(PodkopTheme.card.opacity(0.88), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
     }
 }

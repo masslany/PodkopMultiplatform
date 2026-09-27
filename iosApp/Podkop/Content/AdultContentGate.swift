@@ -23,7 +23,7 @@ struct AdultContentGate<Content: View>: View {
                                 .font(.headline.weight(.heavy))
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 10).padding(.vertical, 4)
-                                .background(WykopTheme.adultRed, in: Capsule())
+                                .background(PodkopTheme.adultRed, in: Capsule())
                             Text(.contentContentAdultsOnlyTap)
                                 .font(.subheadline.weight(.semibold))
                                 .multilineTextAlignment(.center)
@@ -32,7 +32,7 @@ struct AdultContentGate<Content: View>: View {
                         .padding()
                         .frame(maxWidth: .infinity, minHeight: 120, maxHeight: .infinity)
                         .background(.ultraThinMaterial,
-                                    in: RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
+                                    in: RoundedRectangle(cornerRadius: PodkopTheme.smallRadius, style: .continuous))
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
@@ -40,7 +40,7 @@ struct AdultContentGate<Content: View>: View {
                     .accessibilityHint(.contentRevealsSensitiveContent)
             }
             .frame(minHeight: 120)
-            .clipShape(RoundedRectangle(cornerRadius: WykopTheme.smallRadius, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: PodkopTheme.smallRadius, style: .continuous))
         } else {
             content()
         }

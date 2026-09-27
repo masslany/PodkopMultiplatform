@@ -71,7 +71,7 @@ struct ResourceActionsSheet: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .presentationDragIndicator(.visible)
-        .presentationBackground(WykopTheme.card)
+        .presentationBackground(PodkopTheme.card)
         .accessibilityIdentifier("resourceActions")
         // Sized to its rows, like Android's bottom sheet.
         .presentationDetents([.height(contentHeight + 24)])
@@ -124,7 +124,7 @@ struct ResourceActionsSheet: View {
                 Text(title).font(.body)
                 Spacer(minLength: 0)
             }
-            .foregroundStyle(destructive ? WykopTheme.voteNegative : .primary)
+            .foregroundStyle(destructive ? PodkopTheme.voteNegative : .primary)
             .padding(.horizontal, 24)
             .frame(minHeight: 56)
             .contentShape(Rectangle())

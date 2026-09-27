@@ -9,7 +9,7 @@ struct WebsiteReportView: View {
 
     var body: some View {
         NavigationStack {
-            WykopList {
+            PodkopList {
                 Section {
                     Text(.reportInstructions)
                     if let missingCommentID {

@@ -28,9 +28,9 @@ struct MagicGradient: View {
         // Warm Wykop colors with a violet accent; dark enough everywhere for white text on top.
         let violet = Color(red: 0.42, green: 0.24, blue: 0.72)
         let colors: [Color] = [
-            WykopTheme.hotOrange, WykopTheme.nameBurgundy, WykopTheme.genderPink,
-            WykopTheme.nameBurgundy, WykopTheme.hotOrange, violet,
-            WykopTheme.favouriteGold, WykopTheme.nameBurgundy, violet,
+            PodkopTheme.hotOrange, PodkopTheme.nameBurgundy, PodkopTheme.genderPink,
+            PodkopTheme.nameBurgundy, PodkopTheme.hotOrange, violet,
+            PodkopTheme.favouriteGold, PodkopTheme.nameBurgundy, violet,
         ]
         return MeshGradient(width: 3, height: 3, points: points, colors: colors, smoothsColors: true)
             .overlay(Color.black.opacity(0.18))

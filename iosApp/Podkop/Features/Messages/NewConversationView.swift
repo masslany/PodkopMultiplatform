@@ -13,7 +13,7 @@ struct NewConversationView: View {
     }
 
     var body: some View {
-        WykopList {
+        PodkopList {
             Section {
                 TextField(String(localized: .commonUsername), text: $model.username)
                     .textInputAutocapitalization(.never)

@@ -14,7 +14,7 @@ struct DropdownLabel: View {
         }
         .foregroundStyle(.primary)
         .padding(.horizontal, 12).padding(.vertical, 8)
-        .background(WykopTheme.cardInset, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background(PodkopTheme.cardInset, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .contentShape(RoundedRectangle(cornerRadius: 10))
     }
 }

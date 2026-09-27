@@ -25,7 +25,7 @@ struct AvatarView: View {
 
     private var placeholder: some View {
         RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
-            .fill(WykopTheme.cardInset)
+            .fill(PodkopTheme.cardInset)
             .overlay(Image(systemName: "person").font(.system(size: size * 0.5, weight: .light))
                 .foregroundStyle(.secondary))
     }

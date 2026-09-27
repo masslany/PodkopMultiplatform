@@ -79,12 +79,12 @@ struct ProfileView: View {
                 }
                 .frame(height: 140)
                 .frame(maxWidth: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: WykopTheme.cardRadius, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: PodkopTheme.cardRadius, style: .continuous))
                 .padding(.bottom, 48)
                 .accessibilityHidden(true)
                 AvatarView(url: profile.avatarURL, name: profile.username, size: 92, gender: profile.gender)
                     .padding(3)
-                    .background(WykopTheme.background,
+                    .background(PodkopTheme.background,
                                 in: RoundedRectangle(cornerRadius: 92 * 0.22 + 3, style: .continuous))
                     .overlay(alignment: .topTrailing) {
                         if let rank = profile.rankPosition {
@@ -92,7 +92,7 @@ struct ProfileView: View {
                                 .font(.caption.weight(.bold).monospacedDigit())
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 7).padding(.vertical, 3)
-                                .background(WykopTheme.hotOrange, in: Capsule())
+                                .background(PodkopTheme.hotOrange, in: Capsule())
                                 .offset(x: 10, y: -6)
                                 .accessibilityLabel(String(localized: .profileRankPosition(rank)))
                         }
@@ -116,7 +116,7 @@ struct ProfileView: View {
                           systemImage: model.detailsExpanded ? "chevron.up" : "chevron.down")
                         .labelStyle(.iconOnly)
                         .frame(width: 32, height: 32)
-                        .background(WykopTheme.card, in: Circle())
+                        .background(PodkopTheme.card, in: Circle())
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
@@ -128,7 +128,7 @@ struct ProfileView: View {
     }
 
     private var bannerPlaceholder: some View {
-        LinearGradient(colors: [WykopTheme.cardInset, WykopTheme.separator],
+        LinearGradient(colors: [PodkopTheme.cardInset, PodkopTheme.separator],
                        startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
@@ -181,7 +181,7 @@ struct ProfileView: View {
                 }
             }
         }
-        .wykopCard(padding: 12)
+        .podkopCard(padding: 12)
     }
 
     @ViewBuilder private var noteSection: some View {
@@ -227,7 +227,7 @@ struct ProfileView: View {
                         }
                         .frame(minWidth: 72, alignment: .leading)
                         .padding(.horizontal, 12).padding(.vertical, 8)
-                        .background(WykopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .background(PodkopTheme.card, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
                             .strokeBorder(selected ? Color.primary : .clear, lineWidth: 2))
                     }
@@ -290,7 +290,7 @@ struct ProfileView: View {
                     if online { Circle().fill(.green).frame(width: 7, height: 7).accessibilityLabel(.profileOnline) }
                     Spacer()
                 }
-                .wykopCard(padding: 10)
+                .podkopCard(padding: 10)
             }
             .buttonStyle(.plain)
         case .tag(let name, let pinned):
@@ -300,7 +300,7 @@ struct ProfileView: View {
                     if pinned { Image(systemName: "pin.fill").accessibilityLabel(.profilePinned) }
                     Spacer()
                 }
-                .wykopCard(padding: 10)
+                .podkopCard(padding: 10)
             }
             .buttonStyle(.plain)
         }
