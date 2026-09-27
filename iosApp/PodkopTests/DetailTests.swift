@@ -98,9 +98,37 @@ final class DetailTests: XCTestCase {
         XCTAssertEqual(model.resource?.favourite, resource.favourite) // confirmed updates only
         mutator.finish?(.success(()))
         await settle()
-        XCTAssertTrue(updates.needsReload([resource], since: 0))
-        updates.reset(for: 1)
+        // Like Android, the confirmed state replaces the row; nothing is fetched again.
         XCTAssertFalse(updates.needsReload([resource], since: 0))
+        model.reconcileUpdates()
+        XCTAssertEqual(model.resource?.favourite, true)
+        XCTAssertEqual(loader.commentCalls, [1])
+        updates.reset(for: 1)
+        XCTAssertEqual(updates.reconcile(resource)?.favourite, resource.favourite)
+    }
+
+    func testVoteOnALoadedReplyUpdatesThatRowWithoutReloading() async throws {
+        let loader = DetailFixtureLoader()
+        let mutator = ControlledDetailMutator()
+        let updates = ResourceUpdates()
+        let model = DetailModel(kind: .link, id: 101, loader: loader, mutator: mutator, updates: updates)
+        model.start()
+        await settle()
+        model.loadReplies(for: 201)
+        await settle()
+        let reply = try XCTUnwrap(model.replies[201]?.rows.first)
+
+        model.submit(.voteUp(reply, remove: false))
+        await settle()
+        mutator.finish?(.success(()))
+        await settle()
+        model.reconcileUpdates()
+
+        XCTAssertEqual(model.replies[201]?.rows.first?.vote.state, "positive")
+        XCTAssertEqual(model.replies[201]?.rows.first?.vote.up, reply.vote.up + 1)
+        XCTAssertEqual(loader.commentCalls, [1], "a vote must not reload the comments")
+        XCTAssertEqual(loader.replyCalls, [1])
+        XCTAssertTrue(model.mutating.isEmpty)
     }
 
     func testResourceLinksUseRootAndNestedParent() {

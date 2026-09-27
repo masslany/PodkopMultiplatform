@@ -34,7 +34,6 @@ struct LinkVoteBadge: View {
                         .accessibilityHidden(true)
                 }
             }
-            .opacity(pending ? 0.5 : 1)
             .contentShape(RoundedRectangle(cornerRadius: 12))
             .onTapGesture { if enabled { action?() } }
             .accessibilityElement(children: .ignore)
@@ -77,8 +76,8 @@ struct ScoreVoteControl: View {
                     .accessibilityIdentifier("voteDown")
             }
         }
-        .opacity(pending ? 0.5 : 1)
-        .disabled(pending)
+        // Like Android, the row doesn't dim while the vote is sent; it changes once the server
+        // accepts it, and the model ignores repeat taps meanwhile.
     }
 
     private func voteButton(symbol: String, color: Color, active: Bool, label: LocalizedStringResource,

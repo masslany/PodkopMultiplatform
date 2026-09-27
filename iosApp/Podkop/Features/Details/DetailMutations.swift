@@ -10,6 +10,26 @@ enum DetailMutation {
     case relatedVote(linkID: Int, resource: Resource, remove: Bool, down: Bool)
     case delete(Resource)
 
+    /// The resource and its new state once the server accepts the mutation, so the screen can
+    /// update that one row like Android does instead of reloading; nil when only the server knows
+    /// the result (survey counts) or the resource goes away (delete).
+    var confirmedUpdate: (resource: Resource, change: (inout Resource) -> Void)? {
+        switch self {
+        case .voteUp(let value, let remove):
+            (value, { $0.vote = $0.vote.upvoted(remove: remove) })
+        case .voteDown(let value, let remove, _):
+            (value, { $0.vote = $0.vote.downvoted(remove: remove) })
+        case .favourite(let value, let enabled):
+            (value, { $0.favourite = enabled })
+        case .relatedVote(_, let value, let remove, let down):
+            (value, { $0.vote = down ? $0.vote.downvoted(remove: remove) : $0.vote.upvoted(remove: remove) })
+        case .survey, .delete:
+            nil
+        }
+    }
+
+    var traceKey: String { "\(identity.kind.rawValue):\(identity.id)" }
+
     var identity: ResourceIdentity {
         switch self {
         case .voteUp(let value, _), .voteDown(let value, _, _),

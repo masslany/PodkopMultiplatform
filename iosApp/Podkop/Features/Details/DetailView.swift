@@ -252,15 +252,18 @@ struct DetailView: View {
             openTag: { dependencies.router.navigate(.tag($0)) },
             openURL: { openURL($0) },
             voteUp: live && resource.vote.allowsUp ? {
+                VoteTrace.begin(VoteTrace.key(resource), "tap up, row state=\(resource.vote.state) up=\(resource.vote.up)")
                 model.submit(.voteUp(resource, remove: resource.vote.state == "positive"))
             } : nil,
             voteDown: live && canDown ? {
+                VoteTrace.begin(VoteTrace.key(resource), "tap down, row state=\(resource.vote.state) down=\(resource.vote.down)")
                 model.submit(.voteDown(resource, remove: resource.vote.state == "negative", reason: nil))
             } : nil,
             buryLink: live && canDown && resource.kind == .link ? { reason in
                 model.submit(.voteDown(resource, remove: false, reason: reason.rawValue))
             } : nil,
             favourite: live && resource.canFavourite ? {
+                VoteTrace.begin(VoteTrace.key(resource), "tap favourite, row favourite=\(resource.favourite)")
                 model.submit(.favourite(resource, enabled: !resource.favourite))
             } : nil,
             comment: live && canReply(resource) ? commentAction : nil,

@@ -292,6 +292,15 @@ struct ResourceCard: View {
     private var scoreControl: some View {
         ScoreVoteControl(vote: resource.vote, showsDown: resource.kind == .linkComment,
                          pending: actions.pending, up: actions.voteUp, down: actions.voteDown)
+            .onChange(of: resource.vote.state) { _, state in
+                VoteTrace.log(VoteTrace.key(resource), "row shows state=\(state) up=\(resource.vote.up)")
+            }
+            .onChange(of: actions.pending) { _, pending in
+                VoteTrace.log(VoteTrace.key(resource), "row pending=\(pending) (dims votes, disables star)")
+            }
+            .onChange(of: resource.favourite) { _, favourite in
+                VoteTrace.log(VoteTrace.key(resource), "row shows favourite=\(favourite)")
+            }
     }
 
     // MARK: Shared pieces
@@ -360,7 +369,7 @@ struct ResourceCard: View {
                 Image(systemName: resource.favourite ? "star.fill" : "star")
                     .foregroundStyle(resource.favourite ? PodkopTheme.favouriteGold : .secondary)
             }
-            .disabled(actions.favourite == nil || actions.pending)
+            .disabled(actions.favourite == nil)
             .opacity(actions.favourite == nil ? 0.4 : 1)
             .accessibilityLabel(resource.favourite ? .contentRemoveFavorite : .contentFavorite)
             Spacer(minLength: 0)
