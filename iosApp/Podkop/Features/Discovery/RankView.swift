@@ -26,12 +26,24 @@ struct RankView: View {
                 if model.pager.refreshError {
                     Label(.commonCouldNotRefresh, systemImage: "exclamationmark.triangle")
                 }
-                ForEach(model.pager.items) { user in
-                    Button { dependencies.router.navigate(.user(user.username), in: tab) } label: {
-                        RankRow(user: user)
+                Section {
+                    ForEach(model.pager.items) { user in
+                        Button { dependencies.router.navigate(.user(user.username), in: tab) } label: {
+                            RankRow(user: user)
+                        }
+                        .foregroundStyle(.primary)
+                        .onAppear { model.pager.loadNextIfNeeded(after: user) }
                     }
-                    .foregroundStyle(.primary)
-                    .onAppear { model.pager.loadNextIfNeeded(after: user) }
+                } header: {
+                    // Android's `RankTableHeader`, lined up with the rows' position column.
+                    HStack(spacing: 12) {
+                        Text(.discoveryRankHeaderPosition).frame(minWidth: 44)
+                        Text(.discoveryRankHeaderUser)
+                    }
+                    .font(.subheadline.weight(.medium))
+                    .padding(.leading, 6)
+                    .textCase(nil)
+                    .accessibilityHidden(true)
                 }
                 PagerFooter(pager: model.pager)
             }
