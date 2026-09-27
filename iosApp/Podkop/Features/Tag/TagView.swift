@@ -66,6 +66,8 @@ struct TagView: View {
             }
             HStack(alignment: .center, spacing: 8) {
                 Text(verbatim: "#\(model.tag)").font(.title2.bold())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if model.isLoggedIn, let details = model.details { actions(details) }
             }
@@ -101,10 +103,13 @@ struct TagView: View {
         }
         Button { model.toggle(.observe) } label: {
             if model.pending.contains(.observe) { ProgressView() }
-            else { Text(details.observed ? .commonObserving : .commonObserve) }
+            else {
+                Label(details.observed ? .commonObserving : .commonObserve, systemImage: "eye")
+                    .lineLimit(1)
+                    .fixedSize()
+            }
         }
-        .buttonStyle(.borderedProminent)
-        .tint(details.observed ? .secondary : ContentTokens.brand)
+        .modifier(ObserveButtonStyle(observed: details.observed))
         .disabled(model.pending.contains(.observe))
         .accessibilityIdentifier("tagObserve")
     }
@@ -149,6 +154,24 @@ struct TagView: View {
         case .all: String(localized: .commonEverything)
         case .link: String(localized: .commonLinks)
         case .entry: String(localized: .commonEntries)
+        }
+    }
+}
+
+/// Observe is the one filled button (Android's filled `Button`); once observing it turns neutral
+/// like the buttons beside it. The fill is the text color (white in dark mode), so the label
+/// takes the page color, like Android's primary/onPrimary pair.
+private struct ObserveButtonStyle: ViewModifier {
+    let observed: Bool
+
+    func body(content: Content) -> some View {
+        if observed {
+            content.buttonStyle(.bordered)
+        } else {
+            content
+                .buttonStyle(.borderedProminent)
+                .tint(ContentTokens.brand)
+                .foregroundStyle(PodkopTheme.background)
         }
     }
 }
