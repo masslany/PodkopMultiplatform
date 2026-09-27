@@ -4811,6 +4811,23 @@
         }
       }
     },
+    "platform.screenshotPreviewActionCopy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy image"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiuj obraz"
+          }
+        }
+      }
+    },
     "platform.share" : {
       "extractionState" : "manual",
       "localizations" : {

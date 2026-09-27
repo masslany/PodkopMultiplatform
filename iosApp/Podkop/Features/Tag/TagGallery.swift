@@ -108,6 +108,7 @@ private struct TagGalleryTile: View {
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isImage)
             .accessibilityAction(named: Text(.contentOpensImage), showImage)
+            .accessibilityIdentifier("galleryItem-\(item.sourceID)")
     }
 
     private func badge(_ text: String) -> some View {

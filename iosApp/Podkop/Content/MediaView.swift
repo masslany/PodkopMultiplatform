@@ -26,6 +26,7 @@ struct MediaView: View {
                     .background(PodkopTheme.cardInset, in: RoundedRectangle(cornerRadius: PodkopTheme.smallRadius, style: .continuous))
                     .contentShape(Rectangle())
                     .onTapGesture { viewerBytes = bytes }
+                    .imageActions(url: photo.url)
                     .accessibilityAddTraits(.isButton)
                     .accessibilityHint(.contentOpensImage)
                     .accessibilityIdentifier("mediaImage")

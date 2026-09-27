@@ -280,6 +280,12 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["resource-entry:102"].waitForExistence(timeout: 5))
         app.buttons["tagGallery"].tap()
         XCTAssertFalse(app.descendants(matching: .any)["resource-entry:102"].exists)
+        // Like Android, long-pressing an image offers copying and saving it.
+        let photo = app.descendants(matching: .any)["galleryItem-107"]
+        XCTAssertTrue(photo.waitForExistence(timeout: 5))
+        photo.press(forDuration: 1.2)
+        XCTAssertTrue(app.buttons["Copy image"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Save"].exists)
     }
 
     func testFixtureProfileFromRankShowsDetailsAndSections() {

@@ -12,7 +12,7 @@ final class FixtureTagLoader: TagLoading {
     func details(_ tag: String) async throws -> TagDetails { state }
     func stream(_ tag: String, sort: String, type: String, request: FeedRequest, loaded: Int) async throws
         -> ListPage<Resource> {
-        ListPage(items: type == "link" ? [ContentFixtures.link] : [ContentFixtures.link, ContentFixtures.entry],
+        ListPage(items: type == "link" ? [ContentFixtures.link] : [ContentFixtures.link, ContentFixtures.entry, ContentFixtures.photoEntry],
                  next: nil, total: nil)
     }
     func setObserved(_ tag: String, _ enabled: Bool) async throws { state.observed = enabled }

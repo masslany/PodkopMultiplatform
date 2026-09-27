@@ -48,5 +48,11 @@ enum ContentFixtures {
         return value
     }()
 
+    /// Only the tag gallery uses it, so the other fixture screens keep their layout.
+    static let photoEntry = Resource(
+        sourceID: 107, kind: .entry, body: "Wpis ze zdjęciem.", author: author,
+        photo: Photo(url: "https://example.com/photo.png", width: 64, height: 40,
+                     mimeType: "image/png", key: "photo"))
+
     static let all = [link, entry, entryComment, linkComment, embed, blacklisted]
 }
