@@ -161,8 +161,25 @@ struct LinkSubmissionView: View {
             TextField(String(localized: .composerTitle), text: $model.title)
             TextField(String(localized: .composerDescription), text: $model.description, axis: .vertical)
                 .lineLimit(3...6)
-            TextField(String(localized: .composerTagsSeparatedCommas), text: $model.tagsText)
-                .textInputAutocapitalization(.never)
+            VStack(alignment: .leading, spacing: 8) {
+                if !model.tags.isEmpty {
+                    FlowLayout(spacing: 6) {
+                        ForEach(model.tags, id: \.self) { tag in
+                            TagChip(tag: tag) { model.removeTag(tag) }
+                        }
+                    }
+                }
+                TextField(String(localized: .composerAddLinkTagHint), text: $model.tagInput)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .submitLabel(.done)
+                    .onSubmit { model.submitPendingTag() }
+                    .accessibilityLabel(.commonTags)
+                    .accessibilityIdentifier("linkTagInput")
+                Text(.composerAddLinkTagHelper)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
             ForEach(model.tagSuggestions, id: \.self) { tag in
                 Button("#" + tag) { model.selectTag(tag) }
             }
@@ -207,5 +224,28 @@ struct LinkSubmissionView: View {
             Button(.composerSaveDraft) { model.saveAndBack() }
                 .disabled(model.busy || model.mediaUploading || model.imageSaving)
         }
+    }
+}
+
+/// A committed tag with its remove button (Android's `AddLinkTagChip`).
+private struct TagChip: View {
+    let tag: String
+    let remove: () -> Void
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text(verbatim: "#\(tag)").font(.subheadline)
+            Button(action: remove) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(.composerAddLinkTagRemove(tag)))
+        }
+        .padding(.leading, 12)
+        .padding(.trailing, 8)
+        .padding(.vertical, 6)
+        .background(PodkopTheme.cardInset, in: Capsule())
     }
 }

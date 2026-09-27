@@ -9,7 +9,21 @@ final class LinkSubmissionModel {
     var url = ""
     var title = ""
     var description = ""
-    var tagsText = "" { didSet { requestTagSuggestions() } }
+    /// Committed tags, shown as removable chips (Android's `tags`).
+    private(set) var tags: [String] = []
+    /// What is being typed; a comma, space or Return turns it into chips, like Android.
+    var tagInput = "" {
+        didSet {
+            guard tagInput != oldValue else { return }
+            let trailing = String(tagInput.reversed().prefix(while: { !Self.isTagSeparator($0) }).reversed())
+            if trailing != tagInput {
+                tags = Self.merge(tags, Self.normalize(String(tagInput.dropLast(trailing.count))))
+                tagInput = trailing
+                return
+            }
+            requestTagSuggestions()
+        }
+    }
     private(set) var tagSuggestions: [String] = []
     var adult = false
     private(set) var photoKey: String?
@@ -122,7 +136,8 @@ final class LinkSubmissionModel {
                 url = draft.url
                 title = draft.title
                 description = draft.description
-                tagsText = draft.tags.joined(separator: ", ")
+                tags = Self.normalize(draft.tags.joined(separator: " "))
+                tagInput = ""
                 adult = draft.adult
                 photoKey = draft.photoKey
                 photoURL = draft.photoURL
@@ -138,26 +153,44 @@ final class LinkSubmissionModel {
         }
     }
 
-    var normalizedTags: [String] {
-        var seen = Set<String>()
-        return tagsText.split(whereSeparator: { $0 == "," || $0.isWhitespace })
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines)
+    /// The chips plus anything still typed, as Android publishes them.
+    var normalizedTags: [String] { Self.merge(tags, Self.normalize(tagInput)) }
+
+    /// Return in the tag field (Android's `onPendingTagSubmitted`).
+    func submitPendingTag() {
+        let additions = Self.normalize(tagInput)
+        guard !additions.isEmpty else { return }
+        tags = Self.merge(tags, additions)
+        tagInput = ""
+        tagSuggestions = []
+    }
+
+    func removeTag(_ tag: String) {
+        tags.removeAll { $0 == tag }
+    }
+
+    private static func isTagSeparator(_ character: Character) -> Bool {
+        character == "," || character.isWhitespace
+    }
+
+    /// Android's `normalizeLinkTags`: split on separators, drop "#", lowercase, no blanks or repeats.
+    static func normalize(_ raw: String) -> [String] {
+        merge([], raw.split(whereSeparator: isTagSeparator)
+            .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines)
                 .replacingOccurrences(of: "^#", with: "", options: .regularExpression)
                 .lowercased() }
-            .filter { !$0.isEmpty && seen.insert($0).inserted }
+            .filter { !$0.isEmpty })
+    }
+
+    private static func merge(_ existing: [String], _ additions: [String]) -> [String] {
+        var seen = Set(existing)
+        return existing + additions.filter { seen.insert($0).inserted }
     }
 
     private func requestTagSuggestions() {
         suggestionGeneration += 1
         suggestionTask?.cancel()
-        if tagsText.last.map({ $0 == "," || $0.isWhitespace }) == true {
-            tagSuggestions = []
-            return
-        }
-        let query = String(tagsText.split(whereSeparator: { $0 == "," || $0.isWhitespace })
-            .last ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-            .replacingOccurrences(of: "^#", with: "", options: .regularExpression)
-            .lowercased()
+        let query = Self.normalize(tagInput).last ?? ""
         guard query.count >= 2 else { tagSuggestions = []; return }
         let request = suggestionGeneration
         suggestionTask = Task { [weak self] in
@@ -167,7 +200,7 @@ final class LinkSubmissionModel {
             do {
                 let values = try await service.suggest(query)
                 guard request == suggestionGeneration, !Task.isCancelled else { return }
-                let existing = Set(normalizedTags.dropLast())
+                let existing = Set(tags)
                 tagSuggestions = Array(Set(values.map { $0.lowercased() }))
                     .filter { !existing.contains($0) }.sorted()
             } catch {
@@ -177,9 +210,8 @@ final class LinkSubmissionModel {
     }
 
     func selectTag(_ value: String) {
-        let previous = tagsText.split(whereSeparator: { $0 == "," || $0.isWhitespace })
-            .dropLast().map(String.init)
-        tagsText = (previous + [value]).joined(separator: ", ") + ", "
+        tags = Self.merge(tags, Self.normalize(value))
+        tagInput = ""
         tagSuggestions = []
     }
 

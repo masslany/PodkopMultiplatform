@@ -1616,6 +1616,57 @@
         }
       }
     },
+    "composer.addLinkTagHelper" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Separate tags with a comma, space or Return."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oddziel tagi przecinkiem, spacją lub Enterem."
+          }
+        }
+      }
+    },
+    "composer.addLinkTagHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add tags…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodaj tagi…"
+          }
+        }
+      }
+    },
+    "composer.addLinkTagRemove" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove tag %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń tag %@"
+          }
+        }
+      }
+    },
     "composer.attach" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2326,23 +2377,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sugerowany obraz"
-          }
-        }
-      }
-    },
-    "composer.tagsSeparatedCommas" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tags, separated by commas"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tagi oddzielone przecinkami"
           }
         }
       }

@@ -183,8 +183,15 @@ final class ComposerTests: XCTestCase {
         model.continueDespiteSimilar()
         await settle()
         XCTAssertEqual(model.stage, .draft)
-        model.tagsText = "#Science,  Nauka science"
+        model.tagInput = "#Science,  Nauka science"
+        XCTAssertEqual(model.tags, ["science", "nauka"], "separators turn typed text into chips")
+        XCTAssertEqual(model.tagInput, "science", "the unfinished word stays in the field")
         XCTAssertEqual(model.normalizedTags, ["science", "nauka"])
+        model.tagInput = "polityka"
+        model.submitPendingTag()
+        XCTAssertEqual(model.tags, ["science", "nauka", "polityka"])
+        model.removeTag("nauka")
+        XCTAssertEqual(model.normalizedTags, ["science", "polityka"])
         XCTAssertTrue(model.canPublish)
         model.publish()
         await settle()
