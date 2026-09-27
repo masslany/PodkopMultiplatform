@@ -28,8 +28,6 @@ enum DetailMutation {
         }
     }
 
-    var traceKey: String { "\(identity.kind.rawValue):\(identity.id)" }
-
     var identity: ResourceIdentity {
         switch self {
         case .voteUp(let value, _), .voteDown(let value, _, _),

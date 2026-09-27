@@ -54,7 +54,6 @@ final class DetailModel {
     }
 
     func reload() {
-        VoteTrace.log(nil, "reload: link and comments requested again, \(replies.count) reply threads cleared")
         generation += 1
         active?.cancel()
         commentsTask?.cancel()
@@ -74,7 +73,6 @@ final class DetailModel {
                 let value = try await loader.resource(kind: kind, id: id)
                 guard token == generation, !Task.isCancelled else { return }
                 resource = updates.reconcile(value)
-                VoteTrace.log(nil, "reload: link arrived")
                 phase = .loaded
             } catch is CancellationError {
                 return
@@ -118,7 +116,6 @@ final class DetailModel {
                 let page = try await loader.comments(kind: kind, id: id, page: 1, sort: sort)
                 guard token == generation, sort == commentSort, !Task.isCancelled else { return }
                 comments = unique(page.items.compactMap(updates.reconcile))
-                VoteTrace.log(nil, "reload: \(comments.count) comments arrived")
                 commentsExhausted = page.items.isEmpty || page.total.map { comments.count >= $0 } == true
             } catch is CancellationError {
                 return
@@ -222,20 +219,14 @@ final class DetailModel {
 
     func submit(_ mutation: DetailMutation) {
         let identity = mutation.identity
-        let trace = mutation.traceKey
-        guard !mutating.contains(identity) else {
-            VoteTrace.log(trace, "dropped: this resource already has a request in flight")
-            return
-        }
+        guard !mutating.contains(identity) else { return }
         actionFailed = false
         mutating.insert(identity)
-        VoteTrace.log(trace, "submit: pending on, server call starts")
         let currentSession = updates.sessionRevision
         mutationTasks[identity] = Task { [weak self] in
             guard let self else { return }
             do {
                 try await mutator.apply(mutation)
-                VoteTrace.log(trace, "server call succeeded")
                 guard !Task.isCancelled, currentSession == updates.sessionRevision else { return }
                 if case .delete = mutation {
                     updates.publish(.deleted, for: identity)
@@ -247,18 +238,14 @@ final class DetailModel {
                 } else {
                     updates.publish(.invalidated, for: identity)
                 }
-                VoteTrace.log(trace, "published the confirmed state")
             } catch is CancellationError {
-                VoteTrace.log(trace, "cancelled")
                 return
             } catch {
-                VoteTrace.log(trace, "server call failed: \(error)")
                 guard currentSession == updates.sessionRevision else { return }
                 actionFailed = true
             }
             mutating.remove(identity)
             mutationTasks[identity] = nil
-            VoteTrace.log(trace, "pending off")
         }
     }
 
@@ -279,7 +266,6 @@ final class DetailModel {
         let affected = ([resource].compactMap { $0 } + comments + replyRows).flatMap { [$0] + $0.inlineComments }
             + related
         let refresh = updates.needsReload(affected, since: appliedUpdateRevision)
-        VoteTrace.log(nil, "reconcile updates, full reload=\(refresh)")
         appliedUpdateRevision = updates.revision
         resource = resource.flatMap(updates.reconcile)
         comments = comments.compactMap(updates.reconcile)
