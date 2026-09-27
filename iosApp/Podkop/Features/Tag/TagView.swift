@@ -115,14 +115,8 @@ struct TagView: View {
     }
 
     private var controls: some View {
+        // Like Android: what to show (all, entries, links) first, then the sort.
         AdaptiveControlRow {
-            Menu {
-                Button(.commonAll) { model.select(sort: .all) }
-                Button(.commonBest) { model.select(sort: .best) }
-            } label: {
-                DropdownLabel(title: model.sort == .all ? String(localized: .commonAll) : String(localized: .commonBest))
-            }
-            .accessibilityIdentifier("tagSort")
             Menu {
                 ForEach(TagModel.Kind.allCases, id: \.self) { kind in
                     Button(title(for: kind)) { model.select(kind: kind) }
@@ -131,6 +125,13 @@ struct TagView: View {
                 DropdownLabel(title: title(for: model.kind))
             }
             .accessibilityIdentifier("tagType")
+            Menu {
+                Button(.commonAll) { model.select(sort: .all) }
+                Button(.commonBest) { model.select(sort: .best) }
+            } label: {
+                DropdownLabel(title: model.sort == .all ? String(localized: .commonAll) : String(localized: .commonBest))
+            }
+            .accessibilityIdentifier("tagSort")
         }
     }
 
@@ -152,8 +153,8 @@ struct TagView: View {
     private func title(for kind: TagModel.Kind) -> String {
         switch kind {
         case .all: String(localized: .commonEverything)
-        case .link: String(localized: .commonLinks)
-        case .entry: String(localized: .commonEntries)
+        case .link: String(localized: .commonDropdownMenuLabelLinks)
+        case .entry: String(localized: .commonDropdownMenuLabelEntries)
         }
     }
 }

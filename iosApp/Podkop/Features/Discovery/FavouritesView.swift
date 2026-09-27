@@ -60,8 +60,8 @@ struct FavouritesView: View {
     private func title(for kind: FavouritesModel.Kind) -> String {
         switch kind {
         case .all: String(localized: .commonEverything)
-        case .link: String(localized: .commonLinks)
-        case .entry: String(localized: .commonEntries)
+        case .link: String(localized: .commonDropdownMenuLabelLinks)
+        case .entry: String(localized: .commonDropdownMenuLabelEntries)
         case .linkComment: String(localized: .discoveryLinkComments)
         case .entryComment: String(localized: .discoveryEntryComments)
         }

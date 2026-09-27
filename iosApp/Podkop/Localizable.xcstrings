@@ -766,6 +766,40 @@
         }
       }
     },
+    "common.dropdownMenuLabelEntries" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entries"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wpisy"
+          }
+        }
+      }
+    },
+    "common.dropdownMenuLabelLinks" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Links"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Znaleziska"
+          }
+        }
+      }
+    },
     "common.dug" : {
       "extractionState" : "manual",
       "localizations" : {
