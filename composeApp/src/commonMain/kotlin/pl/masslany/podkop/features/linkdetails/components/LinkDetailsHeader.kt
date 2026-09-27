@@ -41,6 +41,7 @@ import pl.masslany.podkop.common.components.Dot
 import pl.masslany.podkop.common.components.Source
 import pl.masslany.podkop.common.components.Tag
 import pl.masslany.podkop.common.components.Title
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.common.models.vote.VoteReasonType
 import pl.masslany.podkop.common.models.vote.toStringResource
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -83,7 +84,7 @@ fun LinkDetailsHeader(
         ) {
             if (state.imageUrl.isNotEmpty()) {
                 AsyncImage(
-                    modifier = Modifier
+                    modifier = Modifier.imageActions(state.imageUrl)
                         .fillMaxWidth()
                         .height(200.dp),
                     model = Builder(LocalPlatformContext.current)

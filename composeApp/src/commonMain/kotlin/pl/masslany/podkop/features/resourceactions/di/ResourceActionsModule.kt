@@ -5,6 +5,7 @@ import org.koin.dsl.module
 import pl.masslany.podkop.features.resourceactions.ResourceActionUpdatesStore
 import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetViewModel
 import pl.masslany.podkop.features.resourceactions.ResourceActionsParams
+import pl.masslany.podkop.features.resourceactions.ResourceReportDialogViewModel
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotPreviewDialogViewModel
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
 import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogParams
@@ -32,6 +33,14 @@ val resourceActionsModule = module {
             content = dialogParams.content,
             previewDraftId = dialogParams.previewDraftId,
             draftStore = get(),
+            appNavigator = get(),
+            snackbarManager = get(),
+        )
+    }
+
+    viewModel { params ->
+        ResourceReportDialogViewModel(
+            contentUrl = params.get<String>(),
             appNavigator = get(),
             snackbarManager = get(),
         )

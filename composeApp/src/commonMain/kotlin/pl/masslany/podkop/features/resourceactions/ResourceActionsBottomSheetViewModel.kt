@@ -31,6 +31,7 @@ import podkop.composeapp.generated.resources.ic_copy
 import podkop.composeapp.generated.resources.ic_copy_all
 import podkop.composeapp.generated.resources.ic_delete
 import podkop.composeapp.generated.resources.ic_edit
+import podkop.composeapp.generated.resources.ic_flag
 import podkop.composeapp.generated.resources.ic_link
 import podkop.composeapp.generated.resources.ic_share
 import podkop.composeapp.generated.resources.resource_actions_copy_as_link
@@ -39,6 +40,7 @@ import podkop.composeapp.generated.resources.resource_actions_delete_entry
 import podkop.composeapp.generated.resources.resource_actions_delete_entry_comment
 import podkop.composeapp.generated.resources.resource_actions_edit_comment
 import podkop.composeapp.generated.resources.resource_actions_edit_entry
+import podkop.composeapp.generated.resources.resource_actions_report
 import podkop.composeapp.generated.resources.resource_actions_select_text
 import podkop.composeapp.generated.resources.resource_actions_share_as_screenshot
 import podkop.composeapp.generated.resources.resource_actions_show_link_downvoters
@@ -99,6 +101,11 @@ class ResourceActionsBottomSheetViewModel(
                     ),
                 )
                 appNavigator.back()
+            }
+
+            ResourceActionId.Report -> {
+                appNavigator.back()
+                appNavigator.navigateTo(ResourceReportDialogScreen(contentUrl = buildResourceLink(params)))
             }
 
             ResourceActionId.ShareAsScreenshot -> {
@@ -369,6 +376,11 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
             ),
         ),
     )
+    val reportAction = ResourceActionItemState(
+        id = ResourceActionId.Report,
+        title = Res.string.resource_actions_report,
+        icon = Res.drawable.ic_flag,
+    )
     val copyTextAction = params.copyContent
         ?.takeIf { it.isNotBlank() }
         ?.let { copyContent ->
@@ -458,6 +470,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
             ResourceActionsType.Link -> listOfNotNull(
                 showLinkUpvotersAction,
                 showLinkDownvotersAction,
+                reportAction,
                 copyLinkAction,
             ).toPersistentList()
 
@@ -465,6 +478,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
             -> listOfNotNull(
                 showVotersAction,
                 screenshotAction,
+                reportAction,
                 copyLinkAction,
                 copyTextAction,
                 selectTextAction,
@@ -476,6 +490,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
             -> listOfNotNull(
                 showVotersAction,
                 screenshotAction,
+                reportAction,
                 copyLinkAction,
                 copyTextAction,
                 selectTextAction,
@@ -486,6 +501,7 @@ internal fun buildState(params: ResourceActionsParams): ResourceActionsBottomShe
             ResourceActionsType.LinkComment,
             -> listOfNotNull(
                 screenshotAction,
+                reportAction,
                 copyLinkAction,
                 copyTextAction,
                 selectTextAction,

@@ -32,6 +32,7 @@ import org.jetbrains.compose.resources.painterResource
 import pl.masslany.podkop.common.components.AdultRating
 import pl.masslany.podkop.common.components.Count
 import pl.masslany.podkop.common.components.Title
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.links.hits.models.HitItemState
 import pl.masslany.podkop.features.links.hits.preview.HitItemStateProvider
@@ -65,7 +66,7 @@ fun HitItem(
             )
         } else {
             AsyncImage(
-                modifier = Modifier
+                modifier = Modifier.imageActions(state.imageUrl)
                     .fillMaxSize(),
                 model = ImageRequest.Builder(LocalPlatformContext.current)
                     .data(state.imageUrl)

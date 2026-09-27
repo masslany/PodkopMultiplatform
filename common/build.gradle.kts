@@ -38,7 +38,6 @@ kotlin {
         commonMain.dependencies {
             api(libs.koin.core)
             api(libs.ktor.client.core)
-            api(libs.ktor.client.logging)
             api(libs.ktor.client.auth)
             api(libs.ktor.client.content.negotiation)
             api(libs.ktor.serialization.kotlinx.json)

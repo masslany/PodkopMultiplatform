@@ -62,7 +62,7 @@ fun AvatarImageTypeRouter(avatarType: AvatarType) {
                     .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
             ) {
                 AsyncImage(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.imageActions(avatarType.url).fillMaxSize(),
                     model = ImageRequest.Builder(LocalPlatformContext.current)
                         .data(avatarType.url)
                         .build(),

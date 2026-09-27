@@ -1,37 +1,16 @@
 package pl.masslany.podkop.features.notifications
 
-import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
 import pl.masslany.podkop.business.notifications.domain.models.NotificationItem
+import pl.masslany.podkop.business.notifications.domain.models.NotificationTarget
+import pl.masslany.podkop.business.notifications.domain.models.target
 import pl.masslany.podkop.features.notifications.models.NotificationNavigationTarget
 
-internal fun NotificationItem.navigationTarget(): NotificationNavigationTarget {
-    if (group == NotificationGroup.PrivateMessages) {
-        return NotificationNavigationTarget.Conversation(
-            username = actor?.username.orEmpty().ifBlank { id },
-        )
-    }
-
-    val notificationLinkId = linkId
-    if (notificationLinkId != null) {
-        return NotificationNavigationTarget.Link(notificationLinkId)
-    }
-
-    val notificationEntryId = entryId
-    if (notificationEntryId != null) {
-        return NotificationNavigationTarget.Entry(notificationEntryId)
-    }
-
-    if (!profileUsername.isNullOrBlank()) {
-        return NotificationNavigationTarget.Profile(profileUsername.orEmpty())
-    }
-
-    if (!tagName.isNullOrBlank()) {
-        return NotificationNavigationTarget.Tag(tagName.orEmpty())
-    }
-
-    if (!url.isNullOrBlank()) {
-        return NotificationNavigationTarget.External(url.orEmpty())
-    }
-
-    return NotificationNavigationTarget.None
+internal fun NotificationItem.navigationTarget(): NotificationNavigationTarget = when (val value = target()) {
+    is NotificationTarget.Conversation -> NotificationNavigationTarget.Conversation(value.username)
+    is NotificationTarget.Link -> NotificationNavigationTarget.Link(value.id)
+    is NotificationTarget.Entry -> NotificationNavigationTarget.Entry(value.id)
+    is NotificationTarget.Profile -> NotificationNavigationTarget.Profile(value.username)
+    is NotificationTarget.Tag -> NotificationNavigationTarget.Tag(value.name)
+    is NotificationTarget.External -> NotificationNavigationTarget.External(value.url)
+    NotificationTarget.None -> NotificationNavigationTarget.None
 }

@@ -12,6 +12,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.search.domain.main.SearchRepository
 import pl.masslany.podkop.business.search.domain.models.request.SearchSort
 import pl.masslany.podkop.business.search.domain.models.request.SearchStreamQuery
+import pl.masslany.podkop.business.search.domain.models.request.withSearchFallbackPagination
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState

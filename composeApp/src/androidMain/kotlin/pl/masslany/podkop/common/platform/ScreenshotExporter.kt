@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 private const val PNG_COMPRESS_QUALITY = 100
 private const val SCREENSHOT_FILE_PROVIDER_AUTHORITY_SUFFIX = ".fileprovider"
@@ -27,17 +29,17 @@ actual class ScreenshotExporter(private val application: Application) {
     actual suspend fun copyToClipboard(
         image: ImageBitmap,
         fileName: String,
-    ): Boolean = runCatching {
-        val uri = writeToCacheAndGetUri(image = image, fileName = fileName)
-        val clipboard = application.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(
-            ClipData.newUri(
-                application.contentResolver,
-                fileName,
-                uri,
-            ),
-        )
-    }.isSuccess
+    ): Boolean {
+        val uri = withContext(Dispatchers.IO) {
+            runCatching { writeToCacheAndGetUri(image = image, fileName = fileName) }.getOrNull()
+        } ?: return false
+        return withContext(Dispatchers.Main) {
+            runCatching {
+                val clipboard = application.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboard.setPrimaryClip(ClipData.newUri(application.contentResolver, fileName, uri))
+            }.isSuccess
+        }
+    }
 
     actual suspend fun shareImage(
         image: ImageBitmap,

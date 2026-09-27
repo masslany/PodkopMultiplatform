@@ -78,7 +78,7 @@ internal class TokenRefreshCoordinator(
             true
         }
             .onFailure {
-                logger.warn("Failed to refresh API token with refresh token", it)
+                logger.warn("Failed to refresh API token with refresh token")
             }
             .getOrDefault(false)
     }
@@ -106,7 +106,7 @@ internal class TokenRefreshCoordinator(
             true
         }
             .onFailure {
-                logger.warn("Failed to refresh API token with API credentials", it)
+                logger.warn("Failed to refresh API token with API credentials")
             }
             .getOrDefault(false)
     }

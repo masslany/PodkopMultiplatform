@@ -23,6 +23,7 @@ enum class ResourceActionId {
     CopyText,
     SelectText,
     CopyAsLink,
+    Report,
     ShareAsScreenshot,
     ShowVoters,
     ShowLinkUpvoters,

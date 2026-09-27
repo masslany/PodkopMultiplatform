@@ -2,19 +2,22 @@
 
 Podkop is a Kotlin Multiplatform (KMP) client for Wykop.pl, built with modern Android development practices and Compose Multiplatform.
 
+The iOS app is written in SwiftUI on top of the shared Kotlin modules; Android uses Compose.
+
 ## Project Structure
 
 The project is divided into several modules to ensure a clean separation of concerns and maximize code sharing:
 
 - **`:business`**: The core logic of the application. It contains the domain models, repositories, and data sources (networking with Ktor, serialization). This is a pure Kotlin Multiplatform module.
-- **`:composeApp`**: Shared UI module using Compose Multiplatform. It contains the ViewModels, screens, and navigation logic that are shared between Android and iOS.
+- **`:composeApp`**: The Android UI module using Compose. It contains the ViewModels, screens, and navigation logic.
 - **`:common`**: Shared utilities, design system components, and base classes used by other modules.
 - **`:androidApp`**: The Android-specific entry point and configuration.
-- **`:iosApp`**: The iOS-specific entry point (SwiftUI wrapper).
+- **`:iosShared`**: The Kotlin facade the iOS app calls; it exports the `PodkopShared` framework.
+- **`iosApp/`**: The SwiftUI iOS app (`Podkop` target) with its unit (`PodkopTests`) and UI (`PodkopUITests`) tests. Swift files are grouped by feature under `iosApp/Podkop`; Xcode picks up new files in those folders automatically.
 
 ## Tech Stack
 
-- **UI**: [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)
+- **UI**: [Jetpack Compose](https://developer.android.com/compose) on Android, SwiftUI on iOS
 - **Dependency Injection**: [Koin](https://insert-koin.io/)
 - **Networking**: [Ktor](https://ktor.io/)
 - **Navigation**: [Jetpack Navigation 3](https://developer.android.com/jetpack/compose/navigation)
@@ -71,6 +74,22 @@ Or simply use the `androidApp` run configuration in Android Studio.
 If Firebase config files are missing, the Android build will fail during Google Services processing.
 
 ### iOS
-1. Open the `iosApp/iosApp.xcodeproj` in Xcode.
-2. Select your target device/simulator and click Run.
-Note: You can also run the iOS app directly from Android Studio if you have the [Kotlin Multiplatform plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile) installed.
+1. Open `iosApp/iosApp.xcodeproj` in Xcode.
+2. Select the `Podkop` scheme and your device or simulator, then click Run. The build compiles the shared Kotlin framework first.
+
+
+Unit tests that verify session persistence need a signed simulator host for Keychain access.
+Run all unit tests (without UI tests) with a local signature and execution deadlines:
+
+```sh
+xcodebuild -project iosApp/iosApp.xcodeproj -scheme Podkop \
+  -destination 'platform=iOS Simulator,name=iPhone 16e' \
+  -only-testing:PodkopTests -parallel-testing-enabled NO \
+  -test-timeouts-enabled YES -default-test-execution-time-allowance 30 \
+  -maximum-test-execution-time-allowance 30 \
+  CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test
+```
+
+`SessionPersistenceTests` also has a five-second callback deadline and owns its shared
+client and adapter. It must not use `AppDependencies.shared`: other bridge tests close
+the singleton client, leaving the host app's cached client reference closed.

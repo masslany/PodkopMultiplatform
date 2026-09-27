@@ -48,7 +48,7 @@ internal class StartupManagerImpl(
                     state.emit(AppState.Ready)
                 },
                 onFailure = {
-                    logger.error("Failed to get auth token", it)
+                    logger.error("Failed to get auth token")
                     state.emit(AppState.Error)
                 }
             )

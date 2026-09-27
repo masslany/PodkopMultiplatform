@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import pl.masslany.podkop.business.blacklists.domain.main.BlacklistsRepository
+import pl.masslany.podkop.business.blacklists.domain.models.BlacklistNormalization
 import pl.masslany.podkop.business.common.domain.models.common.PaginatedData
 import pl.masslany.podkop.business.common.domain.models.common.Pagination
 import pl.masslany.podkop.business.profile.domain.main.ProfileRepository
@@ -489,9 +490,9 @@ class BlacklistsViewModel(
             }
 
         private fun normalizeInput(value: String): String = when (type) {
-            BlacklistCategoryType.Users -> value.trim().removePrefix("@")
+            BlacklistCategoryType.Users -> BlacklistNormalization.user(value)
             BlacklistCategoryType.Tags -> normalizeTag(value)
-            BlacklistCategoryType.Domains -> value.trim().lowercase()
+            BlacklistCategoryType.Domains -> BlacklistNormalization.domain(value)
         }
 
         private suspend fun loadPage(page: Int): Result<PaginatedData<BlacklistEntryState>> =
@@ -537,7 +538,4 @@ class BlacklistsViewModel(
 private val BlacklistCategoryType.supportsSuggestions: Boolean
     get() = this == BlacklistCategoryType.Users || this == BlacklistCategoryType.Tags
 
-private fun normalizeTag(value: String): String = value
-    .trim()
-    .removePrefix("#")
-    .lowercase()
+private fun normalizeTag(value: String): String = BlacklistNormalization.tag(value)

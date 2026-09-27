@@ -33,6 +33,7 @@ import coil3.request.crossfade
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import pl.masslany.podkop.common.components.embed.MediumMinWidth
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.common.models.embed.TwitterEmbedPreviewState
 import pl.masslany.podkop.common.models.embed.TwitterEmbedState
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -66,7 +67,7 @@ fun TwitterTweetCard(
             ) {
                 tweet.avatarUrl?.takeIf { it.isNotBlank() }?.let { avatarUrl ->
                     AsyncImage(
-                        modifier = Modifier
+                        modifier = Modifier.imageActions(avatarUrl)
                             .size(36.dp)
                             .clip(CircleShape),
                         model = ImageRequest.Builder(LocalPlatformContext.current)
@@ -110,7 +111,7 @@ fun TwitterTweetCard(
             tweet.mediaThumbnailUrl?.takeIf { it.isNotBlank() }?.let { mediaThumbnailUrl ->
                 val mediaAspectRatio = tweet.mediaAspectRatio
                 AsyncImage(
-                    modifier = Modifier
+                    modifier = Modifier.imageActions(mediaThumbnailUrl)
                         .fillMaxWidth()
                         .then(
                             if (mediaAspectRatio != null) {

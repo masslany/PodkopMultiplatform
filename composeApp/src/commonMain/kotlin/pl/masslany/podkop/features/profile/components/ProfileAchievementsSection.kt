@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.features.profile.models.ProfileAchievementItemState
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.profile_achievements_empty
@@ -127,7 +128,7 @@ private fun ProfileAchievementBadge(
         ) {
             if (item.iconUrl.isNotBlank()) {
                 AsyncImage(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.imageActions(item.iconUrl).fillMaxSize(),
                     model = item.iconUrl,
                     contentDescription = item.label,
                     contentScale = ContentScale.Fit,

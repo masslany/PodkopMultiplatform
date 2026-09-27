@@ -452,6 +452,11 @@
     <string name="snackbar_entry_comment_deleted">Usunięto komentarz</string>
 
     <!-- Resource actions -->
+    <string name="resource_actions_report">Zgłoś na Wykopie</string>
+    <string name="resource_report_dialog_instructions">Otwórz tę treść na Wykopie, wybierz „Zgłoś” z jej menu i dokończ zgłoszenie na stronie. Może być konieczne osobne zalogowanie w serwisie. Podkop nie wysyła zgłoszenia automatycznie.</string>
+    <string name="resource_report_dialog_open_content">Otwórz treść na Wykopie</string>
+    <string name="resource_report_dialog_fallback">Jeśli opcja zgłoszenia jest niedostępna, skopiuj link do treści i dołącz go do formularza kontaktowego Wykopu.</string>
+    <string name="resource_report_dialog_contact">Formularz kontaktowy Wykopu</string>
     <string name="resource_actions_copy_as_link">Kopiuj link</string>
     <string name="resource_actions_copy_text">Kopiuj treść</string>
     <string name="resource_actions_select_text">Zaznacz tekst</string>
@@ -516,7 +521,7 @@
 
     <!-- Composer -->
     <string name="composer_button_send">Wyślij</string>
-    <string name="composer_bold_placeholder">treść progrubiona</string>
+    <string name="composer_bold_placeholder">treść pogrubiona</string>
     <string name="composer_italic_placeholder">treść pochylona</string>
     <string name="composer_link_description_placeholder">opis odnośnika</string>
     <string name="composer_link_url_placeholder">url</string>
@@ -540,4 +545,5 @@
     <string name="favorites_empty_entries">Brak ulubionych wpisów</string>
     <string name="favorites_empty_link_comments">Brak ulubionych komentarzy znalezisk</string>
     <string name="favorites_empty_entry_comments">Brak ulubionych komentarzy wpisów</string>
+    <string name="image_actions_label">Opcje obrazu</string>
 </resources>

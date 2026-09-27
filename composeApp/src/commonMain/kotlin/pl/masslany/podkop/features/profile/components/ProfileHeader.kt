@@ -37,6 +37,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import pl.masslany.podkop.common.components.GenderIndicator
+import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.common.components.toComposeColor
 import pl.masslany.podkop.common.extensions.toMemberSinceLabel
 import pl.masslany.podkop.common.models.NameColorType
@@ -66,7 +67,7 @@ fun ProfileHeader(
         Box {
             if (state.backgroundUrl.isNotBlank()) {
                 AsyncImage(
-                    modifier = Modifier
+                    modifier = Modifier.imageActions(state.backgroundUrl)
                         .fillMaxWidth()
                         .height(160.dp),
                     model = Builder(LocalPlatformContext.current)
@@ -103,7 +104,7 @@ fun ProfileHeader(
                     ) {
                         if (state.avatarUrl.isNotBlank()) {
                             AsyncImage(
-                                modifier = Modifier
+                                modifier = Modifier.imageActions(state.avatarUrl)
                                     .fillMaxSize()
                                     .clip(MaterialTheme.shapes.small),
                                 model = Builder(LocalPlatformContext.current)

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,6 +40,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.components.LocalImageActions
 import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.imageviewer.preview.ImageViewerScreenStateProvider
@@ -47,7 +49,9 @@ import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_topbar_back
 import podkop.composeapp.generated.resources.accessibility_topbar_downloads
 import podkop.composeapp.generated.resources.ic_arrow_back
+import podkop.composeapp.generated.resources.ic_copy
 import podkop.composeapp.generated.resources.ic_download
+import podkop.composeapp.generated.resources.screenshot_preview_action_copy
 
 private const val MAX_SCALE = 5f
 private const val MIN_SCALE = 1f
@@ -97,7 +101,24 @@ fun ImageViewerScreenContent(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { actions.onDownloadClicked(state.imageUrl) }) {
+                    IconButton(
+                        enabled = !state.isCopying,
+                        onClick = { actions.onCopyClicked(state.imageUrl) },
+                    ) {
+                        if (state.isCopying) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        } else {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = vectorResource(Res.drawable.ic_copy),
+                                contentDescription = stringResource(Res.string.screenshot_preview_action_copy),
+                            )
+                        }
+                    }
+                    IconButton(
+                        enabled = !state.isCopying,
+                        onClick = { actions.onDownloadClicked(state.imageUrl) },
+                    ) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = vectorResource(resource = Res.drawable.ic_download),
@@ -128,6 +149,7 @@ private fun ZoomableImage(
     modifier: Modifier = Modifier,
     imageUrl: String,
 ) {
+    val showImageActions = LocalImageActions.current
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
@@ -150,8 +172,9 @@ private fun ZoomableImage(
                     )
                 }
             }
-            .pointerInput(containerSize, scale) {
+            .pointerInput(containerSize, scale, imageUrl, showImageActions) {
                 detectTapGestures(
+                    onLongPress = { showImageActions(imageUrl) },
                     onDoubleTap = { tapOffset ->
                         val currentScale = scale
                         val shouldResetZoom = currentScale > SCALE_RESET_THRESHOLD

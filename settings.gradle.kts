@@ -30,5 +30,6 @@ dependencyResolutionManagement {
 
 include(":common")
 include(":business")
+include(":iosShared")
 include(":composeApp")
 include(":androidApp")

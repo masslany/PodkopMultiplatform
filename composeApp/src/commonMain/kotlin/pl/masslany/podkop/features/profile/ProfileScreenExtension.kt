@@ -11,6 +11,7 @@ import pl.masslany.podkop.business.profile.domain.models.ObservedUser
 import pl.masslany.podkop.business.profile.domain.models.ObservedUsers
 import pl.masslany.podkop.business.profile.domain.models.Profile
 import pl.masslany.podkop.business.profile.domain.models.Summary
+import pl.masslany.podkop.business.profile.domain.models.permissionsFor
 import pl.masslany.podkop.common.extensions.toMemberSinceState
 import pl.masslany.podkop.common.models.UserItemState
 import pl.masslany.podkop.common.models.avatar.toGenderIndicatorType
@@ -26,9 +27,7 @@ internal fun Profile.toProfileHeaderState(
     isLoggedIn: Boolean,
     viewerUsername: String?,
 ): ProfileHeaderState {
-    val isOwnProfile = viewerUsername?.equals(name, ignoreCase = true) == true
-    val observationEnabled = isLoggedIn && !isOwnProfile && canManageObservation
-    val privateMessageEnabled = isLoggedIn && !isOwnProfile && (viewerUsername != null || observationEnabled)
+    val permissions = permissionsFor(isLoggedIn = isLoggedIn, viewerUsername = viewerUsername)
 
     return ProfileHeaderState(
         username = name,
@@ -39,11 +38,11 @@ internal fun Profile.toProfileHeaderState(
         nameColorType = color.toNameColorType(),
         memberSinceState = memberSince.toMemberSinceState(),
         isLoggedIn = isLoggedIn,
-        isOwnProfile = isOwnProfile,
+        isOwnProfile = permissions.isOwnProfile,
         isObserved = isObserved,
         isBlacklisted = isBlacklisted,
-        canManageObservation = observationEnabled,
-        canSendPrivateMessage = privateMessageEnabled,
+        canManageObservation = permissions.canManageObservation,
+        canSendPrivateMessage = permissions.canSendPrivateMessage,
     )
 }
 

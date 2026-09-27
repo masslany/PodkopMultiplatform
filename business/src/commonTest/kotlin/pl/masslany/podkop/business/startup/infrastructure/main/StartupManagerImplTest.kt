@@ -53,7 +53,7 @@ class StartupManagerImplTest {
 
     @Test
     fun `init emits error and logs when token refresh fails`() = runBlocking {
-        val failure = IllegalStateException("refresh failed")
+        val failure = IllegalStateException("response contains secret-456 and token-789")
         val logger = RecordingLogger()
         val authRepository = FakeAuthRepository(
             shouldUpdateTokensValue = true,
@@ -69,7 +69,7 @@ class StartupManagerImplTest {
 
         assertEquals(AppState.Error, sut.state.value)
         assertEquals(
-            listOf(RecordingLogger.Error("Failed to get auth token", failure)),
+            listOf(RecordingLogger.Error("Failed to get auth token", null)),
             logger.errors,
         )
     }

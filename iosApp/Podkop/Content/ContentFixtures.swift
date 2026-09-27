@@ -1,0 +1,58 @@
+import SwiftUI
+
+enum ContentFixtures {
+    static let author = Author(name: "Ewa-Żółw", avatarURL: nil,
+                                     color: "green", verified: true, online: true, rank: 24)
+
+    static let link = Resource(
+        sourceID: 101, kind: .link, title: "Przykładowy link o długim tytule",
+        body: "Krótki opis z @ewa-test, #technologia i [odnośnikiem](https://example.com).\n-------------",
+        author: author, commentCount: 12,
+        vote: Vote(up: 58, down: 4, state: "none", canUp: true,
+                         canDown: true, canUndo: true),
+        tags: ["technologia", "nauka"], sourceURL: "https://example.com",
+        sourceLabel: "example.com", hot: true, slug: "sample-link")
+
+    static let entry = Resource(
+        sourceID: 102, kind: .entry, body: "Pierwszy akapit z emoji 👩🏽‍💻 i łączonymi znakami é.\n!Ukryty tekst ze spoilerem.\n- Pierwszy punkt\n- Drugi punkt\n> Cytat\n```swift\nlet a = 1\n```",
+        author: author, commentCount: 3,
+        vote: Vote(up: 8, down: 0, state: "none", canUp: true,
+                         canDown: false, canUndo: false),
+        survey: Survey(
+            question: "Która odpowiedź?",
+            answers: [.init(id: 1, text: "Pierwsza", count: 2, selected: false),
+                      .init(id: 2, text: "Druga", count: 3, selected: true)],
+            count: 5, canVote: false, selectedOption: 2
+        ))
+
+    static let entryComment = Resource(
+        sourceID: 103, kind: .entryComment, body: "", author: author,
+        deletion: .moderator, parentID: 102)
+
+    static let linkComment = Resource(
+        sourceID: 104, kind: .linkComment,
+        body: "Treść tylko dla dorosłych z wieloma zdaniami.", author: author,
+        adult: true, favourite: true, parentID: 101,
+        vote: Vote(up: 2, down: 1, state: "negative", canUp: true,
+                         canDown: true, canUndo: true))
+
+    static let embed = Resource(
+        sourceID: 105, kind: .entry,
+        body: "Zewnętrzny materiał z uszkodzonym podglądem.", author: author,
+        embed: Embed(key: "preview", url: "https://example.com/video",
+                           thumbnailURL: "", type: "other"))
+
+    static let blacklisted: Resource = {
+        var value = Resource(sourceID: 106, kind: .entry, body: "Wpis od autora z czarnej listy.", author: author)
+        value.blacklisted = true
+        return value
+    }()
+
+    /// Only the tag gallery uses it, so the other fixture screens keep their layout.
+    static let photoEntry = Resource(
+        sourceID: 107, kind: .entry, body: "Wpis ze zdjęciem.", author: author,
+        photo: Photo(url: "https://example.com/photo.png", width: 64, height: 40,
+                     mimeType: "image/png", key: "photo"))
+
+    static let all = [link, entry, entryComment, linkComment, embed, blacklisted]
+}
