@@ -122,6 +122,8 @@ struct ResourceCard: View {
                         .frame(height: 200)
                         .frame(maxWidth: .infinity)
                         .clipped()
+                        .contentShape(Rectangle())
+                        .onTapGesture { openSource() }
                 }
                 .accessibilityHidden(true)
             }
@@ -129,20 +131,33 @@ struct ResourceCard: View {
                 VStack(spacing: 4) {
                     LinkVoteBadge(vote: resource.vote, hot: resource.hot, pending: actions.pending,
                                   action: actions.voteUp)
-                    if let voteDown = actions.voteDown {
-                        Button(action: voteDown) {
-                            Text(resource.vote.state == "negative" ? .contentUndoBury : .contentBury)
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(resource.vote.state == "negative" ? PodkopTheme.voteNegative : .secondary)
+                    if let buryLink = actions.buryLink, resource.vote.state != "negative" {
+                        // Anchored on the button like Android's dropdown, so the menu points at it.
+                        Menu {
+                            ForEach(VoteReason.allCases) { reason in
+                                Button { buryLink(reason) } label: { Text(reason.title) }
+                            }
+                        } label: {
+                            buryLabel
                         }
+                        .menuStyle(.button)
                         .buttonStyle(.plain)
                         .disabled(actions.pending)
-                        .accessibilityLabel(resource.vote.state == "negative" ? .contentRemoveDownvote : .contentDownvote)
+                        .accessibilityLabel(.contentDownvote)
+                    } else if let voteDown = actions.voteDown {
+                        Button(action: voteDown) { buryLabel }
+                            .buttonStyle(.plain)
+                            .disabled(actions.pending)
+                            .accessibilityLabel(resource.vote.state == "negative" ? .contentRemoveDownvote : .contentDownvote)
                     }
                 }
                 Text(resource.title)
                     .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                    // Only the image, title and description open the article; a tap gesture
+                    // around the vote column would take taps from the bury menu.
+                    .onTapGesture { openSource() }
                     .onGeometryChange(for: CGFloat.self) {
                         $0.frame(in: .named(ResourceCard.detailContentSpace)).maxY
                     } action: { onTitleBottom?($0) }
@@ -152,10 +167,9 @@ struct ResourceCard: View {
                 Text(resource.description)
                     .font(.subheadline)
                     .padding(.horizontal, 16)
+                    .onTapGesture { openSource() }
             }
         }
-        .contentShape(Rectangle())
-        .onTapGesture { openSource() }
         VStack(alignment: .leading, spacing: 8) {
             if !resource.body.isEmpty || resource.deletion != nil { richContent }
             if resource.deletion == nil, let embed = resource.embed {
@@ -190,6 +204,14 @@ struct ResourceCard: View {
                 Text(time).font(.footnote).foregroundStyle(.secondary)
             }
         }
+    }
+
+    /// "Zakop" under the link's vote badge, or "Cofnij" once buried.
+    private var buryLabel: some View {
+        let buried = resource.vote.state == "negative"
+        return Text(buried ? .contentUndoBury : .contentBury)
+            .font(.caption.weight(.medium))
+            .foregroundStyle(buried ? PodkopTheme.voteNegative : .secondary)
     }
 
     private var separator: some View {

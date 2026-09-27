@@ -3369,23 +3369,6 @@
         }
       }
     },
-    "details.whyDownvoteLink" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Why downvote this link?"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dlaczego głosujesz przeciw?"
-          }
-        }
-      }
-    },
     "discovery.actions" : {
       "extractionState" : "manual",
       "localizations" : {

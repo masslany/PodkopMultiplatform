@@ -60,6 +60,22 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.descendants(matching: .any)["resource-entryComment:103"].waitForExistence(timeout: 5))
     }
 
+    func testFixtureBuryMenuAsksForAReason() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["Links"].tap()
+        XCTAssertTrue(app.staticTexts["Przykładowy link o długim tytule"].firstMatch.waitForExistence(timeout: 5))
+        app.staticTexts["Przykładowy link o długim tytule"].firstMatch.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["detail-link-101"].waitForExistence(timeout: 5))
+        let bury = app.buttons["Downvote"].firstMatch
+        XCTAssertTrue(bury.waitForExistence(timeout: 5))
+        bury.tap()
+        let reason = app.buttons["duplicate"]
+        XCTAssertTrue(reason.waitForExistence(timeout: 5), "the reasons open as a menu on the bury button")
+        XCTAssertTrue(app.buttons["spam"].exists)
+        reason.tap()
+        XCTAssertTrue(app.buttons["Remove downvote"].waitForExistence(timeout: 5))
+    }
+
     func testScreenshotPreviewCanExcludeParent() {
         let app = launch("guest")
         app.tabBars.buttons["Entries"].tap()

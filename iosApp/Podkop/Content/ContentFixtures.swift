@@ -8,8 +8,8 @@ enum ContentFixtures {
         sourceID: 101, kind: .link, title: "Przykładowy link o długim tytule",
         body: "Krótki opis z @ewa-test, #technologia i [odnośnikiem](https://example.com).\n-------------",
         author: author, commentCount: 12,
-        vote: Vote(up: 58, down: 4, state: "positive", canUp: true,
-                         canDown: false, canUndo: true),
+        vote: Vote(up: 58, down: 4, state: "none", canUp: true,
+                         canDown: true, canUndo: true),
         tags: ["technologia", "nauka"], sourceURL: "https://example.com",
         sourceLabel: "example.com", hot: true, slug: "sample-link")
 

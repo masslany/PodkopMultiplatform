@@ -5,7 +5,6 @@ struct DetailView: View {
     @State private var model: DetailModel
     let dependencies: AppDependencies
     @State private var actionTarget: Resource?
-    @State private var downvoteTarget: Resource?
     /// Where the link title ends in the scroll content, and whether it has scrolled under the bar.
     /// Only the boolean is state, so scrolling does not re-render the page on every frame.
     @State private var titleBottom: CGFloat?
@@ -84,19 +83,6 @@ struct DetailView: View {
                                        parent: screenshotParent(for: target),
                                        dependencies: dependencies,
                                        delete: { model.submit(.delete(target)) })
-        }
-        .confirmationDialog(.detailsWhyDownvoteLink, isPresented: Binding(
-            get: { downvoteTarget != nil },
-            set: { if !$0 { downvoteTarget = nil } }
-        )) {
-            ForEach(["duplicate", "spam", "fake", "wrong", "invalid"], id: \.self) { reason in
-                Button(reason.capitalized) {
-                    if let target = downvoteTarget {
-                        model.submit(.voteDown(target, remove: false, reason: reason))
-                    }
-                    downvoteTarget = nil
-                }
-            }
         }
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
@@ -269,11 +255,10 @@ struct DetailView: View {
                 model.submit(.voteUp(resource, remove: resource.vote.state == "positive"))
             } : nil,
             voteDown: live && canDown ? {
-                if resource.kind == .link && resource.vote.state != "negative" {
-                    downvoteTarget = resource
-                } else {
-                    model.submit(.voteDown(resource, remove: resource.vote.state == "negative", reason: nil))
-                }
+                model.submit(.voteDown(resource, remove: resource.vote.state == "negative", reason: nil))
+            } : nil,
+            buryLink: live && canDown && resource.kind == .link ? { reason in
+                model.submit(.voteDown(resource, remove: false, reason: reason.rawValue))
             } : nil,
             favourite: live && resource.canFavourite ? {
                 model.submit(.favourite(resource, enabled: !resource.favourite))

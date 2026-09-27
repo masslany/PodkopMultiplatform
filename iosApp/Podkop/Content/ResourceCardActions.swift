@@ -7,6 +7,8 @@ struct ResourceActions {
     var openURL: ((URL) -> Void)?
     var voteUp: (() -> Void)?
     var voteDown: (() -> Void)?
+    /// Burying a link asks why; the reasons open as a menu on the bury button.
+    var buryLink: ((VoteReason) -> Void)?
     var favourite: (() -> Void)?
     var comment: (() -> Void)?
     var menu: (() -> Void)?

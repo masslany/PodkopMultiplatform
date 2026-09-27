@@ -95,13 +95,6 @@ struct VotersSheet: View {
 
     /// The API's reason names, worded like Android's `vote_reason_*` strings.
     static func reasonTitle(_ raw: String) -> String? {
-        switch raw.lowercased() {
-        case "duplicate": String(localized: .detailsVoteReasonDuplicate)
-        case "spam": String(localized: .detailsVoteReasonSpam)
-        case "fake": String(localized: .detailsVoteReasonFake)
-        case "wrong": String(localized: .detailsVoteReasonWrong)
-        case "invalid": String(localized: .detailsVoteReasonInvalid)
-        default: nil
-        }
+        VoteReason(rawValue: raw.lowercased()).map { String(localized: $0.title) }
     }
 }
