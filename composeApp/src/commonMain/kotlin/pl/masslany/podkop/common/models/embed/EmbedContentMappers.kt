@@ -6,9 +6,10 @@ import pl.masslany.podkop.business.embeds.domain.models.TwitterEmbedPreview
 internal fun Embed?.toEmbedContentState(): EmbedContentState? {
     val embed = this ?: return null
     if (embed.url.isBlank()) return null
-    if (embed.thumbnail.isBlank()) return null
 
     val type = embed.type.toEmbedContentType()
+    // Text-only tweets come without a thumbnail; their preview is loaded on tap instead.
+    if (embed.thumbnail.isBlank() && type != EmbedContentType.Twitter) return null
 
     return EmbedContentState(
         key = embed.key,

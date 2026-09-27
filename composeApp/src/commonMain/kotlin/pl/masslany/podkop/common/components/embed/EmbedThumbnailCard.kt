@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,18 +54,27 @@ fun EmbedThumbnailCard(
                     },
                 ),
         ) {
-            AsyncImage(
-                modifier = Modifier.imageActions(thumbnailUrl)
-                    .fillMaxWidth()
-                    .aspectRatio(16f / 9f)
-                    .heightIn(min = 120.dp),
-                model = ImageRequest.Builder(LocalPlatformContext.current)
-                    .data(thumbnailUrl)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-            )
+            if (thumbnailUrl.isBlank()) {
+                // Text-only tweets have no thumbnail; a short card still carries the badge.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp),
+                )
+            } else {
+                AsyncImage(
+                    modifier = Modifier.imageActions(thumbnailUrl)
+                        .fillMaxWidth()
+                        .aspectRatio(16f / 9f)
+                        .heightIn(min = 120.dp),
+                    model = ImageRequest.Builder(LocalPlatformContext.current)
+                        .data(thumbnailUrl)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                )
+            }
 
             Box(
                 modifier = Modifier
