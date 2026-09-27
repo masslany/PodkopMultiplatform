@@ -3165,6 +3165,74 @@
         }
       }
     },
+    "details.linksDetailsScreenErrorLoadingComments" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There was a problem loading comments"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wystąpił problem podczas wczytywania komentarzy"
+          }
+        }
+      }
+    },
+    "details.linksDetailsScreenErrorLoadingRelated" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There was a problem loading related links"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wystąpił problem podczas wczytywania powiązanych"
+          }
+        }
+      }
+    },
+    "details.linksDetailsScreenNoComments" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No comments"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak komentarzy"
+          }
+        }
+      }
+    },
+    "details.linksDetailsScreenNoRelated" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No related links"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak powiązanych"
+          }
+        }
+      }
+    },
     "details.votesEmpty" : {
       "extractionState" : "manual",
       "localizations" : {

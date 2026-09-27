@@ -19,6 +19,9 @@ final class DetailModel {
     private(set) var resource: Resource?
     private(set) var comments: [Resource] = []
     private(set) var related: [Resource] = []
+    enum RelatedPhase { case loading, failed, loaded }
+    /// Android shows the related section with a loading, error or empty state instead of hiding it.
+    private(set) var relatedPhase = RelatedPhase.loading
     private(set) var commentsError = false
     private(set) var commentsLoading = false
     private(set) var nextCommentsError = false
@@ -84,10 +87,17 @@ final class DetailModel {
             active = nil
             loadFirstComments()
             if kind == .link {
+                if related.isEmpty { relatedPhase = .loading }
                 do {
                     let values = try await loader.related(linkID: id)
-                    if token == generation, !Task.isCancelled { related = values.compactMap(updates.reconcile) }
-                } catch { /* Related links do not hide the main resource. */ }
+                    if token == generation, !Task.isCancelled {
+                        related = values.compactMap(updates.reconcile)
+                        relatedPhase = .loaded
+                    }
+                } catch {
+                    // Related links never hide the main resource; the section shows the error.
+                    if token == generation, !Task.isCancelled, related.isEmpty { relatedPhase = .failed }
+                }
             }
         }
     }

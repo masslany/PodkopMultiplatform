@@ -6,6 +6,7 @@ private final class DetailFixtureLoader: DetailLoading {
     var commentCalls: [Int] = []
     var replyCalls: [Int] = []
     var failPageTwo = false
+    var failRelated = false
 
     func resource(kind: ResourceKind, id: Int) async throws -> Resource {
         kind == .link ? ContentFixtures.link : ContentFixtures.entry
@@ -23,7 +24,10 @@ private final class DetailFixtureLoader: DetailLoading {
         let reply = Resource(sourceID: 203, kind: .linkComment, body: "reply", parentID: commentID)
         return FeedPage(items: page == 1 ? [reply] : [], next: nil, total: 1)
     }
-    func related(linkID: Int) async throws -> [Resource] { [] }
+    func related(linkID: Int) async throws -> [Resource] {
+        if failRelated { throw NSError(domain: "fixture", code: 3) }
+        return []
+    }
 }
 
 @MainActor
@@ -79,6 +83,19 @@ final class DetailTests: XCTestCase {
         XCTAssertEqual(model.replies[201]?.rows.map(\.sourceID), [203])
         XCTAssertTrue(model.replies[201]?.exhausted == true)
         XCTAssertEqual(loader.replyCalls, [1])
+    }
+
+    func testRelatedSectionReportsEmptyAndFailedLoads() async {
+        let loader = DetailFixtureLoader()
+        let model = DetailModel(kind: .link, id: 101, loader: loader,
+                                mutator: FixtureDetailMutator(), updates: ResourceUpdates())
+        model.start()
+        await settle()
+        XCTAssertEqual(model.relatedPhase, .loaded, "an empty list shows Android's no-related text")
+        loader.failRelated = true
+        model.reload()
+        await settle()
+        XCTAssertEqual(model.relatedPhase, .failed)
     }
 
     func testConfirmedUpdateAndSessionReset() async throws {

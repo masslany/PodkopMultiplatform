@@ -54,7 +54,7 @@ struct DetailView: View {
                     }
                 }
                 if model.phase == .loaded {
-                    if model.kind == .link, !model.related.isEmpty { relatedSection.padding(.bottom, 16) }
+                    if model.kind == .link, model.phase == .loaded { relatedSection.padding(.bottom, 16) }
                     commentsSection
                 }
             }
@@ -123,10 +123,24 @@ struct DetailView: View {
         if model.commentsLoading && model.comments.isEmpty {
             ProgressView(.commonLoading).frame(maxWidth: .infinity).padding(.vertical, 12)
         } else if model.commentsError && model.comments.isEmpty {
-            ThreadMoreButton(title: String(localized: .detailsRetryComments)) { model.retryComments() }
-                .padding(.vertical, 12)
+            VStack(spacing: 8) {
+                Text(.detailsLinksDetailsScreenErrorLoadingComments)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                ThreadMoreButton(title: String(localized: .detailsRetryComments)) { model.retryComments() }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
         } else if model.comments.isEmpty {
-            ContentUnavailableView(.commonNothingHereYet, systemImage: "bubble")
+            // Like Android, only links say so; an entry without comments just ends.
+            if model.kind == .link {
+                Text(.detailsLinksDetailsScreenNoComments)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+            }
         } else {
             ForEach(model.comments) { comment in
                 Group {
@@ -204,6 +218,19 @@ struct DetailView: View {
     private var relatedSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(.detailsRelatedLinks).font(.headline).padding(.horizontal, 16)
+            if model.related.isEmpty {
+                Group {
+                    switch model.relatedPhase {
+                    case .loading: ProgressView()
+                    case .failed: Text(.detailsLinksDetailsScreenErrorLoadingRelated)
+                    case .loaded: Text(.detailsLinksDetailsScreenNoRelated)
+                    }
+                }
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+            } else {
             ScrollView(.horizontal) {
                 LazyHStack(spacing: 10) {
                     ForEach(model.related) { item in
@@ -226,6 +253,7 @@ struct DetailView: View {
                 .padding(.horizontal, 12)
             }
             .scrollIndicators(.hidden)
+            }
         }
     }
 
