@@ -20,6 +20,14 @@ extension ComposerIntent {
         }
     }
 
+    /// Android's editor hint: entries ask for a post, every comment for a reply.
+    var hint: LocalizedStringResource {
+        switch self {
+        case .createEntry, .editEntry: .composerEntriesComposerHint
+        default: .composerEntryDetailsReplyComposerHint
+        }
+    }
+
     var replyPrefix: String {
         guard !target.isEdit, let author = target.replyTarget else { return "" }
         let nickname = author.trimmingCharacters(in: .whitespacesAndNewlines)

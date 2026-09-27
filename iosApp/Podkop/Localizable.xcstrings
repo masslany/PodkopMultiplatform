@@ -1718,6 +1718,91 @@
         }
       }
     },
+    "composer.composerBoldPlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bold text"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "treść pogrubiona"
+          }
+        }
+      }
+    },
+    "composer.composerCodePlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "code"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kod"
+          }
+        }
+      }
+    },
+    "composer.composerItalicPlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "italic text"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "treść pochylona"
+          }
+        }
+      }
+    },
+    "composer.composerLinkDescriptionPlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "link description"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "opis odnośnika"
+          }
+        }
+      }
+    },
+    "composer.composerQuotePlaceholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "quoted text"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "cytowana treść"
+          }
+        }
+      }
+    },
     "composer.continue" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1833,6 +1918,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Szczegóły"
+          }
+        }
+      }
+    },
+    "composer.entriesComposerHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write a post"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Napisz wpis"
+          }
+        }
+      }
+    },
+    "composer.entryDetailsReplyComposerHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write a reply"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Napisz odpowiedź"
           }
         }
       }

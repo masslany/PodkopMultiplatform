@@ -26,6 +26,18 @@ struct ComposerView: View {
                     ComposerFormattingBar(text: $model.text, selection: $model.selection, disabled: model.submitting)
                     ComposerEditor(text: $model.text, selection: $model.selection)
                         .frame(minHeight: 230)
+                        .overlay(alignment: .topLeading) {
+                            // Matches UITextView's inset (8) plus its line fragment padding (5).
+                            if model.text.isEmpty {
+                                Text(model.intent.hint)
+                                    .font(.body)
+                                    .foregroundStyle(.tertiary)
+                                    .padding(.top, 12)
+                                    .padding(.leading, 13)
+                                    .allowsHitTesting(false)
+                                    .accessibilityHidden(true)
+                            }
+                        }
                         .background(PodkopTheme.background, in: RoundedRectangle(cornerRadius: 12))
                         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.primary.opacity(0.4), lineWidth: 1.5))
                         .disabled(model.submitting)

@@ -9,11 +9,11 @@ struct ComposerFormattingBar: View {
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 8) {
-                tool(.composerBold, icon: "bold", prefix: "**", suffix: "**", placeholder: "bold")
-                tool(.composerItalic, icon: "italic", prefix: "__", suffix: "__", placeholder: "italic")
-                tool(.commonLink, icon: "link", prefix: "[", suffix: "](url)", placeholder: "description")
-                tool(.composerQuote, icon: "text.quote", prefix: ">", suffix: "", placeholder: "quote")
-                tool(.composerCode, icon: "chevron.left.forwardslash.chevron.right", prefix: "`", suffix: "`", placeholder: "code")
+                tool(.composerBold, icon: "bold", prefix: "**", suffix: "**", placeholder: String(localized: .composerComposerBoldPlaceholder))
+                tool(.composerItalic, icon: "italic", prefix: "__", suffix: "__", placeholder: String(localized: .composerComposerItalicPlaceholder))
+                tool(.commonLink, icon: "link", prefix: "[", suffix: "](url)", placeholder: String(localized: .composerComposerLinkDescriptionPlaceholder))
+                tool(.composerQuote, icon: "text.quote", prefix: ">", suffix: "", placeholder: String(localized: .composerComposerQuotePlaceholder))
+                tool(.composerCode, icon: "chevron.left.forwardslash.chevron.right", prefix: "`", suffix: "`", placeholder: String(localized: .composerComposerCodePlaceholder))
                 Button { insertSpoiler() } label: { Image(systemName: "eye.slash").frame(width: 44, height: 44) }
                     .accessibilityLabel(.composerSpoiler)
             }
