@@ -14,7 +14,10 @@ struct DetailView: View {
         _model = State(initialValue: DetailModel(kind: kind, id: id,
                                                 loader: dependencies.detailLoader,
                                                 mutator: dependencies.detailMutator,
-                                                updates: dependencies.resourceUpdates))
+                                                updates: dependencies.resourceUpdates,
+                                                threadedEntryComments: { [session = dependencies.session] in
+                                                    session.threadedEntryComments
+                                                }))
         self.dependencies = dependencies
     }
 
@@ -125,7 +128,19 @@ struct DetailView: View {
             .padding(.horizontal, 12)
             .padding(.bottom, 12)
         }
-        if model.commentsLoading && model.comments.isEmpty {
+        if let rows = model.threadRows, !rows.isEmpty {
+            ForEach(rows) { row in
+                threadRow(row, isLast: row.id == rows.last?.id)
+                    .onAppear {
+                        if row.id == rows.last?.id { model.loadMoreComments() }
+                    }
+            }
+            if model.commentsLoading { ProgressView(.commonLoading).frame(maxWidth: .infinity).padding(.vertical, 12) }
+            if model.nextCommentsError {
+                ThreadMoreButton(title: String(localized: .commonRetryNextPage)) { model.retryComments() }
+                    .padding(.vertical, 12)
+            }
+        } else if model.commentsLoading && model.comments.isEmpty {
             ProgressView(.commonLoading).frame(maxWidth: .infinity).padding(.vertical, 12)
         } else if model.commentsError && model.comments.isEmpty {
             VStack(spacing: 8) {
@@ -170,6 +185,30 @@ struct DetailView: View {
             if model.nextCommentsError {
                 ThreadMoreButton(title: String(localized: .commonRetryNextPage)) { model.retryComments() }
                     .padding(.vertical, 12)
+            }
+        }
+    }
+
+    @ViewBuilder private func threadRow(_ row: DetailModel.ThreadRow, isLast: Bool) -> some View {
+        switch row {
+        case .comment(let comment, let depth, let isByEntryAuthor):
+            EntryCommentRow(comment: comment,
+                            actions: actions(for: comment, replyParentID: comment.sourceID),
+                            isOwn: isOwn(comment),
+                            isLast: isLast,
+                            depth: depth,
+                            accent: isByEntryAuthor ? PodkopTheme.linkAuthorAccent : nil,
+                            autoplayGifs: dependencies.session.autoplayGifs,
+                            isForeground: dependencies.isForeground)
+        case .moreReplies(let parentID, let depth, let remaining, let loading, let failed):
+            EntryThreadMoreRow(
+                title: failed ? String(localized: .detailsRetryReplies)
+                    : String(localized: .detailsEntryDetailsButtonShowMoreReplies(remaining)),
+                loading: loading,
+                depth: depth,
+                isLast: isLast
+            ) {
+                model.loadThreadReplies(for: parentID)
             }
         }
     }
@@ -274,6 +313,11 @@ struct DetailView: View {
                 dependencies.router.presentComposer(.createLinkComment(
                     linkID: model.id, parentCommentID: replyParentID,
                     replyTarget: replyParentID == nil ? nil : resource.author?.name))
+            } else if resource.kind == .entryComment,
+                      let parentID = model.thread?.replyParentID(for: resource.sourceID) {
+                // Threaded: the reply nests under the comment.
+                dependencies.router.presentComposer(.createEntryThreadReply(
+                    entryID: model.id, parentCommentID: parentID, replyTarget: resource.author?.name))
             } else {
                 dependencies.router.presentComposer(.createEntryComment(
                     entryID: model.id, replyTarget: resource.author?.name))

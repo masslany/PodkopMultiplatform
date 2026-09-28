@@ -11,7 +11,7 @@ final class FixtureComposerSubmitter: ComposerSubmitting {
         let kind: ResourceKind
         switch target.kind {
         case "createEntry", "editEntry": kind = .entry
-        case "createEntryComment", "editEntryComment": kind = .entryComment
+        case "createEntryComment", "createEntryThreadReply", "editEntryComment": kind = .entryComment
         default: kind = .linkComment
         }
         return Resource(sourceID: target.isEdit ? (target.commentID ?? target.rootID ?? 801) : 801,

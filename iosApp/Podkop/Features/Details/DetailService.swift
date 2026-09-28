@@ -7,6 +7,20 @@ import PodkopShared
     func comments(kind: ResourceKind, id: Int, page: Int, sort: String) async throws -> FeedPage
     func replies(linkID: Int, commentID: Int, page: Int) async throws -> FeedPage
     func related(linkID: Int) async throws -> [Resource]
+    /// The first page of an entry's comments as reply trees.
+    func entryThread(entryID: Int) async throws -> ThreadReplies
+    /// Replies to `parentID` (top-level comments when nil) after the sibling `afterID`.
+    func entryThreadReplies(entryID: Int, parentID: Int?, afterID: Int?) async throws -> ThreadReplies
+}
+
+struct ThreadsUnavailable: Error {}
+
+/// Loaders without threads make the entry fall back to its flat comment list.
+extension DetailLoading {
+    func entryThread(entryID: Int) async throws -> ThreadReplies { throw ThreadsUnavailable() }
+    func entryThreadReplies(entryID: Int, parentID: Int?, afterID: Int?) async throws -> ThreadReplies {
+        throw ThreadsUnavailable()
+    }
 }
 
 @MainActor
@@ -51,6 +65,24 @@ final class SharedDetailLoader: DetailLoading {
         }
         return FeedPage(items: value.items.map(Resource.init), next: value.next,
                         total: value.total?.intValue)
+    }
+
+    func entryThread(entryID: Int) async throws -> ThreadReplies {
+        let value: IOSThreadReplies = try await adapter.call {
+            self.client.details.entryThread(entryId: Int32(entryID), completion: $0)
+        }
+        return ThreadReplies(value)
+    }
+
+    func entryThreadReplies(entryID: Int, parentID: Int?, afterID: Int?) async throws -> ThreadReplies {
+        let value: IOSThreadReplies = try await adapter.call {
+            self.client.details.entryThreadReplies(
+                entryId: Int32(entryID),
+                parentCommentId: parentID.map { KotlinInt(int: Int32($0)) },
+                afterId: afterID.map { KotlinInt(int: Int32($0)) },
+                completion: $0)
+        }
+        return ThreadReplies(value)
     }
 
     func related(linkID: Int) async throws -> [Resource] {

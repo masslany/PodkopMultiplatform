@@ -68,6 +68,7 @@ final class ComposerTests: XCTestCase {
 
     func testRepliesStartWithMentionAndCursorAtEnd() {
         for intent in [ComposerIntent.createEntryComment(entryID: 1, replyTarget: "test"),
+                       .createEntryThreadReply(entryID: 1, parentCommentID: 4, replyTarget: "test"),
                        .createLinkComment(linkID: 2, parentCommentID: 3, replyTarget: " @test ")] {
             let model = ComposerModel(intent: intent, seed: nil,
                                       submitter: FixtureComposerSubmitter(), updates: ResourceUpdates())
@@ -77,6 +78,14 @@ final class ComposerTests: XCTestCase {
             model.text += "My reply"
             XCTAssertTrue(model.isDirty)
         }
+    }
+
+    func testThreadReplyPostsUnderItsParentComment() {
+        let target = ComposerIntent.createEntryThreadReply(entryID: 1, parentCommentID: 7, replyTarget: "Ewa").target
+        XCTAssertEqual(target.kind, "createEntryThreadReply")
+        XCTAssertEqual(target.rootID, 1)
+        XCTAssertEqual(target.commentID, 7)
+        XCTAssertFalse(target.isEdit)
     }
 
     func testNewCommentsStayEmptyAndEditsPreserveExistingMentions() {

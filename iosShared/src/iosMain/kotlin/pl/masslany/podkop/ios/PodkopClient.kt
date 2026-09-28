@@ -33,6 +33,9 @@ import pl.masslany.podkop.business.di.businessModule
 import pl.masslany.podkop.business.embeds.domain.main.StreamableVideoRepository
 import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadComment
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadReplies
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadSort
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.business.hits.domain.main.HitsRepository
@@ -76,6 +79,7 @@ class IOSSettings(
     val themeOverride: String,
     val dynamicColorsEnabled: Boolean,
     val playVideosInline: Boolean,
+    val threadedEntryComments: Boolean,
 )
 class IOSNotificationStatus(
     val totalUnreadCount: Int,
@@ -166,6 +170,18 @@ class IOSResourcePage(
     val items: List<IOSResource>,
     val next: String?,
     val total: Int?,
+)
+
+/** A loaded slice of one node's direct replies; [totalCount] counts all of them on the server. */
+class IOSThreadReplies(val totalCount: Int, val items: List<IOSThreadComment>)
+class IOSThreadComment(
+    val resource: IOSResource,
+    /** 0 for comments directly under the entry, +1 per reply level. */
+    val depth: Int,
+    val isByEntryAuthor: Boolean,
+    /** The comment a reply to this one is posted under (its parent past the depth limit). */
+    val replyParentId: Int,
+    val replies: IOSThreadReplies,
 )
 class IOSVoter(
     val username: String,
@@ -364,8 +380,9 @@ class PodkopClient private constructor(
                 settingsStore.themeOverride,
                 settingsStore.dynamicColorsEnabled,
                 settingsStore.playVideosInline,
-            ) { autoplay, theme, dynamic, inlineVideos ->
-                IOSSettings(autoplay, theme.name, dynamic, inlineVideos)
+                settingsStore.threadedEntryComments,
+            ) { autoplay, theme, dynamic, inlineVideos, threadedComments ->
+                IOSSettings(autoplay, theme.name, dynamic, inlineVideos, threadedComments)
             }.collect { emit(it) }
         }
 
@@ -385,6 +402,9 @@ class PodkopClient private constructor(
 
         fun setPlayVideosInline(enabled: Boolean, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
             operation(completion) { settingsStore.setPlayVideosInline(enabled); IOSSuccess() }
+
+        fun setThreadedEntryComments(enabled: Boolean, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) { settingsStore.setThreadedEntryComments(enabled); IOSSuccess() }
     }
 
     inner class NotificationsService {
@@ -557,6 +577,24 @@ class PodkopClient private constructor(
             IOSResourcePage(result.data.map(ResourceItem::toIOSResource), result.pagination?.next, result.pagination?.total)
         }
 
+        /** The first page of an entry's comments as reply trees, oldest first like the flat list. */
+        fun entryThread(entryId: Int, completion: (IOSThreadReplies?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) {
+                entriesRepository.getEntryThread(entryId, EntryThreadSort.Oldest).getOrThrow().comments.toIOSThreadReplies()
+            }
+
+        /** Replies to [parentCommentId] (top-level comments when null) after the sibling [afterId]. */
+        fun entryThreadReplies(
+            entryId: Int,
+            parentCommentId: Int?,
+            afterId: Int?,
+            completion: (IOSThreadReplies?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            entriesRepository.getEntryThreadReplies(entryId, parentCommentId, EntryThreadSort.Oldest, afterId)
+                .getOrThrow()
+                .toIOSThreadReplies()
+        }
+
         fun linkReplies(
             linkId: Int,
             commentId: Int,
@@ -598,6 +636,9 @@ class PodkopClient private constructor(
                 "createEntryComment" -> entriesRepository.createEntryComment(
                     requireNotNull(rootId), text, adult, photoKey,
                 )
+                "createEntryThreadReply" -> entriesRepository.createEntryThreadReply(
+                    requireNotNull(rootId), requireNotNull(commentId), text, adult, photoKey,
+                ).map { it.comment }
                 "createLinkComment" -> {
                     val linkId = requireNotNull(rootId)
                     if (commentId == null) linksRepository.createLinkComment(linkId, text, adult, photoKey)
@@ -886,6 +927,17 @@ class PodkopClient private constructor(
         }
     }
 }
+
+internal fun EntryThreadReplies.toIOSThreadReplies(): IOSThreadReplies =
+    IOSThreadReplies(totalCount = totalCount, items = items.map { it.toIOSThreadComment() })
+
+internal fun EntryThreadComment.toIOSThreadComment(): IOSThreadComment = IOSThreadComment(
+    resource = comment.toIOSResource(),
+    depth = depth,
+    isByEntryAuthor = isByEntryAuthor,
+    replyParentId = replyParentId,
+    replies = replies.toIOSThreadReplies(),
+)
 
 internal fun ResourceItem.toIOSResource(): IOSResource {
     val selectedSurveyOption = media?.survey?.let { survey ->
