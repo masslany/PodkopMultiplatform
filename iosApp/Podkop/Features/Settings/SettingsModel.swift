@@ -6,6 +6,7 @@ import PodkopShared
 @MainActor protocol SettingsState: AnyObject {
     var theme: ThemeChoice { get set }
     var autoplayGifs: Bool { get set }
+    var playVideosInline: Bool { get set }
 }
 
 @MainActor @Observable
@@ -24,6 +25,10 @@ final class SettingsModel {
     /// shared layer saves it. The previous value returns if the save fails.
     func setAutoplay(_ enabled: Bool) {
         update(\.autoplayGifs, to: enabled) { try await $0.setAutoplayGifs(enabled) }
+    }
+
+    func setPlayVideosInline(_ enabled: Bool) {
+        update(\.playVideosInline, to: enabled) { try await $0.setPlayVideosInline(enabled) }
     }
 
     func setTheme(_ theme: ThemeChoice) {
@@ -45,6 +50,7 @@ final class SettingsModel {
             "loggedIn=\(session.isLoggedIn)",
             "themeOverride=\(session.theme.rawValue)",
             "autoplayGifs=\(session.autoplayGifs)",
+            "playVideosInline=\(session.playVideosInline)",
         ].joined(separator: "\n")
         confirmation = String(localized: .settingsDiagnosticsCopied)
     }

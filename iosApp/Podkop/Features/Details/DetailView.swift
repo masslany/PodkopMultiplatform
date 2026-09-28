@@ -302,6 +302,8 @@ struct DetailView: View {
                 requireAccount { model.submit(.survey(entryID: resource.sourceID, option: option)) }
             } : nil,
             loadTweet: { try await dependencies.loadTweet($0) },
+            loadStreamable: dependencies.session.playVideosInline
+                ? { try await dependencies.loadStreamableVideo($0) } : nil,
             pending: model.mutating.contains(ResourceIdentity(resource))
         )
     }

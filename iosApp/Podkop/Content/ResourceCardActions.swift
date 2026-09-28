@@ -14,6 +14,8 @@ struct ResourceActions {
     var menu: (() -> Void)?
     var surveyVote: ((Int) -> Void)?
     var loadTweet: ((String) async throws -> TweetPreview)?
+    /// Set only while inline video playback is on in settings.
+    var loadStreamable: ((String) async throws -> StreamableVideo)?
     /// A vote or favourite for this resource is waiting for the server.
     var pending = false
 

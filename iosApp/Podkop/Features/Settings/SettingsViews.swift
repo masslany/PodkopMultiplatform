@@ -24,10 +24,20 @@ struct SettingsView: View {
                 .pickerStyle(.segmented)
                 .accessibilityIdentifier("settingsTheme")
             }
-            Section(.settingsMedia) {
+            Section {
                 Toggle(.settingsAutoplayGIFs, isOn: Binding(get: { session.autoplayGifs }, set: { model.setAutoplay($0) }))
                     .podkopSwitch()
                     .accessibilityIdentifier("settingsAutoplay")
+                Toggle(.settingsSettingsBodyPlayVideosInline, isOn: Binding(
+                    get: { session.playVideosInline },
+                    set: { model.setPlayVideosInline($0) }
+                ))
+                .podkopSwitch()
+                .accessibilityIdentifier("settingsPlayVideosInline")
+            } header: {
+                Text(.settingsMedia)
+            } footer: {
+                Text(.settingsSettingsBodyPlayVideosInlineSupporting)
             }
             if session.isLoggedIn {
                 // Android's private-message notifications switch, with its explanation below.

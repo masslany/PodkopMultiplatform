@@ -7,6 +7,7 @@ final class FixtureSettingsService: SettingsServicing {
     private unowned let session: SessionModel
     init(session: SessionModel) { self.session = session }
     func setAutoplayGifs(_ enabled: Bool) async throws { session.autoplayGifs = enabled }
+    func setPlayVideosInline(_ enabled: Bool) async throws { session.playVideosInline = enabled }
     func setTheme(_ theme: ThemeChoice) async throws { session.theme = theme }
     func clearMediaCache() { ImageDecoder.shared.clear() }
     func libraries() -> [LibraryNotice] {
