@@ -3,6 +3,7 @@ package pl.masslany.podkop.features.resources.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,11 +23,15 @@ import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
 import pl.masslany.podkop.features.resources.preview.EntryCommentItemStateProvider
 
+// Avatar width plus the gap before the author name.
+private val AuthorColumnStart = 44.dp
+
 @Composable
 fun EntryCommentItem(
     state: EntryCommentItemState,
     modifier: Modifier = Modifier,
     showInlineActions: Boolean = true,
+    indentBodyUnderAuthor: Boolean = false,
     onProfileClick: (String) -> Unit,
     onTagClick: (String) -> Unit,
     onUrlClick: (String) -> Unit,
@@ -69,43 +74,48 @@ fun EntryCommentItem(
                 onVoteDownClick = { /* no-op */ },
             )
         }
-        Spacer(Modifier.size(8.dp))
-        BlacklistedContentGate(
-            isBlacklisted = state.isBlacklisted,
-            revealKey = "entry_comment_${state.id}",
+        // Threads draw their reply line in the column this leaves free under the avatar.
+        Column(
+            modifier = Modifier.padding(start = if (indentBodyUnderAuthor) AuthorColumnStart else 0.dp),
         ) {
-            EntryContent(
-                state = state.entryContentState,
-                onProfileClick = onProfileClick,
-                onTagClick = onTagClick,
-                onUrlClick = onUrlClick,
-            )
-            state.embedImageState?.let {
-                Spacer(Modifier.size(8.dp))
-                EmbedImage(
-                    state = state.embedImageState,
-                    onImageClick = { onImageClick(state.embedImageState.url) },
+            Spacer(Modifier.size(8.dp))
+            BlacklistedContentGate(
+                isBlacklisted = state.isBlacklisted,
+                revealKey = "entry_comment_${state.id}",
+            ) {
+                EntryContent(
+                    state = state.entryContentState,
+                    onProfileClick = onProfileClick,
+                    onTagClick = onTagClick,
+                    onUrlClick = onUrlClick,
+                )
+                state.embedImageState?.let {
+                    Spacer(Modifier.size(8.dp))
+                    EmbedImage(
+                        state = state.embedImageState,
+                        onImageClick = { onImageClick(state.embedImageState.url) },
+                    )
+                }
+                state.embedContentState?.let {
+                    Spacer(Modifier.size(8.dp))
+                    EmbedContent(
+                        state = state.embedContentState,
+                        onPreviewClick = { onEmbedPreviewClick(state.embedContentState) },
+                        onFetchedContentClick = { onUrlClick(state.embedContentState.url) },
+                    )
+                }
+            }
+            if (showInlineActions) {
+                Spacer(Modifier.size(2.dp))
+                ResourceInlineActionsRow(
+                    onMoreClick = onMoreClick,
+                    onReplyClick = onReplyClick,
+                    isReplyEnabled = state.isReplyEnabled,
+                    onFavouriteClick = onFavouriteClick,
+                    isFavourite = state.isFavourite,
+                    isFavouriteEnabled = state.isFavouriteEnabled,
                 )
             }
-            state.embedContentState?.let {
-                Spacer(Modifier.size(8.dp))
-                EmbedContent(
-                    state = state.embedContentState,
-                    onPreviewClick = { onEmbedPreviewClick(state.embedContentState) },
-                    onFetchedContentClick = { onUrlClick(state.embedContentState.url) },
-                )
-            }
-        }
-        if (showInlineActions) {
-            Spacer(Modifier.size(2.dp))
-            ResourceInlineActionsRow(
-                onMoreClick = onMoreClick,
-                onReplyClick = onReplyClick,
-                isReplyEnabled = state.isReplyEnabled,
-                onFavouriteClick = onFavouriteClick,
-                isFavourite = state.isFavourite,
-                isFavouriteEnabled = state.isFavouriteEnabled,
-            )
         }
     }
 }

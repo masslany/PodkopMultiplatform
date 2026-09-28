@@ -378,6 +378,7 @@ private fun EntryCommentItemRenderer(
                 onLongClick = state.textSelectionLongClick(actions),
             ),
             state = state,
+            indentBodyUnderAuthor = config.indentCommentBodyUnderAuthor,
             onProfileClick = { actions.onProfileClicked(it) },
             onTagClick = { actions.onTagClicked(it) },
             onUrlClick = { actions.onLinkUrlClicked(it) },

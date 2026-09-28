@@ -55,7 +55,8 @@ struct EntryThreadCommentRow: View {
         EntryThreadRowFrame(depth: depth, connectors: connectors, avatarSize: avatar,
                             elbowY: 16 + avatar / 2, endsThread: endsThread, isLast: isLast) {
             ResourceCard(resource: comment, actions: actions, style: .embedded,
-                         autoplayGifs: autoplayGifs, isForeground: isForeground)
+                         autoplayGifs: autoplayGifs, isForeground: isForeground,
+                         indentsBodyUnderAuthor: true)
                 .padding(.top, 16)
         }
     }

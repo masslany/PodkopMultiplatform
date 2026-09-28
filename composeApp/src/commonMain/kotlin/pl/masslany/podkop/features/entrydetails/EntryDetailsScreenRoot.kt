@@ -286,6 +286,7 @@ private fun EntryDetailsScreenList(
         }
 
         val threadRows = state.threadRows
+        val threadActionsConfig = replyActionsConfig.copy(indentCommentBodyUnderAuthor = true)
         if (threadRows != null) {
             itemsIndexed(
                 items = threadRows,
@@ -302,7 +303,7 @@ private fun EntryDetailsScreenList(
                     // Threads are separated from each other, not from their own replies.
                     showDivider = threadRows.getOrNull(index + 1)?.depth == 0,
                     actions = actions,
-                    config = replyActionsConfig,
+                    config = threadActionsConfig,
                 )
             }
         } else {
