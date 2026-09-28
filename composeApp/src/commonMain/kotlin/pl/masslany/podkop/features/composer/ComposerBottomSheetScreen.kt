@@ -24,8 +24,12 @@ sealed interface ComposerRequest {
     data class CreateEntry(override val prefill: ComposerPrefill = ComposerPrefill()) : ComposerRequest
 
     @Serializable
-    data class CreateEntryComment(val entryId: Int, override val prefill: ComposerPrefill = ComposerPrefill()) :
-        ComposerRequest
+    data class CreateEntryComment(
+        val entryId: Int,
+        /** Set to post the comment nested under this comment (threaded entry comments). */
+        val parentCommentId: Int? = null,
+        override val prefill: ComposerPrefill = ComposerPrefill(),
+    ) : ComposerRequest
 
     @Serializable
     data class CreateLinkComment(

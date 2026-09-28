@@ -9,6 +9,7 @@ object NoOpSettingsActions : SettingsActions, TopBarActions by NoOpTopBarActions
     override fun onPrivateMessagesBackgroundNotificationsChanged(enabled: Boolean) = Unit
     override fun onAutoplayGifsChanged(enabled: Boolean) = Unit
     override fun onPlayVideosInlineChanged(enabled: Boolean) = Unit
+    override fun onThreadedEntryCommentsChanged(enabled: Boolean) = Unit
     override fun onThemeOverrideChanged(value: ThemeOverride) = Unit
     override fun onDynamicColorsChanged(enabled: Boolean) = Unit
     override fun onNotificationPermissionResult(granted: Boolean) = Unit

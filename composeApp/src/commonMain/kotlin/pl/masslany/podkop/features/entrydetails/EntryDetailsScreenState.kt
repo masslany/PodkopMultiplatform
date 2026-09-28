@@ -14,6 +14,8 @@ data class EntryDetailsScreenState(
     val entry: ResourceItemState?,
     val comments: ImmutableList<ResourceItemState>,
     val isPaginating: Boolean,
+    /** Threaded comment rows; null when comments show as the classic flat list. */
+    val threadRows: ImmutableList<EntryThreadRowState>? = null,
 ) {
     companion object {
         val initial = EntryDetailsScreenState(

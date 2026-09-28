@@ -151,6 +151,9 @@
     <string name="settings_body_gif_autoplay">Autoodtwarzanie GIF-ów</string>
     <string name="settings_body_play_videos_inline">Odtwarzaj filmy w aplikacji</string>
     <string name="settings_body_play_videos_inline_supporting">Filmy ze Streamable odtworzysz bezpośrednio we wpisie.</string>
+    <string name="settings_headline_comments">Komentarze</string>
+    <string name="settings_body_threaded_entry_comments">Wątki w komentarzach wpisów</string>
+    <string name="settings_body_threaded_entry_comments_supporting">Odpowiedzi pokażą się pod komentarzem, na który odpowiadają.</string>
     <string name="settings_action_clear_cache">Wyczyść pamięć podręczną</string>
     <string name="settings_action_copy_diagnostics">Kopiuj dane diagnostyczne</string>
     <string name="settings_button_clear">Wyczyść</string>
@@ -388,6 +391,7 @@
 
     <!-- Entry details -->
     <string name="entry_details_screen_error_loading_comments">Wystąpił problem podczas wczytywania komentarzy</string>
+    <string name="entry_details_button_show_more_replies">Pokaż więcej odpowiedzi (%1$d)</string>
     <string name="entry_details_reply_composer_hint">Napisz odpowiedź</string>
     <string name="entries_composer_hint">Napisz wpis</string>
     <string name="entry_details_reply_composer_send">Wyślij</string>
