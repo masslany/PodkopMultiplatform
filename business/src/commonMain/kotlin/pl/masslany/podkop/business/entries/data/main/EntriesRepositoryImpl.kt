@@ -109,7 +109,10 @@ class EntriesRepositoryImpl(
                 afterId = afterId,
                 limit = THREAD_PAGE_SIZE,
             ).mapCatching {
-                it.data.toEntryThreadReplies(fallbackDepth = if (parentCommentId == null) 0 else 1)
+                it.data.toEntryThreadReplies(
+                    entryId = entryId,
+                    fallbackDepth = if (parentCommentId == null) 0 else 1,
+                )
             }
         }
     }
@@ -129,7 +132,7 @@ class EntriesRepositoryImpl(
                 adult = adult,
                 photoKey = photoKey,
             ).mapCatching {
-                it.data.toEntryThreadComment(fallbackDepth = 1)
+                it.data.toEntryThreadComment(entryId = entryId, fallbackDepth = 1)
             }
         }
     }

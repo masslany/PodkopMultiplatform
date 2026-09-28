@@ -53,7 +53,15 @@ class EntryThreadDtoTest {
         assertEquals(1, reply.depth)
         assertTrue(reply.isByEntryAuthor)
         assertEquals(11, reply.replyParentId)
-        assertEquals(10, reply.comment.parent?.id)
+    }
+
+    @Test
+    fun `nested replies address their entry as parent so comment actions hit the entry`() {
+        val actual = json.decodeFromString<EntryThreadResponseDto>(threadPayload).data.toEntryThread()
+
+        val reply = actual.comments.items.single().replies.items.single()
+        assertEquals(1, reply.comment.parent?.id)
+        assertEquals(1, reply.comment.parentId)
     }
 
     @Test
@@ -61,7 +69,7 @@ class EntryThreadDtoTest {
         val payload = """{"data":{"count":1,"total":1,"items":[${node(id = 70, nesting = 7, parentId = 60)}]}}"""
 
         val actual = json.decodeFromString<EntryThreadRepliesResponseDto>(payload).data
-            .toEntryThreadReplies(fallbackDepth = 1)
+            .toEntryThreadReplies(entryId = 1, fallbackDepth = 1)
 
         val comment = actual.items.single()
         assertEquals(5, comment.depth)

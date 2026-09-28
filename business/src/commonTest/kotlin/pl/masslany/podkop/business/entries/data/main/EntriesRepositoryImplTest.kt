@@ -194,6 +194,7 @@ class EntriesRepositoryImplTest {
         )
         assertEquals(2, actual.totalCount)
         assertEquals(1, actual.items.single().depth)
+        assertEquals(1, actual.items.single().comment.parent?.id)
     }
 
     @Test
