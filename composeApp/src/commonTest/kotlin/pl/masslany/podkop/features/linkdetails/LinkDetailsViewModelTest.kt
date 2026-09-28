@@ -13,6 +13,7 @@ import pl.masslany.podkop.common.models.avatar.AvatarType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentType
+import pl.masslany.podkop.common.models.embed.StreamableEmbedState
 import pl.masslany.podkop.common.models.embed.TwitterEmbedState
 import pl.masslany.podkop.common.models.toEntryContentState
 import pl.masslany.podkop.common.models.vote.VoteButtonState
@@ -20,6 +21,7 @@ import pl.masslany.podkop.common.models.vote.VoteButtonType
 import pl.masslany.podkop.common.models.vote.VoteState
 import pl.masslany.podkop.common.models.vote.VoteValueType
 import pl.masslany.podkop.features.resources.models.ResourceType
+import pl.masslany.podkop.features.resources.updateStreamableEmbedStateIfMatches
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 
 class LinkDetailsViewModelTest {
@@ -73,6 +75,37 @@ class LinkDetailsViewModelTest {
         assertEquals(
             TwitterEmbedState.Preview,
             updated.single().replies.single().embedContentState?.twitterState,
+        )
+    }
+
+    @Test
+    fun `applyEmbedStateById sets streamable state on the matching nested reply`() {
+        val streamable = EmbedContentState(
+            key = "reply-video",
+            type = EmbedContentType.Streamable,
+            url = "https://streamable.com/moo",
+            thumbnailUrl = "https://example.com/thumb.jpg",
+            streamableState = StreamableEmbedState.Preview,
+        )
+        val comments = persistentListOf(
+            linkCommentState(
+                id = 100,
+                parentId = 42,
+                embedContentState = streamable,
+                replies = persistentListOf(
+                    linkCommentState(id = 200, parentId = 100, embedContentState = streamable),
+                ),
+            ),
+        )
+
+        val updated = comments.applyEmbedStateById(commentId = 200) {
+            it.updateStreamableEmbedStateIfMatches("reply-video", StreamableEmbedState.Loading)
+        }
+
+        assertEquals(StreamableEmbedState.Preview, updated.single().embedContentState?.streamableState)
+        assertEquals(
+            StreamableEmbedState.Loading,
+            updated.single().replies.single().embedContentState?.streamableState,
         )
     }
 }

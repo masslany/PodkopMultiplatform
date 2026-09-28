@@ -17,6 +17,18 @@ class EmbedContentMappersTest {
     }
 
     @Test
+    fun `streamable embed starts in preview and tweets carry no streamable state`() {
+        val streamable = Embed(key = "k", thumbnail = "t", type = "streamable", url = "https://streamable.com/moo")
+            .toEmbedContentState()
+        val tweet = Embed(key = "k", thumbnail = "", type = "twitter", url = "https://x.com/a/status/1")
+            .toEmbedContentState()
+
+        assertEquals(StreamableEmbedState.Preview, streamable?.streamableState)
+        assertNull(streamable?.twitterState)
+        assertNull(tweet?.streamableState)
+    }
+
+    @Test
     fun `other embeds without thumbnail are dropped`() {
         val state = Embed(key = "k", thumbnail = "", type = "youtube", url = "https://youtube.com/watch?v=1")
             .toEmbedContentState()

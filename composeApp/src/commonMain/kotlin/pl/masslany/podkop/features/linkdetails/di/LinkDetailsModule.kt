@@ -14,6 +14,7 @@ val linkDetailsModule = module {
             profileRepository = get(),
             resourceItemStateHolder = get<ResourceItemStateHolder>(),
             twitterEmbedPreviewRepository = get(),
+            streamableEmbedPlayback = get(),
             appNavigator = get(),
             screenshotShareDraftStore = get(),
             resourceActionUpdatesStore = get(),
