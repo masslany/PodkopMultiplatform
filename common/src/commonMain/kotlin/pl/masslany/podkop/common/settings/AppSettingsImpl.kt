@@ -26,6 +26,11 @@ class AppSettingsImpl(private val keyValueStorage: KeyValueStorage) : AppSetting
             .map { it ?: false }
             .distinctUntilChanged()
 
+    override val threadedEntryComments: Flow<Boolean> =
+        keyValueStorage.observeBoolean(THREADED_ENTRY_COMMENTS_KEY)
+            .map { it ?: false }
+            .distinctUntilChanged()
+
     override suspend fun setAutoplayGifs(enabled: Boolean) {
         keyValueStorage.putBoolean(AUTOPLAY_GIFS_KEY, enabled)
     }
@@ -42,6 +47,10 @@ class AppSettingsImpl(private val keyValueStorage: KeyValueStorage) : AppSetting
         keyValueStorage.putBoolean(PLAY_VIDEOS_INLINE_KEY, enabled)
     }
 
+    override suspend fun setThreadedEntryComments(enabled: Boolean) {
+        keyValueStorage.putBoolean(THREADED_ENTRY_COMMENTS_KEY, enabled)
+    }
+
     private fun themeOverrideFromStorageValue(value: String): ThemeOverride =
         ThemeOverride.entries.firstOrNull { entry -> entry.name == value } ?: ThemeOverride.AUTO
 
@@ -50,5 +59,6 @@ class AppSettingsImpl(private val keyValueStorage: KeyValueStorage) : AppSetting
         const val THEME_OVERRIDE_KEY = "THEME_OVERRIDE"
         const val DYNAMIC_COLORS_ENABLED_KEY = "DYNAMIC_COLORS_ENABLED"
         const val PLAY_VIDEOS_INLINE_KEY = "PLAY_VIDEOS_INLINE"
+        const val THREADED_ENTRY_COMMENTS_KEY = "THREADED_ENTRY_COMMENTS"
     }
 }

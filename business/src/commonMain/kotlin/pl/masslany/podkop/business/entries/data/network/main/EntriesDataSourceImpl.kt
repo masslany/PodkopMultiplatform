@@ -6,6 +6,8 @@ import pl.masslany.podkop.business.common.data.network.models.common.ResourceRes
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.entries.data.api.EntriesDataSource
 import pl.masslany.podkop.business.entries.data.network.api.EntriesApi
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadRepliesResponseDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadResponseDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 
 
@@ -32,6 +34,40 @@ class EntriesDataSourceImpl(
         page: Int?,
     ): Result<ResourceResponseDto> {
         return entriesApi.getEntryComments(entryId, page)
+    }
+
+    override suspend fun getEntryThread(
+        entryId: Int,
+        sort: String,
+        limit: Int,
+    ): Result<EntryThreadResponseDto> {
+        return entriesApi.getEntryThread(entryId, sort, limit)
+    }
+
+    override suspend fun getEntryThreadReplies(
+        entryId: Int,
+        parentCommentId: Int?,
+        sort: String,
+        afterId: Int?,
+        limit: Int,
+    ): Result<EntryThreadRepliesResponseDto> {
+        return entriesApi.getEntryThreadReplies(entryId, parentCommentId, sort, afterId, limit)
+    }
+
+    override suspend fun createEntryThreadReply(
+        entryId: Int,
+        parentCommentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<EntryThreadResponseDto> {
+        return entriesApi.createEntryThreadReply(
+            entryId = entryId,
+            parentCommentId = parentCommentId,
+            content = content,
+            adult = adult,
+            photoKey = photoKey,
+        )
     }
 
     override suspend fun getEntryVotes(

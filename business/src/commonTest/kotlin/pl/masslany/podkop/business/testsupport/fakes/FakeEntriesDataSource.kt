@@ -5,6 +5,8 @@ import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceResponseDto
 import pl.masslany.podkop.business.common.data.network.models.common.SingleResourceResponseDto
 import pl.masslany.podkop.business.entries.data.api.EntriesDataSource
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadRepliesResponseDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadResponseDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 
 class FakeEntriesDataSource : EntriesDataSource {
@@ -20,6 +22,28 @@ class FakeEntriesDataSource : EntriesDataSource {
     data class GetEntryCommentsCall(
         val entryId: Int,
         val page: Int?,
+    )
+
+    data class GetEntryThreadCall(
+        val entryId: Int,
+        val sort: String,
+        val limit: Int,
+    )
+
+    data class GetEntryThreadRepliesCall(
+        val entryId: Int,
+        val parentCommentId: Int?,
+        val sort: String,
+        val afterId: Int?,
+        val limit: Int,
+    )
+
+    data class CreateEntryThreadReplyCall(
+        val entryId: Int,
+        val parentCommentId: Int,
+        val content: String,
+        val adult: Boolean,
+        val photoKey: String?,
     )
 
     data class GetEntryVotesCall(
@@ -69,6 +93,11 @@ class FakeEntriesDataSource : EntriesDataSource {
     var getEntriesResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntries")
     var getEntryResult: Result<SingleResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntry")
     var getEntryCommentsResult: Result<ResourceResponseDto> = unstubbedResult("EntriesDataSource.getEntryComments")
+    var getEntryThreadResult: Result<EntryThreadResponseDto> = unstubbedResult("EntriesDataSource.getEntryThread")
+    var getEntryThreadRepliesResult: Result<EntryThreadRepliesResponseDto> =
+        unstubbedResult("EntriesDataSource.getEntryThreadReplies")
+    var createEntryThreadReplyResult: Result<EntryThreadResponseDto> =
+        unstubbedResult("EntriesDataSource.createEntryThreadReply")
     var getEntryVotesResult: Result<EntryVotersResponseDto> = unstubbedResult("EntriesDataSource.getEntryVotes")
     var getEntryCommentVotesResult: Result<EntryVotersResponseDto> =
         unstubbedResult("EntriesDataSource.getEntryCommentVotes")
@@ -91,6 +120,9 @@ class FakeEntriesDataSource : EntriesDataSource {
     val getEntriesCalls = mutableListOf<GetEntriesCall>()
     val getEntryCalls = mutableListOf<Int>()
     val getEntryCommentsCalls = mutableListOf<GetEntryCommentsCall>()
+    val getEntryThreadCalls = mutableListOf<GetEntryThreadCall>()
+    val getEntryThreadRepliesCalls = mutableListOf<GetEntryThreadRepliesCall>()
+    val createEntryThreadReplyCalls = mutableListOf<CreateEntryThreadReplyCall>()
     val getEntryVotesCalls = mutableListOf<GetEntryVotesCall>()
     val getEntryCommentVotesCalls = mutableListOf<GetEntryCommentVotesCall>()
     val createEntryCommentCalls = mutableListOf<CreateEntryCommentCall>()
@@ -128,6 +160,37 @@ class FakeEntriesDataSource : EntriesDataSource {
     ): Result<ResourceResponseDto> {
         getEntryCommentsCalls += GetEntryCommentsCall(entryId, page)
         return getEntryCommentsResult
+    }
+
+    override suspend fun getEntryThread(
+        entryId: Int,
+        sort: String,
+        limit: Int,
+    ): Result<EntryThreadResponseDto> {
+        getEntryThreadCalls += GetEntryThreadCall(entryId, sort, limit)
+        return getEntryThreadResult
+    }
+
+    override suspend fun getEntryThreadReplies(
+        entryId: Int,
+        parentCommentId: Int?,
+        sort: String,
+        afterId: Int?,
+        limit: Int,
+    ): Result<EntryThreadRepliesResponseDto> {
+        getEntryThreadRepliesCalls += GetEntryThreadRepliesCall(entryId, parentCommentId, sort, afterId, limit)
+        return getEntryThreadRepliesResult
+    }
+
+    override suspend fun createEntryThreadReply(
+        entryId: Int,
+        parentCommentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<EntryThreadResponseDto> {
+        createEntryThreadReplyCalls += CreateEntryThreadReplyCall(entryId, parentCommentId, content, adult, photoKey)
+        return createEntryThreadReplyResult
     }
 
     override suspend fun getEntryVotes(
