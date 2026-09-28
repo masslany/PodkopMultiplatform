@@ -129,8 +129,8 @@ struct DetailView: View {
             .padding(.bottom, 12)
         }
         if let rows = model.threadRows, !rows.isEmpty {
-            ForEach(rows) { row in
-                threadRow(row, isLast: row.id == rows.last?.id)
+            ForEach(Array(rows.enumerated()), id: \.element.id) { index, row in
+                threadRow(row, next: rows.indices.contains(index + 1) ? rows[index + 1] : nil)
                     .onAppear {
                         if row.id == rows.last?.id { model.loadMoreComments() }
                     }
@@ -189,24 +189,28 @@ struct DetailView: View {
         }
     }
 
-    @ViewBuilder private func threadRow(_ row: DetailModel.ThreadRow, isLast: Bool) -> some View {
+    @ViewBuilder private func threadRow(_ row: DetailModel.ThreadRow, next: DetailModel.ThreadRow?) -> some View {
+        // Threads are separated from each other, not from their own replies.
+        let endsThread = next?.depth == 0
         switch row {
-        case .comment(let comment, let depth, let isByEntryAuthor):
-            EntryCommentRow(comment: comment,
-                            actions: actions(for: comment, replyParentID: comment.sourceID),
-                            isOwn: isOwn(comment),
-                            isLast: isLast,
-                            depth: depth,
-                            accent: isByEntryAuthor ? PodkopTheme.linkAuthorAccent : nil,
-                            autoplayGifs: dependencies.session.autoplayGifs,
-                            isForeground: dependencies.isForeground)
-        case .moreReplies(let parentID, let depth, let remaining, let loading, let failed):
+        case .comment(let comment, let depth, _, let connectors):
+            EntryThreadCommentRow(comment: comment,
+                                  actions: actions(for: comment, replyParentID: comment.sourceID),
+                                  depth: depth,
+                                  connectors: connectors,
+                                  endsThread: endsThread,
+                                  isLast: next == nil,
+                                  autoplayGifs: dependencies.session.autoplayGifs,
+                                  isForeground: dependencies.isForeground)
+        case .moreReplies(let parentID, let depth, let remaining, let loading, let failed, let connectors):
             EntryThreadMoreRow(
                 title: failed ? String(localized: .detailsRetryReplies)
                     : String(localized: .detailsEntryDetailsButtonShowMoreReplies(remaining)),
                 loading: loading,
                 depth: depth,
-                isLast: isLast
+                connectors: connectors,
+                endsThread: endsThread,
+                isLast: next == nil
             ) {
                 model.loadThreadReplies(for: parentID)
             }

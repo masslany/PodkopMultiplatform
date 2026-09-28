@@ -133,8 +133,8 @@ final class DetailTests: XCTestCase {
     private func rowSummary(_ rows: [DetailModel.ThreadRow]?) -> [String] {
         (rows ?? []).map { row in
             switch row {
-            case .comment(let comment, let depth, let author): "\(comment.sourceID)@\(depth)\(author ? "*" : "")"
-            case .moreReplies(let parent, let depth, let remaining, _, _): "more\(parent)@\(depth):\(remaining)"
+            case .comment(let comment, let depth, let author, _): "\(comment.sourceID)@\(depth)\(author ? "*" : "")"
+            case .moreReplies(let parent, let depth, let remaining, _, _, _): "more\(parent)@\(depth):\(remaining)"
             }
         }
     }
@@ -161,6 +161,32 @@ final class DetailTests: XCTestCase {
         XCTAssertEqual(loader.replyCalls.last?.after, 20)
         XCTAssertEqual(rowSummary(model.threadRows).last, "30@0")
         XCTAssertTrue(model.commentsExhausted)
+    }
+
+    func testThreadConnectorsRunOnOnlyToLaterSiblings() {
+        func node(_ id: Int, _ depth: Int, total: Int? = nil, _ replies: [ThreadComment] = []) -> ThreadComment {
+            ThreadComment(resource: Resource(sourceID: id, kind: .entryComment, body: "", parentID: 1),
+                          depth: depth, isByEntryAuthor: false, replyParentID: id,
+                          replies: ThreadReplies(totalCount: total ?? replies.count, items: replies))
+        }
+        let tree = EntryThreadTree(ThreadReplies(totalCount: 1, items: [
+            node(10, 0, [node(11, 1, [node(111, 2)]), node(12, 1, total: 2, [node(121, 2)])]),
+        ]))
+
+        let connectors = tree.rows.map { row -> ThreadConnectors in
+            switch row {
+            case .comment(_, _, _, let connectors), .moreReplies(_, _, _, let connectors): connectors
+            }
+        }
+
+        XCTAssertEqual(connectors, [
+            ThreadConnectors(hasReplies: true),
+            ThreadConnectors(continuesBelow: true, hasReplies: true),
+            ThreadConnectors(ancestorLines: [true]),
+            ThreadConnectors(hasReplies: true),
+            ThreadConnectors(ancestorLines: [false], continuesBelow: true),
+            ThreadConnectors(ancestorLines: [false]),
+        ])
     }
 
     func testThreadedCommentsFallBackToTheFlatListWhenTheThreadFails() async {

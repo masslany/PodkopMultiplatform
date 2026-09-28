@@ -31,9 +31,21 @@ internal data class EntryCommentThreadTree(
     )
 
     sealed interface Row {
-        data class Comment(val id: Int, val depth: Int, val isByEntryAuthor: Boolean) : Row
+        val connectors: ThreadConnectors
 
-        data class MoreReplies(val parentId: Int, val depth: Int, val remainingCount: Int) : Row
+        data class Comment(
+            val id: Int,
+            val depth: Int,
+            val isByEntryAuthor: Boolean,
+            override val connectors: ThreadConnectors = ThreadConnectors(),
+        ) : Row
+
+        data class MoreReplies(
+            val parentId: Int,
+            val depth: Int,
+            val remainingCount: Int,
+            override val connectors: ThreadConnectors = ThreadConnectors(),
+        ) : Row
     }
 
     val hasMoreTopLevel: Boolean get() = root.remainingCount > 0
@@ -85,15 +97,40 @@ internal data class EntryCommentThreadTree(
     }
 
     /** Depth-first rows, with a "more replies" row after each branch that has unloaded replies. */
-    fun rows(): List<Row> = buildList { addRows(root.childIds) }
+    fun rows(): List<Row> = buildList {
+        addRows(childIds = root.childIds, branchHasMore = false, ancestorLines = emptyList())
+    }
 
-    private fun MutableList<Row>.addRows(childIds: List<Int>) {
-        childIds.forEach { id ->
-            val node = nodes[id] ?: return@forEach
-            add(Row.Comment(id = id, depth = node.depth, isByEntryAuthor = node.isByEntryAuthor))
-            addRows(node.replies.childIds)
-            if (node.replies.remainingCount > 0) {
-                add(Row.MoreReplies(parentId = id, depth = node.depth + 1, remainingCount = node.replies.remainingCount))
+    private fun MutableList<Row>.addRows(childIds: List<Int>, branchHasMore: Boolean, ancestorLines: List<Boolean>) {
+        val loadedIds = childIds.filter { it in nodes }
+        loadedIds.forEachIndexed { index, id ->
+            val node = nodes.getValue(id)
+            val replies = node.replies
+            // Top-level comments hang from no line; the entry itself has no connector.
+            val continuesBelow = node.depth > 0 && (index < loadedIds.lastIndex || branchHasMore)
+            add(
+                Row.Comment(
+                    id = id,
+                    depth = node.depth,
+                    isByEntryAuthor = node.isByEntryAuthor,
+                    connectors = ThreadConnectors(
+                        ancestorLines = ancestorLines,
+                        continuesBelow = continuesBelow,
+                        hasReplies = replies.childIds.isNotEmpty() || replies.remainingCount > 0,
+                    ),
+                ),
+            )
+            val childAncestorLines = if (node.depth == 0) emptyList() else ancestorLines + continuesBelow
+            addRows(childIds = replies.childIds, branchHasMore = replies.remainingCount > 0, ancestorLines = childAncestorLines)
+            if (replies.remainingCount > 0) {
+                add(
+                    Row.MoreReplies(
+                        parentId = id,
+                        depth = node.depth + 1,
+                        remainingCount = replies.remainingCount,
+                        connectors = ThreadConnectors(ancestorLines = childAncestorLines),
+                    ),
+                )
             }
         }
     }

@@ -11,10 +11,13 @@ sealed interface EntryThreadRowState {
     val key: String
     val depth: Int
 
+    val connectors: ThreadConnectors
+
     data class Comment(
         val item: ResourceItemState,
         override val depth: Int,
         val isByEntryAuthor: Boolean,
+        override val connectors: ThreadConnectors = ThreadConnectors(),
     ) : EntryThreadRowState {
         override val key: String get() = "comment-${item.id}"
     }
@@ -24,6 +27,7 @@ sealed interface EntryThreadRowState {
         override val depth: Int,
         val remainingCount: Int,
         val isLoading: Boolean,
+        override val connectors: ThreadConnectors = ThreadConnectors(),
     ) : EntryThreadRowState {
         override val key: String get() = "more-$parentId"
     }
@@ -39,7 +43,12 @@ internal fun buildEntryThreadRows(
     return tree.rows().mapNotNull { row ->
         when (row) {
             is EntryCommentThreadTree.Row.Comment -> commentsById[row.id]?.let { item ->
-                EntryThreadRowState.Comment(item = item, depth = row.depth, isByEntryAuthor = row.isByEntryAuthor)
+                EntryThreadRowState.Comment(
+                    item = item,
+                    depth = row.depth,
+                    isByEntryAuthor = row.isByEntryAuthor,
+                    connectors = row.connectors,
+                )
             }
 
             is EntryCommentThreadTree.Row.MoreReplies -> EntryThreadRowState.MoreReplies(
@@ -47,6 +56,7 @@ internal fun buildEntryThreadRows(
                 depth = row.depth,
                 remainingCount = row.remainingCount,
                 isLoading = row.parentId in loadingRepliesIds,
+                connectors = row.connectors,
             )
         }
     }.toImmutableList()

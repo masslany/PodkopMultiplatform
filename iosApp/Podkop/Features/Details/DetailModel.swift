@@ -15,13 +15,20 @@ final class DetailModel {
 
     /// One row of threaded entry comments, in display order.
     enum ThreadRow: Identifiable {
-        case comment(Resource, depth: Int, isByEntryAuthor: Bool)
-        case moreReplies(parentID: Int, depth: Int, remaining: Int, loading: Bool, failed: Bool)
+        case comment(Resource, depth: Int, isByEntryAuthor: Bool, connectors: ThreadConnectors)
+        case moreReplies(parentID: Int, depth: Int, remaining: Int, loading: Bool, failed: Bool,
+                         connectors: ThreadConnectors)
 
         var id: String {
             switch self {
-            case .comment(let comment, _, _): "comment-\(comment.sourceID)"
-            case .moreReplies(let parentID, _, _, _, _): "more-\(parentID)"
+            case .comment(let comment, _, _, _): "comment-\(comment.sourceID)"
+            case .moreReplies(let parentID, _, _, _, _, _): "more-\(parentID)"
+            }
+        }
+
+        var depth: Int {
+            switch self {
+            case .comment(_, let depth, _, _), .moreReplies(_, let depth, _, _, _, _): depth
             }
         }
     }
@@ -80,12 +87,14 @@ final class DetailModel {
         guard let thread else { return nil }
         return thread.rows.compactMap { row in
             switch row {
-            case .comment(let id, let depth, let isByEntryAuthor):
-                threadComments[id].map { .comment($0, depth: depth, isByEntryAuthor: isByEntryAuthor) }
-            case .moreReplies(let parentID, let depth, let remaining):
+            case .comment(let id, let depth, let isByEntryAuthor, let connectors):
+                threadComments[id].map {
+                    .comment($0, depth: depth, isByEntryAuthor: isByEntryAuthor, connectors: connectors)
+                }
+            case .moreReplies(let parentID, let depth, let remaining, let connectors):
                 .moreReplies(parentID: parentID, depth: depth, remaining: remaining,
                              loading: threadRepliesLoading.contains(parentID),
-                             failed: threadRepliesFailed.contains(parentID))
+                             failed: threadRepliesFailed.contains(parentID), connectors: connectors)
             }
         }
     }

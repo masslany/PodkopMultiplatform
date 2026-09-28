@@ -79,7 +79,6 @@ import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
 import podkop.composeapp.generated.resources.topbar_label_entry
 
 private const val FAB_ITEMS_OFFSET = 10
-private val ThreadIndent = 12.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -300,8 +299,8 @@ private fun EntryDetailsScreenList(
             ) { index, row ->
                 EntryThreadRow(
                     row = row,
-                    currentUsername = state.currentUsername,
-                    showDivider = index != threadRows.lastIndex,
+                    // Threads are separated from each other, not from their own replies.
+                    showDivider = threadRows.getOrNull(index + 1)?.depth == 0,
                     actions = actions,
                     config = replyActionsConfig,
                 )
@@ -376,69 +375,39 @@ private fun EntryDetailsScreenList(
 @Composable
 private fun EntryThreadRow(
     row: EntryThreadRowState,
-    currentUsername: String?,
     showDivider: Boolean,
     actions: EntryDetailsActions,
     config: ResourceItemConfig,
 ) {
-    val guideColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-    val accentColor = when {
-        row !is EntryThreadRowState.Comment -> null
-        !currentUsername.isNullOrBlank() &&
-            (row.item as? EntryCommentItemState)?.authorState?.name == currentUsername ->
-            MaterialTheme.colorsPalette.nameGreen
-
-        row.isByEntryAuthor -> MaterialTheme.colorsPalette.linkAuthor
-        else -> guideColor
-    }
-    val depthIndent = ThreadIndent * row.depth
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp + depthIndent, end = 16.dp)
-            .drawBehind {
-                val lineWidth = 2.dp.toPx()
-                // One guide per ancestor level, so each branch reads as a continuous column.
-                repeat(row.depth) { level ->
-                    drawRect(
-                        color = guideColor,
-                        topLeft = Offset(-(ThreadIndent * (row.depth - level)).toPx(), 0f),
-                        size = Size(lineWidth, size.height),
-                    )
-                }
-                accentColor?.let { color ->
-                    drawRect(color = color, topLeft = Offset(0f, 0f), size = Size(lineWidth, size.height))
-                }
-            },
+            .threadConnectors(
+                depth = row.depth,
+                connectors = row.connectors,
+                // Middle of the avatar, or of the "more replies" button.
+                elbowY = if (row is EntryThreadRowState.Comment) 34.dp else 32.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            .padding(start = threadContentStart(row.depth), end = 16.dp),
     ) {
         when (row) {
-            is EntryThreadRowState.Comment -> Row(
+            is EntryThreadRowState.Comment -> ResourceItemRenderer(
                 modifier = Modifier.padding(top = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                Spacer(Modifier.width(2.dp))
-                ResourceItemRenderer(
-                    state = row.item,
-                    actions = actions,
-                    config = config,
-                )
-            }
+                state = row.item,
+                actions = actions,
+                config = config,
+            )
 
             is EntryThreadRowState.MoreReplies -> ShowMoreRepliesButton(
-                modifier = Modifier.padding(start = 18.dp, top = 12.dp),
+                modifier = Modifier.padding(top = 12.dp),
                 row = row,
                 onClick = { actions.onShowMoreEntryRepliesClicked(row.parentId) },
             )
         }
 
         if (showDivider) {
-            HorizontalDivider(
-                modifier = Modifier.padding(
-                    top = 16.dp,
-                    start = 16.dp,
-                ),
-            )
+            HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
         }
     }
 }

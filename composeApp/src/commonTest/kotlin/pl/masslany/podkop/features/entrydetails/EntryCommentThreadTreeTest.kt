@@ -34,7 +34,7 @@ class EntryCommentThreadTreeTest {
                 Row.MoreReplies(parentId = 10, depth = 1, remainingCount = 3),
                 Row.Comment(id = 20, depth = 0, isByEntryAuthor = true),
             ),
-            sut.rows(),
+            sut.rows().shapes(),
         )
         assertTrue(sut.hasMoreTopLevel)
         assertEquals(20, sut.topLevelCursorId)
@@ -60,7 +60,7 @@ class EntryCommentThreadTreeTest {
                 Row.Comment(id = 13, depth = 1, isByEntryAuthor = false),
                 Row.MoreReplies(parentId = 13, depth = 2, remainingCount = 1),
             ),
-            actual.rows(),
+            actual.rows().shapes(),
         )
         assertEquals(13, actual.repliesCursorId(10))
     }
@@ -90,7 +90,7 @@ class EntryCommentThreadTreeTest {
                 Row.Comment(id = 99, depth = 1, isByEntryAuthor = true),
                 Row.MoreReplies(parentId = 10, depth = 1, remainingCount = 3),
             ),
-            actual.rows(),
+            actual.rows().shapes(),
         )
         assertEquals(11, actual.repliesCursorId(10))
         assertEquals(99, actual.replyParentId(99))
@@ -135,10 +135,46 @@ class EntryCommentThreadTreeTest {
 
         assertEquals(
             listOf(
-                EntryThreadRowState.Comment(item = states.single(), depth = 0, isByEntryAuthor = false),
+                EntryThreadRowState.Comment(
+                    item = states.single(),
+                    depth = 0,
+                    isByEntryAuthor = false,
+                    connectors = ThreadConnectors(hasReplies = true),
+                ),
                 EntryThreadRowState.MoreReplies(parentId = 10, depth = 1, remainingCount = 2, isLoading = true),
             ),
             actual,
+        )
+    }
+
+    @Test
+    fun `connectors run on only to later siblings and hang from comments with replies`() {
+        val sut = EntryCommentThreadTree.from(
+            replies(
+                total = 1,
+                comment(
+                    10,
+                    depth = 0,
+                    replies = listOf(
+                        comment(11, depth = 1, replies = listOf(comment(111, depth = 2))),
+                        comment(12, depth = 1, total = 2, replies = listOf(comment(121, depth = 2))),
+                    ),
+                ),
+            ),
+        )
+
+        assertEquals(
+            listOf(
+                ThreadConnectors(hasReplies = true),
+                ThreadConnectors(continuesBelow = true, hasReplies = true),
+                // Its parent 11 has a later sibling, so level 0 runs on past it.
+                ThreadConnectors(ancestorLines = listOf(true)),
+                ThreadConnectors(continuesBelow = false, hasReplies = true),
+                // 121 has an unloaded sibling below it: the "more replies" row.
+                ThreadConnectors(ancestorLines = listOf(false), continuesBelow = true),
+                ThreadConnectors(ancestorLines = listOf(false)),
+            ),
+            sut.rows().map { it.connectors },
         )
     }
 
@@ -200,4 +236,11 @@ class EntryCommentThreadTreeTest {
         votes = null,
         favourite = false,
     )
+
+    private fun List<Row>.shapes(): List<Row> = map { row ->
+        when (row) {
+            is Row.Comment -> row.copy(connectors = ThreadConnectors())
+            is Row.MoreReplies -> row.copy(connectors = ThreadConnectors())
+        }
+    }
 }
