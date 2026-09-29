@@ -175,7 +175,8 @@ struct ResourceCard: View {
             if !resource.body.isEmpty || resource.deletion != nil { richContent }
             if resource.deletion == nil, let embed = resource.embed {
                 EmbedCard(embed: embed, thumbnailBytes: embedThumbnailBytes,
-                                loadTweet: actions.loadTweet, open: actions.openURL)
+                                loadTweet: actions.loadTweet, loadStreamable: actions.loadStreamable,
+                                open: actions.openURL)
             }
             linkMeta(showsTime: false)
             tags
@@ -345,7 +346,8 @@ struct ResourceCard: View {
         }
         if let embed = resource.embed {
             EmbedCard(embed: embed, thumbnailBytes: embedThumbnailBytes,
-                            loadTweet: actions.loadTweet, open: actions.openURL)
+                            loadTweet: actions.loadTweet, loadStreamable: actions.loadStreamable,
+                            open: actions.openURL)
         }
     }
 

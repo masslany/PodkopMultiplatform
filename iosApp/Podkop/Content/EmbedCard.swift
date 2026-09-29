@@ -42,6 +42,7 @@ struct EmbedCard: View {
     let embed: Embed
     var thumbnailBytes: Data?
     var loadTweet: ((String) async throws -> TweetPreview)?
+    var loadStreamable: ((String) async throws -> StreamableVideo)?
     var open: ((URL) -> Void)?
     @State private var tweet: TweetPreview?
     @State private var failed = false
@@ -56,6 +57,8 @@ struct EmbedCard: View {
                 } else {
                     TweetPlaceholderCard(failed: failed || loadTweet == nil, url: URL(string: embed.url), open: open)
                 }
+            } else if embed.type.lowercased() == "streamable", let loadStreamable {
+                StreamableEmbed(embed: embed, thumbnailBytes: thumbnailBytes, load: loadStreamable, open: open)
             } else {
                 otherEmbed
             }

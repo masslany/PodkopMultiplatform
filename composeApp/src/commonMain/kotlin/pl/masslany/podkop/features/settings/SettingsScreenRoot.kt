@@ -59,6 +59,8 @@ import podkop.composeapp.generated.resources.settings_body_dynamic_colors
 import podkop.composeapp.generated.resources.settings_body_gif_autoplay
 import podkop.composeapp.generated.resources.settings_body_manage_blacklists
 import podkop.composeapp.generated.resources.settings_body_open_debug
+import podkop.composeapp.generated.resources.settings_body_play_videos_inline
+import podkop.composeapp.generated.resources.settings_body_play_videos_inline_supporting
 import podkop.composeapp.generated.resources.settings_body_pm_notifications_disabled
 import podkop.composeapp.generated.resources.settings_body_pm_notifications_enabled
 import podkop.composeapp.generated.resources.settings_body_pm_notifications_toggle
@@ -203,6 +205,13 @@ fun SettingsScreenContent(
                         supportingText = null,
                         checked = state.autoplayGifs,
                         onCheckedChange = actions::onAutoplayGifsChanged,
+                    )
+                    SectionCardDivider()
+                    SwitchSettingRow(
+                        label = stringResource(resource = Res.string.settings_body_play_videos_inline),
+                        supportingText = stringResource(resource = Res.string.settings_body_play_videos_inline_supporting),
+                        checked = state.playVideosInline,
+                        onCheckedChange = actions::onPlayVideosInlineChanged,
                     )
                 }
 

@@ -8,6 +8,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import pl.masslany.podkop.common.components.embed.external.ExternalEmbedThumbnail
 import pl.masslany.podkop.common.components.embed.twitter.TwitterEmbedContent
+import pl.masslany.podkop.common.components.embed.video.StreamableEmbedContent
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentType
 import pl.masslany.podkop.common.preview.EmbedContentStateProvider
@@ -30,8 +31,14 @@ fun EmbedContent(
             onFetchedContentClick = onFetchedContentClick,
         )
 
+        EmbedContentType.Streamable -> StreamableEmbedContent(
+            modifier = modifier,
+            state = state,
+            onPlayClick = onPreviewClick,
+            onOpenSource = onFetchedContentClick,
+        )
+
         EmbedContentType.Youtube,
-        EmbedContentType.Streamable,
         EmbedContentType.Other,
         -> ExternalEmbedThumbnail(
             modifier = modifier,

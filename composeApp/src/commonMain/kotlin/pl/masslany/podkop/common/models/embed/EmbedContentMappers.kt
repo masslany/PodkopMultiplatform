@@ -21,6 +21,11 @@ internal fun Embed?.toEmbedContentState(): EmbedContentState? {
         } else {
             null
         },
+        streamableState = if (type == EmbedContentType.Streamable) {
+            StreamableEmbedState.Preview
+        } else {
+            null
+        },
     )
 }
 

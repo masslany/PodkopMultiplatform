@@ -10,6 +10,8 @@ interface SettingsActions : TopBarActions {
 
     fun onAutoplayGifsChanged(enabled: Boolean)
 
+    fun onPlayVideosInlineChanged(enabled: Boolean)
+
     fun onThemeOverrideChanged(value: ThemeOverride)
 
     fun onDynamicColorsChanged(enabled: Boolean)

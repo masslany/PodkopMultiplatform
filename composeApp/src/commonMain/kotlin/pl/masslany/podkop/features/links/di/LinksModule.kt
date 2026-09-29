@@ -30,6 +30,7 @@ val linksModule = module {
             dispatcherProvider = get(),
             logger = get(),
             twitterEmbedPreviewRepository = get(),
+            streamableEmbedPlayback = get(),
             screenshotShareDraftStore = get(),
             resourceActionUpdatesStore = get(),
         )

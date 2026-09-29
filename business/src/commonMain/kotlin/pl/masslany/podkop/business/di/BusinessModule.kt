@@ -4,7 +4,9 @@ import org.koin.dsl.module
 import pl.masslany.podkop.business.auth.data.di.authDataModule
 import pl.masslany.podkop.business.blacklists.data.di.blacklistsDataModule
 import pl.masslany.podkop.business.blacklists.data.network.di.blacklistsNetworkModule
+import pl.masslany.podkop.business.embeds.data.di.streamableVideoDataModule
 import pl.masslany.podkop.business.embeds.data.di.twitterEmbedPreviewDataModule
+import pl.masslany.podkop.business.embeds.data.network.di.streamableVideoNetworkModule
 import pl.masslany.podkop.business.embeds.data.network.di.twitterEmbedPreviewNetworkModule
 import pl.masslany.podkop.business.entries.data.di.entriesDataModule
 import pl.masslany.podkop.business.entries.data.network.di.entriesNetworkModule
@@ -47,6 +49,8 @@ val businessModule = module {
         blacklistsNetworkModule,
         twitterEmbedPreviewDataModule,
         twitterEmbedPreviewNetworkModule,
+        streamableVideoDataModule,
+        streamableVideoNetworkModule,
         hitsDataModule,
         hitsNetworkModule,
         entriesDataModule,

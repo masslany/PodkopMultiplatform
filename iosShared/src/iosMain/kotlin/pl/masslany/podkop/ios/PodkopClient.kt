@@ -30,6 +30,7 @@ import pl.masslany.podkop.business.common.domain.models.common.NameColor
 import pl.masslany.podkop.business.common.domain.models.common.Voted
 import pl.masslany.podkop.business.common.domain.models.common.VoteReason
 import pl.masslany.podkop.business.di.businessModule
+import pl.masslany.podkop.business.embeds.domain.main.StreamableVideoRepository
 import pl.masslany.podkop.business.embeds.domain.main.TwitterEmbedPreviewRepository
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
@@ -70,7 +71,12 @@ class IOSFailure(val category: String, val code: String? = null)
 class IOSSuccess(val completed: Boolean = true)
 class IOSStartupState(val phase: String)
 class IOSSessionState(val isLoggedIn: Boolean, val revision: Int)
-class IOSSettings(val autoplayGifs: Boolean, val themeOverride: String, val dynamicColorsEnabled: Boolean)
+class IOSSettings(
+    val autoplayGifs: Boolean,
+    val themeOverride: String,
+    val dynamicColorsEnabled: Boolean,
+    val playVideosInline: Boolean,
+)
 class IOSNotificationStatus(
     val totalUnreadCount: Int,
     val privateMessagesUnreadCount: Int,
@@ -110,6 +116,7 @@ class IOSTweetPreview(
     val mediaThumbnailUrl: String?,
     val mediaAspectRatio: Float?,
 )
+class IOSStreamableVideo(val mp4Url: String, val aspectRatio: Float?)
 class IOSResource(
     val id: Int,
     val kind: String,
@@ -211,6 +218,7 @@ class PodkopClient private constructor(
     private val mediaRepository: MediaRepository = app.koin.get()
     private val tagsRepository: TagsRepository = app.koin.get()
     private val twitterPreviewRepository: TwitterEmbedPreviewRepository = app.koin.get()
+    private val streamableVideoRepository: StreamableVideoRepository = app.koin.get()
     private val parser = AppDeepLinkParser()
     private var closed = false
 
@@ -351,8 +359,13 @@ class PodkopClient private constructor(
 
     inner class SettingsService {
         fun observe(onChange: (IOSSettings) -> Unit): IOSObservation = observe(onChange) { emit ->
-            combine(settingsStore.autoplayGifs, settingsStore.themeOverride, settingsStore.dynamicColorsEnabled) {
-                    autoplay, theme, dynamic -> IOSSettings(autoplay, theme.name, dynamic)
+            combine(
+                settingsStore.autoplayGifs,
+                settingsStore.themeOverride,
+                settingsStore.dynamicColorsEnabled,
+                settingsStore.playVideosInline,
+            ) { autoplay, theme, dynamic, inlineVideos ->
+                IOSSettings(autoplay, theme.name, dynamic, inlineVideos)
             }.collect { emit(it) }
         }
 
@@ -369,6 +382,9 @@ class PodkopClient private constructor(
 
         fun setDynamicColors(enabled: Boolean, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
             operation(completion) { settingsStore.setDynamicColorsEnabled(enabled); IOSSuccess() }
+
+        fun setPlayVideosInline(enabled: Boolean, completion: (IOSSuccess?, IOSFailure?) -> Unit): IOSOperation =
+            operation(completion) { settingsStore.setPlayVideosInline(enabled); IOSSuccess() }
     }
 
     inner class NotificationsService {
@@ -844,6 +860,15 @@ class PodkopClient private constructor(
                 mediaThumbnailUrl = preview.mediaThumbnailUrl,
                 mediaAspectRatio = preview.mediaAspectRatio,
             )
+        }
+
+        /** Resolve right before playback: the returned MP4 url is signed and expires. */
+        fun streamableVideo(
+            url: String,
+            completion: (IOSStreamableVideo?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            val video = streamableVideoRepository.getVideo(url).getOrThrow()
+            IOSStreamableVideo(mp4Url = video.mp4Url, aspectRatio = video.aspectRatio)
         }
     }
 

@@ -5,6 +5,7 @@ import XCTest
 private final class ControlledSettings: SettingsServicing {
     let saves = Pending<Void>()
     func setAutoplayGifs(_ enabled: Bool) async throws { try await saves.wait("autoplay:\(enabled)") }
+    func setPlayVideosInline(_ enabled: Bool) async throws { try await saves.wait("inlineVideos:\(enabled)") }
     func setTheme(_ theme: ThemeChoice) async throws { try await saves.wait("theme:\(theme.rawValue)") }
     func clearMediaCache() {}
     func libraries() -> [LibraryNotice] { [] }
@@ -14,6 +15,7 @@ private final class ControlledSettings: SettingsServicing {
 private final class StoredSettings: SettingsState {
     var theme: ThemeChoice = .auto
     var autoplayGifs = true
+    var playVideosInline = false
 }
 
 @MainActor
@@ -61,6 +63,22 @@ final class SettingsTests: XCTestCase {
         try await waitUntil("failure") { model.failed }
         XCTAssertEqual(state.theme, .light, "an older failed save must not undo a newer choice")
         service.saves.succeed(1, ())
+    }
+
+    func testInlineVideosSwitchSavesThroughTheService() async throws {
+        let service = ControlledSettings()
+        let state = StoredSettings()
+        let model = SettingsModel(service: service, state: state)
+
+        model.setPlayVideosInline(true)
+
+        XCTAssertTrue(state.playVideosInline, "the switch must not snap back while the choice is saved")
+        try await waitUntil("inline videos save") { service.saves.calls.count == 1 }
+        XCTAssertEqual(service.saves.calls[0].input, "inlineVideos:true")
+        service.saves.succeed(0, ())
+        try await Task.sleep(for: .milliseconds(20))
+        XCTAssertTrue(state.playVideosInline)
+        XCTAssertFalse(model.failed)
     }
 
     func testChoosingTheCurrentValueSavesNothing() async throws {

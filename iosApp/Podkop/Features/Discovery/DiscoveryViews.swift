@@ -47,6 +47,8 @@ extension ResourceActions {
             surveyVote: live && dependencies.session.isLoggedIn && item.kind == .entry && item.survey?.canVote == true
                 ? { interactor.voteSurvey(item, option: $0) } : nil,
             loadTweet: { try await dependencies.loadTweet($0) },
+            loadStreamable: dependencies.session.playVideosInline
+                ? { try await dependencies.loadStreamableVideo($0) } : nil,
             pending: interactor.isPending(item)
         )
     }

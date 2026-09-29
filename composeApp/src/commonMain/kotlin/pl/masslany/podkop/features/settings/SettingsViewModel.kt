@@ -58,11 +58,13 @@ class SettingsViewModel(
         appSettings.autoplayGifs,
         appSettings.themeOverride,
         appSettings.dynamicColorsEnabled,
-    ) { autoplayGifs, themeOverride, dynamicColorsEnabled ->
+        appSettings.playVideosInline,
+    ) { autoplayGifs, themeOverride, dynamicColorsEnabled, playVideosInline ->
         VisualPreferencesState(
             autoplayGifs = autoplayGifs,
             themeOverride = themeOverride,
             dynamicColorsEnabled = dynamicColorsEnabled,
+            playVideosInline = playVideosInline,
         )
     }
     private val telemetryPreferencesState = combine(
@@ -82,6 +84,7 @@ class SettingsViewModel(
             autoplayGifs = visualPreferencesState.autoplayGifs,
             themeOverride = visualPreferencesState.themeOverride,
             dynamicColorsEnabled = visualPreferencesState.dynamicColorsEnabled,
+            playVideosInline = visualPreferencesState.playVideosInline,
             analyticsEnabled = telemetryPreferencesState.analyticsEnabled,
             crashReportingEnabled = telemetryPreferencesState.crashReportingEnabled,
         )
@@ -103,6 +106,7 @@ class SettingsViewModel(
                 privateMessagesBackgroundNotificationsController.areSystemNotificationsEnabled(),
             shouldRequestNotificationPermission = shouldRequestNotificationPermission,
             autoplayGifs = preferencesState.autoplayGifs,
+            playVideosInline = preferencesState.playVideosInline,
             themeOverride = preferencesState.themeOverride,
             dynamicColorsEnabled = preferencesState.dynamicColorsEnabled,
             supportsDynamicColorsToggle = supportsDynamicColorsToggle(),
@@ -146,6 +150,12 @@ class SettingsViewModel(
     override fun onAutoplayGifsChanged(enabled: Boolean) {
         viewModelScope.launch {
             appSettings.setAutoplayGifs(enabled)
+        }
+    }
+
+    override fun onPlayVideosInlineChanged(enabled: Boolean) {
+        viewModelScope.launch {
+            appSettings.setPlayVideosInline(enabled)
         }
     }
 
@@ -279,6 +289,7 @@ class SettingsViewModel(
         appendLine("themeOverride=${state.themeOverride.name}")
         appendLine("dynamicColors=${state.dynamicColorsEnabled}")
         appendLine("autoplayGifs=${state.autoplayGifs}")
+        appendLine("playVideosInline=${state.playVideosInline}")
 
         if (state.supportsPrivateMessagesBackgroundNotifications) {
             appendLine("pmBackgroundNotifications=${state.privateMessagesBackgroundNotificationsEnabled}")
@@ -296,6 +307,7 @@ private data class SettingsPreferencesState(
     val autoplayGifs: Boolean,
     val themeOverride: ThemeOverride,
     val dynamicColorsEnabled: Boolean,
+    val playVideosInline: Boolean,
     val analyticsEnabled: Boolean,
     val crashReportingEnabled: Boolean,
 )
@@ -304,6 +316,7 @@ private data class VisualPreferencesState(
     val autoplayGifs: Boolean,
     val themeOverride: ThemeOverride,
     val dynamicColorsEnabled: Boolean,
+    val playVideosInline: Boolean,
 )
 
 private data class TelemetryPreferencesState(val analyticsEnabled: Boolean, val crashReportingEnabled: Boolean)

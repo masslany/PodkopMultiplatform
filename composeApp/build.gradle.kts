@@ -94,6 +94,8 @@ kotlin {
             implementation(libs.ktor.client.android)
             implementation(libs.androidx.browser)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.media3.exoplayer)
+            implementation(libs.androidx.media3.ui)
             implementation(libs.androidx.compose.ui.tooling)
             implementation(libs.coil.svg)
         }

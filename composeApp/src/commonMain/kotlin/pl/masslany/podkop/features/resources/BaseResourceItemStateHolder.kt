@@ -22,6 +22,7 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentType
+import pl.masslany.podkop.common.models.embed.StreamableEmbedState
 import pl.masslany.podkop.common.models.embed.TwitterEmbedState
 import pl.masslany.podkop.common.models.embed.toTwitterEmbedPreviewState
 import pl.masslany.podkop.common.models.survey.registerVote
@@ -56,6 +57,7 @@ open class BaseResourceItemStateHolder(
     private val dispatcherProvider: DispatcherProvider,
     private val logger: AppLogger,
     private val twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
+    private val streamableEmbedPlayback: StreamableEmbedPlayback,
     private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
     private val resourceActionUpdatesStore: ResourceActionUpdatesStore,
 ) : ResourceItemStateHolder {
@@ -184,11 +186,26 @@ open class BaseResourceItemStateHolder(
     ) {
         when (state.type) {
             EmbedContentType.Youtube,
-            EmbedContentType.Streamable,
             EmbedContentType.Other,
             -> {
                 appNavigator.openExternalLink(state.url)
                 return
+            }
+
+            EmbedContentType.Streamable -> {
+                // Playing and Error reload too: a fresh signed url fixes an expired or stalled stream.
+                if (state.streamableState == StreamableEmbedState.Loading) return
+                scope?.launch {
+                    if (state.streamableState == null || !streamableEmbedPlayback.isInlinePlaybackEnabled()) {
+                        appNavigator.openExternalLink(state.url)
+                        return@launch
+                    }
+                    updateEmbedState(itemId) {
+                        it.updateStreamableEmbedStateIfMatches(state.key, StreamableEmbedState.Loading)
+                    }
+                    val resolved = streamableEmbedPlayback.resolve(state.url)
+                    updateEmbedState(itemId) { it.updateStreamableEmbedStateIfMatches(state.key, resolved) }
+                }
             }
 
             EmbedContentType.Twitter -> {
@@ -777,28 +794,19 @@ open class BaseResourceItemStateHolder(
         embedKey: String,
         newState: TwitterEmbedState,
     ) {
+        updateEmbedState(itemId) { it.updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState) }
+    }
+
+    private fun updateEmbedState(
+        itemId: Int,
+        transform: (EmbedContentState?) -> EmbedContentState?,
+    ) {
         updateItem(itemId) { item ->
             when (item) {
-                is EntryItemState -> item.copy(
-                    embedContentState = item.embedContentState
-                        .updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState),
-                )
-
-                is EntryCommentItemState -> item.copy(
-                    embedContentState = item.embedContentState
-                        .updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState),
-                )
-
-                is LinkItemState -> item.copy(
-                    embedContentState = item.embedContentState
-                        .updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState),
-                )
-
-                is LinkCommentItemState -> item.copy(
-                    embedContentState = item.embedContentState
-                        .updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState),
-                )
-
+                is EntryItemState -> item.copy(embedContentState = transform(item.embedContentState))
+                is EntryCommentItemState -> item.copy(embedContentState = transform(item.embedContentState))
+                is LinkItemState -> item.copy(embedContentState = transform(item.embedContentState))
+                is LinkCommentItemState -> item.copy(embedContentState = transform(item.embedContentState))
                 else -> item
             }
         }
@@ -908,4 +916,15 @@ internal fun EmbedContentState?.updateTwitterEmbedStateIfMatches(
     if (current.key != embedKey) return current
 
     return current.copy(twitterState = newState)
+}
+
+internal fun EmbedContentState?.updateStreamableEmbedStateIfMatches(
+    embedKey: String,
+    newState: StreamableEmbedState,
+): EmbedContentState? {
+    val current = this ?: return null
+    if (current.type != EmbedContentType.Streamable) return current
+    if (current.key != embedKey) return current
+
+    return current.copy(streamableState = newState)
 }

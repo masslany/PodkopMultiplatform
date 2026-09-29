@@ -2587,6 +2587,57 @@
         }
       }
     },
+    "content.embedVideoError" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't play the video"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się odtworzyć filmu"
+          }
+        }
+      }
+    },
+    "content.embedVideoOpenSource" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz w %@"
+          }
+        }
+      }
+    },
+    "content.embedVideoPlay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play video"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odtwórz film"
+          }
+        }
+      }
+    },
     "content.favorite" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6762,6 +6813,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Masz nowe prywatne wiadomości"
+          }
+        }
+      }
+    },
+    "settings.settingsBodyPlayVideosInline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play videos in the app"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odtwarzaj filmy w aplikacji"
+          }
+        }
+      }
+    },
+    "settings.settingsBodyPlayVideosInlineSupporting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Streamable videos play right in the post."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filmy ze Streamable odtworzysz bezpośrednio we wpisie."
           }
         }
       }

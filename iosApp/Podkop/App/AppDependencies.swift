@@ -162,4 +162,12 @@ final class AppDependencies {
         }
         return TweetPreview(value)
     }
+
+    func loadStreamableVideo(_ url: String) async throws -> StreamableVideo {
+        let value: IOSStreamableVideo = try await adapter.call {
+            self.client.embeds.streamableVideo(url: url, completion: $0)
+        }
+        guard let video = StreamableVideo(value) else { throw URLError(.badURL) }
+        return video
+    }
 }

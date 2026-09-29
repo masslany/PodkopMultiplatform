@@ -19,6 +19,7 @@ import pl.masslany.podkop.features.links.hits.models.toHitItemState
 import pl.masslany.podkop.features.resourceactions.ResourceActionUpdatesStore
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
 import pl.masslany.podkop.features.resources.BaseResourceItemStateHolder
+import pl.masslany.podkop.features.resources.StreamableEmbedPlayback
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 
 class LinksResourceItemStateHolderImpl(
@@ -29,6 +30,7 @@ class LinksResourceItemStateHolderImpl(
     dispatcherProvider: DispatcherProvider,
     logger: AppLogger,
     twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
+    streamableEmbedPlayback: StreamableEmbedPlayback,
     screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
     resourceActionUpdatesStore: ResourceActionUpdatesStore,
 ) : BaseResourceItemStateHolder(
@@ -39,6 +41,7 @@ class LinksResourceItemStateHolderImpl(
     dispatcherProvider = dispatcherProvider,
     logger = logger,
     twitterEmbedPreviewRepository = twitterEmbedPreviewRepository,
+    streamableEmbedPlayback = streamableEmbedPlayback,
     screenshotShareDraftStore = screenshotShareDraftStore,
     resourceActionUpdatesStore = resourceActionUpdatesStore,
 ),
