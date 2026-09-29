@@ -85,6 +85,9 @@ final class SessionModel: SettingsState {
         let arguments = ProcessInfo.processInfo.arguments
         if let marker = arguments.firstIndex(of: "-uiFixture"),
            arguments.indices.contains(marker + 1) {
+            if arguments.contains("-contentTerms") {
+                UserDefaults.standard.removeObject(forKey: ContentTermsView.storageKey)
+            }
             switch arguments[marker + 1] {
             case "guest", "authenticated", "content":
                 dependencies.router.paths = [:]

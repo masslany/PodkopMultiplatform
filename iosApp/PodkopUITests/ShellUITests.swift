@@ -230,6 +230,15 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Wpis od autora z czarnej listy."].waitForExistence(timeout: 5))
     }
 
+    func testContentTermsMustBeAcceptedBeforeContent() {
+        let app = launch("guest", "-contentTerms")
+        let accept = app.buttons["acceptContentTerms"]
+        XCTAssertTrue(accept.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.tabBars.buttons["More"].exists)
+        accept.tap()
+        XCTAssertTrue(app.tabBars.buttons["More"].waitForExistence(timeout: 5))
+    }
+
     func testAdultContentStaysHiddenWithoutAccountSetting() {
         let app = launch("content")
         XCTAssertTrue(app.staticTexts["Przykładowy link o długim tytule"].waitForExistence(timeout: 5))

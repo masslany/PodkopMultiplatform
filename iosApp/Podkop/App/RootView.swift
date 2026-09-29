@@ -6,6 +6,7 @@ struct RootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var sceneID = UUID()
     @State private var externalPage: ExternalPage?
+    @AppStorage(ContentTermsView.storageKey) private var acceptedTermsVersion = 0
 
     private var session: SessionModel { dependencies.session }
     private var router: AppRouter { dependencies.router }
@@ -27,15 +28,11 @@ struct RootView: View {
                     explanation: String(localized: .appCheckConnectionTryAgain)
                 )
             case .ready:
-                #if DEBUG
-                if ProcessInfo.processInfo.arguments.contains("content") {
-                    ContentFixtureGallery()
+                if !termsAccepted {
+                    ContentTermsView { acceptedTermsVersion = ContentTermsView.version }
                 } else {
-                    tabs
+                    content
                 }
-                #else
-                tabs
-                #endif
             }
         }
         .environment(\.mediaLoader, dependencies.mediaLoader)
@@ -89,6 +86,27 @@ struct RootView: View {
                 .accessibilityIdentifier("appBanner")
             }
         }
+    }
+
+    /// UI tests skip the rules unless they launch with `-contentTerms`.
+    private var termsAccepted: Bool {
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-uiFixture") && !arguments.contains("-contentTerms") { return true }
+        #endif
+        return acceptedTermsVersion >= ContentTermsView.version
+    }
+
+    @ViewBuilder private var content: some View {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("content") {
+            ContentFixtureGallery()
+        } else {
+            tabs
+        }
+        #else
+        tabs
+        #endif
     }
 
     private var tabs: some View {
