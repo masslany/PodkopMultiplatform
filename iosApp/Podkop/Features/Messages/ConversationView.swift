@@ -184,12 +184,17 @@ private struct MessageBubble: View {
     let tab: AppTab
     let dependencies: AppDependencies
     @State private var adultRevealed = false
+    @Environment(\.adultContentAllowed) private var adultContentAllowed
 
     var body: some View {
         HStack {
             if !message.incoming { Spacer(minLength: 40) }
             VStack(alignment: .leading, spacing: 6) {
-                if message.adult && !adultRevealed {
+                if message.adult && !adultContentAllowed {
+                    Text(.contentAdultContentTurnedOff)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else if message.adult && !adultRevealed {
                     Button(.commonShowAdultContent) { adultRevealed = true }.buttonStyle(.bordered)
                 } else {
                     if let content = message.content, !content.isEmpty {

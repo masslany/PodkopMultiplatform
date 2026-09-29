@@ -2415,6 +2415,23 @@
         }
       }
     },
+    "content.adultContentTurnedOff" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adult content is turned off.\nYou can turn it on in your account settings on wykop.pl."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treści +18 są wyłączone.\nMożesz je włączyć w ustawieniach konta na wykop.pl."
+          }
+        }
+      }
+    },
     "content.bury" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -9,10 +9,12 @@ struct RelatedLinkCard: View {
     let openAuthor: (String) -> Void
     var voteUp: (() -> Void)?
     var voteDown: (() -> Void)?
+    @Environment(\.adultContentAllowed) private var adultContentAllowed
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            RemoteImage(url: resource.photo?.url, maxDimension: 360) {
+            RemoteImage(url: resource.adult && !adultContentAllowed ? nil : resource.photo?.url,
+                        maxDimension: 360) {
                 PodkopTheme.cardInset.overlay(Image(systemName: "link").foregroundStyle(.secondary))
             }
             .frame(width: 96)

@@ -1,6 +1,7 @@
 package pl.masslany.podkop.ios
 
 import pl.masslany.podkop.business.auth.domain.AuthRepository
+import pl.masslany.podkop.business.accountsettings.domain.main.AccountSettingsRepository
 import pl.masslany.podkop.business.blacklists.domain.main.BlacklistsRepository
 import pl.masslany.podkop.business.blacklists.domain.models.BlacklistNormalization
 import pl.masslany.podkop.business.common.domain.models.common.PaginatedData
@@ -233,6 +234,18 @@ class ProfileService internal constructor(private val client: PodkopClient) {
     private fun String.normalizedUsername(): String = trim().removePrefix("@").also {
         require(it.isNotBlank()) { "empty username" }
     }
+}
+
+class IOSAccountContentSettings(val showAdult: Boolean)
+
+/** The signed-in account's content preferences, which are changed on wykop.pl only. */
+class AccountSettingsService internal constructor(private val client: PodkopClient) {
+    private val accountSettingsRepository: AccountSettingsRepository = client.koin.get()
+
+    fun contentSettings(completion: (IOSAccountContentSettings?, IOSFailure?) -> Unit): IOSOperation =
+        client.operation(completion) {
+            IOSAccountContentSettings(accountSettingsRepository.getContentSettings().getOrThrow().showAdult)
+        }
 }
 
 class BlacklistsService internal constructor(private val client: PodkopClient) {

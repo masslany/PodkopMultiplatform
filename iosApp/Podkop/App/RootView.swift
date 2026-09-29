@@ -39,6 +39,7 @@ struct RootView: View {
             }
         }
         .environment(\.mediaLoader, dependencies.mediaLoader)
+        .environment(\.adultContentAllowed, dependencies.session.adultContentAllowed)
         .environment(\.imageActionMessage) { dependencies.router.banner = $0 }
         .environment(\.openURL, OpenURLAction { url in
             guard ["http", "https"].contains(url.scheme?.lowercased() ?? "") else {

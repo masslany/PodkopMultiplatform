@@ -138,8 +138,11 @@ final class AppDependencies {
     private init() {}
 
     func scene(_ id: UUID, active: Bool) {
+        let wasForeground = isForeground
         sceneActivity.set(id, active: active)
         updatePolling()
+        // The +18 setting changes on wykop.pl, so returning to the app picks up the new value.
+        if isForeground && !wasForeground && session.phase == .ready { session.refreshAdultContent() }
     }
 
     func updatePolling() {

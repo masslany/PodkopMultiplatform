@@ -1,9 +1,9 @@
 import XCTest
 
 final class ShellUITests: XCTestCase {
-    private func launch(_ fixture: String) -> XCUIApplication {
+    private func launch(_ fixture: String, _ arguments: String...) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments = ["-uiFixture", fixture]
+        app.launchArguments = ["-uiFixture", fixture] + arguments
         app.launch()
         return app
     }
@@ -208,7 +208,8 @@ final class ShellUITests: XCTestCase {
     }
 
     func testContentFixtureSpoilerAndAdultReveal() {
-        let app = launch("content")
+        // Stands in for Wykop's "+18" account setting, without which nothing can be revealed.
+        let app = launch("content", "-adultContentAllowed")
         XCTAssertTrue(app.staticTexts["Przykładowy link o długim tytule"].waitForExistence(timeout: 5))
         let spoiler = app.buttons["Show spoiler"]
         XCTAssertTrue(spoiler.exists)
@@ -227,6 +228,16 @@ final class ShellUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Wpis od autora z czarnej listy."].exists)
         blacklisted.tap()
         XCTAssertTrue(app.staticTexts["Wpis od autora z czarnej listy."].waitForExistence(timeout: 5))
+    }
+
+    func testAdultContentStaysHiddenWithoutAccountSetting() {
+        let app = launch("content")
+        XCTAssertTrue(app.staticTexts["Przykładowy link o długim tytule"].waitForExistence(timeout: 5))
+        let notice = app.descendants(matching: .any)["adultContentTurnedOff"].firstMatch
+        for _ in 0..<4 where !notice.exists { app.swipeUp() }
+        XCTAssertTrue(notice.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Show adult content"].exists)
+        XCTAssertFalse(app.staticTexts["Treść tylko dla dorosłych z wieloma zdaniami."].exists)
     }
 
     func testFixtureSearchSuggestionsOpenAdvancedSearch() {

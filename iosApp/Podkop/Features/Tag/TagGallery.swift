@@ -75,17 +75,22 @@ private struct TagGalleryTile: View {
     let ratio: CGFloat
     let showImage: () -> Void
     let openEntry: () -> Void
+    @Environment(\.adultContentAllowed) private var adultContentAllowed
+
+    /// Without the account's +18 setting an adult photo is neither loaded nor opened (see
+    /// `AdultContentGate`); the tile keeps its badge and the open-entry button.
+    private var photoHidden: Bool { item.adult && !adultContentAllowed }
 
     var body: some View {
         Color.clear
             .aspectRatio(ratio, contentMode: .fit)
             .frame(minHeight: 120)
             .overlay {
-                RemoteImage(url: item.photo?.url, maxDimension: 700) { PodkopTheme.cardInset }
+                RemoteImage(url: photoHidden ? nil : item.photo?.url, maxDimension: 700) { PodkopTheme.cardInset }
             }
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .onTapGesture(perform: showImage)
+            .onTapGesture { if !photoHidden { showImage() } }
             .overlay(alignment: .topLeading) {
                 HStack(spacing: 6) {
                     if item.adult { badge("18+") }

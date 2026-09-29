@@ -241,6 +241,7 @@ class PodkopClient private constructor(
     val tag = TagService(this)
     val profile = ProfileService(this)
     val blacklists = BlacklistsService(this)
+    val accountSettings = AccountSettingsService(this)
     val messages = MessagesService(this)
     val about = AboutService()
     val voters = VotersService()
