@@ -26,7 +26,9 @@ struct ContentTermsView: View {
                     Text(.termsAccept).frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
                 .tint(.primary)
+                .foregroundStyle(PodkopTheme.background)
                 .controlSize(.large)
                 .padding()
                 .background(PodkopTheme.background)
