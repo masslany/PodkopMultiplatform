@@ -1,6 +1,8 @@
 package pl.masslany.podkop.business.di
 
 import org.koin.dsl.module
+import pl.masslany.podkop.business.accountsettings.data.di.accountSettingsDataModule
+import pl.masslany.podkop.business.accountsettings.data.network.di.accountSettingsNetworkModule
 import pl.masslany.podkop.business.auth.data.di.authDataModule
 import pl.masslany.podkop.business.blacklists.data.di.blacklistsDataModule
 import pl.masslany.podkop.business.blacklists.data.network.di.blacklistsNetworkModule
@@ -47,6 +49,8 @@ val businessModule = module {
         authDataModule,
         blacklistsDataModule,
         blacklistsNetworkModule,
+        accountSettingsDataModule,
+        accountSettingsNetworkModule,
         twitterEmbedPreviewDataModule,
         twitterEmbedPreviewNetworkModule,
         streamableVideoDataModule,

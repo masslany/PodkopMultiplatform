@@ -5,11 +5,14 @@ import SwiftUI
 struct HitTile: View {
     let resource: Resource
     let open: () -> Void
+    @Environment(\.adultContentAllowed) private var adultContentAllowed
 
     var body: some View {
         Button(action: open) {
             ZStack(alignment: .bottomLeading) {
-                RemoteImage(url: resource.photo?.url, maxDimension: 480) {
+                // An adult image is not loaded at all without the account's +18 setting.
+                RemoteImage(url: resource.adult && !adultContentAllowed ? nil : resource.photo?.url,
+                            maxDimension: 480) {
                     LinearGradient(colors: [.gray, .gray.opacity(0.6)],
                                    startPoint: .topLeading, endPoint: .bottomTrailing)
                 }

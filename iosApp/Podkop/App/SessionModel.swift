@@ -10,13 +10,25 @@ final class SessionModel: SettingsState {
         didSet {
             guard isLoggedIn != oldValue else { return }
             refreshUsername()
+            refreshAdultContent(clearing: true)
             if !isLoggedIn { dependencies.messageNotifications.loggedOut() }
         }
     }
-    var revision = 0 { didSet { if revision != oldValue { refreshUsername() } } }
+    var revision = 0 {
+        didSet {
+            guard revision != oldValue else { return }
+            refreshUsername()
+            refreshAdultContent(clearing: true)
+        }
+    }
     /// The signed-in user's name, used to highlight their own comments; nil while unknown.
     private(set) var username: String?
     private var usernameTask: Task<Void, Never>?
+    /// Wykop's "+18" account setting, which can only be changed on wykop.pl. App Store guideline
+    /// 1.2 allows adult content only when the user turned it on there, so it stays off for guests
+    /// and until the account confirms it.
+    private(set) var adultContentAllowed = false
+    private var adultContentTask: Task<Void, Never>?
     var unreadCount = 0
     var notificationCounts = NotificationCounts()
     var autoplayGifs = true
@@ -43,6 +55,29 @@ final class SessionModel: SettingsState {
         }
     }
 
+    /// Re-reads the account's +18 setting; `clearing` hides adult content during the lookup, as
+    /// another account's preference must never stay behind.
+    func refreshAdultContent(clearing: Bool = false) {
+        adultContentTask?.cancel()
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-uiFixture") {
+            adultContentAllowed = ProcessInfo.processInfo.arguments.contains("-adultContentAllowed")
+            return
+        }
+        #endif
+        if clearing || !isLoggedIn { adultContentAllowed = false }
+        guard isLoggedIn else { return }
+        let client = dependencies.client
+        let adapter = dependencies.adapter
+        adultContentTask = Task { [weak self] in
+            let settings: IOSAccountContentSettings? = try? await adapter.call {
+                client.accountSettings.contentSettings(completion: $0)
+            }
+            guard !Task.isCancelled else { return }
+            self?.adultContentAllowed = settings?.showAdult ?? false
+        }
+    }
+
     func startIfNeeded() {
         guard !started else { return }
         started = true
@@ -50,6 +85,9 @@ final class SessionModel: SettingsState {
         let arguments = ProcessInfo.processInfo.arguments
         if let marker = arguments.firstIndex(of: "-uiFixture"),
            arguments.indices.contains(marker + 1) {
+            if arguments.contains("-contentTerms") {
+                UserDefaults.standard.removeObject(forKey: ContentTermsView.storageKey)
+            }
             switch arguments[marker + 1] {
             case "guest", "authenticated", "content":
                 dependencies.router.paths = [:]
@@ -58,6 +96,7 @@ final class SessionModel: SettingsState {
                 isLoggedIn = arguments[marker + 1] == "authenticated"
                 revision = 0
                 dependencies.router.applySession(isLoggedIn: isLoggedIn, revision: 0)
+                refreshAdultContent()
                 dependencies.ingress.ready = true
                 dependencies.updatePolling()
             case "retry", "retryLink":
@@ -80,6 +119,7 @@ final class SessionModel: SettingsState {
                     phase = .ready
                     dependencies.ingress.ready = true
                     dependencies.updatePolling()
+                    refreshAdultContent()
                 case "error": phase = .error
                 default: if phase != .missingConfiguration { phase = .initializing }
                 }

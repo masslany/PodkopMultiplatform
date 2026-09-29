@@ -2415,6 +2415,23 @@
         }
       }
     },
+    "content.adultContentTurnedOff" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adult content is turned off.\nYou can turn it on in your account settings on wykop.pl."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treści +18 są wyłączone.\nMożesz je włączyć w ustawieniach konta na wykop.pl."
+          }
+        }
+      }
+    },
     "content.bury" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7493,6 +7510,176 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edytuj komentarz"
+          }
+        }
+      }
+    },
+    "terms.accept" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I agree"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akceptuję"
+          }
+        }
+      }
+    },
+    "terms.adultBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adult content is hidden. It can only be turned on in your account settings on wykop.pl."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treści +18 są ukryte. Można je włączyć wyłącznie w ustawieniach konta na wykop.pl."
+          }
+        }
+      }
+    },
+    "terms.adultTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adult content"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treści +18"
+          }
+        }
+      }
+    },
+    "terms.intro" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podkop is an unofficial client for Wykop. Everything you see is posted by Wykop users and moderated by Wykop."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podkop jest nieoficjalnym klientem Wykopu. Wszystkie treści publikują użytkownicy Wykopu, a moderuje je Wykop."
+          }
+        }
+      }
+    },
+    "terms.reportBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To report a link, entry or comment, choose “Report on Wykop” from its ⋯ menu. When signed in, you can block users and tags from their pages and manage blocked users, tags and domains in Settings → Manage blacklists. Blocked content disappears from your feeds."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby zgłosić znalezisko, wpis lub komentarz, wybierz „Zgłoś na Wykopie” z jego menu ⋯. Po zalogowaniu możesz blokować użytkowników i tagi na ich stronach oraz zarządzać zablokowanymi użytkownikami, tagami i domenami w Ustawieniach → Zarządzaj czarną listą. Zablokowane treści znikają z Twoich list."
+          }
+        }
+      }
+    },
+    "terms.reportTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reporting and blocking"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zgłaszanie i blokowanie"
+          }
+        }
+      }
+    },
+    "terms.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Community rules"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zasady społeczności"
+          }
+        }
+      }
+    },
+    "terms.wykopTerms" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wykop's terms"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regulamin Wykopu"
+          }
+        }
+      }
+    },
+    "terms.zeroToleranceBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "By using Podkop you agree to Wykop's terms. There is no tolerance for objectionable content, such as hateful, violent or illegal material, or for abusive users. Wykop removes such content and bans accounts that break the rules."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korzystając z Podkopu, akceptujesz regulamin Wykopu. Nie ma tolerancji dla treści niedozwolonych, np. nienawistnych, brutalnych lub nielegalnych, ani dla użytkowników, którzy nękają innych. Wykop usuwa takie treści i blokuje konta łamiące zasady."
+          }
+        }
+      }
+    },
+    "terms.zeroToleranceTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zero tolerance"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zero tolerancji"
           }
         }
       }
