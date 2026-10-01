@@ -188,7 +188,10 @@ final class ShellUITests: XCTestCase {
         app.buttons["Settings"].tap()
         // Like Android, the private-message notifications switch is for signed-in users only.
         XCTAssertTrue(app.switches["settingsMessageNotifications"].waitForExistence(timeout: 5))
-        app.buttons["settingsSignOut"].tap()
+        // Sign-out ends the list, below the fold on shorter phones.
+        let signOut = app.buttons["settingsSignOut"]
+        for _ in 0..<4 where !signOut.isHittable { app.swipeUp() }
+        signOut.tap()
         XCTAssertTrue(app.alerts.buttons["Sign out"].waitForExistence(timeout: 5))
         app.alerts.buttons["Sign out"].tap()
         XCTAssertTrue(app.buttons["settingsSignOut"].waitForNonExistence(timeout: 5))
