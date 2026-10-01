@@ -13,6 +13,7 @@ import pl.masslany.podkop.common.network.infrastructure.main.mapper.toHttpReques
 import pl.masslany.podkop.common.network.models.request.Request
 import pl.masslany.podkop.common.network.models.response.ApiResponse
 import pl.masslany.podkop.common.network.models.response.ResponseTypeInfo
+import kotlin.coroutines.cancellation.CancellationException
 
 internal class ApiClientImpl(
     private val httpClient: HttpClient,
@@ -41,6 +42,8 @@ internal class ApiClientImpl(
                 ) as T
 
             Result.success(ApiResponse(content = responseBody))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Result.failure(e)
         }
