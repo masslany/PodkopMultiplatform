@@ -3,6 +3,8 @@ package pl.masslany.podkop.features.entrydetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
@@ -65,8 +68,9 @@ class EntryDetailsViewModel(
     private val isLoadingMoreTopLevel = MutableStateFlow(false)
     private var isTopLevelPaginationBlocked = false
 
-    // Bumped on every (re)load so late thread pages from a previous load are dropped.
-    private var loadGeneration = 0
+    // Parent of every load for the content on screen. A reload cancels it, so requests from the
+    // previous load stop instead of landing on the new content.
+    private var contentLoads = SupervisorJob(viewModelScope.coroutineContext.job)
 
     // Composer result key -> comment the reply was posted under (null = top level), threaded mode only.
     private val pendingReplyParents = mutableMapOf<String, Int?>()
@@ -143,16 +147,15 @@ class EntryDetailsViewModel(
         val tree = threadTree.value ?: return
         if (parentCommentId in loadingRepliesIds.value) return
         loadingRepliesIds.update { it + parentCommentId }
-        val generation = loadGeneration
 
-        viewModelScope.launch {
+        launchContentLoad {
             entriesRepository.getEntryThreadReplies(
                 entryId = entryId,
                 parentCommentId = parentCommentId,
                 sort = THREAD_SORT,
                 afterId = tree.repliesCursorId(parentCommentId),
             )
-                .onSuccess { page -> appendThreadPage(parentCommentId, page, generation) }
+                .onSuccess { page -> appendThreadPage(parentCommentId, page) }
                 .onFailure {
                     logger.error("Failed to load replies to entry comment id=$parentCommentId", it)
                     snackbarManager.tryEmitGenericError()
@@ -162,7 +165,8 @@ class EntryDetailsViewModel(
     }
 
     private fun loadContent(isRefreshing: Boolean) {
-        val generation = ++loadGeneration
+        contentLoads.cancel()
+        contentLoads = SupervisorJob(viewModelScope.coroutineContext.job)
         loadingRepliesIds.value = emptySet()
         isLoadingMoreTopLevel.value = false
         isTopLevelPaginationBlocked = false
@@ -175,7 +179,7 @@ class EntryDetailsViewModel(
                 .updateRefreshing(isRefreshing)
         }
 
-        viewModelScope.launch {
+        launchContentLoad {
             coroutineScope {
                 val viewerContextDeferred = async {
                     resolveViewerContext()
@@ -239,9 +243,7 @@ class EntryDetailsViewModel(
                 }
 
                 // After comments, so a reply to a comment can be nested under it in threaded mode.
-                if (generation == loadGeneration) {
-                    maybeApplyPendingComposerIntent(canShowComposer = viewerContext.isLoggedIn)
-                }
+                maybeApplyPendingComposerIntent(canShowComposer = viewerContext.isLoggedIn)
             }
 
             updateState { previousState ->
@@ -282,16 +284,15 @@ class EntryDetailsViewModel(
     private fun loadMoreTopLevelComments() {
         val tree = threadTree.value ?: return
         if (!isLoadingMoreTopLevel.compareAndSet(expect = false, update = true)) return
-        val generation = loadGeneration
 
-        viewModelScope.launch {
+        launchContentLoad {
             entriesRepository.getEntryThreadReplies(
                 entryId = entryId,
                 parentCommentId = null,
                 sort = THREAD_SORT,
                 afterId = tree.topLevelCursorId,
             )
-                .onSuccess { page -> appendThreadPage(parentId = null, page = page, generation = generation) }
+                .onSuccess { page -> appendThreadPage(parentId = null, page = page) }
                 .onFailure {
                     logger.error("Failed to load more entry comments for id=$entryId", it)
                     // Stop auto-paginating into the same error on every scroll; refresh retries.
@@ -302,8 +303,11 @@ class EntryDetailsViewModel(
         }
     }
 
-    private suspend fun appendThreadPage(parentId: Int?, page: EntryThreadReplies, generation: Int) {
-        if (generation != loadGeneration) return
+    private fun launchContentLoad(block: suspend CoroutineScope.() -> Unit) {
+        viewModelScope.launch(contentLoads, block = block)
+    }
+
+    private suspend fun appendThreadPage(parentId: Int?, page: EntryThreadReplies) {
         resourceItemStateHolder.appendData(page.flattenComments())
         threadTree.update { it?.appendPage(parentId, page) }
     }
