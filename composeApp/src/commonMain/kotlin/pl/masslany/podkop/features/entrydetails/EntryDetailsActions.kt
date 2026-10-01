@@ -12,4 +12,6 @@ interface EntryDetailsActions :
     TopBarActions {
 
     fun onRefresh()
+
+    fun onShowMoreEntryRepliesClicked(parentCommentId: Int)
 }

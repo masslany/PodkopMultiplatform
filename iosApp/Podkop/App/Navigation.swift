@@ -74,6 +74,8 @@ enum AppSheet: String, Identifiable {
 enum ComposerIntent: Hashable {
     case createEntry
     case createEntryComment(entryID: Int, replyTarget: String?)
+    /// A reply nested under `parentCommentID` (threaded entry comments).
+    case createEntryThreadReply(entryID: Int, parentCommentID: Int, replyTarget: String?)
     case createLinkComment(linkID: Int, parentCommentID: Int?, replyTarget: String?)
     case editEntry(Int)
     case editEntryComment(entryID: Int, commentID: Int)

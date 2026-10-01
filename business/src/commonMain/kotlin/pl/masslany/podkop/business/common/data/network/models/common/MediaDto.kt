@@ -10,6 +10,9 @@ data class MediaDto(
     val embed: EmbedDto? = null,
     @SerialName("photo")
     val photo: PhotoDto? = null,
+    // Thread endpoints (entries-threads) only send the list form.
+    @SerialName("photos")
+    val photos: List<PhotoDto>? = null,
     @SerialName("survey")
     val survey: SurveyDto? = null,
 )

@@ -29,6 +29,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -71,6 +72,7 @@ import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentIte
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.accessibility_fab_scroll_to_top
 import podkop.composeapp.generated.resources.accessibility_topbar_back
+import podkop.composeapp.generated.resources.entry_details_button_show_more_replies
 import podkop.composeapp.generated.resources.entry_details_screen_error_loading_comments
 import podkop.composeapp.generated.resources.ic_arrow_back
 import podkop.composeapp.generated.resources.ic_keyboard_arrow_up
@@ -283,57 +285,80 @@ private fun EntryDetailsScreenList(
             }
         }
 
-        itemsIndexed(
-            items = state.comments,
-            key = { _, item -> item.id },
-            contentType = { _, item -> item.contentType },
-        ) { index, item ->
-            val lineColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-            val authorColor = MaterialTheme.colorsPalette.nameGreen
-            val isCurrentUserComment = (item as? EntryCommentItemState)
-                ?.authorState
-                ?.name == state.currentUsername
+        val threadRows = state.threadRows
+        val threadActionsConfig = replyActionsConfig.copy(indentCommentBodyUnderAuthor = true)
+        if (threadRows != null) {
+            itemsIndexed(
+                items = threadRows,
+                key = { _, row -> row.key },
+                contentType = { _, row ->
+                    when (row) {
+                        is EntryThreadRowState.Comment -> row.item.contentType
+                        is EntryThreadRowState.MoreReplies -> "MoreReplies"
+                    }
+                },
+            ) { index, row ->
+                EntryThreadRow(
+                    row = row,
+                    // Threads are separated from each other, not from their own replies.
+                    showDivider = threadRows.getOrNull(index + 1)?.depth == 0,
+                    actions = actions,
+                    config = threadActionsConfig,
+                )
+            }
+        } else {
+            itemsIndexed(
+                items = state.comments,
+                key = { _, item -> item.id },
+                contentType = { _, item -> item.contentType },
+            ) { index, item ->
+                val lineColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                val authorColor = MaterialTheme.colorsPalette.nameGreen
+                val isCurrentUserComment = (item as? EntryCommentItemState)
+                    ?.authorState
+                    ?.name == state.currentUsername
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = 16.dp,
-                        end = 16.dp,
-                    )
-                    .drawBehind {
-                        val lineWidth = 2.dp.toPx()
-                        drawRect(
-                            color = if (isCurrentUserComment && !state.currentUsername.isNullOrBlank()) {
-                                authorColor
-                            } else {
-                                lineColor
-                            },
-                            topLeft = Offset(0f, 0f),
-                            size = Size(lineWidth, size.height),
-                        )
-                    },
-            ) {
-                Row(
-                    modifier = Modifier.padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    Spacer(Modifier.width(2.dp))
-
-                    ResourceItemRenderer(
-                        state = item,
-                        actions = actions,
-                        config = replyActionsConfig,
-                    )
-                }
-
-                if (index != state.comments.lastIndex) {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(
-                            top = 16.dp,
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
                             start = 16.dp,
-                        ),
-                    )
+                            end = 16.dp,
+                        )
+                        .drawBehind {
+                            val lineWidth = 2.dp.toPx()
+                            drawRect(
+                                color = if (isCurrentUserComment && !state.currentUsername.isNullOrBlank()) {
+                                    authorColor
+                                } else {
+                                    lineColor
+                                },
+                                topLeft = Offset(0f, 0f),
+                                size = Size(lineWidth, size.height),
+                            )
+                        },
+                ) {
+                    Row(
+                        modifier = Modifier.padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        Spacer(Modifier.width(2.dp))
+
+                        ResourceItemRenderer(
+                            state = item,
+                            actions = actions,
+                            config = replyActionsConfig,
+                        )
+                    }
+
+                    if (index != state.comments.lastIndex) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(
+                                top = 16.dp,
+                                start = 16.dp,
+                            ),
+                        )
+                    }
                 }
             }
         }
@@ -345,6 +370,73 @@ private fun EntryDetailsScreenList(
                 PaginationLoadingIndicator()
             }
         }
+    }
+}
+
+@Composable
+private fun EntryThreadRow(
+    row: EntryThreadRowState,
+    showDivider: Boolean,
+    actions: EntryDetailsActions,
+    config: ResourceItemConfig,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .threadConnectors(
+                depth = row.depth,
+                connectors = row.connectors,
+                // Middle of the avatar, or of the "more replies" button.
+                elbowY = if (row is EntryThreadRowState.Comment) 34.dp else 32.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            .padding(start = threadContentStart(row.depth), end = 16.dp),
+    ) {
+        when (row) {
+            is EntryThreadRowState.Comment -> ResourceItemRenderer(
+                modifier = Modifier.padding(top = 16.dp),
+                state = row.item,
+                actions = actions,
+                config = config,
+            )
+
+            is EntryThreadRowState.MoreReplies -> ShowMoreRepliesButton(
+                modifier = Modifier.padding(top = 12.dp),
+                row = row,
+                onClick = { actions.onShowMoreEntryRepliesClicked(row.parentId) },
+            )
+        }
+
+        if (showDivider) {
+            HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
+        }
+    }
+}
+
+@Composable
+private fun ShowMoreRepliesButton(
+    row: EntryThreadRowState.MoreReplies,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedButton(
+        modifier = modifier,
+        onClick = onClick,
+        enabled = !row.isLoading,
+    ) {
+        if (row.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(16.dp),
+                strokeWidth = 2.dp,
+            )
+            Spacer(Modifier.size(8.dp))
+        }
+        Text(
+            text = stringResource(
+                resource = Res.string.entry_details_button_show_more_replies,
+                row.remainingCount,
+            ),
+        )
     }
 }
 

@@ -6,6 +6,7 @@ private final class ControlledSettings: SettingsServicing {
     let saves = Pending<Void>()
     func setAutoplayGifs(_ enabled: Bool) async throws { try await saves.wait("autoplay:\(enabled)") }
     func setPlayVideosInline(_ enabled: Bool) async throws { try await saves.wait("inlineVideos:\(enabled)") }
+    func setThreadedEntryComments(_ enabled: Bool) async throws { try await saves.wait("threads:\(enabled)") }
     func setTheme(_ theme: ThemeChoice) async throws { try await saves.wait("theme:\(theme.rawValue)") }
     func clearMediaCache() {}
     func libraries() -> [LibraryNotice] { [] }
@@ -16,6 +17,7 @@ private final class StoredSettings: SettingsState {
     var theme: ThemeChoice = .auto
     var autoplayGifs = true
     var playVideosInline = false
+    var threadedEntryComments = false
 }
 
 @MainActor
@@ -78,6 +80,22 @@ final class SettingsTests: XCTestCase {
         service.saves.succeed(0, ())
         try await Task.sleep(for: .milliseconds(20))
         XCTAssertTrue(state.playVideosInline)
+        XCTAssertFalse(model.failed)
+    }
+
+    func testThreadedCommentsSwitchSavesThroughTheService() async throws {
+        let service = ControlledSettings()
+        let state = StoredSettings()
+        let model = SettingsModel(service: service, state: state)
+
+        model.setThreadedEntryComments(true)
+
+        XCTAssertTrue(state.threadedEntryComments, "the switch must not snap back while the choice is saved")
+        try await waitUntil("threaded comments save") { service.saves.calls.count == 1 }
+        XCTAssertEqual(service.saves.calls[0].input, "threads:true")
+        service.saves.succeed(0, ())
+        try await Task.sleep(for: .milliseconds(20))
+        XCTAssertTrue(state.threadedEntryComments)
         XCTAssertFalse(model.failed)
     }
 

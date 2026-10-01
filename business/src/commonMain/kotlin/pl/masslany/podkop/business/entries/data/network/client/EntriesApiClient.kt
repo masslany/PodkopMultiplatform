@@ -10,6 +10,10 @@ import pl.masslany.podkop.business.entries.data.network.models.EntryCreateDataDt
 import pl.masslany.podkop.business.entries.data.network.models.EntryCreateRequestDto
 import pl.masslany.podkop.business.entries.data.network.models.EntrySurveyVoteDataDto
 import pl.masslany.podkop.business.entries.data.network.models.EntrySurveyVoteRequestDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadReplyCreateDataDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadReplyCreateRequestDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadRepliesResponseDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadResponseDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
 import pl.masslany.podkop.common.network.api.ApiClient
 import pl.masslany.podkop.common.network.api.request
@@ -82,6 +86,90 @@ class EntriesApiClient(
             onFailure = { Result.failure(it) },
         )
     }
+
+    override suspend fun getEntryThread(
+        entryId: Int,
+        sort: String,
+        limit: Int,
+    ): Result<EntryThreadResponseDto> {
+        val request =
+            Request<EntryThreadResponseDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/entries-threads/$entryId",
+                queryParameters = mapOf(
+                    "comments_sort" to sort,
+                    "comments_limit" to limit.toString(),
+                    "comments_expanded" to "true",
+                ),
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun getEntryThreadReplies(
+        entryId: Int,
+        parentCommentId: Int?,
+        sort: String,
+        afterId: Int?,
+        limit: Int,
+    ): Result<EntryThreadRepliesResponseDto> {
+        val queryParameters = buildMap {
+            put("sort", sort)
+            put("limit", limit.toString())
+            put("expanded", "true")
+            // Thread lists page by the id of the last loaded sibling, not by page number.
+            afterId?.let { put("id", it.toString()) }
+        }
+
+        val request =
+            Request<EntryThreadRepliesResponseDto>(
+                method = Request.HttpMethod.GET,
+                path = entryThreadCommentsPath(entryId, parentCommentId),
+                queryParameters = queryParameters,
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    override suspend fun createEntryThreadReply(
+        entryId: Int,
+        parentCommentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<EntryThreadResponseDto> {
+        val body = EntryThreadReplyCreateRequestDto(
+            data = EntryThreadReplyCreateDataDto(
+                content = content,
+                adult = adult,
+                photos = photoKey?.let(::listOf),
+            ),
+        )
+        val request =
+            Request<EntryThreadResponseDto>(
+                method = Request.HttpMethod.POST,
+                path = entryThreadCommentsPath(entryId, parentCommentId),
+                body = body,
+            )
+
+        return apiClient.request(request).fold(
+            onSuccess = { Result.success(it.content) },
+            onFailure = { Result.failure(it) },
+        )
+    }
+
+    private fun entryThreadCommentsPath(entryId: Int, parentCommentId: Int?): String =
+        if (parentCommentId == null) {
+            "api/v3/entries-threads/$entryId/comments"
+        } else {
+            "api/v3/entries-threads/$entryId/comments/$parentCommentId/comments"
+        }
 
     override suspend fun getEntryVotes(
         entryId: Int,

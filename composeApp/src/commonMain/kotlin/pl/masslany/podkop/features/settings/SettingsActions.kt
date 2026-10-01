@@ -12,6 +12,8 @@ interface SettingsActions : TopBarActions {
 
     fun onPlayVideosInlineChanged(enabled: Boolean)
 
+    fun onThreadedEntryCommentsChanged(enabled: Boolean)
+
     fun onThemeOverrideChanged(value: ThemeOverride)
 
     fun onDynamicColorsChanged(enabled: Boolean)

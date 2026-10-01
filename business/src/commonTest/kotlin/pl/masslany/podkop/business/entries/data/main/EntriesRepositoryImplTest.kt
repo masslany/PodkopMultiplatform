@@ -7,7 +7,12 @@ import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.Voted
 import pl.masslany.podkop.business.common.domain.models.common.Voter
 import pl.masslany.podkop.business.common.domain.models.common.Voters
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadNodeDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadRepliesDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadRepliesResponseDto
+import pl.masslany.podkop.business.entries.data.network.models.EntryThreadResponseDto
 import pl.masslany.podkop.business.entries.data.network.models.EntryVotersResponseDto
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadSort
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
@@ -127,6 +132,101 @@ class EntriesRepositoryImplTest {
             entriesDataSource.getEntryCommentsCalls,
         )
         assertEquals(Fixtures.resources(), actual.getOrThrow())
+    }
+
+    @Test
+    fun `get entry thread forwards sort and page size and maps the tree`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            getEntryThreadResult = Result.success(
+                EntryThreadResponseDto(
+                    data = threadNode(
+                        id = 1,
+                        nesting = 1,
+                        resource = "entry",
+                        replies = EntryThreadRepliesDto(count = 4, items = listOf(threadNode(id = 10, nesting = 2))),
+                    ),
+                ),
+            )
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.getEntryThread(entryId = 1, sort = EntryThreadSort.Best).getOrThrow()
+
+        assertEquals(
+            listOf(FakeEntriesDataSource.GetEntryThreadCall(entryId = 1, sort = "best", limit = 25)),
+            entriesDataSource.getEntryThreadCalls,
+        )
+        assertEquals(1, actual.entry.id)
+        assertEquals(4, actual.comments.totalCount)
+        assertEquals(listOf(10), actual.comments.items.map { it.comment.id })
+        assertEquals(0, actual.comments.items.single().depth)
+    }
+
+    @Test
+    fun `get entry thread replies forwards parent and cursor`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            getEntryThreadRepliesResult = Result.success(
+                EntryThreadRepliesResponseDto(
+                    data = EntryThreadRepliesDto(count = 2, items = listOf(threadNode(id = 21, nesting = 3))),
+                ),
+            )
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.getEntryThreadReplies(
+            entryId = 1,
+            parentCommentId = 10,
+            sort = EntryThreadSort.Oldest,
+            afterId = 20,
+        ).getOrThrow()
+
+        assertEquals(
+            listOf(
+                FakeEntriesDataSource.GetEntryThreadRepliesCall(
+                    entryId = 1,
+                    parentCommentId = 10,
+                    sort = "oldest",
+                    afterId = 20,
+                    limit = 25,
+                ),
+            ),
+            entriesDataSource.getEntryThreadRepliesCalls,
+        )
+        assertEquals(2, actual.totalCount)
+        assertEquals(1, actual.items.single().depth)
+        assertEquals(1, actual.items.single().comment.parent?.id)
+    }
+
+    @Test
+    fun `create entry thread reply forwards parent and maps the new comment`() = runBlocking {
+        val entriesDataSource = FakeEntriesDataSource().apply {
+            createEntryThreadReplyResult = Result.success(EntryThreadResponseDto(data = threadNode(id = 30, nesting = 4)))
+        }
+        val sut = createSut(entriesDataSource = entriesDataSource)
+
+        val actual = sut.createEntryThreadReply(
+            entryId = 1,
+            parentCommentId = 21,
+            content = "hej",
+            adult = false,
+            photoKey = "photo",
+        ).getOrThrow()
+
+        assertEquals(
+            listOf(
+                FakeEntriesDataSource.CreateEntryThreadReplyCall(
+                    entryId = 1,
+                    parentCommentId = 21,
+                    content = "hej",
+                    adult = false,
+                    photoKey = "photo",
+                ),
+            ),
+            entriesDataSource.createEntryThreadReplyCalls,
+        )
+        assertEquals(30, actual.comment.id)
+        assertEquals(2, actual.depth)
+        assertEquals(30, actual.replyParentId)
     }
 
     @Test
@@ -599,6 +699,18 @@ class EntriesRepositoryImplTest {
         assertTrue(actual.isFailure)
         assertSame(expected, actual.exceptionOrNull())
     }
+
+    private fun threadNode(
+        id: Int,
+        nesting: Int,
+        resource: String = "entry_comment",
+        replies: EntryThreadRepliesDto = EntryThreadRepliesDto(),
+    ) = EntryThreadNodeDto(
+        item = Fixtures.resourceItemDto(id = id, resource = resource),
+        nesting = nesting,
+        host = false,
+        replies = replies,
+    )
 
     private fun createSut(
         entriesDataSource: FakeEntriesDataSource = FakeEntriesDataSource(),

@@ -61,6 +61,8 @@ import podkop.composeapp.generated.resources.settings_body_manage_blacklists
 import podkop.composeapp.generated.resources.settings_body_open_debug
 import podkop.composeapp.generated.resources.settings_body_play_videos_inline
 import podkop.composeapp.generated.resources.settings_body_play_videos_inline_supporting
+import podkop.composeapp.generated.resources.settings_body_threaded_entry_comments
+import podkop.composeapp.generated.resources.settings_body_threaded_entry_comments_supporting
 import podkop.composeapp.generated.resources.settings_body_pm_notifications_disabled
 import podkop.composeapp.generated.resources.settings_body_pm_notifications_enabled
 import podkop.composeapp.generated.resources.settings_body_pm_notifications_toggle
@@ -70,6 +72,7 @@ import podkop.composeapp.generated.resources.settings_button_copy
 import podkop.composeapp.generated.resources.settings_button_open
 import podkop.composeapp.generated.resources.settings_button_open_debug
 import podkop.composeapp.generated.resources.settings_headline_account
+import podkop.composeapp.generated.resources.settings_headline_comments
 import podkop.composeapp.generated.resources.settings_headline_debug
 import podkop.composeapp.generated.resources.settings_headline_media
 import podkop.composeapp.generated.resources.settings_headline_notifications
@@ -212,6 +215,19 @@ fun SettingsScreenContent(
                         supportingText = stringResource(resource = Res.string.settings_body_play_videos_inline_supporting),
                         checked = state.playVideosInline,
                         onCheckedChange = actions::onPlayVideosInlineChanged,
+                    )
+                }
+
+                SectionCard(
+                    title = stringResource(resource = Res.string.settings_headline_comments),
+                ) {
+                    SwitchSettingRow(
+                        label = stringResource(resource = Res.string.settings_body_threaded_entry_comments),
+                        supportingText = stringResource(
+                            resource = Res.string.settings_body_threaded_entry_comments_supporting,
+                        ),
+                        checked = state.threadedEntryComments,
+                        onCheckedChange = actions::onThreadedEntryCommentsChanged,
                     )
                 }
 

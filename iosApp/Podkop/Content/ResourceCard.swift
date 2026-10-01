@@ -25,6 +25,9 @@ struct ResourceCard: View {
     /// Off when a surrounding thread card carries this resource's identifier.
     var identified = true
     var showsActions = true
+    /// Starts a comment's text and actions under the author name, keeping the column under the
+    /// avatar free for a thread's reply line.
+    var indentsBodyUnderAuthor = false
     /// Detail header only: reports the bottom of the title in the `detailContent` coordinate
     /// space, so the screen can show the title in the navigation bar once it scrolls away.
     var onTitleBottom: ((CGFloat) -> Void)?
@@ -59,8 +62,12 @@ struct ResourceCard: View {
             if resource.kind == .link {
                 if style == .detailHeader { linkDetailLayout } else { linkListLayout }
             } else {
-                entryLayout
-                if showsActions { actionsRow }
+                entryHeader
+                VStack(alignment: .leading, spacing: 8) {
+                    entryBody
+                    if showsActions { actionsRow }
+                }
+                .padding(.leading, indentsBodyUnderAuthor ? avatarSize + 8 : 0)
             }
         }
     }
@@ -242,7 +249,7 @@ struct ResourceCard: View {
 
     // MARK: Entries and comments
 
-    @ViewBuilder private var entryLayout: some View {
+    @ViewBuilder private var entryHeader: some View {
         if dynamicTypeSize.isAccessibilitySize {
             identity
             scoreControl
@@ -253,6 +260,9 @@ struct ResourceCard: View {
                 scoreControl
             }
         }
+    }
+
+    @ViewBuilder private var entryBody: some View {
         if resource.deletion != nil {
             richContent
         } else if resource.blacklisted && !blacklistRevealed {
@@ -273,7 +283,7 @@ struct ResourceCard: View {
     private var identity: some View {
         HStack(alignment: .top, spacing: 8) {
             if let author = resource.author {
-                let size: CGFloat = dynamicTypeSize.isAccessibilitySize ? 48 : isComment ? 32 : 36
+                let size = avatarSize
                 if let openAuthor = actions.openAuthor {
                     Button { openAuthor(author.name) } label: {
                         AvatarView(url: author.avatarURL, name: author.name, size: size, gender: author.gender)
@@ -292,6 +302,8 @@ struct ResourceCard: View {
             }
         }
     }
+
+    private var avatarSize: CGFloat { dynamicTypeSize.isAccessibilitySize ? 48 : isComment ? 32 : 36 }
 
     private var scoreControl: some View {
         ScoreVoteControl(vote: resource.vote, showsDown: resource.kind == .linkComment,

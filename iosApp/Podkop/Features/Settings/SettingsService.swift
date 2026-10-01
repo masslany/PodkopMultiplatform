@@ -5,6 +5,7 @@ import PodkopShared
 @MainActor protocol SettingsServicing {
     func setAutoplayGifs(_ enabled: Bool) async throws
     func setPlayVideosInline(_ enabled: Bool) async throws
+    func setThreadedEntryComments(_ enabled: Bool) async throws
     func setTheme(_ theme: ThemeChoice) async throws
     /// Removes downloaded media only; the session and settings stay intact.
     func clearMediaCache()
@@ -30,6 +31,12 @@ final class SharedSettingsService: SettingsServicing {
     func setPlayVideosInline(_ enabled: Bool) async throws {
         let _: IOSSuccess = try await adapter.call {
             self.client.settings.setPlayVideosInline(enabled: enabled, completion: $0)
+        }
+    }
+
+    func setThreadedEntryComments(_ enabled: Bool) async throws {
+        let _: IOSSuccess = try await adapter.call {
+            self.client.settings.setThreadedEntryComments(enabled: enabled, completion: $0)
         }
     }
 
