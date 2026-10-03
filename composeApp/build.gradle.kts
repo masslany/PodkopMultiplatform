@@ -94,7 +94,6 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies  {
-            implementation(libs.ktor.client.android)
             implementation(libs.androidx.browser)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.media3.exoplayer)
@@ -124,6 +123,9 @@ kotlin {
             implementation(libs.kotlinx.collections.immutable)
             implementation(libs.coil.compose)
             implementation(libs.coil.gif)
+            // Coil's Ktor fetcher uses whichever Ktor engine is on the classpath: keep that OkHttp (from
+            // :common). Since Ktor 3.5.1 the Android engine closes a cancelled image download from the
+            // main thread, which HttpURLConnection rejects with a crash.
             implementation(libs.coil.network.ktor)
             implementation(libs.kotlinx.datetime)
             implementation(libs.multiplatform.markdown.renderer)
