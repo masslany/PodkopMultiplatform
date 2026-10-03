@@ -1,7 +1,6 @@
 
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 import pl.masslany.podkop.buildlogic.GenerateAboutDependenciesMetadataTask
@@ -13,7 +12,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinter)
     alias(libs.plugins.kover)
-    kotlin("plugin.serialization") version libs.versions.kotlinx.serialization
+    alias(libs.plugins.kotlinSerialization)
 }
 
 private data class AboutDependencyCoordinate(
@@ -73,7 +72,11 @@ private val aboutPomFileMappings = aboutDependencyCoordinates.associate { coordi
 }
 
 kotlin {
-    androidLibrary {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
+    android {
         withHostTestBuilder {}.configure {
             isIncludeAndroidResources = true
         }
@@ -85,13 +88,12 @@ kotlin {
         androidResources.enable = true
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 
     sourceSets {
         androidMain.dependencies  {
-            implementation(libs.ktor.client.android)
             implementation(libs.androidx.browser)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.media3.exoplayer)
@@ -121,11 +123,15 @@ kotlin {
             implementation(libs.kotlinx.collections.immutable)
             implementation(libs.coil.compose)
             implementation(libs.coil.gif)
+            // Coil's Ktor fetcher uses whichever Ktor engine is on the classpath: keep that OkHttp (from
+            // :common). Since Ktor 3.5.1 the Android engine closes a cancelled image download from the
+            // main thread, which HttpURLConnection rejects with a crash.
             implementation(libs.coil.network.ktor)
             implementation(libs.kotlinx.datetime)
             implementation(libs.multiplatform.markdown.renderer)
             implementation(libs.multiplatform.markdown.renderer.m3)
             implementation(libs.haze)
+            implementation(libs.haze.blur)
 
             implementation(projects.business)
         }
@@ -144,10 +150,6 @@ kotlin.sourceSets.named("androidHostTest") {
     }
 }
 
-kotlin.sourceSets.named("commonMain") {
-    kotlin.srcDir(layout.buildDirectory.dir("generated/source/about/kotlin"))
-}
-
 val generateAboutDependenciesMetadata = tasks.register<GenerateAboutDependenciesMetadataTask>(
     "generateAboutDependenciesMetadata",
 ) {
@@ -157,8 +159,10 @@ val generateAboutDependenciesMetadata = tasks.register<GenerateAboutDependencies
     outputDirectory.set(layout.buildDirectory.dir("generated/source/about/kotlin"))
 }
 
-tasks.withType<KotlinCompilationTask<*>>().configureEach {
-    dependsOn(generateAboutDependenciesMetadata)
+// Registering the task output (not a bare path) makes every consumer of commonMain sources,
+// including compilation and kotlinter, depend on the generator.
+kotlin.sourceSets.named("commonMain") {
+    kotlin.srcDir(generateAboutDependenciesMetadata.flatMap { it.outputDirectory })
 }
 
 afterEvaluate {

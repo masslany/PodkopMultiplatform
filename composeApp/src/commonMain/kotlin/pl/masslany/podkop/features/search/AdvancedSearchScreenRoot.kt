@@ -648,7 +648,9 @@ private fun datePresetLabel(preset: AdvancedSearchDatePreset): String = when (pr
 
 @Composable
 private fun validationErrorLabel(error: AdvancedSearchValidationError): String = when (error) {
-    AdvancedSearchValidationError.QueryRequired -> stringResource(resource = Res.string.advanced_search_screen_query_required)
+    AdvancedSearchValidationError.QueryRequired -> stringResource(
+        resource = Res.string.advanced_search_screen_query_required,
+    )
 
     AdvancedSearchValidationError.InvalidCustomDateFormat -> stringResource(
         resource = Res.string.advanced_search_screen_invalid_date_format,

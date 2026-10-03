@@ -70,26 +70,14 @@ private fun ResourceReportDialogContent(
 ) {
     val clipboard = rememberPlatformClipboard()
     val coroutineScope = rememberCoroutineScope()
-    val dismissInteractionSource = remember { MutableInteractionSource() }
     val contentInteractionSource = remember { MutableInteractionSource() }
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.56f))
-                .clickable(
-                    interactionSource = dismissInteractionSource,
-                    indication = null,
-                    onClick = actions::onDismissClicked,
-                ),
-        )
-
         Surface(
-            modifier = Modifier
+            modifier = modifier
                 .padding(16.dp)
                 .fillMaxWidth()
                 .widthIn(max = 640.dp)

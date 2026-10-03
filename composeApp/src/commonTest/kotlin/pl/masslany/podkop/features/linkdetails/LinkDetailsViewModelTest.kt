@@ -21,8 +21,8 @@ import pl.masslany.podkop.common.models.vote.VoteButtonType
 import pl.masslany.podkop.common.models.vote.VoteState
 import pl.masslany.podkop.common.models.vote.VoteValueType
 import pl.masslany.podkop.features.resources.models.ResourceType
-import pl.masslany.podkop.features.resources.updateStreamableEmbedStateIfMatches
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
+import pl.masslany.podkop.features.resources.updateStreamableEmbedStateIfMatches
 
 class LinkDetailsViewModelTest {
 

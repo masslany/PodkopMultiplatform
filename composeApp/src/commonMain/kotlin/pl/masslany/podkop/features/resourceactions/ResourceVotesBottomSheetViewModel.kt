@@ -57,7 +57,9 @@ class ResourceVotesBottomSheetViewModel(
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
-            logger.warn("Ignoring resource vote users pagination request because numbered page was expected, got $request")
+            logger.warn(
+                "Ignoring resource vote users pagination request because numbered page was expected, got $request",
+            )
             return@Paginator Result.success(Voters(emptyList(), null))
         }
 

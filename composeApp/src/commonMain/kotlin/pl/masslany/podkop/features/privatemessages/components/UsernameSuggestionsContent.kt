@@ -41,7 +41,9 @@ internal fun UsernameSuggestionsContent(
 
     when (state.suggestions.status) {
         UserSuggestionsStatus.Hidden -> {
-            val helperText = if (normalizedUsername.isBlank() || normalizedUsername.length >= MinUsernameQueryLength) {
+            val helperText = if (normalizedUsername.isBlank() ||
+                normalizedUsername.length >= MinUsernameQueryLength
+            ) {
                 stringResource(resource = Res.string.private_messages_new_conversation_helper)
             } else {
                 stringResource(
@@ -73,7 +75,9 @@ internal fun UsernameSuggestionsContent(
             SuggestionCard {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text = stringResource(resource = Res.string.private_messages_new_conversation_suggestions_error),
+                        text = stringResource(
+                            resource = Res.string.private_messages_new_conversation_suggestions_error,
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
