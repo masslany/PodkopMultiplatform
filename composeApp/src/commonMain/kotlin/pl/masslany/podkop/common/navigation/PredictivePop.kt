@@ -36,8 +36,8 @@ private val PredictivePopEasing = CubicBezierEasing(0.1f, 0.1f, 0f, 1f)
 /** How small the leaving screen gets at the end of a predictive Back preview. */
 private const val PredictivePopScale = 0.9f
 
-/** How dim the revealed screen starts, before the gesture brings it up. */
-private const val PredictivePopRevealedAlpha = 0.35f
+/** How dim the revealed screen starts: a light touch that keeps the screen below almost fully lit. */
+private const val PredictivePopRevealedAlpha = 0.8f
 
 /** The corner radius of a screen that a predictive Back gesture is shrinking. */
 private val PredictivePopCornerRadius = 28.dp
