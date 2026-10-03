@@ -24,12 +24,18 @@ class LinkDraftScreenStateProvider : PreviewParameterProvider<LinkDraftScreenSta
                 AddLinkTagSuggestionState(name = "szczepienia", observedQuantity = 175),
             ),
             suggestedImages = persistentListOf(
-                AddLinkSuggestedImageState(url = "https://i.pcmag.com/imagery/articles/05PK323rI5BMn61kbJJdDOy-1.fit_lim.v1773154806.png"),
-                AddLinkSuggestedImageState(url = "https://i.pcmag.com/imagery/articles/05PK323rI5BMn61kbJJdDOy-1.fit_lim.size_1200x630.v1773154806.png"),
+                AddLinkSuggestedImageState(
+                    url = "https://i.pcmag.com/imagery/articles/05PK323rI5BMn61kbJJdDOy-1.fit_lim.v1773154806.png",
+                ),
+                AddLinkSuggestedImageState(
+                    url = "https://i.pcmag.com/imagery/articles/" +
+                        "05PK323rI5BMn61kbJJdDOy-1.fit_lim.size_1200x630.v1773154806.png",
+                ),
             ),
             selectedSuggestedImageIndex = 0,
             adult = false,
-            photoUrl = "https://wykop.pl/cdn/c3397993/889fbb7dc3d08b07b75a2ae4c43ec69e74fdd1c3e4d686c5ef61cd82365a47ad.jpg",
+            photoUrl = "https://wykop.pl/cdn/c3397993/" +
+                "889fbb7dc3d08b07b75a2ae4c43ec69e74fdd1c3e4d686c5ef61cd82365a47ad.jpg",
         ),
     )
 }

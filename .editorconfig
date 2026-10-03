@@ -49,3 +49,8 @@ ktlint_code_style = android_studio
 # Some code also uses @Preview and @OptIn above @Composable.
 ktlint_function_naming_ignore_when_annotated_with = Composable,Preview,OptIn
 ktlint_standard_function-naming_ignore_when_annotated_with = Composable,Preview,OptIn
+
+# Compose constants use PascalCase (e.g. `private const val FabItemsOffset = 10`), while other
+# constants use SCREAMING_SNAKE_CASE. ktlint's property-naming rule can only enforce one style
+# (ktlint_property_naming_constant_naming), so it's disabled to allow both.
+ktlint_standard_property-naming = disabled

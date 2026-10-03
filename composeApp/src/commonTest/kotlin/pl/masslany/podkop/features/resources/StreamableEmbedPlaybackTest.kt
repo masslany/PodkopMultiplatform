@@ -1,5 +1,11 @@
 package pl.masslany.podkop.features.resources
 
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 import kotlinx.coroutines.runBlocking
 import pl.masslany.podkop.business.embeds.domain.main.StreamableVideoRepository
 import pl.masslany.podkop.business.embeds.domain.models.StreamableVideo
@@ -8,12 +14,6 @@ import pl.masslany.podkop.common.models.embed.EmbedContentType
 import pl.masslany.podkop.common.models.embed.StreamableEmbedState
 import pl.masslany.podkop.common.preview.FakeAppSettings
 import pl.masslany.podkop.testsupport.fakes.FakeAppLogger
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertSame
-import kotlin.test.assertTrue
 
 class StreamableEmbedPlaybackTest {
 

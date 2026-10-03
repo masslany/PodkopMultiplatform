@@ -50,7 +50,9 @@ class PrivateMessagesViewModel(
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
-            logger.warn("Ignoring private messages inbox pagination request because numbered page was expected, got $request")
+            logger.warn(
+                "Ignoring private messages inbox pagination request because numbered page was expected, got $request",
+            )
             return@Paginator Result.success(PrivateMessagesPage(emptyList(), null))
         }
 

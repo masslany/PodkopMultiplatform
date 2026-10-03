@@ -209,7 +209,9 @@ fun SettingsScreenContent(
                     SectionCardDivider()
                     SwitchSettingRow(
                         label = stringResource(resource = Res.string.settings_body_play_videos_inline),
-                        supportingText = stringResource(resource = Res.string.settings_body_play_videos_inline_supporting),
+                        supportingText = stringResource(
+                            resource = Res.string.settings_body_play_videos_inline_supporting,
+                        ),
                         checked = state.playVideosInline,
                         onCheckedChange = actions::onPlayVideosInlineChanged,
                     )

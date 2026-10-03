@@ -544,7 +544,8 @@ internal class LinkDraftViewModel(
                 tags = decodeTags(savedStateHandle.get<String>(STATE_TAGS)).toImmutableList(),
                 tagInput = savedStateHandle.get<String>(STATE_TAG_INPUT).orEmpty(),
                 tagSuggestions = emptyList<AddLinkTagSuggestionState>().toImmutableList(),
-                suggestedImages = decodeSuggestedImages(savedStateHandle.get<String>(STATE_SUGGESTED_IMAGES)).toImmutableList(),
+                suggestedImages = decodeSuggestedImages(savedStateHandle.get<String>(STATE_SUGGESTED_IMAGES))
+                    .toImmutableList(),
                 selectedSuggestedImageIndex = savedStateHandle.get<Int>(STATE_SELECTED_SUGGESTED_IMAGE_INDEX),
                 adult = savedStateHandle.get<Boolean>(STATE_ADULT) ?: false,
                 photoKey = savedStateHandle.get<String>(STATE_PHOTO_KEY),

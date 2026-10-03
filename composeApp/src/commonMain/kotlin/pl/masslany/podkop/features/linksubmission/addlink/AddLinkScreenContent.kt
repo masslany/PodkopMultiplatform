@@ -104,7 +104,8 @@ private fun AddLinkScreenContentPreview() {
                     AddLinkSavedDraftState(
                         key = "draft-1",
                         title = "Świnoujście zawarło ugodę z wykonawcą tunelu pod Świną",
-                        url = "https://inzynieria.com/tunele/wiadomosci/99940,swinoujscie-zawarlo-ugode-z-wykonawca-tunelu-pod-swina",
+                        url = "https://inzynieria.com/tunele/wiadomosci/" +
+                            "99940,swinoujscie-zawarlo-ugode-z-wykonawca-tunelu-pod-swina",
                     ),
                 ),
                 url = "https://example.com",

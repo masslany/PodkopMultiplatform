@@ -41,6 +41,7 @@ import pl.masslany.podkop.common.components.Tag
 import pl.masslany.podkop.common.components.Title
 import pl.masslany.podkop.common.components.embed.EmbedContent
 import pl.masslany.podkop.common.components.imageActions
+import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.resourceactions.resourceTextSelectionGesture
@@ -211,7 +212,7 @@ fun LinkItem(
                                 .resourceTextSelectionGesture(
                                     onClick = onLinkClick,
                                     onLongClick = if (
-                                        comment.entryContentState is pl.masslany.podkop.common.models.EntryContentState.Content &&
+                                        comment.entryContentState is EntryContentState.Content &&
                                         !comment.isBlacklisted &&
                                         comment.rawContent.isNotBlank()
                                     ) {

@@ -817,8 +817,12 @@ internal fun resolveLinkCommentAccent(
 
     return when {
         !currentUsername.isNullOrBlank() && commentAuthor == currentUsername -> LinkCommentAccent.CurrentUser
+
         !linkAuthorName.isNullOrBlank() && commentAuthor == linkAuthorName -> LinkCommentAccent.LinkAuthor
-        !parentCommentAuthorName.isNullOrBlank() && commentAuthor == parentCommentAuthorName -> LinkCommentAccent.ParentAuthor
+
+        !parentCommentAuthorName.isNullOrBlank() && commentAuthor == parentCommentAuthorName ->
+            LinkCommentAccent.ParentAuthor
+
         else -> null
     }
 }

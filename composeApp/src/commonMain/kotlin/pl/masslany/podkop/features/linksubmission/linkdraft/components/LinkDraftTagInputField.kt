@@ -123,7 +123,9 @@ internal fun AddLinkTagChip(
                 Icon(
                     modifier = Modifier.size(14.dp),
                     imageVector = vectorResource(resource = Res.drawable.ic_close),
-                    contentDescription = stringResource(resource = Res.string.accessibility_reply_composer_remove_photo),
+                    contentDescription = stringResource(
+                        resource = Res.string.accessibility_reply_composer_remove_photo,
+                    ),
                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
             }
