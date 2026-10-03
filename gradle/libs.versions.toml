@@ -41,7 +41,7 @@ compose-material3 = "1.9.0"
 compose-runtime = "1.12.1"
 compose-ui = "1.12.1"
 
-multiplatformMarkdownRenderer = "0.39.2"
+multiplatformMarkdownRenderer = "0.45.0"
 
 kotlinter = "5.7.0"
 kover = "0.9.11"

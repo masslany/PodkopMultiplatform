@@ -73,6 +73,10 @@ private val aboutPomFileMappings = aboutDependencyCoordinates.associate { coordi
 }
 
 kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     android {
         withHostTestBuilder {}.configure {
             isIncludeAndroidResources = true
@@ -85,7 +89,7 @@ kotlin {
         androidResources.enable = true
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 

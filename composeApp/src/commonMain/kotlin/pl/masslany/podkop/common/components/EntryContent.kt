@@ -201,6 +201,7 @@ private val markdownComponents = markdownComponents(
 
                 MarkdownText(
                     content = strippedText,
+                    node = node,
                 )
             } else {
                 Button(

@@ -20,7 +20,7 @@ kotlin {
         androidResources.enable = true
 
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 
