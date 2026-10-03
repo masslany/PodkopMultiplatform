@@ -1,7 +1,6 @@
 
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jmailen.gradle.kotlinter.tasks.FormatTask
 import org.jmailen.gradle.kotlinter.tasks.LintTask
 import pl.masslany.podkop.buildlogic.GenerateAboutDependenciesMetadataTask
@@ -149,10 +148,6 @@ kotlin.sourceSets.named("androidHostTest") {
     }
 }
 
-kotlin.sourceSets.named("commonMain") {
-    kotlin.srcDir(layout.buildDirectory.dir("generated/source/about/kotlin"))
-}
-
 val generateAboutDependenciesMetadata = tasks.register<GenerateAboutDependenciesMetadataTask>(
     "generateAboutDependenciesMetadata",
 ) {
@@ -162,8 +157,10 @@ val generateAboutDependenciesMetadata = tasks.register<GenerateAboutDependencies
     outputDirectory.set(layout.buildDirectory.dir("generated/source/about/kotlin"))
 }
 
-tasks.withType<KotlinCompilationTask<*>>().configureEach {
-    dependsOn(generateAboutDependenciesMetadata)
+// Registering the task output (not a bare path) makes every consumer of commonMain sources,
+// including compilation and kotlinter, depend on the generator.
+kotlin.sourceSets.named("commonMain") {
+    kotlin.srcDir(generateAboutDependenciesMetadata.flatMap { it.outputDirectory })
 }
 
 afterEvaluate {
