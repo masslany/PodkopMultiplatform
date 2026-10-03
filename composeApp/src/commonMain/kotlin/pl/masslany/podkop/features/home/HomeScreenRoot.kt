@@ -45,13 +45,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.extensions.rememberWindowSizeClass
+import pl.masslany.podkop.common.navigation.AnimatedDialogSceneStrategy
 import pl.masslany.podkop.common.navigation.BottomSheetSceneStrategy
 import pl.masslany.podkop.common.navigation.HomeListDetailSceneStrategy
 import pl.masslany.podkop.common.navigation.NavTarget
@@ -288,7 +288,7 @@ private fun HomeNavDisplay(
     onEntryCommentReplyClicked: (entryId: Int, entryCommentId: Int, author: String?) -> Unit,
 ) {
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavTarget>() }
-    val dialogSceneStrategy = remember { DialogSceneStrategy<NavTarget>() }
+    val dialogSceneStrategy = remember { AnimatedDialogSceneStrategy<NavTarget>() }
     val listDetailSceneStrategy = remember(inlineSceneEnabled) {
         HomeListDetailSceneStrategy<NavTarget>(
             enabled = inlineSceneEnabled,

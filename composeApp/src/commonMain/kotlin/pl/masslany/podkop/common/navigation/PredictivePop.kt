@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavEntryDecorator
-import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigationevent.NavigationEvent
@@ -33,10 +32,10 @@ private const val PredictivePopMillis = 300
  * Material's predictive Back easing. It front-loads the preview, so a short swipe already shows
  * most of the shrink, as system Back between apps does, instead of following the finger linearly.
  */
-private val PredictivePopEasing = CubicBezierEasing(0.1f, 0.1f, 0f, 1f)
+internal val PredictivePopEasing = CubicBezierEasing(0.1f, 0.1f, 0f, 1f)
 
 /** How small the leaving screen gets at the end of a predictive Back preview. */
-private const val PredictivePopScale = 0.9f
+internal const val PredictivePopScale = 0.9f
 
 /**
  * How dark the scrim over the revealed screen starts. It sets the leaving screen apart
@@ -51,7 +50,8 @@ private val PredictivePopCornerRadius = 28.dp
 private const val PredictivePopCornerProgress = 0.15f
 
 /** Metadata keys of entries that `NavDisplay` shows as overlays, which keep their own shape. */
-private val OverlayMetadataKeys = DialogSceneStrategy.dialog().keys + BottomSheetSceneStrategy.BOTTOM_SHEET_KEY
+private val OverlayMetadataKeys =
+    setOf(AnimatedDialogSceneStrategy.DIALOG_KEY, BottomSheetSceneStrategy.BOTTOM_SHEET_KEY)
 
 /**
  * Where the leaving screen shrinks toward: the edge opposite the swipe, so only the side the

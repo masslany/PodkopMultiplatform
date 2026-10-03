@@ -28,7 +28,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.scene.DialogSceneStrategy
 import org.jetbrains.compose.resources.getString
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -42,12 +41,12 @@ import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalSc
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalScreenRoot
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogScreen
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogScreenRoot
+import pl.masslany.podkop.common.navigation.AnimatedDialogSceneStrategy
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.BottomSheetSceneStrategy
 import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.navigation.HomeScreen
 import pl.masslany.podkop.common.navigation.NavigationContent
-import pl.masslany.podkop.common.navigation.SetDialogDestinationToEdgeToEdge
 import pl.masslany.podkop.common.settings.AppSettings
 import pl.masslany.podkop.common.settings.LocalAppSettings
 import pl.masslany.podkop.common.settings.ThemeOverride
@@ -247,9 +246,9 @@ fun App() {
                         }
 
                         entry<AboutAppScreen>(
-                            metadata = DialogSceneStrategy.dialog(
+                            metadata = AnimatedDialogSceneStrategy.dialog(
                                 DialogProperties(
-                                    usePlatformDefaultWidth = false,
+                                    dismissOnClickOutside = false,
                                 ),
                             ),
                         ) {
@@ -366,13 +365,12 @@ fun App() {
                         }
 
                         entry<ResourceScreenshotPreviewDialogScreen>(
-                            metadata = DialogSceneStrategy.dialog(
+                            metadata = AnimatedDialogSceneStrategy.dialog(
                                 DialogProperties(
-                                    usePlatformDefaultWidth = false,
+                                    dismissOnClickOutside = false,
                                 ),
                             ),
                         ) {
-                            SetDialogDestinationToEdgeToEdge()
                             ResourceScreenshotPreviewDialogScreenRoot(
                                 modifier = Modifier
                                     .padding(safeDrawingPaddingValues)
@@ -382,13 +380,8 @@ fun App() {
                         }
 
                         entry<ResourceTextSelectionDialogScreen>(
-                            metadata = DialogSceneStrategy.dialog(
-                                DialogProperties(
-                                    usePlatformDefaultWidth = false,
-                                ),
-                            ),
+                            metadata = AnimatedDialogSceneStrategy.dialog(),
                         ) {
-                            SetDialogDestinationToEdgeToEdge()
                             ResourceTextSelectionDialogScreenRoot(
                                 modifier = Modifier
                                     .padding(safeDrawingPaddingValues)
@@ -398,13 +391,8 @@ fun App() {
                         }
 
                         entry<ResourceReportDialogScreen>(
-                            metadata = DialogSceneStrategy.dialog(
-                                DialogProperties(
-                                    usePlatformDefaultWidth = false,
-                                ),
-                            ),
+                            metadata = AnimatedDialogSceneStrategy.dialog(),
                         ) {
-                            SetDialogDestinationToEdgeToEdge()
                             ResourceReportDialogScreenRoot(
                                 modifier = Modifier
                                     .padding(safeDrawingPaddingValues)
@@ -423,11 +411,7 @@ fun App() {
                         }
 
                         entry<ComposerMediaUrlDialogScreen>(
-                            metadata = DialogSceneStrategy.dialog(
-                                DialogProperties(
-                                    usePlatformDefaultWidth = false,
-                                ),
-                            ),
+                            metadata = AnimatedDialogSceneStrategy.dialog(),
                         ) {
                             ComposerMediaUrlDialogScreenRoot(
                                 modifier = Modifier
@@ -439,9 +423,9 @@ fun App() {
                         }
 
                         entry<ComposerMediaPickLocalScreen>(
-                            metadata = DialogSceneStrategy.dialog(
+                            metadata = AnimatedDialogSceneStrategy.dialog(
                                 DialogProperties(
-                                    usePlatformDefaultWidth = false,
+                                    dismissOnClickOutside = false,
                                 ),
                             ),
                         ) {
@@ -455,9 +439,7 @@ fun App() {
                         }
 
                         entry<GenericDialog>(
-                            metadata = DialogSceneStrategy.dialog(
-                                DialogProperties(),
-                            ),
+                            metadata = AnimatedDialogSceneStrategy.dialog(),
                         ) {
                             DefaultGenericDialog(
                                 modifier = Modifier

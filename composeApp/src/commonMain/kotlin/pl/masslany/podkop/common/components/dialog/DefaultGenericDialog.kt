@@ -1,6 +1,5 @@
 package pl.masslany.podkop.common.components.dialog
 
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -19,7 +18,7 @@ internal fun DefaultGenericDialog(
     dialog: GenericDialog,
     navigator: AppNavigator,
 ) {
-    AlertDialog(
+    PodkopAlertDialog(
         modifier = modifier,
         onDismissRequest = { navigator.back() },
         title = { Text(dialog.title.resolve()) },

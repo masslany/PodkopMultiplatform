@@ -14,7 +14,6 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -66,7 +65,7 @@ private fun GenericNavDisplay(
     modifier: Modifier = Modifier,
 ) {
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavTarget>() }
-    val dialogSceneStrategy = remember { DialogSceneStrategy<NavTarget>() }
+    val dialogSceneStrategy = remember { AnimatedDialogSceneStrategy<NavTarget>() }
     val canNavigateBack = backStack.size > 1
     val navigationInput = rememberPlatformBackNavigationInput(enabled = canNavigateBack)
 
