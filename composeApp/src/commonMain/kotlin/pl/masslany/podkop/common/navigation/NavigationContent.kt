@@ -1,11 +1,8 @@
 package pl.masslany.podkop.common.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,11 +16,8 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
-import androidx.navigationevent.NavigationEvent
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-
-private const val PredictiveBackTransitionDurationMs = 280
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,33 +89,11 @@ private fun GenericNavDisplay(
                 initialContentExit = ExitTransition.None,
             )
         },
-        predictivePopTransitionSpec = { edge ->
-            val direction = if (edge == NavigationEvent.EDGE_LEFT) {
-                AnimatedContentTransitionScope.SlideDirection.Right
-            } else {
-                AnimatedContentTransitionScope.SlideDirection.Left
-            }
-            ContentTransform(
-                targetContentEnter = slideIntoContainer(
-                    towards = direction,
-                    initialOffset = { it / 4 },
-                    animationSpec = tween(
-                        durationMillis = PredictiveBackTransitionDurationMs,
-                        easing = LinearEasing,
-                    ),
-                ),
-                initialContentExit = slideOutOfContainer(
-                    towards = direction,
-                    animationSpec = tween(
-                        durationMillis = PredictiveBackTransitionDurationMs,
-                        easing = LinearEasing,
-                    ),
-                ),
-            )
-        },
+        predictivePopTransitionSpec = { edge -> predictivePopTransform(edge) },
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator(),
+            rememberPredictivePopCornersDecorator(),
         ),
         entryProvider = { entryProvider(it) },
         onBack = onBack,
