@@ -74,7 +74,7 @@ private fun ResourceReportDialogContent(
     val contentInteractionSource = remember { MutableInteractionSource() }
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         Box(
@@ -89,7 +89,7 @@ private fun ResourceReportDialogContent(
         )
 
         Surface(
-            modifier = Modifier
+            modifier = modifier
                 .padding(16.dp)
                 .fillMaxWidth()
                 .widthIn(max = 640.dp)
