@@ -4,11 +4,11 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKmpLibrary)
     alias(libs.plugins.kover)
-    kotlin("plugin.serialization") version libs.versions.kotlinx.serialization
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
-    androidLibrary {
+    android {
         withHostTestBuilder {}.configure {
             isIncludeAndroidResources = true
         }

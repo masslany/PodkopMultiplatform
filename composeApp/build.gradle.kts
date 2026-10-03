@@ -13,7 +13,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinter)
     alias(libs.plugins.kover)
-    kotlin("plugin.serialization") version libs.versions.kotlinx.serialization
+    alias(libs.plugins.kotlinSerialization)
 }
 
 private data class AboutDependencyCoordinate(
@@ -73,7 +73,7 @@ private val aboutPomFileMappings = aboutDependencyCoordinates.associate { coordi
 }
 
 kotlin {
-    androidLibrary {
+    android {
         withHostTestBuilder {}.configure {
             isIncludeAndroidResources = true
         }
@@ -126,6 +126,7 @@ kotlin {
             implementation(libs.multiplatform.markdown.renderer)
             implementation(libs.multiplatform.markdown.renderer.m3)
             implementation(libs.haze)
+            implementation(libs.haze.blur)
 
             implementation(projects.business)
         }

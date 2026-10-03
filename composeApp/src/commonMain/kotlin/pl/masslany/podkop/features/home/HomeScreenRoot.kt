@@ -402,7 +402,7 @@ private fun HomeNavDisplay(
         NavDisplay(
             modifier = Modifier.fillMaxSize(),
             backStack = backStack,
-            sceneStrategy = bottomSheetStrategy then dialogSceneStrategy then listDetailSceneStrategy,
+            sceneStrategies = listOf(bottomSheetStrategy, dialogSceneStrategy, listDetailSceneStrategy),
             transitionSpec = {
                 ContentTransform(
                     targetContentEnter = EnterTransition.None,

@@ -82,7 +82,7 @@ private fun GenericNavDisplay(
             navigationInput = navigationInput,
         ),
         backStack = backStack,
-        sceneStrategy = bottomSheetStrategy then dialogSceneStrategy,
+        sceneStrategies = listOf(bottomSheetStrategy, dialogSceneStrategy),
         transitionSpec = {
             ContentTransform(
                 targetContentEnter = EnterTransition.None,
