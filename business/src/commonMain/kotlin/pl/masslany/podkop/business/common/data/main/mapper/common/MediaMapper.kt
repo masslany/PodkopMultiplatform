@@ -6,7 +6,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Media
 fun MediaDto.toMedia(): Media {
     return Media(
         embed = this.embed?.toEmbed(),
-        photo = this.photo?.toPhoto(),
+        photo = (this.photo ?: this.photos?.firstOrNull())?.toPhoto(),
         survey = this.survey?.toSurvey(),
     )
 }

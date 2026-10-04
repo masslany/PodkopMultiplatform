@@ -39,6 +39,18 @@ struct SettingsView: View {
             } footer: {
                 Text(.settingsSettingsBodyPlayVideosInlineSupporting)
             }
+            Section {
+                Toggle(.settingsSettingsBodyThreadedEntryComments, isOn: Binding(
+                    get: { session.threadedEntryComments },
+                    set: { model.setThreadedEntryComments($0) }
+                ))
+                .podkopSwitch()
+                .accessibilityIdentifier("settingsThreadedEntryComments")
+            } header: {
+                Text(.settingsSettingsHeadlineComments)
+            } footer: {
+                Text(.settingsSettingsBodyThreadedEntryCommentsSupporting)
+            }
             if session.isLoggedIn {
                 // Android's private-message notifications switch, with its explanation below.
                 Section {

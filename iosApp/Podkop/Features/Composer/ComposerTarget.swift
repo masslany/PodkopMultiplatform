@@ -14,7 +14,7 @@ extension ComposerIntent {
     var title: LocalizedStringResource {
         switch self {
         case .createEntry: .commonWritePost
-        case .createEntryComment, .createLinkComment: .composerAddComment
+        case .createEntryComment, .createEntryThreadReply, .createLinkComment: .composerAddComment
         case .editEntry: .composerEditEntry
         case .editEntryComment, .editLinkComment: .composerEditComment
         }
@@ -42,6 +42,9 @@ extension ComposerIntent {
                            replyTarget: nil, isEdit: false)
         case .createEntryComment(let id, let replyTarget):
             ComposerTarget(kind: "createEntryComment", rootID: id, commentID: nil,
+                           replyTarget: replyTarget, isEdit: false)
+        case .createEntryThreadReply(let id, let parentID, let replyTarget):
+            ComposerTarget(kind: "createEntryThreadReply", rootID: id, commentID: parentID,
                            replyTarget: replyTarget, isEdit: false)
         case .createLinkComment(let id, let parentID, let replyTarget):
             ComposerTarget(kind: "createLinkComment", rootID: id, commentID: parentID,

@@ -64,7 +64,11 @@ final class AccessibilityAuditTests: XCTestCase {
         audit(app, screen: "own profile")
         app.navigationBars.buttons.firstMatch.tap()
         app.buttons["Settings"].tap()
-        XCTAssertTrue(app.buttons["settingsSignOut"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        // Sign-out ends the list, below the fold on shorter phones.
+        let signOut = app.buttons["settingsSignOut"]
+        for _ in 0..<4 where !signOut.isHittable { app.swipeUp() }
+        XCTAssertTrue(signOut.isHittable)
         audit(app, screen: "settings")
     }
 }

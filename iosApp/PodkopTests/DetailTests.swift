@@ -31,6 +31,51 @@ private final class DetailFixtureLoader: DetailLoading {
 }
 
 @MainActor
+private final class ThreadFixtureLoader: DetailLoading {
+    var threadCalls = 0
+    var flatCalls = 0
+    var replyCalls: [(parent: Int?, after: Int?)] = []
+    var failThread = false
+
+    func resource(kind: ResourceKind, id: Int) async throws -> Resource { ContentFixtures.entry }
+    func comments(kind: ResourceKind, id: Int, page: Int, sort: String) async throws -> FeedPage {
+        flatCalls += 1
+        return FeedPage(items: [comment(900)], next: nil, total: 1)
+    }
+    func replies(linkID: Int, commentID: Int, page: Int) async throws -> FeedPage {
+        FeedPage(items: [], next: nil, total: 0)
+    }
+    func related(linkID: Int) async throws -> [Resource] { [] }
+
+    func entryThread(entryID: Int) async throws -> ThreadReplies {
+        threadCalls += 1
+        if failThread { throw NSError(domain: "fixture", code: 4) }
+        return ThreadReplies(totalCount: 3, items: [
+            node(10, depth: 0, replies: ThreadReplies(totalCount: 4, items: [node(11, depth: 1, author: true)])),
+            node(20, depth: 0),
+        ])
+    }
+
+    func entryThreadReplies(entryID: Int, parentID: Int?, afterID: Int?) async throws -> ThreadReplies {
+        replyCalls.append((parentID, afterID))
+        if parentID == 10 {
+            return ThreadReplies(totalCount: 4, items: [node(12, depth: 1), node(13, depth: 1)])
+        }
+        return ThreadReplies(totalCount: 3, items: [node(30, depth: 0)])
+    }
+
+    private func comment(_ id: Int) -> Resource {
+        Resource(sourceID: id, kind: .entryComment, body: "c\(id)", parentID: 102)
+    }
+
+    private func node(_ id: Int, depth: Int, author: Bool = false,
+                      replies: ThreadReplies = ThreadReplies(totalCount: 0, items: [])) -> ThreadComment {
+        ThreadComment(resource: comment(id), depth: depth, isByEntryAuthor: author,
+                      replyParentID: id, replies: replies)
+    }
+}
+
+@MainActor
 private final class ControlledDetailMutator: DetailMutating {
     var calls = 0
     var finish: ((Result<Void, Error>) -> Void)?
@@ -83,6 +128,101 @@ final class DetailTests: XCTestCase {
         XCTAssertEqual(model.replies[201]?.rows.map(\.sourceID), [203])
         XCTAssertTrue(model.replies[201]?.exhausted == true)
         XCTAssertEqual(loader.replyCalls, [1])
+    }
+
+    private func rowSummary(_ rows: [DetailModel.ThreadRow]?) -> [String] {
+        (rows ?? []).map { row in
+            switch row {
+            case .comment(let comment, let depth, let author, _): "\(comment.sourceID)@\(depth)\(author ? "*" : "")"
+            case .moreReplies(let parent, let depth, let remaining, _, _, _): "more\(parent)@\(depth):\(remaining)"
+            }
+        }
+    }
+
+    func testThreadedEntryCommentsLoadRepliesAndTopLevelPagesAfterTheirCursor() async {
+        let loader = ThreadFixtureLoader()
+        let model = DetailModel(kind: .entry, id: 102, loader: loader, mutator: FixtureDetailMutator(),
+                                updates: ResourceUpdates(), threadedEntryComments: { true })
+        model.start()
+        await settle()
+        XCTAssertEqual(loader.flatCalls, 0)
+        XCTAssertEqual(rowSummary(model.threadRows), ["10@0", "11@1*", "more10@1:3", "20@0"])
+        XCTAssertEqual(model.thread?.replyParentID(for: 11), 11)
+
+        model.loadThreadReplies(for: 10)
+        await settle()
+        XCTAssertEqual(loader.replyCalls.last?.parent, 10)
+        XCTAssertEqual(loader.replyCalls.last?.after, 11)
+        XCTAssertEqual(rowSummary(model.threadRows), ["10@0", "11@1*", "12@1", "13@1", "more10@1:1", "20@0"])
+
+        model.loadMoreComments()
+        await settle()
+        XCTAssertNil(loader.replyCalls.last?.parent)
+        XCTAssertEqual(loader.replyCalls.last?.after, 20)
+        XCTAssertEqual(rowSummary(model.threadRows).last, "30@0")
+        XCTAssertTrue(model.commentsExhausted)
+    }
+
+    func testThreadConnectorsRunOnOnlyToLaterSiblings() {
+        func node(_ id: Int, _ depth: Int, total: Int? = nil, _ replies: [ThreadComment] = []) -> ThreadComment {
+            ThreadComment(resource: Resource(sourceID: id, kind: .entryComment, body: "", parentID: 1),
+                          depth: depth, isByEntryAuthor: false, replyParentID: id,
+                          replies: ThreadReplies(totalCount: total ?? replies.count, items: replies))
+        }
+        let tree = EntryThreadTree(ThreadReplies(totalCount: 1, items: [
+            node(10, 0, [node(11, 1, [node(111, 2)]), node(12, 1, total: 2, [node(121, 2)])]),
+        ]))
+
+        let connectors = tree.rows.map { row -> ThreadConnectors in
+            switch row {
+            case .comment(_, _, _, let connectors), .moreReplies(_, _, _, let connectors): connectors
+            }
+        }
+
+        XCTAssertEqual(connectors, [
+            ThreadConnectors(hasReplies: true),
+            ThreadConnectors(continuesBelow: true, hasReplies: true),
+            ThreadConnectors(ancestorLines: [true]),
+            ThreadConnectors(hasReplies: true),
+            ThreadConnectors(ancestorLines: [false], continuesBelow: true),
+            ThreadConnectors(ancestorLines: [false]),
+        ])
+    }
+
+    func testThreadedCommentsFallBackToTheFlatListWhenTheThreadFails() async {
+        let loader = ThreadFixtureLoader()
+        loader.failThread = true
+        let model = DetailModel(kind: .entry, id: 102, loader: loader, mutator: FixtureDetailMutator(),
+                                updates: ResourceUpdates(), threadedEntryComments: { true })
+        model.start()
+        await settle()
+        XCTAssertEqual(loader.threadCalls, 1)
+        XCTAssertNil(model.threadRows)
+        XCTAssertEqual(model.comments.map(\.sourceID), [900])
+    }
+
+    func testEntryCommentsStayFlatWithThreadsOff() async {
+        let loader = ThreadFixtureLoader()
+        let model = DetailModel(kind: .entry, id: 102, loader: loader, mutator: FixtureDetailMutator(),
+                                updates: ResourceUpdates())
+        model.start()
+        await settle()
+        XCTAssertEqual(loader.threadCalls, 0)
+        XCTAssertNil(model.threadRows)
+        XCTAssertEqual(model.comments.map(\.sourceID), [900])
+    }
+
+    func testDeletedThreadCommentDropsOutOfTheRows() async {
+        let loader = ThreadFixtureLoader()
+        let updates = ResourceUpdates()
+        let model = DetailModel(kind: .entry, id: 102, loader: loader, mutator: FixtureDetailMutator(),
+                                updates: updates, threadedEntryComments: { true })
+        model.start()
+        await settle()
+        updates.publish(.deleted, for: ResourceIdentity(
+            Resource(sourceID: 20, kind: .entryComment, body: "", parentID: 102)))
+        model.reconcileUpdates()
+        XCTAssertEqual(rowSummary(model.threadRows), ["10@0", "11@1*", "more10@1:3"])
     }
 
     func testRelatedSectionReportsEmptyAndFailedLoads() async {

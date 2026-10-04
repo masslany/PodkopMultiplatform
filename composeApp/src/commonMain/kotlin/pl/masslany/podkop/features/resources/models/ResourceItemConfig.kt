@@ -6,4 +6,6 @@ data class ResourceItemConfig(
     val showEntryInlineActions: Boolean = true,
     val showReplyAction: Boolean = false,
     val showLinkCommentReplyAction: Boolean = false,
+    /** Starts entry comment text under the author name, keeping the column under the avatar free. */
+    val indentCommentBodyUnderAuthor: Boolean = false,
 )

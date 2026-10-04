@@ -7,6 +7,7 @@ import PodkopShared
     var theme: ThemeChoice { get set }
     var autoplayGifs: Bool { get set }
     var playVideosInline: Bool { get set }
+    var threadedEntryComments: Bool { get set }
 }
 
 @MainActor @Observable
@@ -31,6 +32,10 @@ final class SettingsModel {
         update(\.playVideosInline, to: enabled) { try await $0.setPlayVideosInline(enabled) }
     }
 
+    func setThreadedEntryComments(_ enabled: Bool) {
+        update(\.threadedEntryComments, to: enabled) { try await $0.setThreadedEntryComments(enabled) }
+    }
+
     func setTheme(_ theme: ThemeChoice) {
         update(\.theme, to: theme) { try await $0.setTheme(theme) }
     }
@@ -51,6 +56,7 @@ final class SettingsModel {
             "themeOverride=\(session.theme.rawValue)",
             "autoplayGifs=\(session.autoplayGifs)",
             "playVideosInline=\(session.playVideosInline)",
+            "threadedEntryComments=\(session.threadedEntryComments)",
         ].joined(separator: "\n")
         confirmation = String(localized: .settingsDiagnosticsCopied)
     }

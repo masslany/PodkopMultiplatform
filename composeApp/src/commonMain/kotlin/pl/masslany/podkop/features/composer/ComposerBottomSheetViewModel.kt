@@ -343,12 +343,23 @@ class ComposerBottomSheetViewModel(
         }
 
         is ComposerRequest.CreateEntryComment -> {
-            entriesRepository.createEntryComment(
-                entryId = request.entryId,
-                content = content,
-                adult = adult,
-                photoKey = photoKey,
-            )
+            val parentCommentId = request.parentCommentId
+            if (parentCommentId == null) {
+                entriesRepository.createEntryComment(
+                    entryId = request.entryId,
+                    content = content,
+                    adult = adult,
+                    photoKey = photoKey,
+                )
+            } else {
+                entriesRepository.createEntryThreadReply(
+                    entryId = request.entryId,
+                    parentCommentId = parentCommentId,
+                    content = content,
+                    adult = adult,
+                    photoKey = photoKey,
+                ).map { it.comment }
+            }
         }
 
         is ComposerRequest.CreateLinkComment -> {

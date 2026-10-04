@@ -14,6 +14,9 @@ interface AppSettings {
     val dynamicColorsEnabled: Flow<Boolean>
     val playVideosInline: Flow<Boolean>
 
+    /** Show entry comments as reply threads instead of the classic flat list. */
+    val threadedEntryComments: Flow<Boolean>
+
     suspend fun setAutoplayGifs(enabled: Boolean)
 
     suspend fun setThemeOverride(value: ThemeOverride)
@@ -21,4 +24,6 @@ interface AppSettings {
     suspend fun setDynamicColorsEnabled(enabled: Boolean)
 
     suspend fun setPlayVideosInline(enabled: Boolean)
+
+    suspend fun setThreadedEntryComments(enabled: Boolean)
 }

@@ -5,6 +5,10 @@ import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.common.domain.models.common.Voters
+import pl.masslany.podkop.business.entries.domain.models.EntryThread
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadComment
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadReplies
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadSort
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import kotlin.time.ExperimentalTime
@@ -32,6 +36,32 @@ interface EntriesRepository {
         entryId: Int,
         page: Int?,
     ): Result<Resources>
+
+    /** The entry with the first page of its comments as a reply tree. */
+    suspend fun getEntryThread(
+        entryId: Int,
+        sort: EntryThreadSort,
+    ): Result<EntryThread>
+
+    /**
+     * Direct replies to [parentCommentId], or top-level comments when it is null, loaded after the
+     * sibling with id [afterId].
+     */
+    suspend fun getEntryThreadReplies(
+        entryId: Int,
+        parentCommentId: Int?,
+        sort: EntryThreadSort,
+        afterId: Int?,
+    ): Result<EntryThreadReplies>
+
+    /** Posts a reply nested under [parentCommentId] (an [EntryThreadComment.replyParentId]). */
+    suspend fun createEntryThreadReply(
+        entryId: Int,
+        parentCommentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<EntryThreadComment>
 
     suspend fun getEntryVotes(
         entryId: Int,

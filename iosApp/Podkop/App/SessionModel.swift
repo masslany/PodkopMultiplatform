@@ -33,6 +33,7 @@ final class SessionModel: SettingsState {
     var notificationCounts = NotificationCounts()
     var autoplayGifs = true
     var playVideosInline = false
+    var threadedEntryComments = false
     var theme: ThemeChoice = .auto
     var banner: String?
     var loginURL: URL?
@@ -153,6 +154,7 @@ final class SessionModel: SettingsState {
             for await value in adapter.stream({ client.settings.observe(onChange: $0) }) {
                 autoplayGifs = value.autoplayGifs
                 playVideosInline = value.playVideosInline
+                threadedEntryComments = value.threadedEntryComments
                 theme = ThemeChoice(rawValue: value.themeOverride) ?? .auto
             }
         })

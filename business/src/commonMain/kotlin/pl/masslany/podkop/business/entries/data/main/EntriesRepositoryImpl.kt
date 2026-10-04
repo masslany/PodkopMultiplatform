@@ -7,8 +7,15 @@ import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.common.domain.models.common.Voters
 import pl.masslany.podkop.business.entries.data.api.EntriesDataSource
+import pl.masslany.podkop.business.entries.data.main.mapper.toEntryThread
+import pl.masslany.podkop.business.entries.data.main.mapper.toEntryThreadComment
+import pl.masslany.podkop.business.entries.data.main.mapper.toEntryThreadReplies
 import pl.masslany.podkop.business.entries.data.main.mapper.toVoters
 import pl.masslany.podkop.business.entries.domain.main.EntriesRepository
+import pl.masslany.podkop.business.entries.domain.models.EntryThread
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadComment
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadReplies
+import pl.masslany.podkop.business.entries.domain.models.EntryThreadSort
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
@@ -69,6 +76,63 @@ class EntriesRepositoryImpl(
         return withContext(dispatcherProvider.io) {
             entriesDataSource.getEntryComments(entryId, page).mapCatching {
                 it.toResources()
+            }
+        }
+    }
+
+    override suspend fun getEntryThread(
+        entryId: Int,
+        sort: EntryThreadSort,
+    ): Result<EntryThread> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.getEntryThread(
+                entryId = entryId,
+                sort = sort.value,
+                limit = THREAD_PAGE_SIZE,
+            ).mapCatching {
+                it.data.toEntryThread()
+            }
+        }
+    }
+
+    override suspend fun getEntryThreadReplies(
+        entryId: Int,
+        parentCommentId: Int?,
+        sort: EntryThreadSort,
+        afterId: Int?,
+    ): Result<EntryThreadReplies> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.getEntryThreadReplies(
+                entryId = entryId,
+                parentCommentId = parentCommentId,
+                sort = sort.value,
+                afterId = afterId,
+                limit = THREAD_PAGE_SIZE,
+            ).mapCatching {
+                it.data.toEntryThreadReplies(
+                    entryId = entryId,
+                    fallbackDepth = if (parentCommentId == null) 0 else 1,
+                )
+            }
+        }
+    }
+
+    override suspend fun createEntryThreadReply(
+        entryId: Int,
+        parentCommentId: Int,
+        content: String,
+        adult: Boolean,
+        photoKey: String?,
+    ): Result<EntryThreadComment> {
+        return withContext(dispatcherProvider.io) {
+            entriesDataSource.createEntryThreadReply(
+                entryId = entryId,
+                parentCommentId = parentCommentId,
+                content = content,
+                adult = adult,
+                photoKey = photoKey,
+            ).mapCatching {
+                it.data.toEntryThreadComment(entryId = entryId, fallbackDepth = 1)
             }
         }
     }
@@ -238,5 +302,8 @@ class EntriesRepositoryImpl(
 
     internal companion object {
         const val ENTRIES_LAST_UPDATED_KEY = "ENTRIES_LAST_UPDATED_KEY"
+
+        // Largest page the thread endpoints accept.
+        const val THREAD_PAGE_SIZE = 25
     }
 }

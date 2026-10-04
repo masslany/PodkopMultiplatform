@@ -3352,6 +3352,23 @@
         }
       }
     },
+    "details.entryDetailsButtonShowMoreReplies" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show more replies (%lld)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż więcej odpowiedzi (%lld)"
+          }
+        }
+      }
+    },
     "details.includeParent" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6864,6 +6881,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Filmy ze Streamable odtworzysz bezpośrednio we wpisie."
+          }
+        }
+      }
+    },
+    "settings.settingsBodyThreadedEntryComments" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Threads in entry comments"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wątki w komentarzach wpisów"
+          }
+        }
+      }
+    },
+    "settings.settingsBodyThreadedEntryCommentsSupporting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replies show under the comment they answer."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odpowiedzi pokażą się pod komentarzem, na który odpowiadają."
+          }
+        }
+      }
+    },
+    "settings.settingsHeadlineComments" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comments"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Komentarze"
           }
         }
       }

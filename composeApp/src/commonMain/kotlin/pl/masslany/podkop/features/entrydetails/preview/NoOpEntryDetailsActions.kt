@@ -14,4 +14,5 @@ object NoOpEntryDetailsActions :
     PaginationActions by NoOpPaginationActions,
     TopBarActions by NoOpTopBarActions {
     override fun onRefresh() = Unit
+    override fun onShowMoreEntryRepliesClicked(parentCommentId: Int) = Unit
 }
