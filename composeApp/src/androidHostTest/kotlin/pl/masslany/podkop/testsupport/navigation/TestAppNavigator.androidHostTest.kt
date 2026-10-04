@@ -5,6 +5,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import pl.masslany.podkop.common.deeplink.AppDeepLinkParser
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.ExternalBrowser
@@ -21,6 +22,7 @@ actual fun createTestAppNavigator(scope: CoroutineScope): AppNavigator = AppNavi
         application = Application(),
         logger = NoOpAppLogger,
     ),
+    deepLinkParser = AppDeepLinkParser(),
 ).apply {
     initialize()
 }

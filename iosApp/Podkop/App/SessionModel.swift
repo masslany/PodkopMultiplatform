@@ -224,6 +224,13 @@ final class SessionModel: SettingsState {
         }
     }
 
+    /// The in-app screen for a URL tapped in content, like an entry or profile on wykop.pl;
+    /// nil sends it to the browser.
+    func contentRoute(for url: URL) -> AppRoute? {
+        guard let intent = dependencies.client.session.contentLink(url: url.absoluteString) else { return nil }
+        return LinkIngress.route(kind: intent.kind, id: intent.id?.intValue, name: intent.name)
+    }
+
     /// Asks the shared parser whether the embedded login page must stop at this URL.
     func isAppURL(_ url: URL) -> Bool {
         dependencies.client.session.isAppUrl(url: url.absoluteString)
@@ -268,7 +275,7 @@ final class SessionModel: SettingsState {
             let intent: IOSLinkIntent = try await dependencies.adapter.call {
                 self.dependencies.client.session.acceptUrl(url: url.absoluteString, completion: $0)
             }
-            ingress.accept(kind: intent.kind, id: intent.id?.intValue)
+            ingress.accept(kind: intent.kind, id: intent.id?.intValue, name: intent.name)
             if intent.kind == "login" { dependencies.router.dismissSheet() }
         } catch is CancellationError {
             return

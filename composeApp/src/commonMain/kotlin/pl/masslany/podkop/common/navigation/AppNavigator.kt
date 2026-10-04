@@ -9,11 +9,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.common.deeplink.AppDeepLinkParser
+import pl.masslany.podkop.common.deeplink.toNavTarget
 
 class AppNavigator(
     private val configProvider: NavigationConfigProvider,
     private val scope: CoroutineScope,
     private val externalBrowser: ExternalBrowser,
+    private val deepLinkParser: AppDeepLinkParser,
 ) {
     private val destinationBackHandlers = mutableMapOf<NavTarget, () -> Boolean>()
     private var initializationStarted = false
@@ -129,6 +132,19 @@ class AppNavigator(
 
     fun openExternalLink(url: String) {
         externalBrowser.open(url)
+    }
+
+    /**
+     * Opens a URL from user content: entries, links, profiles and tags on wykop.pl open in the app,
+     * anything else in the browser.
+     */
+    fun openLink(url: String) {
+        val target = deepLinkParser.parse(url)?.toNavTarget()
+        if (target != null) {
+            navigateTo(target)
+        } else {
+            openExternalLink(url)
+        }
     }
 
     // --- Helpers ---

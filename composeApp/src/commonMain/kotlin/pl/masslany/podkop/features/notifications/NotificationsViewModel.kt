@@ -257,7 +257,7 @@ class NotificationsViewModel(
             }
 
             is NotificationNavigationTarget.External -> {
-                appNavigator.openExternalLink(target.url)
+                appNavigator.openLink(target.url)
             }
 
             is NotificationNavigationTarget.Link -> {

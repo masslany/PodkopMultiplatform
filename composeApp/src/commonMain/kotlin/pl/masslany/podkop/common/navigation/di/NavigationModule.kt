@@ -11,6 +11,7 @@ val navigationModule = module {
             scope = get(),
             configProvider = get(),
             externalBrowser = get(),
+            deepLinkParser = get(),
         )
     }
 

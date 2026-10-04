@@ -7,5 +7,9 @@ sealed interface AppDeepLink {
 
     data class EntryDetails(val id: Int) : AppDeepLink
 
+    data class Profile(val username: String) : AppDeepLink
+
+    data class Tag(val name: String) : AppDeepLink
+
     data object PrivateMessagesInbox : AppDeepLink
 }

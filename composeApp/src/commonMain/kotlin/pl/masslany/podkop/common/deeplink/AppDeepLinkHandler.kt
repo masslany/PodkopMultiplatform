@@ -10,9 +10,6 @@ import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.NavTarget
-import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
-import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
-import pl.masslany.podkop.features.privatemessages.PrivateMessagesScreen
 
 class AppDeepLinkHandler internal constructor(
     private val scope: CoroutineScope,
@@ -50,16 +47,8 @@ class AppDeepLinkHandler internal constructor(
                 handleLoginCallback(deepLink)
             }
 
-            is AppDeepLink.LinkDetails -> {
-                navigateWhenReady(LinkDetailsScreen(id = deepLink.id))
-            }
-
-            is AppDeepLink.EntryDetails -> {
-                navigateWhenReady(EntryDetailsScreen.forEntry(id = deepLink.id))
-            }
-
-            AppDeepLink.PrivateMessagesInbox -> {
-                navigateWhenReady(PrivateMessagesScreen)
+            else -> {
+                deepLink.toNavTarget()?.let { navigateWhenReady(it) }
             }
         }
     }
