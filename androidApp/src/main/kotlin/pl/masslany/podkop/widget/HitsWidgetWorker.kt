@@ -135,6 +135,8 @@ class HitsWidgetWorker(
         fun ensureScheduled(context: Context) {
             val request = PeriodicWorkRequestBuilder<HitsWidgetWorker>(REFRESH_INTERVAL_HOURS, TimeUnit.HOURS)
                 .setConstraints(networkConstraints)
+                // A new widget already gets an immediate refresh, so the hourly one starts an hour later.
+                .setInitialDelay(REFRESH_INTERVAL_HOURS, TimeUnit.HOURS)
                 .build()
             WorkManager.getInstance(context)
                 .enqueueUniquePeriodicWork(PERIODIC_WORK_NAME, ExistingPeriodicWorkPolicy.KEEP, request)
