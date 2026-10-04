@@ -33,6 +33,9 @@ import pl.masslany.podkop.business.hits.domain.models.request.HitsSortType
 import pl.masslany.podkop.business.startup.api.StartupManager
 import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.logging.api.AppLogger
+import pl.masslany.podkop.widget.models.HitsWidgetItem
+import pl.masslany.podkop.widget.models.HitsWidgetSnapshot
+import pl.masslany.podkop.widget.models.toHitsWidgetItems
 
 class HitsWidgetWorker(
     appContext: Context,

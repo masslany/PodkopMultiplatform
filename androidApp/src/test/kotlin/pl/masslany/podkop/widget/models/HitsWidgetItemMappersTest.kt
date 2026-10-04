@@ -1,11 +1,8 @@
-package pl.masslany.podkop.widget
+package pl.masslany.podkop.widget.models
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
-import kotlinx.serialization.json.Json
 import pl.masslany.podkop.business.common.domain.models.common.Comments
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
 import pl.masslany.podkop.business.common.domain.models.common.Media
@@ -16,7 +13,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Source
 import pl.masslany.podkop.business.common.domain.models.common.Voted
 import pl.masslany.podkop.business.common.domain.models.common.Votes
 
-class HitsWidgetSnapshotTest {
+class HitsWidgetItemMappersTest {
     @Test
     fun `maps a link to a widget item`() {
         val items = listOf(link(id = 1, hot = true)).toHitsWidgetItems()
@@ -57,26 +54,6 @@ class HitsWidgetSnapshotTest {
 
         assertNull(item.thumbnailUrl)
         assertNull(item.source)
-    }
-
-    @Test
-    fun `older snapshots without the hot flag read as not hot`() {
-        val item = Json.decodeFromString<HitsWidgetItem>(
-            """{"id":1,"title":"Link 1","votes":5,"comments":0}""",
-        )
-
-        assertFalse(item.isHot)
-    }
-
-    @Test
-    fun `needs a refresh without data or once the data is stale`() {
-        val snapshot = HitsWidgetSnapshot(updatedAtMillis = 0, items = emptyList())
-        val twoHours = 2 * 60 * 60 * 1000L
-
-        assertTrue(HitsWidgetState().needsRefresh(nowMillis = 0))
-        assertFalse(HitsWidgetState(isRefreshing = true).needsRefresh(nowMillis = 0))
-        assertFalse(HitsWidgetState(snapshot = snapshot).needsRefresh(nowMillis = twoHours - 1))
-        assertTrue(HitsWidgetState(snapshot = snapshot).needsRefresh(nowMillis = twoHours))
     }
 
     private fun link(

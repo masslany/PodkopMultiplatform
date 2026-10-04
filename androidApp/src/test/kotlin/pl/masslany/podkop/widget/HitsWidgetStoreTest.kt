@@ -10,6 +10,9 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.runBlocking
+import pl.masslany.podkop.widget.models.HitsWidgetItem
+import pl.masslany.podkop.widget.models.HitsWidgetSnapshot
+import pl.masslany.podkop.widget.models.HitsWidgetState
 
 class HitsWidgetStoreTest {
     private val directory: File = Files.createTempDirectory("hits-widget").toFile()

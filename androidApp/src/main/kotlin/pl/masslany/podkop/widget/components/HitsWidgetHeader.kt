@@ -1,4 +1,4 @@
-package pl.masslany.podkop.widget
+package pl.masslany.podkop.widget.components
 
 import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
@@ -26,6 +26,8 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import java.util.Date
 import pl.masslany.podkop.R
+import pl.masslany.podkop.widget.RefreshHitsWidgetAction
+import pl.masslany.podkop.widget.openHitsIntent
 
 @Composable
 internal fun HitsWidgetHeader(updatedAtMillis: Long?, isRefreshing: Boolean) {

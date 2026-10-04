@@ -15,6 +15,7 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableMap
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import pl.masslany.podkop.widget.models.HitsWidgetSnapshot
 
 /** Home screen widget with the day's hits; the data comes from [HitsWidgetWorker] through [HitsWidgetStore]. */
 class HitsWidget : GlanceAppWidget(), KoinComponent {

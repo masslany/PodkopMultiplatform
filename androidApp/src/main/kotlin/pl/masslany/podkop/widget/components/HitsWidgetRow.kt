@@ -1,4 +1,4 @@
-package pl.masslany.podkop.widget
+package pl.masslany.podkop.widget.components
 
 import android.graphics.Bitmap
 import androidx.compose.runtime.Composable
@@ -34,6 +34,8 @@ import androidx.glance.unit.ColorProvider
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.theme.DarkHotOrange
 import pl.masslany.podkop.common.theme.LightHotOrange
+import pl.masslany.podkop.widget.models.HitsWidgetItem
+import pl.masslany.podkop.widget.openLinkIntent
 
 @Composable
 internal fun HitsWidgetRow(item: HitsWidgetItem, thumbnail: Bitmap?, showThumbnail: Boolean) {

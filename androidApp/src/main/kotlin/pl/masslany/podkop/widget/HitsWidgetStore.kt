@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
+import pl.masslany.podkop.widget.models.HitsWidgetSnapshot
+import pl.masslany.podkop.widget.models.HitsWidgetState
 
 /**
  * Keeps the widget's snapshot and thumbnails on disk, so every widget instance and process restart
