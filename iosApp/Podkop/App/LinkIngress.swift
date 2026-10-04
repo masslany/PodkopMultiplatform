@@ -21,17 +21,21 @@ final class LinkIngress {
     }
     func end(_ url: URL) { activeURLs.remove(url.absoluteString) }
 
-    func accept(kind: String, id: Int?) {
-        let route: AppRoute?
-        switch kind {
-        case "link": route = id.map(AppRoute.link)
-        case "entry": route = id.map(AppRoute.entry)
-        case "messages": route = .messages
-        case "login": route = nil
-        default: route = nil
-        }
-        guard let route else { return }
+    func accept(kind: String, id: Int?, name: String? = nil) {
+        guard let route = Self.route(kind: kind, id: id, name: name) else { return }
         if ready { router.navigate(route) } else { pending.append(route) }
+    }
+
+    /// The screen for a shared link intent; login intents and unknown kinds have none.
+    static func route(kind: String, id: Int?, name: String?) -> AppRoute? {
+        switch kind {
+        case "link": id.map(AppRoute.link)
+        case "entry": id.map(AppRoute.entry)
+        case "profile": name.map(AppRoute.user)
+        case "tag": name.map(AppRoute.tag)
+        case "messages": .messages
+        default: nil
+        }
     }
 
     func flush() {

@@ -42,6 +42,10 @@ struct RootView: View {
             guard ["http", "https"].contains(url.scheme?.lowercased() ?? "") else {
                 return .systemAction(url)
             }
+            if let route = session.contentRoute(for: url) {
+                router.navigate(route)
+                return .handled
+            }
             externalPage = ExternalPage(url: url)
             return .handled
         })

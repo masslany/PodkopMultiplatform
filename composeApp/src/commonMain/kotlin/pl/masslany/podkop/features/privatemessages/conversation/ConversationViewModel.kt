@@ -194,7 +194,7 @@ class ConversationViewModel(
     }
 
     override fun onUrlClicked(url: String) {
-        appNavigator.openExternalLink(url)
+        appNavigator.openLink(url)
     }
 
     override fun onImageClicked(url: String) {

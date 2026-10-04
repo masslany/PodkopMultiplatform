@@ -164,7 +164,7 @@ open class BaseResourceItemStateHolder(
     }
 
     override fun onLinkUrlClicked(url: String) {
-        appNavigator.openExternalLink(url)
+        appNavigator.openLink(url)
     }
 
     override fun onTagClicked(tag: String) {

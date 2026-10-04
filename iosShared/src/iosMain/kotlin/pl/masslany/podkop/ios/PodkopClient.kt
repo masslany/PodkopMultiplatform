@@ -88,7 +88,7 @@ class IOSNotificationStatus(
     val tagsUnreadCount: Int = 0,
     val observedDiscussionsUnreadCount: Int = 0,
 )
-class IOSLinkIntent(val kind: String, val id: Int? = null)
+class IOSLinkIntent(val kind: String, val id: Int? = null, val name: String? = null)
 class IOSPageRequest(val kind: String, val value: String? = null)
 class IOSPagePolicy(val kind: String, val initial: IOSPageRequest)
 class IOSPhoto(
@@ -347,12 +347,21 @@ class PodkopClient private constructor(
                         sessionEvents.tryEmit(AuthSessionEvent.TokensUpdated)
                         IOSLinkIntent("login")
                     }
-                    is AppDeepLink.LinkDetails -> IOSLinkIntent("link", intent.id)
-                    is AppDeepLink.EntryDetails -> IOSLinkIntent("entry", intent.id)
-                    AppDeepLink.PrivateMessagesInbox -> IOSLinkIntent("messages")
-                    null -> throw IllegalArgumentException("unsupported URL")
+                    else -> intent?.toLinkIntent() ?: throw IllegalArgumentException("unsupported URL")
                 }
             }
+
+        /** The in-app destination for a URL tapped in content, or null to open it in the browser. */
+        fun contentLink(url: String): IOSLinkIntent? = parser.parse(url)?.toLinkIntent()
+
+        private fun AppDeepLink.toLinkIntent(): IOSLinkIntent? = when (this) {
+            is AppDeepLink.LoginCallback -> null
+            is AppDeepLink.LinkDetails -> IOSLinkIntent("link", id)
+            is AppDeepLink.EntryDetails -> IOSLinkIntent("entry", id)
+            is AppDeepLink.Profile -> IOSLinkIntent("profile", name = username)
+            is AppDeepLink.Tag -> IOSLinkIntent("tag", name = name)
+            AppDeepLink.PrivateMessagesInbox -> IOSLinkIntent("messages")
+        }
 
         /** Whether an embedded login page must stop at [url] and hand it to [acceptUrl]. */
         fun isAppUrl(url: String): Boolean = parser.isAppHost(url)
