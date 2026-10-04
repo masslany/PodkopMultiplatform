@@ -76,8 +76,8 @@ internal fun HitsWidgetRow(item: HitsWidgetItem, thumbnail: Bitmap?, showThumbna
             )
             Spacer(modifier = GlanceModifier.height(2.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                MetaIcon(R.drawable.ic_widget_votes, color = votesColor)
-                MetaText(item.votes.toString(), color = votesColor)
+                MetaIcon(R.drawable.ic_widget_votes, color = VotesColor)
+                MetaText(item.votes.toString(), color = VotesColor)
                 Spacer(modifier = GlanceModifier.width(8.dp))
                 MetaIcon(R.drawable.ic_widget_comments)
                 MetaText(item.comments.toString())
@@ -111,4 +111,4 @@ private fun MetaText(text: String, color: ColorProvider = GlanceTheme.colors.onS
 }
 
 /** The app's orange for vote counts on hot content. */
-private val votesColor = ColorProvider(day = LightHotOrange, night = DarkHotOrange)
+private val VotesColor = ColorProvider(day = LightHotOrange, night = DarkHotOrange)

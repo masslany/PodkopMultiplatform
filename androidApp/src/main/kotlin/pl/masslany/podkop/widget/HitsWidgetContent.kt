@@ -42,7 +42,7 @@ internal fun HitsWidgetContent(state: HitsWidgetState, thumbnails: ImmutableMap<
             .padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         HitsWidgetHeader(
-            updatedAtMillis = snapshot?.updatedAtMillis?.takeIf { width >= SHOW_UPDATED_AT_MIN_WIDTH },
+            updatedAtMillis = snapshot?.updatedAtMillis?.takeIf { width >= ShowUpdatedAtMinWidth },
             isRefreshing = state.isRefreshing,
         )
         when {
@@ -60,7 +60,7 @@ internal fun HitsWidgetContent(state: HitsWidgetState, thumbnails: ImmutableMap<
                     HitsWidgetRow(
                         item = item,
                         thumbnail = thumbnails[item.id],
-                        showThumbnail = width >= SHOW_THUMBNAILS_MIN_WIDTH,
+                        showThumbnail = width >= ShowThumbnailsMinWidth,
                     )
                 }
             }
@@ -86,5 +86,5 @@ private fun Message(text: String, onClick: Action? = null) {
     }
 }
 
-private val SHOW_THUMBNAILS_MIN_WIDTH = 220.dp
-private val SHOW_UPDATED_AT_MIN_WIDTH = 160.dp
+private val ShowThumbnailsMinWidth = 220.dp
+private val ShowUpdatedAtMinWidth = 160.dp
