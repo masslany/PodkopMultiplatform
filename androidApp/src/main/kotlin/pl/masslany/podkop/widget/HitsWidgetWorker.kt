@@ -3,6 +3,7 @@ package pl.masslany.podkop.widget
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.core.graphics.scale
 import androidx.glance.appwidget.updateAll
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
@@ -13,11 +14,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import java.io.ByteArrayOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.concurrent.TimeUnit
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
@@ -36,6 +32,12 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.widget.models.HitsWidgetItem
 import pl.masslany.podkop.widget.models.HitsWidgetSnapshot
 import pl.masslany.podkop.widget.models.toHitsWidgetItems
+import java.io.ByteArrayOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.milliseconds
 
 class HitsWidgetWorker(
     appContext: Context,
@@ -82,7 +84,7 @@ class HitsWidgetWorker(
 
     /** The API token comes from app startup, which a widget refresh may race in a fresh process. */
     private suspend fun awaitStartup(): Boolean {
-        val state = withTimeoutOrNull(STARTUP_TIMEOUT_MILLIS) {
+        val state = withTimeoutOrNull(STARTUP_TIMEOUT_MILLIS.milliseconds) {
             startupManager.state.first { it !is AppState.Initializing }
         }
         if (state == AppState.Ready) return true
@@ -191,7 +193,7 @@ private fun ByteArray.toThumbnailJpeg(): ByteArray? {
         cropWidth,
         cropHeight,
     )
-    val scaled = Bitmap.createScaledBitmap(cropped, THUMBNAIL_WIDTH_PX, THUMBNAIL_HEIGHT_PX, true)
+    val scaled = cropped.scale(THUMBNAIL_WIDTH_PX, THUMBNAIL_HEIGHT_PX)
 
     return ByteArrayOutputStream().use { output ->
         scaled.compress(Bitmap.CompressFormat.JPEG, THUMBNAIL_JPEG_QUALITY, output)
