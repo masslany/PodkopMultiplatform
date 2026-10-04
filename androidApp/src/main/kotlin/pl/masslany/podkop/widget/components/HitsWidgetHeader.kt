@@ -24,10 +24,10 @@ import androidx.glance.layout.size
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import java.util.Date
 import pl.masslany.podkop.R
 import pl.masslany.podkop.widget.RefreshHitsWidgetAction
 import pl.masslany.podkop.widget.openHitsIntent
+import java.util.Date
 
 @Composable
 internal fun HitsWidgetHeader(updatedAtMillis: Long?, isRefreshing: Boolean) {
@@ -42,15 +42,24 @@ internal fun HitsWidgetHeader(updatedAtMillis: Long?, isRefreshing: Boolean) {
                 .defaultWeight()
                 .clickable(actionStartActivity(openHitsIntent(context))),
         ) {
-            Text(
-                text = context.getString(R.string.hits_widget_title),
-                maxLines = 1,
-                style = TextStyle(
-                    color = GlanceTheme.colors.onSurface,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
-            )
+            Row {
+                Image(
+                    provider = ImageProvider(R.drawable.ic_fire),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurfaceVariant),
+                    modifier = GlanceModifier
+                        .padding(end = 8.dp),
+                )
+                Text(
+                    text = context.getString(R.string.hits_widget_title),
+                    maxLines = 1,
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onSurface,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                )
+            }
             if (updatedAtMillis != null) {
                 Text(
                     text = context.getString(
