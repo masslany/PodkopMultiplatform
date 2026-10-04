@@ -11,6 +11,7 @@ import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
+import pl.masslany.podkop.features.hits.HitsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.privatemessages.PrivateMessagesScreen
 
@@ -60,6 +61,10 @@ class AppDeepLinkHandler internal constructor(
 
             AppDeepLink.PrivateMessagesInbox -> {
                 navigateWhenReady(PrivateMessagesScreen)
+            }
+
+            AppDeepLink.Hits -> {
+                navigateWhenReady(HitsScreen)
             }
         }
     }

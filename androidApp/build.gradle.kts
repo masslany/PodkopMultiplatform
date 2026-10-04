@@ -5,6 +5,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.firebaseCrashlytics)
 }
@@ -69,8 +70,15 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+    implementation(libs.compose.material3)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.timber)
 
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.leakcanary.android)
+
+    testImplementation(libs.kotlin.testJunit)
+    testImplementation(libs.kotlinx.datetime)
 }

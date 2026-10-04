@@ -334,6 +334,7 @@ class PodkopClient private constructor(
                     is AppDeepLink.LinkDetails -> IOSLinkIntent("link", intent.id)
                     is AppDeepLink.EntryDetails -> IOSLinkIntent("entry", intent.id)
                     AppDeepLink.PrivateMessagesInbox -> IOSLinkIntent("messages")
+                    AppDeepLink.Hits -> IOSLinkIntent("hits")
                     null -> throw IllegalArgumentException("unsupported URL")
                 }
             }

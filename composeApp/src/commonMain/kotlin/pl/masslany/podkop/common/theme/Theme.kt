@@ -7,7 +7,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 
-internal val lightColorScheme = lightColorScheme(
+/** Also themes the home screen widgets on Android versions without dynamic colors. */
+val lightColorScheme = lightColorScheme(
     primary = lightPrimary,
     onPrimary = lightOnPrimary,
     primaryContainer = lightPrimaryContainer,
@@ -39,7 +40,7 @@ internal val lightColorScheme = lightColorScheme(
     scrim = lightScrim,
 )
 
-internal val darkColorScheme = darkColorScheme(
+val darkColorScheme = darkColorScheme(
     primary = darkPrimary,
     onPrimary = darkOnPrimary,
     primaryContainer = darkPrimaryContainer,

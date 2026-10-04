@@ -27,6 +27,7 @@ final class LinkIngress {
         case "link": route = id.map(AppRoute.link)
         case "entry": route = id.map(AppRoute.entry)
         case "messages": route = .messages
+        case "hits": route = .hits
         case "login": route = nil
         default: route = nil
         }

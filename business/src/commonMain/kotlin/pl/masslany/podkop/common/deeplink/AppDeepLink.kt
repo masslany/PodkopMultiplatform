@@ -8,4 +8,6 @@ sealed interface AppDeepLink {
     data class EntryDetails(val id: Int) : AppDeepLink
 
     data object PrivateMessagesInbox : AppDeepLink
+
+    data object Hits : AppDeepLink
 }

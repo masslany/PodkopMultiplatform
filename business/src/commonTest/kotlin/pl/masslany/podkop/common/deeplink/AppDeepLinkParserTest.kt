@@ -64,6 +64,21 @@ class AppDeepLinkParserTest {
     }
 
     @Test
+    fun parsesHits() {
+        val result = parser.parse("https://masslany.pl/app/hits")
+
+        assertEquals(
+            expected = AppDeepLink.Hits,
+            actual = result,
+        )
+    }
+
+    @Test
+    fun ignoresUnknownAppPath() {
+        assertNull(parser.parse("https://masslany.pl/app/unknown"))
+    }
+
+    @Test
     fun ignoresUnsupportedHost() {
         val result = parser.parse("https://example.com/wykop/link/99999999/test")
 

@@ -4,4 +4,12 @@
     <string name="pm_notification_title">Masz nową prywatną wiadomość</string>
     <string name="pm_notification_title_plural">Masz nowe prywatne wiadomości</string>
     <string name="pm_notification_body">Dotknij, aby otworzyć</string>
+    <string name="hits_widget_label">Hity dnia</string>
+    <string name="hits_widget_description">Najpopularniejsze znaleziska dnia</string>
+    <string name="hits_widget_title">Hity dnia</string>
+    <string name="hits_widget_updated_at">Aktualizacja: %1$s</string>
+    <string name="hits_widget_refresh">Odśwież</string>
+    <string name="hits_widget_loading">Ładowanie…</string>
+    <string name="hits_widget_empty">Brak hitów</string>
+    <string name="hits_widget_error">Nie udało się pobrać hitów. Dotknij, aby spróbować ponownie.</string>
 </resources>

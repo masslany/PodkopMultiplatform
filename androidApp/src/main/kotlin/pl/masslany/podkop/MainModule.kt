@@ -1,5 +1,6 @@
 package pl.masslany.podkop
 
+import java.io.File
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
@@ -12,9 +13,13 @@ import pl.masslany.podkop.common.platform.ScreenshotExporter
 import pl.masslany.podkop.common.platform.TextClipboardController
 import pl.masslany.podkop.common.settings.TelemetrySettingsController
 import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesBackgroundNotificationsController
+import pl.masslany.podkop.widget.HitsWidgetStore
 
 val mainModule = module {
     viewModelOf(::MainActivityViewModel)
+    single {
+        HitsWidgetStore(directory = File(androidApplication().filesDir, HitsWidgetStore.DIRECTORY_NAME))
+    }
     single { AndroidActivityHolder() }
     single {
         AndroidPrivateMessagesBackgroundNotificationsController(
