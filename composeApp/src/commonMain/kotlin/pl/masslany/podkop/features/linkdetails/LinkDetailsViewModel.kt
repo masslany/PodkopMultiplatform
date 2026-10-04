@@ -51,12 +51,12 @@ import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftS
 import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogScreen
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
+import pl.masslany.podkop.features.resources.StreamableEmbedPlayback
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.models.link.toLinkItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.toLinkCommentItemState
 import pl.masslany.podkop.features.resources.models.related.toRelatedItemState
-import pl.masslany.podkop.features.resources.StreamableEmbedPlayback
 import pl.masslany.podkop.features.resources.updateStreamableEmbedStateIfMatches
 import pl.masslany.podkop.features.resources.updateTwitterEmbedStateIfMatches
 import pl.masslany.podkop.features.topbar.TopBarActions

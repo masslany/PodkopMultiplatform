@@ -82,7 +82,9 @@ class ConversationViewModel(
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
-            logger.warn("Ignoring private message thread pagination request because numbered page was expected, got $request")
+            logger.warn(
+                "Ignoring private message thread pagination request because numbered page was expected, got $request",
+            )
             return@Paginator Result.success(PrivateMessageThreadPage(emptyList(), null))
         }
 

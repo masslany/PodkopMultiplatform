@@ -2,7 +2,6 @@ package pl.masslany.podkop.common.composer.composermedia
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.components.dialog.PodkopAlertDialog
 import pl.masslany.podkop.common.navigation.AppNavigator
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.composer_photo_url_dialog_confirm
@@ -29,7 +29,7 @@ fun ComposerMediaUrlDialogScreenRoot(
     modifier: Modifier = Modifier,
 ) {
     var urlText by remember { mutableStateOf("") }
-    AlertDialog(
+    PodkopAlertDialog(
         modifier = modifier,
         onDismissRequest = {
             appNavigator.sendResult(

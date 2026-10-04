@@ -318,7 +318,12 @@ class ResourceActionsBottomSheetViewModelTest {
             ResourceActionsParams(resourceType = ResourceActionsType.Link, rootId = 1, rootSlug = "slug"),
             ResourceActionsParams(resourceType = ResourceActionsType.Entry, rootId = 1),
             ResourceActionsParams(resourceType = ResourceActionsType.EntryComment, rootId = 1, childId = 2),
-            ResourceActionsParams(resourceType = ResourceActionsType.LinkComment, rootId = 1, rootSlug = "slug", childId = 2),
+            ResourceActionsParams(
+                resourceType = ResourceActionsType.LinkComment,
+                rootId = 1,
+                rootSlug = "slug",
+                childId = 2,
+            ),
         )
 
         params.forEach { param ->

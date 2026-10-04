@@ -125,8 +125,11 @@ class BlacklistsViewModel(
 
     override fun onEntryClicked(item: BlacklistEntryState) {
         when (item) {
-            is BlacklistEntryState.BlacklistedUserItemState -> appNavigator.navigateTo(ProfileScreen(username = item.username))
+            is BlacklistEntryState.BlacklistedUserItemState ->
+                appNavigator.navigateTo(ProfileScreen(username = item.username))
+
             is BlacklistEntryState.BlacklistedTagItemState -> appNavigator.navigateTo(TagScreen(tag = item.name))
+
             else -> Unit
         }
     }
@@ -207,7 +210,9 @@ class BlacklistsViewModel(
             },
         ) { request ->
             val page = request.numberOrNull() ?: run {
-                logger.warn("Ignoring blacklist pagination request for $type because numbered page was expected, got $request")
+                logger.warn(
+                    "Ignoring blacklist pagination request for $type because numbered page was expected, got $request",
+                )
                 return@Paginator Result.success(BlacklistPage(emptyList(), null))
             }
 
@@ -292,9 +297,14 @@ class BlacklistsViewModel(
                 previousState.copy(isActionsInProgress = true)
             }
             val action = when (item) {
-                is BlacklistEntryState.BlacklistedUserItemState -> blacklistsRepository.removeBlacklistedUser(item.username)
-                is BlacklistEntryState.BlacklistedTagItemState -> blacklistsRepository.removeBlacklistedTag(item.name)
-                is BlacklistEntryState.BlacklistedDomainItemState -> blacklistsRepository.removeBlacklistedDomain(item.domain)
+                is BlacklistEntryState.BlacklistedUserItemState ->
+                    blacklistsRepository.removeBlacklistedUser(item.username)
+
+                is BlacklistEntryState.BlacklistedTagItemState ->
+                    blacklistsRepository.removeBlacklistedTag(item.name)
+
+                is BlacklistEntryState.BlacklistedDomainItemState ->
+                    blacklistsRepository.removeBlacklistedDomain(item.domain)
             }
 
             if (action.isSuccess) {

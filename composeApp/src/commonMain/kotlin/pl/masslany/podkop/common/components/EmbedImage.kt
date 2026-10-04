@@ -44,7 +44,8 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.size.Scale
-import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.HazeInput
+import dev.chrisbanes.haze.blur.hazeBlur
 import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.common.models.EmbedImageState
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -135,7 +136,7 @@ fun EmbedImage(
         }
         .then(
             if (isAdultOverlayVisible) {
-                Modifier.hazeEffect { blurEnabled = true }
+                Modifier.hazeBlur(input = HazeInput.Content)
             } else {
                 Modifier
             },

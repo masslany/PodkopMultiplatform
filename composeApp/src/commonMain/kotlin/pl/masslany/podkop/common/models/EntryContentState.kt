@@ -3,6 +3,7 @@ package pl.masslany.podkop.common.models
 import com.mikepenz.markdown.model.ReferenceLinkHandlerImpl
 import com.mikepenz.markdown.model.State
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
+import org.intellij.markdown.parser.CancellationToken
 import org.intellij.markdown.parser.MarkdownParser
 
 sealed class EntryContentState {
@@ -49,9 +50,11 @@ fun String.toEntryContentState(isDownVoted: Boolean): EntryContentState.Content 
 }
 
 fun String.toMarkdownStateSuccess(): State.Success {
-    val parser = MarkdownParser(GFMFlavourDescriptor())
+    val parser = MarkdownParser(GFMFlavourDescriptor(), cancellationToken = CancellationToken.NonCancellable)
+    // Typed as CharSequence to pick the non-deprecated parser overload.
+    val markdown: CharSequence = this
     return State.Success(
-        node = parser.buildMarkdownTreeFromString(this),
+        node = parser.buildMarkdownTreeFromString(markdown),
         content = this,
         linksLookedUp = false,
         referenceLinkHandler = ReferenceLinkHandlerImpl(),
