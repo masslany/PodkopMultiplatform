@@ -42,6 +42,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.ViewModelStoreProvider
+import androidx.lifecycle.viewmodel.compose.rememberViewModelStoreProvider
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -131,6 +133,7 @@ fun HomeScreenContent(
     onEntryCommentReplyClicked: (entryId: Int, entryCommentId: Int, author: String?, useInlineDetails: Boolean) -> Unit,
     navContent: @Composable (
         backStack: ImmutableList<NavTarget>,
+        viewModelStoreProvider: ViewModelStoreProvider,
         contentPadding: PaddingValues,
         inlineSceneEnabled: Boolean,
         onBack: () -> Unit,
@@ -140,6 +143,7 @@ fun HomeScreenContent(
         onEntryCommentReplyClicked: (entryId: Int, entryCommentId: Int, author: String?) -> Unit,
     ) -> Unit = {
             backStack,
+            viewModelStoreProvider,
             contentPadding,
             inlineSceneEnabled,
             navOnBack,
@@ -150,6 +154,7 @@ fun HomeScreenContent(
         ->
         HomeNavDisplay(
             backStack = backStack,
+            viewModelStoreProvider = viewModelStoreProvider,
             contentPadding = contentPadding,
             inlineSceneEnabled = inlineSceneEnabled,
             onBack = navOnBack,
@@ -181,6 +186,8 @@ fun HomeScreenContent(
         }
     }
     val holder = rememberSaveableStateHolder()
+    // Above the tab's state, so a tab's ViewModels outlive switching away from it, as long as Home is around.
+    val viewModelStoreProvider = rememberViewModelStoreProvider()
     val currentStackState = rememberUpdatedState(newValue = state.currentStack)
     val currentTabKeyState = rememberUpdatedState(newValue = state.currentTabKey)
     val inlineSceneEnabledState = rememberUpdatedState(newValue = inlineSceneEnabled)
@@ -222,6 +229,7 @@ fun HomeScreenContent(
                     holder.SaveableStateProvider(currentTabKeyState.value) {
                         navContent(
                             currentStackState.value,
+                            viewModelStoreProvider,
                             contentPaddingState.value,
                             inlineSceneEnabledState.value,
                             onBack,
@@ -279,6 +287,7 @@ fun HomeScreenContent(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun HomeNavDisplay(
     backStack: ImmutableList<NavTarget>,
+    viewModelStoreProvider: ViewModelStoreProvider,
     contentPadding: PaddingValues,
     inlineSceneEnabled: Boolean,
     onBack: () -> Unit,
@@ -423,7 +432,7 @@ private fun HomeNavDisplay(
             },
             entryDecorators = listOf(
                 rememberSaveableStateHolderNavEntryDecorator(),
-                rememberViewModelStoreNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(viewModelStoreProvider),
             ),
             entryProvider = { provider(it) },
             onBack = onBack,
@@ -516,7 +525,7 @@ private fun HomeScreenContentPreviewLinksTab() {
             onEntryClicked = { _, _ -> },
             onEntryReplyClicked = { _, _, _ -> },
             onEntryCommentReplyClicked = { _, _, _, _ -> },
-            navContent = { _, contentPadding, _, _, _, _, _, _ ->
+            navContent = { _, _, contentPadding, _, _, _, _, _, _ ->
                 LinksScreenContent(
                     paddingValues = contentPadding,
                     state = linksState,
@@ -577,7 +586,7 @@ private fun HomeScreenContentPreviewEntriesTab() {
             onEntryClicked = { _, _ -> },
             onEntryReplyClicked = { _, _, _ -> },
             onEntryCommentReplyClicked = { _, _, _, _ -> },
-            navContent = { _, contentPadding, _, _, _, _, _, _ ->
+            navContent = { _, _, contentPadding, _, _, _, _, _, _ ->
                 EntriesScreenContent(
                     paddingValues = contentPadding,
                     state = entriesState,
