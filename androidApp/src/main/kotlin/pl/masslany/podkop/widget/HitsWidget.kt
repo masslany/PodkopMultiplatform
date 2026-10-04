@@ -11,6 +11,8 @@ import androidx.glance.GlanceTheme
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.toImmutableMap
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -35,7 +37,7 @@ class HitsWidget : GlanceAppWidget(), KoinComponent {
         }
     }
 
-    private fun loadThumbnails(snapshot: HitsWidgetSnapshot?): Map<Int, Bitmap> = snapshot?.items
+    private fun loadThumbnails(snapshot: HitsWidgetSnapshot?): ImmutableMap<Int, Bitmap> = snapshot?.items
         .orEmpty()
         .filter { it.thumbnailUrl != null }
         .mapNotNull { item ->
@@ -45,4 +47,5 @@ class HitsWidget : GlanceAppWidget(), KoinComponent {
                 ?.let { item.id to it }
         }
         .toMap()
+        .toImmutableMap()
 }

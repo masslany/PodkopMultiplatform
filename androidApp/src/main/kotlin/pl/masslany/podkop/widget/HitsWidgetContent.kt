@@ -24,10 +24,11 @@ import androidx.glance.layout.padding
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
+import kotlinx.collections.immutable.ImmutableMap
 import pl.masslany.podkop.R
 
 @Composable
-internal fun HitsWidgetContent(state: HitsWidgetState, thumbnails: Map<Int, Bitmap>) {
+internal fun HitsWidgetContent(state: HitsWidgetState, thumbnails: ImmutableMap<Int, Bitmap>) {
     val context = LocalContext.current
     val width = LocalSize.current.width
     val snapshot = state.snapshot

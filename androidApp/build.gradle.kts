@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.androidx.glance.material3)
     implementation(libs.compose.material3)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.timber)
 
     implementation(libs.androidx.activity.compose)
