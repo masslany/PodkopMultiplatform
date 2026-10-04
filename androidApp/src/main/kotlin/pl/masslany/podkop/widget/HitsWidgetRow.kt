@@ -14,6 +14,7 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
+import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -29,7 +30,10 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 import pl.masslany.podkop.R
+import pl.masslany.podkop.common.theme.DarkHotOrange
+import pl.masslany.podkop.common.theme.LightHotOrange
 
 @Composable
 internal fun HitsWidgetRow(item: HitsWidgetItem, thumbnail: Bitmap?, showThumbnail: Boolean) {
@@ -72,8 +76,8 @@ internal fun HitsWidgetRow(item: HitsWidgetItem, thumbnail: Bitmap?, showThumbna
             )
             Spacer(modifier = GlanceModifier.height(2.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                MetaIcon(R.drawable.ic_widget_votes)
-                MetaText(item.votes.toString())
+                MetaIcon(R.drawable.ic_widget_votes, color = votesColor)
+                MetaText(item.votes.toString(), color = votesColor)
                 Spacer(modifier = GlanceModifier.width(8.dp))
                 MetaIcon(R.drawable.ic_widget_comments)
                 MetaText(item.comments.toString())
@@ -87,21 +91,24 @@ internal fun HitsWidgetRow(item: HitsWidgetItem, thumbnail: Bitmap?, showThumbna
 }
 
 @Composable
-private fun MetaIcon(resId: Int) {
+private fun MetaIcon(resId: Int, color: ColorProvider = GlanceTheme.colors.onSurfaceVariant) {
     Image(
         provider = ImageProvider(resId),
         contentDescription = null,
-        colorFilter = ColorFilter.tint(GlanceTheme.colors.onSurfaceVariant),
+        colorFilter = ColorFilter.tint(color),
         modifier = GlanceModifier.size(12.dp),
     )
     Spacer(modifier = GlanceModifier.width(2.dp))
 }
 
 @Composable
-private fun MetaText(text: String) {
+private fun MetaText(text: String, color: ColorProvider = GlanceTheme.colors.onSurfaceVariant) {
     Text(
         text = text,
         maxLines = 1,
-        style = TextStyle(color = GlanceTheme.colors.onSurfaceVariant, fontSize = 11.sp),
+        style = TextStyle(color = color, fontSize = 11.sp),
     )
 }
+
+/** The app's orange for vote counts on hot content. */
+private val votesColor = ColorProvider(day = LightHotOrange, night = DarkHotOrange)
