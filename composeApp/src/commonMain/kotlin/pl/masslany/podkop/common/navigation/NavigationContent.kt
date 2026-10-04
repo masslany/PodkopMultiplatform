@@ -13,7 +13,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.scene.rememberSceneState
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -69,13 +71,32 @@ private fun GenericNavDisplay(
     val canNavigateBack = backStack.size > 1
     val navigationInput = rememberPlatformBackNavigationInput(enabled = canNavigateBack)
 
+    val entries = rememberDecoratedNavEntries(
+        backStack = backStack,
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
+            rememberPredictivePopCornersDecorator(),
+        ),
+        entryProvider = { entryProvider(it) },
+    )
+    val sceneState = rememberSceneState(
+        entries = entries,
+        sceneStrategies = listOf(bottomSheetStrategy, dialogSceneStrategy),
+        onBack = onBack,
+    )
+
     NavDisplay(
+        sceneState = sceneState,
+        navigationEventState = rememberPredictivePopState(
+            sceneState = sceneState,
+            entryCount = entries.size,
+            onBack = onBack,
+        ),
         modifier = modifier.edgeSwipeBackGesture(
             enabled = canNavigateBack,
             navigationInput = navigationInput,
         ),
-        backStack = backStack,
-        sceneStrategies = listOf(bottomSheetStrategy, dialogSceneStrategy),
         transitionSpec = {
             ContentTransform(
                 targetContentEnter = EnterTransition.None,
@@ -89,12 +110,5 @@ private fun GenericNavDisplay(
             )
         },
         predictivePopTransitionSpec = { edge -> predictivePopTransform(edge) },
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
-            rememberPredictivePopCornersDecorator(),
-        ),
-        entryProvider = { entryProvider(it) },
-        onBack = onBack,
     )
 }
