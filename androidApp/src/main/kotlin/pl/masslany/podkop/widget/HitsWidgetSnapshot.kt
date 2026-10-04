@@ -21,6 +21,7 @@ data class HitsWidgetItem(
     val id: Int,
     val title: String,
     val votes: Int,
+    val isHot: Boolean = false,
     val comments: Int,
     val source: String? = null,
     val thumbnailUrl: String? = null,
@@ -51,6 +52,7 @@ internal fun List<ResourceItem>.toHitsWidgetItems(
             id = item.id,
             title = item.title,
             votes = item.votes?.up ?: 0,
+            isHot = item.hot,
             comments = item.comments?.count ?: 0,
             source = item.source?.label?.takeIf(String::isNotBlank),
             // The app covers adult images until they are tapped, so the widget leaves them out.

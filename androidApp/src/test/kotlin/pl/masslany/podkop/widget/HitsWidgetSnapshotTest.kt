@@ -5,6 +5,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlinx.serialization.json.Json
 import pl.masslany.podkop.business.common.domain.models.common.Comments
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
 import pl.masslany.podkop.business.common.domain.models.common.Media
@@ -18,7 +19,7 @@ import pl.masslany.podkop.business.common.domain.models.common.Votes
 class HitsWidgetSnapshotTest {
     @Test
     fun `maps a link to a widget item`() {
-        val items = listOf(link(id = 1)).toHitsWidgetItems()
+        val items = listOf(link(id = 1, hot = true)).toHitsWidgetItems()
 
         assertEquals(
             listOf(
@@ -26,6 +27,7 @@ class HitsWidgetSnapshotTest {
                     id = 1,
                     title = "Link 1",
                     votes = 120,
+                    isHot = true,
                     comments = 34,
                     source = "example.com",
                     thumbnailUrl = "https://example.com/1.jpg",
@@ -58,6 +60,15 @@ class HitsWidgetSnapshotTest {
     }
 
     @Test
+    fun `older snapshots without the hot flag read as not hot`() {
+        val item = Json.decodeFromString<HitsWidgetItem>(
+            """{"id":1,"title":"Link 1","votes":5,"comments":0}""",
+        )
+
+        assertFalse(item.isHot)
+    }
+
+    @Test
     fun `needs a refresh without data or once the data is stale`() {
         val snapshot = HitsWidgetSnapshot(updatedAtMillis = 0, items = emptyList())
         val twoHours = 2 * 60 * 60 * 1000L
@@ -74,6 +85,7 @@ class HitsWidgetSnapshotTest {
         resource: Resource = Resource.Link,
         deleted: Deleted = Deleted.None,
         adult: Boolean = false,
+        hot: Boolean = false,
         source: String = "example.com",
     ) = ResourceItem(
         actions = null,
@@ -87,7 +99,7 @@ class HitsWidgetSnapshotTest {
         deletable = false,
         description = "",
         editable = false,
-        hot = false,
+        hot = hot,
         id = id,
         media = Media(
             embed = null,
