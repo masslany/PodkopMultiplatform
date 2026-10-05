@@ -108,8 +108,8 @@ private fun Transition<EnterExitState>.predictivePopRevealProgress(): Float? =
 private fun NavEntry<*>.isOverlay(): Boolean = metadata.keys.any { it in OverlayMetadataKeys }
 
 /**
- * Rounds a full-screen entry's corners while a predictive Back gesture shrinks it, and dims the
- * entry it reveals until the gesture completes. Dialogs and bottom sheets are skipped:
+ * Rounds a full-screen entry's corners while a predictive Back gesture shrinks it, hides it once
+ * the Back completes, and dims the entry it reveals until then. Dialogs and bottom sheets are skipped:
  * `NavDisplay` hands them the scope of the screen below them.
  */
 @Composable
@@ -124,8 +124,10 @@ internal fun <T : Any> rememberPredictivePopCornersDecorator(): NavEntryDecorato
                     .fillMaxSize()
                     .graphicsLayer {
                         // Read here, the play time redraws the layer each frame without recomposing.
-                        val rounding = (transition.predictivePopLeaveProgress() / PredictivePopCornerProgress)
-                            .coerceAtMost(1f)
+                        val leave = transition.predictivePopLeaveProgress()
+                        // Only a completed Back reaches the end, so the screen is gone once it does.
+                        if (leave >= 1f) alpha = 0f
+                        val rounding = (leave / PredictivePopCornerProgress).coerceAtMost(1f)
                         if (rounding > 0f) {
                             shape = RoundedCornerShape(PredictivePopCornerRadius * rounding)
                             clip = true
