@@ -15,6 +15,11 @@ val apikeyProperties =
         load(FileInputStream(apikeyPropertiesFile))
     }
 
+// The Android release workflow passes the release version; every other build is a dev build, so its
+// crashes are easy to tell apart (and filter out) in Crashlytics.
+val podkopVersionName: String = providers.gradleProperty("podkop.versionName").getOrElse("0.0.0-dev")
+val podkopVersionCode: Int = providers.gradleProperty("podkop.versionCode").map(String::toInt).getOrElse(1)
+
 android {
     namespace = "pl.masslany.podkop"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -22,8 +27,8 @@ android {
         applicationId = "pl.masslany.podkop"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 16
-        versionName = "2.6.0"
+        versionCode = podkopVersionCode
+        versionName = podkopVersionName
 
         buildConfigField("String", "WYKOP_KEY", "\"${apikeyProperties.getProperty("WYKOP_KEY")}\"")
         buildConfigField("String", "WYKOP_SECRET", "\"${apikeyProperties.getProperty("WYKOP_SECRET")}\"")
