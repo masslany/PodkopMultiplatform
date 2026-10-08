@@ -30,7 +30,7 @@ data class SettingsScreenState(
             areSystemNotificationsEnabled = false,
             shouldRequestNotificationPermission = false,
             autoplayGifs = true,
-            playVideosInline = false,
+            playVideosInline = true,
             threadedEntryComments = false,
             themeOverride = ThemeOverride.AUTO,
             dynamicColorsEnabled = true,
