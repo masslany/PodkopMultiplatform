@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.asStateFlow
 /**
  * Plays [url] inline with platform controls (play/pause, seek, fullscreen) and starts playback right
  * away. Pauses when another inline player starts or the screen goes to the background; releases the
- * player when it leaves composition. Calls [onError] when the stream fails.
+ * player when it leaves composition and, back in composition (e.g. scrolled into view again), comes
+ * back paused where it was left. Calls [onError] when the stream fails.
  */
 @Composable
 internal expect fun InlineVideoPlayer(
@@ -18,7 +19,10 @@ internal expect fun InlineVideoPlayer(
     onError: () -> Unit,
 )
 
-/** Keeps a single inline video playing at a time across the whole app. */
+/**
+ * Keeps a single inline video playing at a time across the whole app. [active] is the player last asked to
+ * play, until it pauses or leaves composition.
+ */
 internal object InlineVideoPlayback {
     private val _active = MutableStateFlow<Any?>(null)
     val active: StateFlow<Any?> = _active.asStateFlow()

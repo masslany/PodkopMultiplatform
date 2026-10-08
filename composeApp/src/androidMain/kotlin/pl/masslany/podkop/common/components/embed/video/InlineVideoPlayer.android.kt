@@ -1,5 +1,6 @@
 package pl.masslany.podkop.common.components.embed.video
 
+import android.content.Context
 import android.graphics.Color as AndroidColor
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
@@ -11,6 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,18 +42,17 @@ internal actual fun InlineVideoPlayer(
     val currentOnError by rememberUpdatedState(onError)
     val token = remember { Any() }
     var isFullscreen by remember { mutableStateOf(false) }
-    val player = remember(url) {
-        ExoPlayer.Builder(context).build().apply {
-            setMediaItem(MediaItem.fromUri(url))
-            playWhenReady = true
-            prepare()
-        }
+    // Saved with the list item, so a clip scrolled out of view comes back paused where it was left.
+    val player = rememberSaveable(url, saver = inlinePlayerSaver(context, url)) {
+        inlinePlayer(context, url, playWhenReady = true, positionMs = 0L)
     }
 
     DisposableEffect(player) {
         val listener = object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                if (isPlaying) InlineVideoPlayback.claim(token)
+            // Claims as soon as playback is asked for, not once frames flow, and lets go on pause, so a clip
+            // paused elsewhere can't stop one that is still buffering.
+            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                if (playWhenReady) InlineVideoPlayback.claim(token) else InlineVideoPlayback.release(token)
             }
 
             override fun onPlayerError(error: PlaybackException) {
@@ -58,6 +60,7 @@ internal actual fun InlineVideoPlayer(
             }
         }
         player.addListener(listener)
+        if (player.playWhenReady) InlineVideoPlayback.claim(token)
         onDispose {
             player.removeListener(listener)
             player.release()
@@ -121,3 +124,23 @@ internal actual fun InlineVideoPlayer(
         }
     }
 }
+
+private fun inlinePlayer(context: Context, url: String, playWhenReady: Boolean, positionMs: Long): ExoPlayer =
+    ExoPlayer.Builder(context).build().apply {
+        setMediaItem(MediaItem.fromUri(url), positionMs)
+        this.playWhenReady = playWhenReady
+        prepare()
+    }
+
+// Restores only for the same signed url; a fresh one (a retry, a re-resolve) starts over and plays. A clip
+// that was playing comes back paused too: it stopped when it left, and it shouldn't start sound unasked.
+private fun inlinePlayerSaver(context: Context, url: String) = listSaver<ExoPlayer, Any>(
+    save = { player -> listOf(url, player.currentPosition) },
+    restore = { (savedUrl, positionMs) ->
+        if (savedUrl == url) {
+            inlinePlayer(context, url, playWhenReady = false, positionMs = positionMs as Long)
+        } else {
+            null
+        }
+    },
+)
