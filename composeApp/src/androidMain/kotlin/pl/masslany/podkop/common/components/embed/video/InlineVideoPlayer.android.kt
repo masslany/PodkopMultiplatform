@@ -49,8 +49,10 @@ internal actual fun InlineVideoPlayer(
 
     DisposableEffect(player) {
         val listener = object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                if (isPlaying) InlineVideoPlayback.claim(token)
+            // Claims as soon as playback is asked for, not once frames flow, and lets go on pause, so a clip
+            // paused elsewhere can't stop one that is still buffering.
+            override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                if (playWhenReady) InlineVideoPlayback.claim(token) else InlineVideoPlayback.release(token)
             }
 
             override fun onPlayerError(error: PlaybackException) {
@@ -58,6 +60,7 @@ internal actual fun InlineVideoPlayer(
             }
         }
         player.addListener(listener)
+        if (player.playWhenReady) InlineVideoPlayback.claim(token)
         onDispose {
             player.removeListener(listener)
             player.release()
@@ -129,10 +132,16 @@ private fun inlinePlayer(context: Context, url: String, playWhenReady: Boolean, 
         prepare()
     }
 
-// Restores only for the same signed url; a fresh one (a retry, a re-resolve) starts over and plays.
+// Restores only for the same signed url; a fresh one (a retry, a re-resolve) starts over and plays. A clip
+// that was playing resumes only if no other clip has started since.
 private fun inlinePlayerSaver(context: Context, url: String) = listSaver<ExoPlayer, Any>(
     save = { player -> listOf(url, player.playWhenReady, player.currentPosition) },
     restore = { (savedUrl, playWhenReady, positionMs) ->
-        if (savedUrl == url) inlinePlayer(context, url, playWhenReady as Boolean, positionMs as Long) else null
+        if (savedUrl == url) {
+            val resume = playWhenReady as Boolean && InlineVideoPlayback.active.value == null
+            inlinePlayer(context, url, resume, positionMs as Long)
+        } else {
+            null
+        }
     },
 )

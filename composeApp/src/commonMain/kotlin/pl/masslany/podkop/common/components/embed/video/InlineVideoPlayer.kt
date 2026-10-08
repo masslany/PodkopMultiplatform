@@ -19,7 +19,10 @@ internal expect fun InlineVideoPlayer(
     onError: () -> Unit,
 )
 
-/** Keeps a single inline video playing at a time across the whole app. */
+/**
+ * Keeps a single inline video playing at a time across the whole app. [active] is the player last asked to
+ * play, until it pauses or leaves composition.
+ */
 internal object InlineVideoPlayback {
     private val _active = MutableStateFlow<Any?>(null)
     val active: StateFlow<Any?> = _active.asStateFlow()
