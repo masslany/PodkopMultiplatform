@@ -42,7 +42,7 @@ internal actual fun InlineVideoPlayer(
     val currentOnError by rememberUpdatedState(onError)
     val token = remember { Any() }
     var isFullscreen by remember { mutableStateOf(false) }
-    // Saved with the list item, so a clip scrolled out of view comes back paused (or playing) where it was left.
+    // Saved with the list item, so a clip scrolled out of view comes back paused where it was left.
     val player = rememberSaveable(url, saver = inlinePlayerSaver(context, url)) {
         inlinePlayer(context, url, playWhenReady = true, positionMs = 0L)
     }
@@ -133,13 +133,12 @@ private fun inlinePlayer(context: Context, url: String, playWhenReady: Boolean, 
     }
 
 // Restores only for the same signed url; a fresh one (a retry, a re-resolve) starts over and plays. A clip
-// that was playing resumes only if no other clip has started since.
+// that was playing comes back paused too: it stopped when it left, and it shouldn't start sound unasked.
 private fun inlinePlayerSaver(context: Context, url: String) = listSaver<ExoPlayer, Any>(
-    save = { player -> listOf(url, player.playWhenReady, player.currentPosition) },
-    restore = { (savedUrl, playWhenReady, positionMs) ->
+    save = { player -> listOf(url, player.currentPosition) },
+    restore = { (savedUrl, positionMs) ->
         if (savedUrl == url) {
-            val resume = playWhenReady as Boolean && InlineVideoPlayback.active.value == null
-            inlinePlayer(context, url, resume, positionMs as Long)
+            inlinePlayer(context, url, playWhenReady = false, positionMs = positionMs as Long)
         } else {
             null
         }
