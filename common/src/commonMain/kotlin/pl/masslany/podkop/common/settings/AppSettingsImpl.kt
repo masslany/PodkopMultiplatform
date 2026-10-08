@@ -23,7 +23,7 @@ class AppSettingsImpl(private val keyValueStorage: KeyValueStorage) : AppSetting
 
     override val playVideosInline: Flow<Boolean> =
         keyValueStorage.observeBoolean(PLAY_VIDEOS_INLINE_KEY)
-            .map { it ?: false }
+            .map { it ?: PlayVideosInlineDefault }
             .distinctUntilChanged()
 
     override val threadedEntryComments: Flow<Boolean> =
