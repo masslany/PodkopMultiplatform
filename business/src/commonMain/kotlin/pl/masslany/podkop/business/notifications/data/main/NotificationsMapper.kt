@@ -31,6 +31,7 @@ private fun NotificationDto.toNotificationItem(group: NotificationGroup): Notifi
     groupCount = groupCount ?: 1,
     showAsGroup = showAsGroup == true,
     createdAt = createdAt,
+    groupUpdatedAt = groupUpdatedAt,
     actor = (user ?: profile)?.toNotificationActor(),
     message = message,
     url = url,

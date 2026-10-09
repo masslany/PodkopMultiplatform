@@ -32,6 +32,7 @@ import pl.masslany.podkop.features.topbar.TopBarActions
 @OptIn(ExperimentalUuidApi::class)
 class TagViewModel(
     private val tag: String,
+    content: TagContent,
     private val authRepository: AuthRepository,
     private val blacklistsRepository: BlacklistsRepository,
     private val tagsRepository: TagsRepository,
@@ -45,7 +46,7 @@ class TagViewModel(
     ResourceItemStateHolder by resourceItemStateHolder {
 
     private var currentSort: TagsSort = TagsSort.All
-    private var currentType: TagsType = TagsType.All
+    private var currentType: TagsType = content.toTagsType()
     private val screenInstanceId = Uuid.random().toString()
 
     private val paginator = Paginator(

@@ -22,12 +22,12 @@ internal fun List<NotificationItem>.toNotificationItemStates(
     else -> map(NotificationItem::toNotificationListItemState)
 }
 
+/** The notifications inside an expanded group, each shown on its own. */
+internal fun List<NotificationItem>.toGroupMemberStates(): List<NotificationListItemState> =
+    map(NotificationItem::toNotificationListItemState)
+
 private fun List<NotificationItem>.toGroupedTagNotificationStates(): List<NotificationListItemState> =
-    groupBy { notification ->
-        notification.groupId
-            ?.takeIf { notification.groupCount > 1 }
-            ?: notification.id
-    }
+    groupBy { notification -> notification.groupKey() }
         .values
         .map { groupedNotifications ->
             val representative = groupedNotifications.first()
@@ -43,11 +43,7 @@ private fun List<NotificationItem>.toGroupedTagNotificationStates(): List<Notifi
         }
 
 private fun List<NotificationItem>.toObservedDiscussionNotificationStates(): List<NotificationListItemState> =
-    groupBy { notification ->
-        notification.groupId
-            ?.takeIf { notification.groupCount > 1 }
-            ?: notification.id
-    }
+    groupBy { notification -> notification.groupKey() }
         .values
         .map { groupedNotifications ->
             val representative = groupedNotifications.first()
@@ -61,6 +57,13 @@ private fun List<NotificationItem>.toObservedDiscussionNotificationStates(): Lis
                 representative.toNotificationListItemState()
             }
         }
+
+/**
+ * The API marks server-grouped rows with `show_as_group`; a group may also arrive as several
+ * notifications sharing a group id, which are merged here.
+ */
+private fun NotificationItem.groupKey(): String =
+    groupId?.takeIf { showAsGroup || groupCount > 1 } ?: id
 
 private fun NotificationItem.toNotificationListItemState(): NotificationListItemState = NotificationListItemState(
     id = id,
@@ -93,7 +96,7 @@ private fun NotificationItem.toGroupedTagState(
     actorAvatarUrl = null,
     actorNameColorType = NotificationsDefaults.NameColor,
     actorGenderIndicatorType = NotificationsDefaults.GenderIndicator,
-    publishedAt = createdAt.toPublishedTimeType(),
+    publishedAt = (groupUpdatedAt ?: createdAt).toPublishedTimeType(),
     notificationIds = groupedNotifications
         .map(NotificationItem::id)
         .toPersistentList(),
@@ -103,7 +106,11 @@ private fun NotificationItem.toGroupedTagState(
     groupedTagContentType = groupedTagContentType(groupedNotifications),
     observedResourceType = null,
     observedResourceTitle = null,
-    navigationTarget = NotificationNavigationTarget.Tag(tagName.orEmpty()),
+    navigationTarget = NotificationNavigationTarget.Tag(
+        name = tagName.orEmpty(),
+        content = groupedTagContentType(groupedNotifications),
+    ),
+    groupId = groupId,
 )
 
 private fun NotificationItem.toGroupedObservedDiscussionState(
@@ -115,7 +122,7 @@ private fun NotificationItem.toGroupedObservedDiscussionState(
     actorAvatarUrl = actor?.avatarUrl,
     actorNameColorType = actor?.nameColor?.toNameColorType() ?: NotificationsDefaults.NameColor,
     actorGenderIndicatorType = actor?.gender?.toGenderIndicatorType() ?: NotificationsDefaults.GenderIndicator,
-    publishedAt = createdAt.toPublishedTimeType(),
+    publishedAt = (groupUpdatedAt ?: createdAt).toPublishedTimeType(),
     notificationIds = groupedNotifications
         .map(NotificationItem::id)
         .toPersistentList(),
@@ -126,6 +133,7 @@ private fun NotificationItem.toGroupedObservedDiscussionState(
     observedResourceType = observedResourceType,
     observedResourceTitle = observedResourceTitle,
     navigationTarget = navigationTarget(),
+    groupId = groupId,
 )
 
 private fun groupedTagContentType(

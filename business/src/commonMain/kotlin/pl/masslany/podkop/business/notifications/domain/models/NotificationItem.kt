@@ -25,6 +25,8 @@ data class NotificationItem(
     val linkDescription: String?,
     val badgeName: String?,
     val issueTitle: String?,
+    /** When the group last got a notification; groups show this rather than their first one's time. */
+    val groupUpdatedAt: LocalDateTime? = null,
 )
 
 data class NotificationActor(

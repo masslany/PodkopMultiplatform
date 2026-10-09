@@ -18,6 +18,7 @@ class MockApiServer(
     private val server = MockWebServer()
     private val routes = CopyOnWriteArrayList<Route>()
     private val unmatchedRequests = CopyOnWriteArrayList<String>()
+    private val requestLines = CopyOnWriteArrayList<String>()
 
     lateinit var baseUrl: String
         private set
@@ -26,12 +27,13 @@ class MockApiServer(
         server.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest): MockResponse {
                 val url = request.url
+                val requestLine = "${request.method} ${url.encodedPath}${url.encodedQuery?.let { "?$it" }.orEmpty()}"
+                requestLines += requestLine
 
                 val route = routes.firstOrNull { it.matches(request.method, url) }
                 return if (route != null) {
-                    response(body = route.body, contentType = route.contentType)
+                    response(code = route.code, body = route.body, contentType = route.contentType)
                 } else {
-                    val requestLine = "${request.method} ${url.encodedPath}${url.encodedQuery?.let { "?$it" }.orEmpty()}"
                     unmatchedRequests += requestLine
                     response(
                         code = 404,
@@ -74,6 +76,27 @@ class MockApiServer(
             contentType = contentType,
         )
     }
+
+    /** Answers an update the app sends, e.g. marking a notification read, which the API answers with 204. */
+    fun put(
+        path: String,
+        code: Int = 204,
+    ) {
+        routes += Route(
+            method = "PUT",
+            path = path,
+            query = emptyMap(),
+            body = "",
+            code = code,
+        )
+    }
+
+    fun hasRequested(
+        method: String,
+        path: String,
+    ): Boolean = requestLines.any { it.substringBefore('?') == "$method $path" }
+
+    fun requestLog(): String = requestLines.joinToString(separator = "\n")
 
     fun postJson(
         path: String,
@@ -121,6 +144,7 @@ private class Route(
     val query: Map<String, String>,
     val body: String,
     val contentType: String = JSON,
+    val code: Int = 200,
 ) {
     fun matches(
         requestMethod: String?,

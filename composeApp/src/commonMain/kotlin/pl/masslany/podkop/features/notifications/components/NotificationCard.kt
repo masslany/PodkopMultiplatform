@@ -16,12 +16,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -40,6 +42,7 @@ import pl.masslany.podkop.common.components.toComposeColor
 import pl.masslany.podkop.common.models.avatar.AvatarType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.features.notifications.NotificationsTestTags
 import pl.masslany.podkop.features.notifications.models.GroupedTagContentType
 import pl.masslany.podkop.features.notifications.models.NotificationListItemState
 import pl.masslany.podkop.features.notifications.models.ObservedNotificationResourceType
@@ -47,6 +50,8 @@ import pl.masslany.podkop.features.notifications.preview.NotificationsPreviewFix
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_comment
 import podkop.composeapp.generated.resources.notifications_fallback_title
+import podkop.composeapp.generated.resources.notifications_grouped_collapse
+import podkop.composeapp.generated.resources.notifications_grouped_expand
 import podkop.composeapp.generated.resources.notifications_observed_entry_comment_action
 import podkop.composeapp.generated.resources.notifications_observed_entry_comments_action
 import podkop.composeapp.generated.resources.notifications_observed_link_comment_action
@@ -61,6 +66,7 @@ fun NotificationCard(
     state: NotificationListItemState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onExpandClick: (() -> Unit)? = null,
 ) {
     val containerColor = if (state.isRead) {
         MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)
@@ -69,7 +75,9 @@ fun NotificationCard(
     }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag(NotificationsTestTags.Item.card(state.id)),
         onClick = onClick,
         colors = CardDefaults.cardColors(containerColor = containerColor),
     ) {
@@ -136,6 +144,25 @@ fun NotificationCard(
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
             )
+
+            if (onExpandClick != null) {
+                TextButton(
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .testTag(NotificationsTestTags.Grouped.expand(state.id)),
+                    onClick = onExpandClick,
+                ) {
+                    Text(
+                        text = stringResource(
+                            resource = if (state.expansion != null) {
+                                Res.string.notifications_grouped_collapse
+                            } else {
+                                Res.string.notifications_grouped_expand
+                            },
+                        ),
+                    )
+                }
+            }
         }
     }
 }
@@ -228,7 +255,7 @@ private fun NotificationListItemState.title(): AnnotatedString {
 
         null -> when (observedResourceType) {
             ObservedNotificationResourceType.Entry -> styledNotificationTitle(
-                action = if (notificationIds.size > 1) {
+                action = if (groupId != null) {
                     pluralStringResource(
                         resource = Res.plurals.notifications_observed_entry_comments_action,
                         quantity = groupCount,
@@ -243,7 +270,7 @@ private fun NotificationListItemState.title(): AnnotatedString {
             )
 
             ObservedNotificationResourceType.Link -> styledNotificationTitle(
-                action = if (notificationIds.size > 1) {
+                action = if (groupId != null) {
                     pluralStringResource(
                         resource = Res.plurals.notifications_observed_link_comments_action,
                         quantity = groupCount,
@@ -281,7 +308,7 @@ private fun styledNotificationTitle(
 }
 
 private fun NotificationListItemState.isGroupedObservedDiscussion(): Boolean =
-    observedResourceType != null && notificationIds.size > 1
+    observedResourceType != null && groupId != null
 
 @Composable
 private fun GroupedCommentMarker(

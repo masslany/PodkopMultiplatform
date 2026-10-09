@@ -37,6 +37,9 @@ data class NotificationDto(
     @SerialName("created_at")
     @Serializable(with = DateAsStringSerializer::class)
     val createdAt: LocalDateTime,
+    @SerialName("group_updated_at")
+    @Serializable(with = DateAsStringSerializer::class)
+    val groupUpdatedAt: LocalDateTime? = null,
     @SerialName("user")
     val user: NotificationUserDto? = null,
     @SerialName("profile")

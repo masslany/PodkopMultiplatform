@@ -1,0 +1,150 @@
+{
+  "data": [
+    {
+      "created_at": "2026-10-04 15:40:41",
+      "entry": {
+        "actions": {
+          "create": true,
+          "create_favourite": true,
+          "delete": false,
+          "delete_favourite": false,
+          "pin": false,
+          "report": true,
+          "undo_vote": false,
+          "unpin": false,
+          "update": false,
+          "vote_up": true
+        },
+        "adult": false,
+        "archive": false,
+        "author": {
+          "avatar": "https://example.com/avatar.jpg",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": "m",
+          "note": false,
+          "online": false,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "HlkibuPitkkj",
+          "verified": false
+        },
+        "comments": {
+          "count": 5,
+          "items": []
+        },
+        "content": "Sample content",
+        "created_at": "2026-10-04 15:40:35",
+        "deletable": false,
+        "deleted": false,
+        "device": "",
+        "editable": false,
+        "family_friendly": true,
+        "favourite": false,
+        "id": 1000,
+        "media": {
+          "embed": null,
+          "photo": null,
+          "photos": [],
+          "survey": {
+            "actions": {
+              "create": true,
+              "delete": false,
+              "update": false,
+              "vote": true
+            },
+            "answers": [
+              {
+                "count": 7,
+                "id": 1001,
+                "text": "Sample text",
+                "voted": 0
+              }
+            ],
+            "count": 39,
+            "deletable": false,
+            "editable": false,
+            "key": "5v9EtlOlrzKw",
+            "question": "Sample question",
+            "voted": 0
+          }
+        },
+        "message": "Sample message",
+        "observed_discussion": false,
+        "parent": null,
+        "pinnable": false,
+        "resource": "entry",
+        "slug": "mslop-emhkb-lttpu-r-xrikzoz-ejovsy-uvp",
+        "status": "visible",
+        "tag_pinned_content": false,
+        "tags": [
+          "iffgzh"
+        ],
+        "voted": 0,
+        "votes": {
+          "down": 0,
+          "up": 1,
+          "users": [
+            {
+              "avatar": "https://example.com/avatar.jpg",
+              "blacklist": false,
+              "color": "orange",
+              "company": false,
+              "donation": null,
+              "follow": false,
+              "gender": "m",
+              "note": false,
+              "online": false,
+              "rank": {
+                "position": null,
+                "trend": 0
+              },
+              "status": "active",
+              "username": "artnnl",
+              "verified": false
+            }
+          ]
+        }
+      },
+      "group_count": 138,
+      "group_id": "6htod7up-27g4-53gz-15j6-nr287s24an3u",
+      "group_updated_at": "2026-10-09 21:20:09",
+      "id": "y51eDqxr",
+      "read": 1,
+      "show_as_group": false,
+      "tag": {
+        "name": "vbz",
+        "pinned": false
+      },
+      "type": "new_entry_with_observed_tag",
+      "user": {
+        "avatar": "https://example.com/avatar.jpg",
+        "blacklist": false,
+        "color": "orange",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": null,
+          "trend": 0
+        },
+        "status": "active",
+        "username": "HlkibuPitkkj",
+        "verified": false
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 25,
+    "total": 138
+  }
+}

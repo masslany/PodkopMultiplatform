@@ -23,6 +23,17 @@ class FakeNotificationsDataSource : NotificationsDataSource {
         page: PageRequest,
     ): Result<NotificationsListDto> = unstubbedResult("getNotifications")
 
+    val getGroupNotificationsCalls = mutableListOf<Pair<String, Int>>()
+    var getGroupNotificationsResult: Result<NotificationsListDto> = unstubbedResult("getGroupNotifications")
+
+    override suspend fun getGroupNotifications(
+        groupId: String,
+        page: Int,
+    ): Result<NotificationsListDto> {
+        getGroupNotificationsCalls += groupId to page
+        return getGroupNotificationsResult
+    }
+
     override suspend fun getNotification(
         group: NotificationGroup,
         id: String,

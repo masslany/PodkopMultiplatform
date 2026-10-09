@@ -15,6 +15,11 @@ interface NotificationsApi {
         page: PageRequest = PageRequest.Initial,
     ): Result<NotificationsListDto>
 
+    suspend fun getGroupNotifications(
+        groupId: String,
+        page: Int,
+    ): Result<NotificationsListDto>
+
     suspend fun getNotification(
         group: NotificationGroup,
         id: String,

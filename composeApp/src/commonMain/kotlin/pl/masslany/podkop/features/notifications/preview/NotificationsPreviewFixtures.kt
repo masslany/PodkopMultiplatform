@@ -70,6 +70,7 @@ internal object NotificationsPreviewFixtures {
         observedResourceType = null,
         observedResourceTitle = null,
         navigationTarget = NotificationNavigationTarget.Tag(name = "wojna"),
+        groupId = "preview-tag-group",
     )
 
     fun groupedObservedNotification() = NotificationListItemState(
@@ -88,6 +89,7 @@ internal object NotificationsPreviewFixtures {
         observedResourceType = ObservedNotificationResourceType.Entry,
         observedResourceTitle = "Wracam do Was z prawdopodobnie już ostatnim wpisem...",
         navigationTarget = NotificationNavigationTarget.Entry(id = 85261721),
+        groupId = "preview-observed-group",
     )
 
     fun observedSingleNotification() = NotificationListItemState(

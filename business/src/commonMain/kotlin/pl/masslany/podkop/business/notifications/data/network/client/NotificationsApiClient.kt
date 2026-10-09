@@ -30,13 +30,30 @@ class NotificationsApiClient(
     ): Result<NotificationsListDto> {
         val queryParameters = buildMap {
             putPagination(page)
-        }.takeIf { it.isNotEmpty() }
+            // Like website: the API groups notifications (e.g. new entries in an observed tag)
+            // into one row per group, instead of the client grouping whatever one page holds.
+            put("show_grouped", "1")
+        }
 
         val request =
             Request<NotificationsListDto>(
                 method = Request.HttpMethod.GET,
                 path = "api/v3/notifications/${group.pathSegment}",
                 queryParameters = queryParameters,
+            )
+
+        return execute(request)
+    }
+
+    override suspend fun getGroupNotifications(
+        groupId: String,
+        page: Int,
+    ): Result<NotificationsListDto> {
+        val request =
+            Request<NotificationsListDto>(
+                method = Request.HttpMethod.GET,
+                path = "api/v3/notifications/groups/$groupId",
+                queryParameters = buildMap { putPagination(PageRequest.Number(page)) },
             )
 
         return execute(request)

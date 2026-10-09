@@ -21,6 +21,16 @@ data class NotificationListItemState(
     val observedResourceType: ObservedNotificationResourceType?,
     val observedResourceTitle: String?,
     val navigationTarget: NotificationNavigationTarget,
+    /** Set when the row stands for a group of notifications, which can be expanded. */
+    val groupId: String? = null,
+    /** The group's own notifications, once expanded; null while collapsed. */
+    val expansion: NotificationGroupExpansionState? = null,
+)
+
+data class NotificationGroupExpansionState(
+    val items: ImmutableList<NotificationListItemState>,
+    val isLoading: Boolean,
+    val canLoadMore: Boolean,
 )
 
 enum class GroupedTagContentType {

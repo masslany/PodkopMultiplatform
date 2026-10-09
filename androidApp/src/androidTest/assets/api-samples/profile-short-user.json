@@ -1,0 +1,20 @@
+{
+  "data": {
+    "avatar": "https://example.com/avatar.jpg",
+    "blacklist": false,
+    "color": "orange",
+    "company": false,
+    "donation": null,
+    "follow": false,
+    "gender": "m",
+    "note": true,
+    "online": false,
+    "rank": {
+      "position": null,
+      "trend": 0
+    },
+    "status": "active",
+    "username": "tpd2qh44862l536679d00892370711x5",
+    "verified": false
+  }
+}

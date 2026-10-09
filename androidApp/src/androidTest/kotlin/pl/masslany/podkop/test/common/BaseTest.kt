@@ -1,5 +1,6 @@
 package pl.masslany.podkop.test.common
 
+import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -24,6 +25,22 @@ abstract class BaseTest {
     protected open val signedIn: Boolean = false
 
     protected open fun configureMockApi(mockApiServer: MockApiServer) = Unit
+
+    /**
+     * Waits for the app to send [method] [path], for side effects like marking something read.
+     * It waits through the compose rule, so the UI keeps running meanwhile.
+     */
+    protected fun awaitRequest(
+        method: String,
+        path: String,
+        timeoutMillis: Long = 5_000,
+    ) {
+        try {
+            activityRule.waitUntil(timeoutMillis) { mockApiServer.hasRequested(method, path) }
+        } catch (timeout: ComposeTimeoutException) {
+            throw AssertionError("Expected $method $path. The app requested:\n" + mockApiServer.requestLog(), timeout)
+        }
+    }
 }
 
 typealias PodkopComposeRule = AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>

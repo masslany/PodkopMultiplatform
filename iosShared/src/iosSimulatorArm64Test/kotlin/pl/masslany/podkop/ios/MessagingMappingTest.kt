@@ -40,9 +40,9 @@ class MessagingMappingTest {
     fun notificationGroupsUseAndroidPagingPolicies() {
         val pm = FeaturePaginationPolicies.notifications("pm".toNotificationGroup())
         assertEquals(PageRequest.Number(1), pm.initialRequest())
-        val entries = FeaturePaginationPolicies.notifications("entries".toNotificationGroup())
-        assertEquals(PageRequest.Initial, entries.initialRequest())
-        assertEquals(PageRequest.KeyCursor("abc"), entries.nextRequest("abc", 2))
+        val tags = FeaturePaginationPolicies.notifications("tags".toNotificationGroup())
+        assertEquals(PageRequest.Number(1), tags.initialRequest())
+        assertEquals(PageRequest.Number(2), tags.nextRequest("", 2))
     }
 
     @Test
