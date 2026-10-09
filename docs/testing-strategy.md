@@ -65,22 +65,35 @@ by whether the user is logged in (see `FeaturePaginationPolicies`): guests get n
 logged-in feeds get opaque cursors sent back as `page`, and most notification groups send cursors
 as `key`. So responses are not written by hand:
 
-- `androidTest/assets/api-samples` holds sanitized captures of real responses, usually trimmed to
-  one item. A sample fixes the shape: every field, null, enum and pagination key the API sends.
-- Fixture builders such as `LinkFixtures` take an item from a sample as the template and generate
-  full pages from it, changing only values (ids, titles, sentinel text). They use values the API
+- `androidTest/assets/api-samples` holds sanitized captures of real responses, trimmed to one item
+  per distinct item shape. A sample fixes the shape: every field, null, enum and pagination key the
+  API sends. `-guest` and `-user` samples are captured logged out and signed in.
+- Fixture builders such as `LinkFixtures` pick their templates from a sample by shape and generate
+  full pages from them, changing only values (ids, titles, sentinel text). They use values the API
   itself sends for missing media (`""` avatars, `null` photos), so tests load no images.
 - A new response shape needs a new capture, not a guess.
 
-To capture a sample:
+What the captures showed (website, 2026-10-09), and the builders reproduce:
 
-1. Run the debug build (signed in, if the flow is for logged-in users) and open Android Studio's
-   App Inspection > Network Inspector.
-2. Use the flow, then save the response body of each request you need to `captures/api/` (ignored
-   by git). Capture the first page and the next one, so the sample shows how pages link up.
-3. Sanitize it into a sample, which replaces names, text, URLs, ids and cursors deterministically
+- Guest homepage pages are numbered, `{per_page: 25, total: 10000}`, but hold 29 items: a promoted
+  link (`published_at: null`) on top and three entries at positions 5, 11 and 17 repeat on every
+  page. The app drops repeats by id when appending a page.
+- Signed-in homepage pages are cursor pages with only `{next, prev}` (`prev` is null on the first
+  page). The first holds 40 links plus the promoted items, later ones 40 links.
+- Upcoming stays numbered when signed in, with a real `total`; the last page is simply short.
+- Some links carry `recommended: true`; hits links add `related`, `comments.items` and
+  `media.photos`.
+
+To capture a sample, use the flow in the debug build with Android Studio's Network Inspector, or on
+website in a browser (the website uses the same API, but its requests can differ: it asks for
+guest pages with `limit=25`). Then:
+
+1. Save the response body of each request you need to `captures/api/` (ignored by git). Capture the
+   first page and the next one, so the sample shows how pages link up. Never capture token
+   responses (`/auth`, `/refresh-token`).
+2. Sanitize it into a sample, which replaces names, text, URLs, ids and cursors deterministically
    but keeps the shape:
-   `python3 -I scripts/api-samples/sanitize.py captures/api/<capture>.json androidApp/src/androidTest/assets/api-samples/<name>.json`
+   `python3 -I scripts/api-samples/sanitize.py captures/api/<capture>.json androidApp/src/androidTest/assets/api-samples/<name>.json --items 5`
 
 Integration flow tests should assert visible UI behavior, not implementation details of the mocked
 web requests. Pagination tests should prove the user can reach content from later pages by checking
