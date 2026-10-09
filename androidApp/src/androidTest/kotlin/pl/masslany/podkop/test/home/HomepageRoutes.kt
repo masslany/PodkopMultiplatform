@@ -18,6 +18,13 @@ object HomepageRoutes {
         "page" to "2",
     )
 
+    // Scrolling to the end of page two prefetches page three, which is empty: there are no more links.
+    val linksPageThreeQuery = mapOf(
+        "sort" to "newest",
+        "type" to "homepage",
+        "page" to "3",
+    )
+
     private val hitsQuery = mapOf(
         "sort" to "day",
         "page" to "1",
@@ -33,6 +40,11 @@ object HomepageRoutes {
             path = LINKS_PATH,
             query = linksPageTwoQuery,
             assetPath = "mock-api/homepage-links-page-2.json",
+        )
+        getJson(
+            path = LINKS_PATH,
+            query = linksPageThreeQuery,
+            assetPath = "mock-api/homepage-links-page-3.json",
         )
         getJson(
             path = HITS_PATH,

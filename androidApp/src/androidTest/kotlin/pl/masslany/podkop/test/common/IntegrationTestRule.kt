@@ -7,7 +7,8 @@ import pl.masslany.podkop.test.support.MockApiServer
 
 /**
  * The orchestrator gives every test a fresh app process with cleared data, so the app, Koin and the
- * mock server all start clean; this rule only registers the test's routes before the activity starts.
+ * mock server all start clean; this rule registers the test's routes before the activity starts and
+ * fails the test if the app made any request those routes don't cover.
  */
 class IntegrationTestRule(
     private val configureMockApi: (MockApiServer) -> Unit,
@@ -17,6 +18,10 @@ class IntegrationTestRule(
 
     override fun before() {
         configureMockApi(mockApiServer)
+    }
+
+    override fun after() {
+        mockApiServer.assertAllRequestsMatched()
     }
 }
 

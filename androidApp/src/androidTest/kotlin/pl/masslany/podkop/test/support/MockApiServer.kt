@@ -14,7 +14,7 @@ class MockApiServer(
 ) {
     private val server = MockWebServer()
     private val routes = CopyOnWriteArrayList<Route>()
-    private val requests = CopyOnWriteArrayList<RecordedRequest>()
+    private val unmatchedRequests = CopyOnWriteArrayList<String>()
 
     lateinit var baseUrl: String
         private set
@@ -22,16 +22,17 @@ class MockApiServer(
     fun start() {
         server.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest): MockResponse {
-                requests += request
                 val url = request.url
 
                 val route = routes.firstOrNull { it.matches(request.method, url) }
                 return if (route != null) {
                     jsonResponse(body = route.body())
                 } else {
+                    val requestLine = "${request.method} ${url.encodedPath}${url.encodedQuery?.let { "?$it" }.orEmpty()}"
+                    unmatchedRequests += requestLine
                     jsonResponse(
                         code = 404,
-                        body = """{"error":"No route for ${request.method} ${url.encodedPath}"}""",
+                        body = """{"error":"No route for $requestLine"}""",
                     )
                 }
             }
@@ -68,26 +69,10 @@ class MockApiServer(
         )
     }
 
-    fun assertRequested(
-        path: String,
-        query: Map<String, String>,
-    ) {
-        check(hasRequested(path = path, query = query)) {
-            val requestList = requests.joinToString(separator = "\n") { request ->
-                "${request.method} ${request.url}"
-            }
-            "Expected GET $path with $query. Recorded requests:\n$requestList"
+    fun assertAllRequestsMatched() {
+        check(unmatchedRequests.isEmpty()) {
+            "The app made requests without a mocked route:\n" + unmatchedRequests.joinToString(separator = "\n")
         }
-    }
-
-    fun hasRequested(
-        path: String,
-        query: Map<String, String>,
-    ): Boolean = requests.any { request ->
-        val url = request.url
-        request.method == "GET" &&
-            url.encodedPath == path &&
-            query.all { (name, value) -> url.queryParameter(name) == value }
     }
 
     private fun jsonResponse(
