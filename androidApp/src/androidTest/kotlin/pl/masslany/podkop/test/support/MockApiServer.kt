@@ -29,11 +29,11 @@ class MockApiServer(
 
                 val route = routes.firstOrNull { it.matches(request.method, url) }
                 return if (route != null) {
-                    jsonResponse(body = route.body)
+                    response(body = route.body, contentType = route.contentType)
                 } else {
                     val requestLine = "${request.method} ${url.encodedPath}${url.encodedQuery?.let { "?$it" }.orEmpty()}"
                     unmatchedRequests += requestLine
-                    jsonResponse(
+                    response(
                         code = 404,
                         body = """{"error":"No route for $requestLine"}""",
                     )
@@ -57,6 +57,21 @@ class MockApiServer(
             path = path,
             query = query,
             body = body,
+        )
+    }
+
+    /** Serves a non-JSON file, e.g. an image the app loads from a URL in a response. */
+    fun get(
+        path: String,
+        body: String,
+        contentType: String,
+    ) {
+        routes += Route(
+            method = "GET",
+            path = path,
+            query = emptyMap(),
+            body = body,
+            contentType = contentType,
         )
     }
 
@@ -85,13 +100,14 @@ class MockApiServer(
         }
     }
 
-    private fun jsonResponse(
+    private fun response(
         code: Int = 200,
         body: String,
+        contentType: String = JSON,
     ): MockResponse =
         MockResponse.Builder()
             .code(code)
-            .setHeader("Content-Type", "application/json")
+            .setHeader("Content-Type", contentType)
             .body(body)
             .build()
 
@@ -104,6 +120,7 @@ private class Route(
     val path: String,
     val query: Map<String, String>,
     val body: String,
+    val contentType: String = JSON,
 ) {
     fun matches(
         requestMethod: String?,
@@ -114,3 +131,5 @@ private class Route(
             url.queryParameterNames == query.keys &&
             query.all { (name, value) -> url.queryParameter(name) == value }
 }
+
+private const val JSON = "application/json"

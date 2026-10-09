@@ -1,7 +1,6 @@
 package pl.masslany.podkop.test.fixtures
 
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -46,6 +45,16 @@ object LinkFixtures {
         page: Int,
     ): String = token("Page${page}Cursor", length = sample.pagination().getValue("next").jsonPrimitive.content.length)
 
+    /**
+     * A numbered page of plain links under the sample's pagination block, as profile tabs serve
+     * them. [links] can be fewer than `per_page`: the API returns short pages before the last one.
+     */
+    fun numberedLinkPage(
+        sample: JsonObject,
+        page: Int,
+        links: Int,
+    ): String = sample.with("data" to JsonArray(page(sample, page, links, promoted = false))).toString()
+
     /** A numbered page as guests get it, under the guest sample's pagination block. */
     fun numberedPage(
         sample: JsonObject,
@@ -86,7 +95,7 @@ object LinkFixtures {
     ): List<JsonObject> {
         val items = sample.getValue("data").jsonArray.map { it.jsonObject }
         val plain = items.first { it.isLink() && !it.isPromoted() && "recommended" !in it }
-        val recommended = items.first { it.isLink() && !it.isPromoted() && "recommended" in it }
+        val recommended = items.firstOrNull { it.isLink() && !it.isPromoted() && "recommended" in it } ?: plain
         val feed = (1..links).mapTo(mutableListOf()) { index ->
             link(
                 template = if (index == RECOMMENDED_LINK_INDEX) recommended else plain,
@@ -133,27 +142,3 @@ private fun JsonObject.pagination(): JsonObject = getValue("pagination").jsonObj
 private fun JsonObject.isLink(): Boolean = getValue("resource").jsonPrimitive.content == "link"
 
 private fun JsonObject.isPromoted(): Boolean = get("published_at") is JsonNull
-
-/**
- * Uses the values the API itself serves for missing images - `""` avatars, a `null` photo and no
- * `photos` - which also keeps the tests from loading images off the network.
- */
-private fun JsonObject.withoutImages(): JsonObject {
-    val author = getValue("author").jsonObject.with("avatar" to JsonPrimitive(""))
-    val media = getValue("media").jsonObject.let { media ->
-        media.with("photo" to JsonNull).let { if ("photos" in media) it.with("photos" to JsonArray(emptyList())) else it }
-    }
-    val votes = getValue("votes").jsonObject.let { votes ->
-        val users = votes["users"]?.jsonArray ?: return@let votes
-        votes.with("users" to JsonArray(users.map { it.jsonObject.with("avatar" to JsonPrimitive("")) }))
-    }
-    return with("author" to author, "media" to media, "votes" to votes)
-}
-
-/** Readable, but in the shape of a real cursor: [length] letters and digits. */
-private fun token(
-    seed: String,
-    length: Int,
-): String = seed.padEnd(length, 'x').take(length)
-
-private fun JsonObject.with(vararg fields: Pair<String, JsonElement>): JsonObject = JsonObject(this + fields)

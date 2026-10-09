@@ -1,6 +1,7 @@
 package pl.masslany.podkop.test.common.robots
 
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
@@ -33,19 +34,27 @@ open class BaseRobot(
         nodeWithTag(tag).assertIsDisplayed()
     }
 
+    protected fun onUiThread(action: () -> Unit) {
+        testRule.runOnUiThread(action)
+    }
+
     protected fun clickNodeWithTag(tag: String) {
         nodeWithTag(tag).performClick()
     }
 
-    /** Waits until the lazy list tagged [tag] holds an item with [key], e.g. once its page loads, then scrolls to it. */
+    /**
+     * Waits until the lazy list tagged [tag] is shown and holds an item with [key], e.g. once its
+     * page loads, then scrolls to it.
+     */
     protected fun scrollToKey(
         tag: String,
         key: Any,
         timeoutMillis: Long = DEFAULT_TIMEOUT_MS,
     ) {
         waitUntil(timeoutMillis) {
-            val indexForKey = nodeWithTag(tag).fetchSemanticsNode().config[SemanticsProperties.IndexForKey]
-            indexForKey(key) >= 0
+            val list = testRule.onAllNodesWithTag(tag, useUnmergedTree = true).fetchSemanticsNodes().firstOrNull()
+            val indexForKey = list?.config?.getOrNull(SemanticsProperties.IndexForKey)
+            indexForKey != null && indexForKey(key) >= 0
         }
         nodeWithTag(tag).performScrollToKey(key)
     }
