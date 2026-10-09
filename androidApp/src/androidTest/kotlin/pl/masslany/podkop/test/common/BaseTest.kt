@@ -16,9 +16,6 @@ abstract class BaseTest {
     @get:Rule(order = 1)
     val activityRule = createAndroidComposeRule<MainActivity>()
 
-    @get:Rule(order = 2)
-    val disableAnimationsRule = DisableAnimationsRule()
-
     protected val mockApiServer: MockApiServer
         get() = integrationRule.mockApiServer
 

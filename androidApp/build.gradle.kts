@@ -65,6 +65,7 @@ android {
     }
     testOptions {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        animationsDisabled = true
         managedDevices {
             // Run integration tests on it with `./gradlew :androidApp:pixel6Api34DebugAndroidTest`.
             localDevices {
@@ -100,7 +101,6 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.testExt.junit)
     androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.uiautomator)
     androidTestImplementation(libs.okhttp)
     androidTestImplementation(libs.mockwebserver3)
     androidTestUtil(libs.androidx.test.orchestrator)
