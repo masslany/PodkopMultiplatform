@@ -19,14 +19,15 @@ class HomepagePaginationTest : BaseTest() {
     fun loggedOutHomepageLoadsNextPageAfterScrolling() {
         homepage(activityRule) {
             displayHomepageList()
-            displayTitle(FIRST_PAGE_TITLE)
+            displayTitle(LinkFixtures.linkTitle(page = 1, index = 1))
 
-            scrollUntilTitleIsVisible(SECOND_PAGE_TITLE)
+            scrollToLink(LinkFixtures.linkId(page = 1, index = LINKS_PER_PAGE))
+            scrollToLink(LinkFixtures.linkId(page = 2, index = LINKS_PER_PAGE))
+            displayTitle(LinkFixtures.linkTitle(page = 2, index = LINKS_PER_PAGE))
         }
     }
 
     private companion object {
-        val FIRST_PAGE_TITLE = LinkFixtures.linkTitle(page = 1, index = 1)
-        val SECOND_PAGE_TITLE = LinkFixtures.linkTitle(page = 2, index = 25)
+        const val LINKS_PER_PAGE = 25
     }
 }

@@ -11,27 +11,16 @@ class HomepageRobot(
         displayedText(title)
     }
 
-    fun scrollUntilTitleIsVisible(title: String) {
-        scrollToIndex(
-            tag = LinksTestTags.Screen.List,
-            index = PAGE_ONE_LAST_ITEM_INDEX,
-        )
-        scrollToIndexWhenAvailable(
-            tag = LinksTestTags.Screen.List,
-            index = PAGE_TWO_TARGET_ITEM_INDEX,
-        )
-        displayTitle(title)
-    }
-
     fun displayHomepageList() {
         displayedNode(LinksTestTags.Screen.List)
     }
 
-    private companion object {
-        const val STATIC_ITEMS_BEFORE_LINKS = 2
-        const val PAGE_SIZE = 25
-        const val PAGE_ONE_LAST_ITEM_INDEX = STATIC_ITEMS_BEFORE_LINKS + PAGE_SIZE - 1
-        const val PAGE_TWO_TARGET_ITEM_INDEX = STATIC_ITEMS_BEFORE_LINKS + PAGE_SIZE + PAGE_SIZE - 1
+    /** Scrolls the homepage to the link with [id], waiting for the page holding it to load. */
+    fun scrollToLink(id: Int) {
+        scrollToKey(
+            tag = LinksTestTags.Screen.List,
+            key = id,
+        )
     }
 }
 

@@ -1,5 +1,6 @@
 package pl.masslany.podkop.test.common.robots
 
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
@@ -8,7 +9,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToIndex
+import androidx.compose.ui.test.performScrollToKey
 
 open class BaseRobot(
     private val testRule: AndroidComposeTestRule<*, *>,
@@ -36,23 +37,17 @@ open class BaseRobot(
         nodeWithTag(tag).performClick()
     }
 
-    protected fun scrollToIndex(
+    /** Waits until the lazy list tagged [tag] holds an item with [key], e.g. once its page loads, then scrolls to it. */
+    protected fun scrollToKey(
         tag: String,
-        index: Int,
-    ) {
-        nodeWithTag(tag).performScrollToIndex(index)
-    }
-
-    protected fun scrollToIndexWhenAvailable(
-        tag: String,
-        index: Int,
+        key: Any,
         timeoutMillis: Long = DEFAULT_TIMEOUT_MS,
     ) {
         waitUntil(timeoutMillis) {
-            runCatching {
-                scrollToIndex(tag, index)
-            }.isSuccess
+            val indexForKey = nodeWithTag(tag).fetchSemanticsNode().config[SemanticsProperties.IndexForKey]
+            indexForKey(key) >= 0
         }
+        nodeWithTag(tag).performScrollToKey(key)
     }
 
     protected fun waitUntilText(
