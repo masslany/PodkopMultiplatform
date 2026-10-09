@@ -8,6 +8,7 @@ import android.view.WindowManager
 import androidx.test.platform.app.InstrumentationRegistry
 import org.koin.core.module.Module
 import pl.masslany.podkop.MainApplication
+import pl.masslany.podkop.test.support.AuthRoutes.appToken
 import pl.masslany.podkop.test.support.MockApiServer
 
 class TestMainApplication : MainApplication() {
@@ -15,9 +16,10 @@ class TestMainApplication : MainApplication() {
         private set
 
     override fun onCreate() {
-        // The app calls the API as soon as it starts, so the mock server has to be up before that.
+        // The app requests its API token as soon as it starts, so the mock server has to answer before that.
         mockApiServer = MockApiServer(assets = InstrumentationRegistry.getInstrumentation().context.assets)
         mockApiServer.start()
+        mockApiServer.appToken()
         super.onCreate()
         registerActivityLifecycleCallbacks(TestActivityWindowFlags)
     }

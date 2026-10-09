@@ -27,7 +27,7 @@ class MockApiServer(
 
                 val route = routes.firstOrNull { it.matches(request.method, url) }
                 return if (route != null) {
-                    jsonAssetResponse(route.assetPath)
+                    jsonResponse(body = route.body())
                 } else {
                     jsonResponse(
                         code = 404,
@@ -52,7 +52,19 @@ class MockApiServer(
             method = "GET",
             path = path,
             query = query,
-            assetPath = assetPath,
+            body = { readAsset(assetPath) },
+        )
+    }
+
+    fun postJson(
+        path: String,
+        body: String,
+    ) {
+        routes += Route(
+            method = "POST",
+            path = path,
+            query = emptyMap(),
+            body = { body },
         )
     }
 
@@ -78,9 +90,6 @@ class MockApiServer(
             query.all { (name, value) -> url.queryParameter(name) == value }
     }
 
-    private fun jsonAssetResponse(assetPath: String): MockResponse =
-        jsonResponse(body = readAsset(assetPath))
-
     private fun jsonResponse(
         code: Int = 200,
         body: String,
@@ -95,11 +104,11 @@ class MockApiServer(
         assets.open(path).bufferedReader().use { it.readText() }
 }
 
-private data class Route(
+private class Route(
     val method: String,
     val path: String,
     val query: Map<String, String>,
-    val assetPath: String,
+    val body: () -> String,
 ) {
     fun matches(
         requestMethod: String?,
