@@ -1,7 +1,9 @@
 package pl.masslany.podkop.test.common
 
 import androidx.test.platform.app.InstrumentationRegistry
-import org.junit.rules.ExternalResource
+import org.junit.rules.TestRule
+import org.junit.runner.Description
+import org.junit.runners.model.Statement
 import pl.masslany.podkop.test.TestMainApplication
 import pl.masslany.podkop.test.support.MockApiServer
 
@@ -12,17 +14,28 @@ import pl.masslany.podkop.test.support.MockApiServer
  */
 class IntegrationTestRule(
     private val configureMockApi: (MockApiServer) -> Unit,
-) : ExternalResource() {
+) : TestRule {
     val mockApiServer: MockApiServer
         get() = testApplication.mockApiServer
 
-    override fun before() {
-        configureMockApi(mockApiServer)
-    }
-
-    override fun after() {
-        mockApiServer.assertAllRequestsMatched()
-    }
+    override fun apply(
+        base: Statement,
+        description: Description,
+    ): Statement =
+        object : Statement() {
+            override fun evaluate() {
+                configureMockApi(mockApiServer)
+                try {
+                    base.evaluate()
+                } catch (failure: Throwable) {
+                    // A missing route usually explains the failure (often a timeout), so it leads the
+                    // report: test results keep only one failure per test.
+                    mockApiServer.assertAllRequestsMatched(cause = failure)
+                    throw failure
+                }
+                mockApiServer.assertAllRequestsMatched()
+            }
+        }
 }
 
 private val testApplication: TestMainApplication

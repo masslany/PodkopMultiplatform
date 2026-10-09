@@ -76,9 +76,12 @@ class MockApiServer(
     fun sample(name: String): JsonObject =
         Json.parseToJsonElement(readAsset("api-samples/$name.json")).jsonObject
 
-    fun assertAllRequestsMatched() {
-        check(unmatchedRequests.isEmpty()) {
-            "The app made requests without a mocked route:\n" + unmatchedRequests.joinToString(separator = "\n")
+    fun assertAllRequestsMatched(cause: Throwable? = null) {
+        if (unmatchedRequests.isNotEmpty()) {
+            throw AssertionError(
+                "The app made requests without a mocked route:\n" + unmatchedRequests.joinToString(separator = "\n"),
+                cause,
+            )
         }
     }
 
