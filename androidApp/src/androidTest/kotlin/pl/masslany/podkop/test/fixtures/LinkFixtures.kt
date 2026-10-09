@@ -11,11 +11,25 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 /**
- * Builds link responses from a sanitized sample of a real website response. The sample fixes the
- * shape - every field, null and pagination key the backend sends - and these builders only change
- * values, so generated pages stay true to what the API serves.
+ * Builds homepage responses from sanitized samples of real website responses (captured 2026-10-09).
+ * A sample fixes each item's shape and the pagination block, and these builders only change values,
+ * so generated pages stay true to what the API serves:
+ *
+ * - Every guest page holds `per_page` links plus a promoted link on top (`published_at` is null)
+ *   and three entries at positions 5, 11 and 17; the promoted link and entries repeat on each page.
+ * - Signed-in users get cursor pages: no `per_page` or `total`, only `next` and `prev`. The first
+ *   page holds the promoted link and entries too, later pages only links; pages hold 40 links.
+ * - Some links are marked `recommended`, here the fourth link of each page.
  */
 object LinkFixtures {
+    const val PROMOTED_LINK_ID = 9000
+    const val PROMOTED_LINK_TITLE = "Promoted link"
+    const val SIGNED_IN_LINKS_PER_PAGE = 40
+    val entryIds = listOf(9001, 9002, 9003)
+
+    private val entryPositions = listOf(5, 11, 17)
+    private const val RECOMMENDED_LINK_INDEX = 4
+
     fun linkId(
         page: Int,
         index: Int,
@@ -26,21 +40,66 @@ object LinkFixtures {
         index: Int,
     ): String = "Link $page-${index.toString().padStart(2, '0')}"
 
-    /** A numbered page as guests get it: `per_page` links under the sample's pagination block. */
+    /** The cursor the API hands out for requesting [page] (2 or later) of a signed-in feed. */
+    fun pageCursor(
+        sample: JsonObject,
+        page: Int,
+    ): String = token("Page${page}Cursor", length = sample.pagination().getValue("next").jsonPrimitive.content.length)
+
+    /** A numbered page as guests get it, under the guest sample's pagination block. */
     fun numberedPage(
         sample: JsonObject,
         page: Int,
     ): String {
-        val template = sample.getValue("data").jsonArray.first().jsonObject
-        val perPage = sample.getValue("pagination").jsonObject.getValue("per_page").jsonPrimitive.int
-        val links = (1..perPage).map { index ->
+        val perPage = sample.pagination().getValue("per_page").jsonPrimitive.int
+        return sample.with("data" to JsonArray(page(sample, page, links = perPage, promoted = true))).toString()
+    }
+
+    /**
+     * A cursor page as signed-in users get it. [firstPage] and [laterPage] are samples of a first
+     * and a later page, whose pagination blocks differ: the first page has no `prev` cursor.
+     */
+    fun cursorPage(
+        firstPage: JsonObject,
+        laterPage: JsonObject,
+        page: Int,
+    ): String {
+        val sample = if (page == 1) firstPage else laterPage
+        val items = page(firstPage, page, links = SIGNED_IN_LINKS_PER_PAGE, promoted = page == 1)
+        val pagination = JsonObject(
+            sample.pagination().mapValues { (key, value) ->
+                when {
+                    value is JsonNull -> value
+                    key == "next" -> JsonPrimitive(pageCursor(firstPage, page + 1))
+                    else -> JsonPrimitive(token("${key.replaceFirstChar(Char::uppercase)}${page}Cursor", value.jsonPrimitive.content.length))
+                }
+            },
+        )
+        return sample.with("data" to JsonArray(items), "pagination" to pagination).toString()
+    }
+
+    private fun page(
+        sample: JsonObject,
+        page: Int,
+        links: Int,
+        promoted: Boolean,
+    ): List<JsonObject> {
+        val items = sample.getValue("data").jsonArray.map { it.jsonObject }
+        val plain = items.first { it.isLink() && !it.isPromoted() && "recommended" !in it }
+        val recommended = items.first { it.isLink() && !it.isPromoted() && "recommended" in it }
+        val feed = (1..links).mapTo(mutableListOf()) { index ->
             link(
-                template = template,
+                template = if (index == RECOMMENDED_LINK_INDEX) recommended else plain,
                 id = linkId(page, index),
                 title = linkTitle(page, index),
             )
         }
-        return sample.with("data" to JsonArray(links)).toString()
+        if (promoted) {
+            val entry = items.first { it.getValue("resource").jsonPrimitive.content == "entry" }
+            feed.add(0, link(items.first { it.isLink() && it.isPromoted() }, PROMOTED_LINK_ID, PROMOTED_LINK_TITLE))
+            entryPositions.zip(entryIds).forEach { (position, id) -> feed.add(position, entry(entry, id)) }
+        }
+        return feed
     }
 
     private fun link(
@@ -49,20 +108,52 @@ object LinkFixtures {
         title: String,
     ): JsonObject {
         val source = template.getValue("source").jsonObject
-        val author = template.getValue("author").jsonObject
-        val media = template.getValue("media").jsonObject
-        return template.with(
+        return template.withoutImages().with(
             "id" to JsonPrimitive(id),
             "title" to JsonPrimitive(title),
             "slug" to JsonPrimitive("link-$id"),
             // Like the API, where a link's source usually carries the link id as type_id.
             "source" to source.with("type_id" to JsonPrimitive(id)),
-            // The API serves authors without an avatar and links without a photo as "" and null, which
-            // also keeps the tests from loading images off the network.
-            "author" to author.with("avatar" to JsonPrimitive("")),
-            "media" to media.with("photo" to JsonNull),
         )
     }
+
+    private fun entry(
+        template: JsonObject,
+        id: Int,
+    ): JsonObject =
+        template.withoutImages().with(
+            "id" to JsonPrimitive(id),
+            "slug" to JsonPrimitive("entry-$id"),
+            "content" to JsonPrimitive("Entry $id"),
+        )
 }
+
+private fun JsonObject.pagination(): JsonObject = getValue("pagination").jsonObject
+
+private fun JsonObject.isLink(): Boolean = getValue("resource").jsonPrimitive.content == "link"
+
+private fun JsonObject.isPromoted(): Boolean = get("published_at") is JsonNull
+
+/**
+ * Uses the values the API itself serves for missing images - `""` avatars, a `null` photo and no
+ * `photos` - which also keeps the tests from loading images off the network.
+ */
+private fun JsonObject.withoutImages(): JsonObject {
+    val author = getValue("author").jsonObject.with("avatar" to JsonPrimitive(""))
+    val media = getValue("media").jsonObject.let { media ->
+        media.with("photo" to JsonNull).let { if ("photos" in media) it.with("photos" to JsonArray(emptyList())) else it }
+    }
+    val votes = getValue("votes").jsonObject.let { votes ->
+        val users = votes["users"]?.jsonArray ?: return@let votes
+        votes.with("users" to JsonArray(users.map { it.jsonObject.with("avatar" to JsonPrimitive("")) }))
+    }
+    return with("author" to author, "media" to media, "votes" to votes)
+}
+
+/** Readable, but in the shape of a real cursor: [length] letters and digits. */
+private fun token(
+    seed: String,
+    length: Int,
+): String = seed.padEnd(length, 'x').take(length)
 
 private fun JsonObject.with(vararg fields: Pair<String, JsonElement>): JsonObject = JsonObject(this + fields)

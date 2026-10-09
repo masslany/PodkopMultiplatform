@@ -1,0 +1,94 @@
+{
+  "data": [
+    {
+      "actions": {
+        "create": false,
+        "create_favourite": false,
+        "delete": false,
+        "delete_favourite": false,
+        "finish_ama": false,
+        "pin": false,
+        "report": false,
+        "start_ama": false,
+        "undo_vote": false,
+        "unpin": false,
+        "update": false,
+        "vote_down": false,
+        "vote_up": false
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "https://example.com/avatar.jpg",
+        "blacklist": false,
+        "color": "burgundy",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": 56,
+          "trend": 1
+        },
+        "status": "active",
+        "username": "rjkdqjar",
+        "verified": false
+      },
+      "comments": {
+        "count": 247,
+        "hot": false,
+        "items": null
+      },
+      "created_at": "2026-10-09 06:49:23",
+      "deletable": false,
+      "description": "Sample description",
+      "editable": false,
+      "family_friendly": true,
+      "hot": true,
+      "id": 1000,
+      "media": {
+        "embed": null,
+        "photo": {
+          "height": 860,
+          "key": "XqvVU5rT95gJ1vBX042zNdga19V2oWHQdWbbAHXZvdm3t7hd2M",
+          "label": "VqmoGcW3PZdHIOrpdnegWdBKyDK6OmEXBWs8M88ZVFjNO6xVjTK-CJHQEjqmUS6DHcy0SOIFBLpTUaDBPZQsIPNwKPw0Ay8JNIEgYUoLHr1ZAGjhVFW2OvTCQvcyG2WPTo6mEAURn13FGm7NBlc4UbZIwbieMkC",
+          "mime_type": "image/jpeg",
+          "size": 282318,
+          "url": "https://example.com/url.jpg",
+          "width": 1507
+        },
+        "photos": []
+      },
+      "observed_discussion": false,
+      "parent": null,
+      "pinnable": false,
+      "published_at": "2026-10-09 08:05:12",
+      "related": null,
+      "resource": "link",
+      "slug": "tepvenk-oq-mrxavb-xkfaep-xmbv-fezk-bktqf-wk-xdgbhzdql-kvt-shbk-kfqbhq",
+      "source": {
+        "label": "tvcxidurhc.xz.pg",
+        "type": "anchor",
+        "type_id": 1000,
+        "url": "https://example.com/url"
+      },
+      "tag_pinned_content": false,
+      "tags": [
+        "mzpwaqm"
+      ],
+      "title": "Sample title",
+      "voted": 0,
+      "votes": {
+        "count": 3351,
+        "down": 1,
+        "up": 3352
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 10,
+    "total": 38
+  }
+}

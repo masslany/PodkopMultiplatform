@@ -2,17 +2,17 @@
   "data": [
     {
       "actions": {
-        "create": false,
-        "create_favourite": false,
+        "create": true,
+        "create_favourite": true,
         "delete": false,
         "delete_favourite": false,
         "finish_ama": false,
-        "report": false,
+        "report": true,
         "start_ama": false,
         "undo_vote": false,
         "update": false,
-        "vote_down": false,
-        "vote_up": false
+        "vote_down": true,
+        "vote_up": true
       },
       "adult": false,
       "archive": false,
@@ -76,24 +76,24 @@
       "title": "Sample title",
       "voted": 0,
       "votes": {
-        "count": 71,
+        "count": 74,
         "down": 8,
-        "up": 79
+        "up": 82
       }
     },
     {
       "actions": {
-        "create": false,
-        "create_favourite": false,
+        "create": true,
+        "create_favourite": true,
         "delete": false,
         "delete_favourite": false,
         "finish_ama": false,
-        "report": false,
+        "report": true,
         "start_ama": false,
         "undo_vote": false,
         "update": false,
-        "vote_down": false,
-        "vote_up": false
+        "vote_down": true,
+        "vote_up": true
       },
       "adult": false,
       "archive": false,
@@ -164,17 +164,17 @@
     },
     {
       "actions": {
-        "create": false,
-        "create_favourite": false,
+        "create": true,
+        "create_favourite": true,
         "delete": false,
         "delete_favourite": false,
         "finish_ama": false,
-        "report": false,
+        "report": true,
         "start_ama": false,
         "undo_vote": false,
         "update": false,
-        "vote_down": false,
-        "vote_up": false
+        "vote_down": true,
+        "vote_up": true
       },
       "adult": false,
       "archive": false,
@@ -246,17 +246,17 @@
     },
     {
       "actions": {
-        "create": false,
-        "create_favourite": false,
+        "create": true,
+        "create_favourite": true,
         "delete": false,
         "delete_favourite": false,
         "finish_ama": false,
-        "report": false,
+        "report": true,
         "start_ama": false,
         "undo_vote": false,
         "update": false,
-        "vote_down": false,
-        "vote_up": false
+        "vote_down": true,
+        "vote_up": true
       },
       "adult": false,
       "archive": false,
@@ -328,16 +328,16 @@
     },
     {
       "actions": {
-        "create": false,
-        "create_favourite": false,
+        "create": true,
+        "create_favourite": true,
         "delete": false,
         "delete_favourite": false,
         "pin": false,
-        "report": false,
+        "report": true,
         "undo_vote": false,
         "unpin": false,
         "update": false,
-        "vote_up": false
+        "vote_up": true
       },
       "adult": false,
       "archive": false,
@@ -434,7 +434,7 @@
     }
   ],
   "pagination": {
-    "per_page": 25,
-    "total": 10000
+    "next": "44OeHB8WRB0HjRW",
+    "prev": null
   }
 }
