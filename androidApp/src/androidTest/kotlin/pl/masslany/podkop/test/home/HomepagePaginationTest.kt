@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Test
 import org.junit.runner.RunWith
 import pl.masslany.podkop.test.common.BaseTest
+import pl.masslany.podkop.test.fixtures.LinkFixtures
 import pl.masslany.podkop.test.home.HomepageRoutes.homepageLoggedOut
 import pl.masslany.podkop.test.home.robots.homepage
 import pl.masslany.podkop.test.support.MockApiServer
@@ -25,7 +26,7 @@ class HomepagePaginationTest : BaseTest() {
     }
 
     private companion object {
-        const val FIRST_PAGE_TITLE = "Izraelskie siły zburzyły klasztor i szkołę sióstr w Yaroun (Liban)"
-        const val SECOND_PAGE_TITLE = "Historia śmierci księdza Popiełuszki dalej nie jest wyjaśniona."
+        val FIRST_PAGE_TITLE = LinkFixtures.linkTitle(page = 1, index = 1)
+        val SECOND_PAGE_TITLE = LinkFixtures.linkTitle(page = 2, index = 25)
     }
 }

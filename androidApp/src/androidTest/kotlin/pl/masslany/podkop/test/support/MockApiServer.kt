@@ -3,6 +3,9 @@ package pl.masslany.podkop.test.support
 import android.content.res.AssetManager
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 import mockwebserver3.Dispatcher
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
@@ -26,7 +29,7 @@ class MockApiServer(
 
                 val route = routes.firstOrNull { it.matches(request.method, url) }
                 return if (route != null) {
-                    jsonResponse(body = route.body())
+                    jsonResponse(body = route.body)
                 } else {
                     val requestLine = "${request.method} ${url.encodedPath}${url.encodedQuery?.let { "?$it" }.orEmpty()}"
                     unmatchedRequests += requestLine
@@ -46,14 +49,14 @@ class MockApiServer(
 
     fun getJson(
         path: String,
-        assetPath: String,
+        body: String,
         query: Map<String, String> = emptyMap(),
     ) {
         routes += Route(
             method = "GET",
             path = path,
             query = query,
-            body = { readAsset(assetPath) },
+            body = body,
         )
     }
 
@@ -65,9 +68,13 @@ class MockApiServer(
             method = "POST",
             path = path,
             query = emptyMap(),
-            body = { body },
+            body = body,
         )
     }
+
+    /** A sanitized sample of a real API response, from `assets/api-samples` (see `scripts/api-samples`). */
+    fun sample(name: String): JsonObject =
+        Json.parseToJsonElement(readAsset("api-samples/$name.json")).jsonObject
 
     fun assertAllRequestsMatched() {
         check(unmatchedRequests.isEmpty()) {
@@ -93,7 +100,7 @@ private class Route(
     val method: String,
     val path: String,
     val query: Map<String, String>,
-    val body: () -> String,
+    val body: String,
 ) {
     fun matches(
         requestMethod: String?,
