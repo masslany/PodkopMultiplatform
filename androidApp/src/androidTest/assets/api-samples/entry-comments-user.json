@@ -1,0 +1,113 @@
+{
+  "data": [
+    {
+      "actions": {
+        "create": true,
+        "create_favourite": true,
+        "delete": false,
+        "delete_favourite": false,
+        "report": true,
+        "update": false,
+        "vote_down": true,
+        "vote_up": true
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "https://example.com/avatar.jpg",
+        "blacklist": false,
+        "color": "orange",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": null,
+          "trend": 0
+        },
+        "status": "active",
+        "username": "ErbwimgdIumotb",
+        "verified": false
+      },
+      "blacklist": false,
+      "card": null,
+      "content": "Sample content",
+      "created_at": "2026-10-09 12:48:29",
+      "deletable": false,
+      "deleted": null,
+      "device": "Qbbyl",
+      "editable": false,
+      "family_friendly": true,
+      "favourite": false,
+      "id": 1000,
+      "media": {
+        "embed": null,
+        "photo": null,
+        "photos": []
+      },
+      "parent": {
+        "author": {
+          "avatar": "https://example.com/avatar.png",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": null,
+          "note": false,
+          "online": true,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "UhyeylN",
+          "verified": false
+        },
+        "id": 1001,
+        "location": [
+          {
+            "filter": "ehawch",
+            "page": 1
+          }
+        ],
+        "resource": "entry",
+        "slug": "xpyvc-o-obgdtoftzpapm-ahyqfghozudve-iuufuh"
+      },
+      "resource": "entry_comment",
+      "slug": "uqqls-qdwoqk",
+      "tags": [],
+      "voted": 0,
+      "votes": {
+        "down": 0,
+        "up": 826,
+        "users": [
+          {
+            "avatar": "https://example.com/avatar.jpg",
+            "blacklist": false,
+            "color": "orange",
+            "company": false,
+            "donation": null,
+            "follow": false,
+            "gender": "m",
+            "note": false,
+            "online": false,
+            "rank": {
+              "position": null,
+              "trend": 0
+            },
+            "status": "active",
+            "username": "fdf9",
+            "verified": false
+          }
+        ]
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 50,
+    "total": 127
+  }
+}

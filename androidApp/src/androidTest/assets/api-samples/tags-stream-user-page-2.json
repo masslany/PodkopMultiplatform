@@ -1,0 +1,91 @@
+{
+  "data": [
+    {
+      "actions": {
+        "create": true,
+        "create_favourite": true,
+        "delete": false,
+        "delete_favourite": false,
+        "finish_ama": false,
+        "pin": false,
+        "report": true,
+        "start_ama": false,
+        "undo_vote": false,
+        "unpin": false,
+        "update": false,
+        "vote_down": true,
+        "vote_up": true
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "https://example.com/avatar.jpg",
+        "blacklist": false,
+        "color": "burgundy",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": 274,
+          "trend": 1
+        },
+        "status": "active",
+        "username": "muphxw",
+        "verified": false
+      },
+      "comments": {
+        "count": 0,
+        "hot": false
+      },
+      "created_at": "2026-10-09 19:29:05",
+      "deletable": false,
+      "description": "Sample description",
+      "editable": false,
+      "family_friendly": true,
+      "hot": false,
+      "id": 1000,
+      "media": {
+        "embed": null,
+        "photo": {
+          "height": 853,
+          "key": "PBolWzR91LjwD3nieUyL7xScS4pxrJ6eVhUR2fXjhRp8jHT68a",
+          "label": "pmrmc-1422096_0059",
+          "mime_type": "image/jpeg",
+          "size": 403793,
+          "url": "https://example.com/url.jpg",
+          "width": 1280
+        }
+      },
+      "observed_discussion": false,
+      "parent": null,
+      "pinnable": false,
+      "published_at": null,
+      "resource": "link",
+      "slug": "lh-hqyyamjk-fxhloct-fhqyh-ow-caor",
+      "source": {
+        "label": "zjvmz.zo",
+        "type": "anchor",
+        "type_id": 1000,
+        "url": "https://example.com/url"
+      },
+      "tag_pinned_content": false,
+      "tags": [
+        "nfkyvzylpln"
+      ],
+      "title": "Sample title",
+      "voted": 0,
+      "votes": {
+        "count": 5,
+        "down": 0,
+        "up": 5
+      }
+    }
+  ],
+  "pagination": {
+    "next": "spCBk57hVmKKnZR",
+    "prev": "7ncmPQAIbasRfDR"
+  }
+}

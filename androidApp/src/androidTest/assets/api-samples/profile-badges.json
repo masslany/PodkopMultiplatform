@@ -1,0 +1,28 @@
+{
+  "data": [
+    {
+      "achieved_at": "2024-10-05 08:28:35",
+      "color": {
+        "hex": "SG0F07",
+        "hex_dark": "SG0F07"
+      },
+      "description": "Sample description",
+      "label": "Yelbiovhlg",
+      "level": 3,
+      "media": {
+        "icon": {
+          "height": 0,
+          "key": "Zt7vUvUhYqIU8U4YzrkWMFexvXsOBFvyfzR9aB4n8WOA0A6efx",
+          "label": "uznmijszee-5",
+          "mime_type": "image/svg+xml",
+          "size": 0,
+          "url": "https://example.com/url",
+          "width": 0
+        }
+      },
+      "progress": 100,
+      "slug": "uznmijszee-5",
+      "type": "progress"
+    }
+  ]
+}

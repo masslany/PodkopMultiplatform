@@ -1,0 +1,240 @@
+{
+  "data": [
+    {
+      "actions": {
+        "create": true,
+        "create_favourite": true,
+        "delete": false,
+        "delete_favourite": false,
+        "pin": false,
+        "report": true,
+        "undo_vote": false,
+        "unpin": false,
+        "update": false,
+        "vote_up": true
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "https://example.com/avatar.png",
+        "blacklist": false,
+        "color": "orange",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": null,
+          "trend": 0
+        },
+        "status": "active",
+        "username": "akwjmdqu",
+        "verified": false
+      },
+      "card": null,
+      "comments": {
+        "count": 5,
+        "items": [
+          {
+            "actions": {
+              "create": true,
+              "create_favourite": true,
+              "delete": false,
+              "delete_favourite": false,
+              "report": true,
+              "update": false,
+              "vote_down": true,
+              "vote_up": true
+            },
+            "adult": false,
+            "archive": false,
+            "author": {
+              "avatar": "https://example.com/avatar.jpg",
+              "blacklist": false,
+              "color": "burgundy",
+              "company": true,
+              "donation": null,
+              "follow": false,
+              "gender": "m",
+              "note": false,
+              "online": false,
+              "rank": {
+                "position": 198,
+                "trend": 1
+              },
+              "status": "active",
+              "username": "NubagSB",
+              "verified": false
+            },
+            "blacklist": false,
+            "card": null,
+            "content": "Sample content",
+            "created_at": "2026-06-01 07:13:14",
+            "deletable": false,
+            "deleted": null,
+            "device": "Qbbyl",
+            "editable": false,
+            "family_friendly": true,
+            "favourite": false,
+            "id": 1000,
+            "media": {
+              "embed": null,
+              "photo": {
+                "height": 645,
+                "key": "4AzGcuDxfjL2bn8SZKH4Ww93cJOfieUq62FMiAjDl1Rw7t0y3q",
+                "label": "EGO_1417",
+                "mime_type": "image/webp",
+                "size": 46518,
+                "url": "https://example.com/url.webp",
+                "width": 800
+              },
+              "photos": [
+                {
+                  "height": 645,
+                  "key": "4AzGcuDxfjL2bn8SZKH4Ww93cJOfieUq62FMiAjDl1Rw7t0y3q",
+                  "label": "EGO_1417",
+                  "mime_type": "image/webp",
+                  "size": 46518,
+                  "url": "https://example.com/url.webp",
+                  "width": 800
+                }
+              ]
+            },
+            "parent": {
+              "author": {
+                "avatar": "https://example.com/avatar.png",
+                "blacklist": false,
+                "color": "orange",
+                "company": false,
+                "donation": null,
+                "follow": false,
+                "gender": "m",
+                "note": false,
+                "online": false,
+                "rank": {
+                  "position": null,
+                  "trend": 0
+                },
+                "status": "active",
+                "username": "akwjmdqu",
+                "verified": false
+              },
+              "id": 1001,
+              "location": [
+                {
+                  "filter": "ehawch",
+                  "page": 1
+                }
+              ],
+              "resource": "entry",
+              "slug": "cgtdhjekudhh-bokvkega-yezx-lsoso-m-j-pkqajnnrhuqb-"
+            },
+            "resource": "entry_comment",
+            "slug": "mrnoanjr-0-5-4-2-8-3-ghgzq-roammsxtugtp-b-yddwjahcc-hmnmfw-xugss-d-amzv-3-8",
+            "status": "visible",
+            "tags": [],
+            "voted": 0,
+            "votes": {
+              "down": 0,
+              "up": 383,
+              "users": [
+                {
+                  "avatar": "",
+                  "blacklist": false,
+                  "color": "orange",
+                  "company": false,
+                  "donation": null,
+                  "follow": false,
+                  "gender": null,
+                  "note": false,
+                  "online": true,
+                  "rank": {
+                    "position": null,
+                    "trend": 0
+                  },
+                  "status": "active",
+                  "username": "OknqkdWwtkbepwm",
+                  "verified": false
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "content": "Sample content",
+      "created_at": "2026-06-01 06:38:59",
+      "deletable": false,
+      "deleted": false,
+      "device": "",
+      "editable": false,
+      "family_friendly": true,
+      "favourite": false,
+      "id": 1001,
+      "media": {
+        "embed": null,
+        "photo": {
+          "height": 496,
+          "key": "6IPUbauIwh98JC2UyPq0al40w1xJmYcpyo54h4AO0NDkpIuAeV",
+          "label": "7502",
+          "mime_type": "image/png",
+          "size": 459590,
+          "url": "https://example.com/url.png",
+          "width": 640
+        },
+        "photos": [
+          {
+            "height": 496,
+            "key": "6IPUbauIwh98JC2UyPq0al40w1xJmYcpyo54h4AO0NDkpIuAeV",
+            "label": "7502",
+            "mime_type": "image/png",
+            "size": 459590,
+            "url": "https://example.com/url.png",
+            "width": 640
+          }
+        ],
+        "survey": null
+      },
+      "observed_discussion": false,
+      "parent": null,
+      "pinnable": false,
+      "resource": "entry",
+      "slug": "cgtdhjekudhh-bokvkega-yezx-lsoso-m-j-pkqajnnrhuqb-",
+      "status": "visible",
+      "tag_pinned_content": false,
+      "tags": [
+        "nmhquh5"
+      ],
+      "voted": 0,
+      "votes": {
+        "down": 0,
+        "up": 1072,
+        "users": [
+          {
+            "avatar": "",
+            "blacklist": false,
+            "color": "orange",
+            "company": false,
+            "donation": null,
+            "follow": false,
+            "gender": "m",
+            "note": false,
+            "online": false,
+            "rank": {
+              "position": null,
+              "trend": 0
+            },
+            "status": "active",
+            "username": "qqclndtd2",
+            "verified": false
+          }
+        ]
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 25,
+    "total": 34
+  }
+}

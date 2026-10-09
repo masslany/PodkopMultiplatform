@@ -1,0 +1,220 @@
+{
+  "data": [
+    {
+      "actions": {
+        "create": true,
+        "create_favourite": true,
+        "delete": false,
+        "delete_favourite": false,
+        "pin": false,
+        "report": true,
+        "undo_vote": false,
+        "unpin": false,
+        "update": false,
+        "vote_up": true
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "https://example.com/avatar.jpg",
+        "blacklist": false,
+        "color": "orange",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": null,
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": 1526,
+          "trend": -1
+        },
+        "status": "active",
+        "username": "Vwcsn",
+        "verified": false
+      },
+      "card": null,
+      "comments": {
+        "count": 1,
+        "items": [
+          {
+            "actions": {
+              "create": true,
+              "create_favourite": true,
+              "delete": false,
+              "delete_favourite": false,
+              "report": true,
+              "update": false,
+              "vote_down": true,
+              "vote_up": true
+            },
+            "adult": false,
+            "archive": false,
+            "author": {
+              "avatar": "https://example.com/avatar.jpg",
+              "blacklist": false,
+              "color": "orange",
+              "company": false,
+              "donation": null,
+              "follow": false,
+              "gender": null,
+              "note": false,
+              "online": false,
+              "rank": {
+                "position": null,
+                "trend": 0
+              },
+              "status": "active",
+              "username": "unhu",
+              "verified": false
+            },
+            "blacklist": false,
+            "card": null,
+            "content": "Sample content",
+            "created_at": "2026-10-09 17:01:05",
+            "deletable": false,
+            "deleted": null,
+            "device": "Qbbyl",
+            "editable": false,
+            "family_friendly": true,
+            "favourite": false,
+            "id": 1000,
+            "media": {
+              "embed": null,
+              "photo": null,
+              "photos": []
+            },
+            "parent": {
+              "author": {
+                "avatar": "https://example.com/avatar.jpg",
+                "blacklist": false,
+                "color": "orange",
+                "company": false,
+                "donation": null,
+                "follow": false,
+                "gender": null,
+                "note": false,
+                "online": false,
+                "rank": {
+                  "position": 1526,
+                  "trend": -1
+                },
+                "status": "active",
+                "username": "Vwcsn",
+                "verified": false
+              },
+              "id": 1001,
+              "location": [
+                {
+                  "filter": "ehawch",
+                  "page": 1
+                }
+              ],
+              "resource": "entry",
+              "slug": "rvwlel-lncpwpxl-tehdpdu"
+            },
+            "resource": "entry_comment",
+            "slug": "giqt-q-oikndepfj-u-imosv-vyl-jlum-wz-wtuoqtj",
+            "tags": [],
+            "voted": 0,
+            "votes": {
+              "down": 0,
+              "up": 5,
+              "users": [
+                {
+                  "avatar": "https://example.com/avatar.jpg",
+                  "blacklist": false,
+                  "color": "orange",
+                  "company": true,
+                  "donation": null,
+                  "follow": false,
+                  "gender": "m",
+                  "note": false,
+                  "online": true,
+                  "rank": {
+                    "position": null,
+                    "trend": 0
+                  },
+                  "status": "active",
+                  "username": "kmtwdulbq4144",
+                  "verified": false
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "content": "Sample content",
+      "created_at": "2026-10-09 15:58:07",
+      "deletable": false,
+      "device": "",
+      "editable": false,
+      "family_friendly": true,
+      "favourite": false,
+      "id": 1001,
+      "media": {
+        "embed": null,
+        "photo": {
+          "height": 500,
+          "key": "aKKms5SZQavNDlf5j5UQzQRLVDfOM24OgqQSY7yf649TJrlHPp",
+          "label": "WKV_1086",
+          "mime_type": "image/jpeg",
+          "size": 63811,
+          "url": "https://example.com/url",
+          "width": 555
+        },
+        "photos": [
+          {
+            "height": 500,
+            "key": "aKKms5SZQavNDlf5j5UQzQRLVDfOM24OgqQSY7yf649TJrlHPp",
+            "label": "WKV_1086",
+            "mime_type": "image/jpeg",
+            "size": 63811,
+            "url": "https://example.com/url",
+            "width": 555
+          }
+        ],
+        "survey": null
+      },
+      "observed_discussion": false,
+      "parent": null,
+      "pinnable": false,
+      "resource": "entry",
+      "slug": "rvwlel-lncpwpxl-tehdpdu",
+      "status": "visible",
+      "tag_pinned_content": false,
+      "tags": [
+        "hbksom"
+      ],
+      "voted": 0,
+      "votes": {
+        "down": 0,
+        "up": 130,
+        "users": [
+          {
+            "avatar": "",
+            "blacklist": false,
+            "color": "orange",
+            "company": false,
+            "donation": null,
+            "follow": false,
+            "gender": null,
+            "note": false,
+            "online": true,
+            "rank": {
+              "position": null,
+              "trend": 0
+            },
+            "status": "active",
+            "username": "IlYbybj",
+            "verified": false
+          }
+        ]
+      }
+    }
+  ],
+  "pagination": {
+    "next": "PBGX5VsYyHdj",
+    "prev": "F9oUsfAfINXw"
+  }
+}

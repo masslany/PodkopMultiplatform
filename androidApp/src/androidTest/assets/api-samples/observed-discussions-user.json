@@ -1,0 +1,84 @@
+{
+  "data": [
+    {
+      "new_content_count": 0,
+      "object": {
+        "actions": {
+          "create": true,
+          "create_favourite": true,
+          "delete": true,
+          "delete_favourite": false,
+          "pin": false,
+          "report": false,
+          "undo_vote": false,
+          "unpin": false,
+          "update": false,
+          "vote_up": false
+        },
+        "adult": false,
+        "archive": false,
+        "author": {
+          "avatar": "https://example.com/avatar.jpg",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": "m",
+          "note": true,
+          "online": false,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "tpd2qh44862l536679d00892370711x5",
+          "verified": false
+        },
+        "card": null,
+        "comments": {
+          "count": 8,
+          "items": []
+        },
+        "content": "avigz",
+        "created_at": "2026-02-28 14:12:17",
+        "deletable": true,
+        "deleted": false,
+        "device": "",
+        "editable": false,
+        "family_friendly": true,
+        "favourite": false,
+        "id": 1000,
+        "media": {
+          "embed": null,
+          "photo": null,
+          "photos": [],
+          "survey": null
+        },
+        "observed_discussion": true,
+        "parent": null,
+        "pinnable": false,
+        "resource": "entry",
+        "slug": "avigz",
+        "status": "visible",
+        "tag_pinned_content": false,
+        "tags": [],
+        "voted": 0,
+        "votes": {
+          "down": 0,
+          "up": 0,
+          "users": []
+        }
+      },
+      "type": "entry"
+    }
+  ],
+  "extra": {
+    "observed_discussions_count": 9,
+    "observed_discussions_limit": 1000
+  },
+  "pagination": {
+    "next": null,
+    "prev": null
+  }
+}

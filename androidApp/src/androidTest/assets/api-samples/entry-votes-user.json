@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "avatar": "https://example.com/avatar.jpg",
+      "blacklist": false,
+      "color": "orange",
+      "company": false,
+      "donation": null,
+      "follow": false,
+      "gender": "m",
+      "note": false,
+      "online": true,
+      "rank": {
+        "position": null,
+        "trend": 0
+      },
+      "status": "active",
+      "username": "Xkrbte_Ocecugmy",
+      "verified": false
+    }
+  ],
+  "pagination": {
+    "per_page": 100000,
+    "total": 452
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "data": [
+    {
+      "created_at": "2026-10-09 21:19:36",
+      "reason": "",
+      "user": {
+        "avatar": "https://example.com/avatar.jpg",
+        "blacklist": false,
+        "color": "orange",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": true,
+        "rank": {
+          "position": null,
+          "trend": 0
+        },
+        "status": "active",
+        "username": "Hfpoekvr",
+        "verified": false
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 100000,
+    "total": 1785
+  }
+}

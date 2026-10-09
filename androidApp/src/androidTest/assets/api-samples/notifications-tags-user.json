@@ -1,0 +1,128 @@
+{
+  "data": [
+    {
+      "created_at": "2026-10-09 21:20:09",
+      "entry": {
+        "actions": {
+          "create": true,
+          "create_favourite": true,
+          "delete": false,
+          "delete_favourite": false,
+          "pin": false,
+          "report": true,
+          "undo_vote": false,
+          "unpin": false,
+          "update": false,
+          "vote_up": true
+        },
+        "adult": false,
+        "archive": false,
+        "author": {
+          "avatar": "https://example.com/avatar.png",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": "m",
+          "note": false,
+          "online": false,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "cyeveeo18",
+          "verified": false
+        },
+        "comments": {
+          "count": 0,
+          "items": []
+        },
+        "content": "Sample content",
+        "created_at": "2026-10-09 21:20:02",
+        "deletable": false,
+        "deleted": false,
+        "device": "",
+        "editable": false,
+        "family_friendly": true,
+        "favourite": false,
+        "id": 1000,
+        "media": {
+          "embed": null,
+          "photo": {
+            "height": 1266,
+            "key": "GShc8MRGbj2GdYfvjDR0ci3kHlwam9SPmYNIgSx4h9447elbPJ",
+            "label": "tgizs",
+            "mime_type": "image/png",
+            "size": 2708936,
+            "url": "https://example.com/url.png",
+            "width": 1266
+          },
+          "photos": [
+            {
+              "height": 1266,
+              "key": "GShc8MRGbj2GdYfvjDR0ci3kHlwam9SPmYNIgSx4h9447elbPJ",
+              "label": "tgizs",
+              "mime_type": "image/png",
+              "size": 2708936,
+              "url": "https://example.com/url.png",
+              "width": 1266
+            }
+          ],
+          "survey": null
+        },
+        "message": "Sample message",
+        "observed_discussion": false,
+        "parent": null,
+        "pinnable": false,
+        "resource": "entry",
+        "slug": "hhuueor-qf-cyuf-dul3-flu",
+        "status": "visible",
+        "tag_pinned_content": false,
+        "tags": [
+          "ebn4"
+        ],
+        "voted": 0,
+        "votes": {
+          "down": 0,
+          "up": 0,
+          "users": []
+        }
+      },
+      "group_count": 139,
+      "group_id": "6htod7up-27g4-53gz-15j6-nr287s24an3u",
+      "group_updated_at": "2026-10-09 21:20:09",
+      "id": "yirdUfel",
+      "read": 0,
+      "show_as_group": false,
+      "tag": {
+        "name": "vbz",
+        "pinned": false
+      },
+      "type": "new_entry_with_observed_tag",
+      "user": {
+        "avatar": "https://example.com/avatar.png",
+        "blacklist": false,
+        "color": "orange",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": null,
+          "trend": 0
+        },
+        "status": "active",
+        "username": "cyeveeo18",
+        "verified": false
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 25,
+    "total": 932
+  }
+}

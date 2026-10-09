@@ -1,0 +1,176 @@
+{
+  "data": [
+    {
+      "actions": {
+        "create": true,
+        "create_favourite": true,
+        "delete": false,
+        "delete_favourite": false,
+        "report": true,
+        "update": false,
+        "vote_down": true,
+        "vote_up": true
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "",
+        "blacklist": false,
+        "color": "orange",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": null,
+          "trend": 0
+        },
+        "status": "active",
+        "username": "ffcpmr53",
+        "verified": false
+      },
+      "blacklist": false,
+      "card": null,
+      "content": "Sample content",
+      "created_at": "2026-10-08 23:29:20",
+      "deletable": false,
+      "deleted": null,
+      "device": "Qbbyl",
+      "editable": false,
+      "family_friendly": true,
+      "favourite": false,
+      "id": 1000,
+      "media": {
+        "embed": null,
+        "photo": null
+      },
+      "parent": {
+        "author": {
+          "avatar": "https://example.com/avatar.jpg",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": "m",
+          "note": false,
+          "online": true,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "Lxulreh_Nuvmxica",
+          "verified": false
+        },
+        "id": 1001,
+        "link": {
+          "actions": {
+            "create": true,
+            "create_favourite": true,
+            "delete": false,
+            "delete_favourite": false,
+            "finish_ama": false,
+            "report": true,
+            "start_ama": false,
+            "undo_vote": false,
+            "update": false,
+            "vote_down": true,
+            "vote_up": true
+          },
+          "adult": false,
+          "archive": false,
+          "author": {
+            "avatar": "https://example.com/avatar.png",
+            "blacklist": false,
+            "color": "burgundy",
+            "company": false,
+            "donation": null,
+            "follow": false,
+            "gender": "m",
+            "note": false,
+            "online": false,
+            "rank": {
+              "position": 68,
+              "trend": -1
+            },
+            "status": "active",
+            "username": "92ljmwjptcgkdj",
+            "verified": false
+          },
+          "comments": {
+            "count": 446,
+            "hot": false
+          },
+          "created_at": "2026-10-08 22:38:59",
+          "deletable": false,
+          "description": "Sample description",
+          "editable": false,
+          "family_friendly": true,
+          "hot": true,
+          "id": 1002,
+          "media": {
+            "embed": null,
+            "photo": {
+              "height": 415,
+              "key": "BykQV1gY87aB4aJU335rNqwb16v1bSCUhEqwBLMEajg1m8pa5B",
+              "label": "jchxPvchZwt",
+              "mime_type": "image/jpeg",
+              "size": 50531,
+              "url": "https://example.com/url.jpg",
+              "width": 739
+            }
+          },
+          "observed_discussion": false,
+          "parent": null,
+          "pinnable": false,
+          "published_at": "2026-10-08 23:39:29",
+          "resource": "link",
+          "slug": "wzrs-ozjihsbmqyxx-fiqqcg-g-sumuhcfx-yufponyhs",
+          "source": {
+            "label": "jnx40.dw",
+            "type": "anchor",
+            "type_id": 1002,
+            "url": "https://example.com/url"
+          },
+          "tag_pinned_content": false,
+          "tags": [
+            "bvwxca"
+          ],
+          "title": "Sample title",
+          "voted": 0,
+          "votes": {
+            "count": 1765,
+            "down": 20,
+            "up": 1785
+          }
+        },
+        "location": [
+          {
+            "filter": "ehawch",
+            "page": 1,
+            "parent_page": 1
+          }
+        ],
+        "resource": "link_comment",
+        "slug": "hwfrqp-atqdixw-bwg-efzsitwbwfiyg-clxwv-gzwjodcyhcm-klfyoz-hcloemt-rdcb-mfcp-jienisgq-leufin-ruks-oxj-hssli-apokt-ymwxrka-otox-qy-udp-nyyr-bgvuq-ue-cdx"
+      },
+      "parent_id": 1001,
+      "resource": "link_comment",
+      "slug": "cuqxztjpy",
+      "tags": [],
+      "voted": 0,
+      "votes": {
+        "down": 32,
+        "up": 385,
+        "users": []
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 50,
+    "total": 53
+  }
+}

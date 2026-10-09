@@ -1,0 +1,164 @@
+{
+  "data": [
+    {
+      "actions": {
+        "create": true,
+        "create_favourite": true,
+        "delete": false,
+        "delete_favourite": false,
+        "pin": false,
+        "report": true,
+        "undo_vote": false,
+        "unpin": false,
+        "update": false,
+        "vote_up": true
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "https://example.com/avatar.jpg",
+        "blacklist": false,
+        "color": "orange",
+        "company": true,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": null,
+          "trend": 0
+        },
+        "status": "active",
+        "username": "yyn_rdzru",
+        "verified": false
+      },
+      "card": null,
+      "comments": {
+        "count": 0,
+        "items": []
+      },
+      "content": "Sample content",
+      "created_at": "2026-10-09 21:20:28",
+      "deletable": false,
+      "deleted": false,
+      "device": "",
+      "editable": false,
+      "family_friendly": true,
+      "favourite": false,
+      "id": 1000,
+      "media": {
+        "embed": null,
+        "photo": null,
+        "photos": [],
+        "survey": null
+      },
+      "observed_discussion": false,
+      "parent": null,
+      "pinnable": false,
+      "resource": "entry",
+      "slug": "eilpsddj-csmkjeo-ow-mxun-rmgdylx-orvyjjppi-sqpku-u",
+      "status": "visible",
+      "tag_pinned_content": false,
+      "tags": [
+        "tykmtgqy"
+      ],
+      "voted": 0,
+      "votes": {
+        "down": 0,
+        "up": 0,
+        "users": []
+      }
+    },
+    {
+      "actions": {
+        "create": true,
+        "create_favourite": true,
+        "delete": false,
+        "delete_favourite": false,
+        "finish_ama": false,
+        "pin": false,
+        "report": true,
+        "start_ama": false,
+        "undo_vote": false,
+        "unpin": false,
+        "update": false,
+        "vote_down": true,
+        "vote_up": true
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "https://example.com/avatar.jpg",
+        "blacklist": false,
+        "color": "orange",
+        "company": true,
+        "donation": null,
+        "follow": false,
+        "gender": null,
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": 1179,
+          "trend": 1
+        },
+        "status": "active",
+        "username": "pnxtvldaiimk",
+        "verified": false
+      },
+      "comments": {
+        "count": 0,
+        "hot": false,
+        "items": null
+      },
+      "created_at": "2026-10-09 21:13:03",
+      "deletable": false,
+      "description": "Sample description",
+      "editable": false,
+      "family_friendly": true,
+      "hot": false,
+      "id": 1001,
+      "media": {
+        "embed": null,
+        "photo": {
+          "height": 600,
+          "key": "DJvo3YSCrf9ZbOqxkLZ4qj7xRzo8u4BTjPBUfEy4x7133uwdQR",
+          "label": "Lhefbbu-Vbanmsk-Ecsp",
+          "mime_type": "image/png",
+          "size": 617920,
+          "url": "https://example.com/url.png",
+          "width": 1200
+        },
+        "photos": []
+      },
+      "observed_discussion": false,
+      "parent": null,
+      "pinnable": false,
+      "published_at": null,
+      "related": null,
+      "resource": "link",
+      "slug": "flwjgph-euchwyu-dyau-pcj-mocmjfbl-cpmvn-kainceay",
+      "source": {
+        "label": "blmuxjhmlszx.sot.xx",
+        "type": "anchor",
+        "type_id": 1001,
+        "url": "https://example.com/url"
+      },
+      "tag_pinned_content": false,
+      "tags": [
+        "oydmdgu"
+      ],
+      "title": "Sample title",
+      "voted": 0,
+      "votes": {
+        "count": 0,
+        "down": 0,
+        "up": 0
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 40,
+    "total": 15920
+  }
+}
