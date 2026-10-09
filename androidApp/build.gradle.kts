@@ -61,6 +61,18 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    testOptions {
+        managedDevices {
+            // Run integration tests on it with `./gradlew :androidApp:pixel6Api34DebugAndroidTest`.
+            localDevices {
+                create("pixel6Api34") {
+                    device = "Pixel 6"
+                    apiLevel = 34
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
+    }
 }
 
 dependencies {
