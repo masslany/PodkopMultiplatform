@@ -11,6 +11,7 @@ abstract class BaseTest {
     @get:Rule(order = 0)
     val integrationRule = IntegrationTestRule(
         configureMockApi = ::configureMockApi,
+        isSignedIn = { signedIn },
     )
 
     @get:Rule(order = 1)
@@ -18,6 +19,9 @@ abstract class BaseTest {
 
     protected val mockApiServer: MockApiServer
         get() = integrationRule.mockApiServer
+
+    /** Whether the app starts signed in, with a session the mock API accepts. */
+    protected open val signedIn: Boolean = false
 
     protected open fun configureMockApi(mockApiServer: MockApiServer) = Unit
 }
