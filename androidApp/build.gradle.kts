@@ -31,6 +31,8 @@ android {
         versionName = podkopVersionName
 
         testInstrumentationRunner = "pl.masslany.podkop.test.PodkopTestRunner"
+        // With the orchestrator, every test gets a fresh app process with its data cleared.
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
 
         buildConfigField("String", "WYKOP_KEY", "\"${apikeyProperties.getProperty("WYKOP_KEY")}\"")
         buildConfigField("String", "WYKOP_SECRET", "\"${apikeyProperties.getProperty("WYKOP_SECRET")}\"")
@@ -62,6 +64,7 @@ android {
         }
     }
     testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
         managedDevices {
             // Run integration tests on it with `./gradlew :androidApp:pixel6Api34DebugAndroidTest`.
             localDevices {
@@ -95,13 +98,11 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.testExt.junit)
     androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.androidx.test.rules)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.uiautomator)
     androidTestImplementation(libs.okhttp)
     androidTestImplementation(libs.mockwebserver3)
-    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestUtil(libs.androidx.test.orchestrator)
+    androidTestUtil(libs.androidx.test.services)
 }

@@ -11,7 +11,6 @@ abstract class BaseTest {
     @get:Rule(order = 0)
     val integrationRule = IntegrationTestRule(
         configureMockApi = ::configureMockApi,
-        configureEnvironment = ::configureEnvironment,
     )
 
     @get:Rule(order = 1)
@@ -24,8 +23,6 @@ abstract class BaseTest {
         get() = integrationRule.mockApiServer
 
     protected open fun configureMockApi(mockApiServer: MockApiServer) = Unit
-
-    protected open fun configureEnvironment() = Unit
 }
 
 typealias PodkopComposeRule = AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>

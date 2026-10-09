@@ -9,9 +9,9 @@ import pl.masslany.podkop.test.fakes.FakeAuthRepository
 import pl.masslany.podkop.test.fakes.FakeNotificationsRepository
 import pl.masslany.podkop.test.fakes.FakeStartupManager
 
-val integrationTestModule = module {
+fun integrationTestModule(baseUrl: String) = module {
     single {
-        NetworkConfig(baseUrl = IntegrationTestNetwork.baseUrl)
+        NetworkConfig(baseUrl = baseUrl)
     }
     single<StartupManager> {
         FakeStartupManager()

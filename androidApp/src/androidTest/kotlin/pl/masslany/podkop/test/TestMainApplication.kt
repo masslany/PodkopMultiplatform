@@ -5,12 +5,25 @@ import android.app.Application
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.test.platform.app.InstrumentationRegistry
+import org.koin.core.module.Module
+import pl.masslany.podkop.MainApplication
+import pl.masslany.podkop.test.support.MockApiServer
 
-class TestMainApplication : Application() {
+class TestMainApplication : MainApplication() {
+    lateinit var mockApiServer: MockApiServer
+        private set
+
     override fun onCreate() {
+        // The app calls the API as soon as it starts, so the mock server has to be up before that.
+        mockApiServer = MockApiServer(assets = InstrumentationRegistry.getInstrumentation().context.assets)
+        mockApiServer.start()
         super.onCreate()
         registerActivityLifecycleCallbacks(TestActivityWindowFlags)
     }
+
+    override fun additionalKoinModules(): List<Module> =
+        listOf(integrationTestModule(baseUrl = mockApiServer.baseUrl))
 }
 
 private object TestActivityWindowFlags : Application.ActivityLifecycleCallbacks {

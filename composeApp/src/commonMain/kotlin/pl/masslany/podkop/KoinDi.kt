@@ -80,16 +80,7 @@ val composeAppModule = module {
 
 fun initKoin(
     appDeclaration: KoinAppDeclaration = {},
-) {
-    initKoin(
-        appDeclaration = appDeclaration,
-        additionalModules = emptyList(),
-    )
-}
-
-fun initKoin(
-    appDeclaration: KoinAppDeclaration,
-    additionalModules: List<Module>,
+    additionalModules: List<Module> = emptyList(),
 ) {
     startKoin {
         appDeclaration()
@@ -97,8 +88,6 @@ fun initKoin(
             businessModule,
             composeAppModule,
         )
-        if (additionalModules.isNotEmpty()) {
-            modules(additionalModules)
-        }
+        modules(additionalModules)
     }
 }

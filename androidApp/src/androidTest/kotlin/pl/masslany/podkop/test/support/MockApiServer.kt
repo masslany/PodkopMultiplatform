@@ -1,7 +1,7 @@
 package pl.masslany.podkop.test.support
 
-import android.content.Context
-import androidx.test.platform.app.InstrumentationRegistry
+import android.content.res.AssetManager
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
 import mockwebserver3.Dispatcher
 import mockwebserver3.MockResponse
@@ -9,14 +9,17 @@ import mockwebserver3.MockWebServer
 import mockwebserver3.RecordedRequest
 import okhttp3.HttpUrl
 
-class MockApiServer {
-    private val context: Context =
-        InstrumentationRegistry.getInstrumentation().context
+class MockApiServer(
+    private val assets: AssetManager,
+) {
     private val server = MockWebServer()
-    private val routes = mutableListOf<Route>()
+    private val routes = CopyOnWriteArrayList<Route>()
     private val requests = CopyOnWriteArrayList<RecordedRequest>()
 
-    fun start(): String {
+    lateinit var baseUrl: String
+        private set
+
+    fun start() {
         server.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest): MockResponse {
                 requests += request
@@ -33,8 +36,11 @@ class MockApiServer {
                 }
             }
         }
-        server.start()
-        return server.url("/").toString()
+        // Application.onCreate runs on the main thread, where Android forbids the localhost lookup made here.
+        baseUrl = CompletableFuture.supplyAsync {
+            server.start()
+            server.url("/").toString()
+        }.get()
     }
 
     fun getJson(
@@ -72,12 +78,6 @@ class MockApiServer {
             query.all { (name, value) -> url.queryParameter(name) == value }
     }
 
-    fun shutdown() {
-        server.close()
-        routes.clear()
-        requests.clear()
-    }
-
     private fun jsonAssetResponse(assetPath: String): MockResponse =
         jsonResponse(body = readAsset(assetPath))
 
@@ -92,7 +92,7 @@ class MockApiServer {
             .build()
 
     private fun readAsset(path: String): String =
-        context.assets.open(path).bufferedReader().use { it.readText() }
+        assets.open(path).bufferedReader().use { it.readText() }
 }
 
 private data class Route(
