@@ -34,27 +34,34 @@ Planned structure as tests expand:
 
 ### Android Integration Tests
 
-Android integration tests live in `androidApp/src/androidTest` and use a test-only application
-started by `PodkopTestRunner`.
+Android integration tests live in `androidApp/src/androidTest`. Run them on the Gradle managed
+emulator with `./gradlew :androidApp:pixel6Api34DebugAndroidTest`, or on a connected device with
+`./gradlew :androidApp:connectedDebugAndroidTest`.
 
-The integration harness should:
+How the harness works:
 
-- Start `MainActivity` through Android instrumentation.
-- Put common activity/server/Koin lifecycle setup in `BaseTest`.
+- Android Test Orchestrator runs every test in a fresh app process and clears the app's data
+  (`clearPackageData`), so storage, Koin and the mock server start clean for each test.
+- `PodkopTestRunner` starts `TestMainApplication`, which extends `MainApplication`. Before the app
+  starts it brings up `MockApiServer`, answers the app-token request (`AuthRoutes`) and adds
+  `integrationTestModule`: the mock server's base URL and telemetry that never reports to Firebase.
+- `BaseTest` registers each test's routes before launching `MainActivity`.
+- The mock dispatcher is strict: a request without a route fails the test and lists every such
+  request. Stub everything a flow requests, including prefetches such as an empty next page.
+
+When writing tests:
+
 - Put repeated UI operations and assertions in feature robots that extend `BaseRobot`.
-- Point the app network stack at `MockWebServer` using the injected network base URL.
 - Serve deterministic response JSON from `androidTest/assets/mock-api`.
 - Use synthetic fixtures first, with short sentinel text values that make UI assertions obvious.
-- Keep the mocked dispatcher strict: unknown requests should fail loudly instead of falling through.
-- Replace startup/auth/background polling dependencies with deterministic fakes unless the test is
-  explicitly covering those flows.
+- Prefer stubbing the API over faking app classes, so the real repositories, mappers and startup
+  code run. Fake only what HTTP cannot cover, such as telemetry.
 
 Integration flow tests should assert visible UI behavior, not implementation details of the mocked
 web requests. Pagination tests should prove the user can reach content from later pages by checking
 that later-page content is displayed after scrolling.
 
-Mock server request recording can remain available for diagnostics or lower-level harness tests, but
-feature flows should not pass only because the correct URL was requested.
+Feature flows should not pass only because the correct URL was requested.
 
 When a synthetic fixture proves a regression path, add real trimmed API JSON later for contract
 coverage without replacing the simpler sentinel fixture.
