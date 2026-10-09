@@ -83,10 +83,20 @@ What the captures showed (website, 2026-10-09), and the builders reproduce:
 - Upcoming stays numbered when signed in, with a real `total`; the last page is simply short.
 - Some links carry `recommended: true`; hits links add `related`, `comments.items` and
   `media.photos`.
+- Signed-in entries (35 per page, 12-character cursors), tag streams (links and entries mixed) and
+  observed feeds are cursor pages too; observed discussions answer `{next: null, prev: null}`.
+- Numbered pages are not always full before the end: profile tabs return e.g. 23 of 25 items on
+  page 1 with `total: 17381`. Only `total` tells whether more pages exist.
+- Link comments report `{per_page: 25, total, total_items}` (`total` counts top-level comments,
+  `total_items` includes replies) and inline two replies each; replies page by 50, entry comments
+  by 50. Voter lists use `per_page: 100000` and come in one page. Related links have no pagination.
+- Tag notifications and favourites came back numbered (`{per_page, total}`, no `next`) for the
+  app's unpaged first request, although the app pages them by cursor.
 
 To capture a sample, use the flow in the debug build with Android Studio's Network Inspector, or on
-website in a browser (the website uses the same API, but its requests can differ: it asks for
-guest pages with `limit=25`). Then:
+website in a browser. The website uses the same API, but its requests often differ (`limit=25`
+for guests, `entries-threads` and `tags-threads` for feeds), so in a browser prefer replaying the
+app's exact GET requests through the site's own HTTP client, which carries the session. Then:
 
 1. Save the response body of each request you need to `captures/api/` (ignored by git). Capture the
    first page and the next one, so the sample shows how pages link up. Never capture token
