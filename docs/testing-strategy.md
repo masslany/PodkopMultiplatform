@@ -46,25 +46,47 @@ How the harness works:
   starts it brings up `MockApiServer`, answers the app-token request (`AuthRoutes`) and adds
   `integrationTestModule`: the mock server's base URL and telemetry that never reports to Firebase.
 - `BaseTest` registers each test's routes before launching `MainActivity`.
-- The mock dispatcher is strict: a request without a route fails the test and lists every such
-  request. Stub everything a flow requests, including prefetches such as an empty next page.
+- The mock dispatcher is strict: a request without a route fails the test, and the failure lists
+  every such request. Stub everything a flow requests, including prefetches of the next page.
 
 When writing tests:
 
-- Put repeated UI operations and assertions in feature robots that extend `BaseRobot`.
-- Serve deterministic response JSON from `androidTest/assets/mock-api`.
-- Use synthetic fixtures first, with short sentinel text values that make UI assertions obvious.
+- Put repeated UI operations and assertions in feature robots that extend `BaseRobot`. Find list
+  items by their lazy-list key (`scrollToKey`), not by position.
+- Build responses from API samples (below), with short sentinel values such as `Link 2-25` that
+  make UI assertions obvious.
 - Prefer stubbing the API over faking app classes, so the real repositories, mappers and startup
   code run. Fake only what HTTP cannot cover, such as telemetry.
+
+#### API samples
+
+Mocked responses must look like what website really serves, and the shape differs by endpoint and
+by whether the user is logged in (see `FeaturePaginationPolicies`): guests get numbered pages,
+logged-in feeds get opaque cursors sent back as `page`, and most notification groups send cursors
+as `key`. So responses are not written by hand:
+
+- `androidTest/assets/api-samples` holds sanitized captures of real responses, usually trimmed to
+  one item. A sample fixes the shape: every field, null, enum and pagination key the API sends.
+- Fixture builders such as `LinkFixtures` take an item from a sample as the template and generate
+  full pages from it, changing only values (ids, titles, sentinel text). They use values the API
+  itself sends for missing media (`""` avatars, `null` photos), so tests load no images.
+- A new response shape needs a new capture, not a guess.
+
+To capture a sample:
+
+1. Run the debug build (signed in, if the flow is for logged-in users) and open Android Studio's
+   App Inspection > Network Inspector.
+2. Use the flow, then save the response body of each request you need to `captures/api/` (ignored
+   by git). Capture the first page and the next one, so the sample shows how pages link up.
+3. Sanitize it into a sample, which replaces names, text, URLs, ids and cursors deterministically
+   but keeps the shape:
+   `python3 -I scripts/api-samples/sanitize.py captures/api/<capture>.json androidApp/src/androidTest/assets/api-samples/<name>.json`
 
 Integration flow tests should assert visible UI behavior, not implementation details of the mocked
 web requests. Pagination tests should prove the user can reach content from later pages by checking
 that later-page content is displayed after scrolling.
 
 Feature flows should not pass only because the correct URL was requested.
-
-When a synthetic fixture proves a regression path, add real trimmed API JSON later for contract
-coverage without replacing the simpler sentinel fixture.
 
 Feature UI test tags should live in one feature-level object, for example `LinksTestTags`, with
 nested groups such as `Screen` when a feature grows. Keep tag names stable and hierarchical, for
