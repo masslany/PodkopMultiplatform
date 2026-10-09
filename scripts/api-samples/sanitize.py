@@ -22,8 +22,8 @@ import json
 import re
 import string
 
-# Strings under these keys are enums the app branches on, not content.
-ENUM_KEYS = {"resource", "type", "status", "color", "gender", "mime_type", "age_category"}
+# Strings under these keys are enums the app branches on, or formats it parses (colour hex), not content.
+ENUM_KEYS = {"resource", "type", "status", "color", "gender", "mime_type", "age_category", "hex", "hex_dark"}
 TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$")
 
 
