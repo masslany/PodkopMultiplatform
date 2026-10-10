@@ -46,6 +46,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -241,7 +242,7 @@ private fun EntryDetailsScreenList(
     lazyListState: LazyListState,
 ) {
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.testTag(EntryDetailsTestTags.Screen.List),
         state = lazyListState,
         contentPadding = PaddingValues(
             bottom = 16.dp +
@@ -401,7 +402,9 @@ private fun EntryThreadRow(
             )
 
             is EntryThreadRowState.MoreReplies -> ShowMoreRepliesButton(
-                modifier = Modifier.padding(top = 12.dp),
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .testTag(EntryDetailsTestTags.Thread.moreReplies(row.parentId)),
                 row = row,
                 onClick = { actions.onShowMoreEntryRepliesClicked(row.parentId) },
             )

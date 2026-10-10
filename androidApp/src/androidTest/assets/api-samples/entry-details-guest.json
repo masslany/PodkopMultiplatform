@@ -1,0 +1,181 @@
+{
+  "data": {
+    "actions": {
+      "create": false,
+      "create_favourite": false,
+      "delete": false,
+      "delete_favourite": false,
+      "pin": false,
+      "report": false,
+      "undo_vote": false,
+      "unpin": false,
+      "update": false,
+      "vote_up": false
+    },
+    "adult": false,
+    "archive": false,
+    "author": {
+      "avatar": "https://example.com/avatar.jpg",
+      "blacklist": false,
+      "color": "orange",
+      "company": false,
+      "donation": null,
+      "follow": false,
+      "gender": "m",
+      "note": false,
+      "online": true,
+      "rank": {
+        "position": null,
+        "trend": 0
+      },
+      "status": "active",
+      "username": "Xoalw_Zyukefhj_Xhnvx_Dntzkeak",
+      "verified": false
+    },
+    "card": null,
+    "comments": {
+      "count": 80,
+      "items": []
+    },
+    "content": "Sample content",
+    "created_at": "2026-10-10 08:29:21",
+    "deletable": false,
+    "deleted": false,
+    "device": "",
+    "editable": false,
+    "family_friendly": true,
+    "favourite": false,
+    "id": 1000,
+    "media": {
+      "embed": null,
+      "photo": {
+        "height": 1536,
+        "key": "Nd7rOuSvPqVY7C0TwkjNTRpoTebObKfltjH5uA4b9WBE9I2zcq",
+        "label": "tgizs",
+        "mime_type": "image/png",
+        "size": 128380,
+        "url": "https://example.com/url.png",
+        "width": 2502
+      },
+      "photos": [
+        {
+          "height": 1536,
+          "key": "Nd7rOuSvPqVY7C0TwkjNTRpoTebObKfltjH5uA4b9WBE9I2zcq",
+          "label": "tgizs",
+          "mime_type": "image/png",
+          "size": 128380,
+          "url": "https://example.com/url.png",
+          "width": 2502
+        }
+      ],
+      "survey": null
+    },
+    "observed_discussion": false,
+    "parent": null,
+    "pinnable": false,
+    "resource": "entry",
+    "slug": "rscvw-gjcx-urjshr-iawhsfno-grg-vxyibcr-pidxa-pynxk",
+    "status": "visible",
+    "tag_pinned_content": false,
+    "tags": [
+      "nywmhaqyz"
+    ],
+    "voted": 0,
+    "votes": {
+      "down": 0,
+      "up": 237,
+      "users": [
+        {
+          "avatar": "https://example.com/avatar.jpg",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": "m",
+          "note": false,
+          "online": false,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "t17ctfy",
+          "verified": false
+        },
+        {
+          "avatar": "https://example.com/avatar.jpg",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": "m",
+          "note": false,
+          "online": false,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "CxrZwo",
+          "verified": false
+        },
+        {
+          "avatar": "https://example.com/avatar.jpg",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": "m",
+          "note": false,
+          "online": true,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "utqcxp",
+          "verified": false
+        },
+        {
+          "avatar": "",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": "m",
+          "note": false,
+          "online": false,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "ugninare",
+          "verified": false
+        },
+        {
+          "avatar": "",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": null,
+          "note": false,
+          "online": true,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "kbsooc_zbf",
+          "verified": false
+        }
+      ]
+    }
+  }
+}

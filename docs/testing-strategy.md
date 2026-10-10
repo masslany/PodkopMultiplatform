@@ -101,6 +101,13 @@ What the captures showed (website, 2026-10-09), and the builders reproduce:
   nothing for it; once a group is read, new notifications start a new group.
 - Single tag notifications are `new_entry_with_observed_tag` or `new_link_with_observed_tag`, and
   the website titles them as an entry using the tag or a link added with it, not as comments.
+- Entry threads (`entries-threads/{id}`, captured as a guest on 2026-10-10) serve the entry with
+  its first 25 top-level comments under `comments: {count, total, items}`, where `count` counts
+  top-level comments only (45 of 80 in the capture). Comments nest replies the same way, and a
+  reply list can be partly inlined (`count: 2` with one item). Later top-level comments and further
+  replies come from `.../comments` and `.../comments/{id}/comments` as `data: {count, total,
+  items}` with no pagination block, each page starting after the `id` the app sends.
+- Not captured yet: vote responses. The app reads no body from them, so tests answer 204.
 
 To capture a sample, use the flow in the debug build with Android Studio's Network Inspector, or on
 website in a browser. The website uses the same API, but its requests often differ (`limit=25`
