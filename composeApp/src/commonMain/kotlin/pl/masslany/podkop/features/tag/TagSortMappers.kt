@@ -21,6 +21,12 @@ internal fun TagsType.toDropdownMenuItemType(): DropdownMenuItemType = when (thi
     TagsType.Entries -> DropdownMenuItemType.Entries
 }
 
+internal fun TagContent.toTagsType(): TagsType = when (this) {
+    TagContent.All -> TagsType.All
+    TagContent.Entries -> TagsType.Entries
+    TagContent.Links -> TagsType.Links
+}
+
 internal fun DropdownMenuItemType.toTagsType(): TagsType = when (this) {
     DropdownMenuItemType.Everything -> TagsType.All
     DropdownMenuItemType.All -> TagsType.All

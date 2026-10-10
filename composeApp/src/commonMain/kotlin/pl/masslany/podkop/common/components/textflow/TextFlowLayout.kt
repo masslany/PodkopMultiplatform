@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.TextLayoutResult
@@ -80,7 +82,11 @@ public fun TextFlowLayout(
     onTextLayout: (TextLayoutResult?, TextLayoutResult?) -> Unit = { _, _ -> },
     obstacleContent: @Composable () -> Unit = {},
 ) {
-    SubcomposeLayout(modifier) { constraints ->
+    SubcomposeLayout(
+        modifier = modifier.semantics {
+            this.text = text
+        },
+    ) { constraints ->
         val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
 
         // Measure obstacle(s) first to check how much space they occupy

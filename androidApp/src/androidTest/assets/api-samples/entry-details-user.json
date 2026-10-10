@@ -1,0 +1,109 @@
+{
+  "data": {
+    "actions": {
+      "create": true,
+      "create_favourite": true,
+      "delete": false,
+      "delete_favourite": false,
+      "pin": false,
+      "report": true,
+      "undo_vote": false,
+      "unpin": false,
+      "update": false,
+      "vote_up": true
+    },
+    "adult": false,
+    "archive": false,
+    "author": {
+      "avatar": "https://example.com/avatar.png",
+      "blacklist": false,
+      "color": "orange",
+      "company": false,
+      "donation": null,
+      "follow": false,
+      "gender": null,
+      "note": false,
+      "online": true,
+      "rank": {
+        "position": null,
+        "trend": 0
+      },
+      "status": "active",
+      "username": "UhyeylN",
+      "verified": false
+    },
+    "card": null,
+    "comments": {
+      "count": 127,
+      "items": []
+    },
+    "content": "Sample content",
+    "created_at": "2026-10-09 12:46:18",
+    "deletable": false,
+    "deleted": false,
+    "device": "",
+    "editable": false,
+    "family_friendly": true,
+    "favourite": false,
+    "id": 1000,
+    "media": {
+      "embed": null,
+      "photo": {
+        "height": 1140,
+        "key": "Vj8sWwShWvPS6C7UrsmXIDvqj7k8bYkdbpE2cC6n6BVY8I9axy",
+        "label": "2216",
+        "mime_type": "image/png",
+        "size": 536398,
+        "url": "https://example.com/url.png",
+        "width": 998
+      },
+      "photos": [
+        {
+          "height": 1140,
+          "key": "Vj8sWwShWvPS6C7UrsmXIDvqj7k8bYkdbpE2cC6n6BVY8I9axy",
+          "label": "2216",
+          "mime_type": "image/png",
+          "size": 536398,
+          "url": "https://example.com/url.png",
+          "width": 998
+        }
+      ],
+      "survey": null
+    },
+    "observed_discussion": false,
+    "parent": null,
+    "pinnable": false,
+    "resource": "entry",
+    "slug": "xpyvc-o-obgdtoftzpapm-ahyqfghozudve-iuufuh",
+    "status": "visible",
+    "tag_pinned_content": false,
+    "tags": [
+      "hbksom"
+    ],
+    "voted": 0,
+    "votes": {
+      "down": 0,
+      "up": 452,
+      "users": [
+        {
+          "avatar": "https://example.com/avatar.jpg",
+          "blacklist": false,
+          "color": "orange",
+          "company": false,
+          "donation": null,
+          "follow": false,
+          "gender": "m",
+          "note": false,
+          "online": true,
+          "rank": {
+            "position": null,
+            "trend": 0
+          },
+          "status": "active",
+          "username": "Xkrbte_Ocecugmy",
+          "verified": false
+        }
+      ]
+    }
+  }
+}

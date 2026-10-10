@@ -10,6 +10,17 @@ interface NotificationsActions : TopBarActions {
 
     fun onNotificationClicked(id: String)
 
+    /** Shows or hides the notifications inside a grouped row, like website's "Rozwiń". */
+    fun onGroupedRowExpandToggled(id: String)
+
+    /** Loads the next page of an expanded group; website only ever shows the first one. */
+    fun onGroupedRowShowMoreClicked(id: String)
+
+    fun onGroupedRowNotificationClicked(
+        rowId: String,
+        id: String,
+    )
+
     fun onRefresh()
 
     fun onMarkAllAsReadClicked()

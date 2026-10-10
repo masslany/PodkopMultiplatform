@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "avatar": "https://example.com/avatar.jpg",
+      "blacklist": false,
+      "color": "burgundy",
+      "company": false,
+      "donation": null,
+      "follow": false,
+      "gender": "m",
+      "note": false,
+      "online": false,
+      "rank": {
+        "position": 586,
+        "trend": 1
+      },
+      "status": "banned",
+      "username": "Sigu7B6",
+      "verified": false
+    }
+  ],
+  "pagination": {
+    "per_page": 30,
+    "total": 19
+  }
+}

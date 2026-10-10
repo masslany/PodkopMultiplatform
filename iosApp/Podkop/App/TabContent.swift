@@ -114,6 +114,7 @@ struct TabContent: View {
         case .tags: SearchView(tab: tab, dependencies: dependencies)
         case .profile: ProfileView(username: nil, tab: tab, dependencies: dependencies)
         case .tag(let name): TagView(tag: name, tab: tab, dependencies: dependencies)
+        case .tagContent(let name, let kind): TagView(tag: name, kind: kind, tab: tab, dependencies: dependencies)
         case .user(let name): ProfileView(username: name, tab: tab, dependencies: dependencies)
         case .settings: SettingsView(tab: tab, dependencies: dependencies)
         case .blacklists: BlacklistsView(tab: tab, dependencies: dependencies)

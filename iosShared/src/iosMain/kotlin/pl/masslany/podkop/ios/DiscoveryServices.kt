@@ -398,6 +398,9 @@ internal fun nextPageRequest(
             received == 0 -> true
             total != null && emitted >= total -> true
             hasNextCursor -> false
+            // The API can return short pages long before the end (e.g. 23 of 25 on a profile tab),
+            // so a known total decides.
+            total != null -> false
             else -> {
                 val perPage = pagination?.perPage?.takeIf { it > 0 }
                 when {

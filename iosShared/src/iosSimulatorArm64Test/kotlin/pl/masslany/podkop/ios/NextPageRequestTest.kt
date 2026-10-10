@@ -48,6 +48,18 @@ class NextPageRequestTest {
     }
 
     @Test
+    fun numberedShortPageKeepsPagingWhileTotalSaysMore() {
+        // As a real profile tab served it: 23 of 25 items on page one, with a total of 532.
+        assertEquals(
+            PageRequest.Number(2),
+            nextPageRequest(PaginationMode.Numbered, PageRequest.Number(1), pagination(perPage = 25, total = 532), 23, 0),
+        )
+        assertNull(
+            nextPageRequest(PaginationMode.Numbered, PageRequest.Number(2), pagination(perPage = 25, total = 532), 0, 23),
+        )
+    }
+
+    @Test
     fun numberedModePrefersNumericNextAndHonoursTotal() {
         assertEquals(
             PageRequest.Number(5),

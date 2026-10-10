@@ -158,12 +158,15 @@ class Paginator<T>(
                     return knownTotal != null && emittedItemsCount >= knownTotal
                 }
 
+                if (receivedItemsCount == 0) return true
+
+                // A known total decides: the API can return short pages long before the last one,
+                // e.g. 23 of 25 items on a profile tab whose total says hundreds more exist.
                 val knownTotal = pagination?.total?.takeIf { it > 0 } ?: total
-                if (knownTotal != null && emittedItemsCount >= knownTotal) return true
+                if (knownTotal != null) return emittedItemsCount >= knownTotal
 
                 val expectedPageSize = pagination?.perPage?.takeIf { it > 0 } ?: perPage
                 when {
-                    receivedItemsCount == 0 -> true
                     expectedPageSize != null -> receivedItemsCount < expectedPageSize
                     pagination != null && pagination.next.isBlank() -> true
                     else -> false

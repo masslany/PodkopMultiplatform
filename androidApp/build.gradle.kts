@@ -30,6 +30,10 @@ android {
         versionCode = podkopVersionCode
         versionName = podkopVersionName
 
+        testInstrumentationRunner = "pl.masslany.podkop.test.PodkopTestRunner"
+        // With the orchestrator, every test gets a fresh app process with its data cleared.
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+
         buildConfigField("String", "WYKOP_KEY", "\"${apikeyProperties.getProperty("WYKOP_KEY")}\"")
         buildConfigField("String", "WYKOP_SECRET", "\"${apikeyProperties.getProperty("WYKOP_SECRET")}\"")
     }
@@ -59,6 +63,20 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        animationsDisabled = true
+        managedDevices {
+            // Run integration tests on it with `./gradlew :androidApp:pixel6Api34DebugAndroidTest`.
+            localDevices {
+                create("pixel6Api34") {
+                    device = "Pixel 6"
+                    apiLevel = 34
+                    systemImageSource = "aosp-atd"
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -78,4 +96,13 @@ dependencies {
 
     implementation(libs.androidx.activity.compose)
     debugImplementation(libs.leakcanary.android)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.testExt.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.okhttp)
+    androidTestImplementation(libs.mockwebserver3)
+    androidTestUtil(libs.androidx.test.orchestrator)
+    androidTestUtil(libs.androidx.test.services)
 }

@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.koin.core.context.startKoin
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -79,6 +80,7 @@ val composeAppModule = module {
 
 fun initKoin(
     appDeclaration: KoinAppDeclaration = {},
+    additionalModules: List<Module> = emptyList(),
 ) {
     startKoin {
         appDeclaration()
@@ -86,5 +88,6 @@ fun initKoin(
             businessModule,
             composeAppModule,
         )
+        modules(additionalModules)
     }
 }

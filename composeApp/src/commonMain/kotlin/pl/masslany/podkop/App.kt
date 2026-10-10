@@ -323,6 +323,7 @@ fun App() {
                         entry<TagScreen> {
                             TagScreenRoot(
                                 tag = it.tag,
+                                content = it.content,
                                 paddingValues = safeDrawingPaddingValues,
                             )
                         }

@@ -1,0 +1,13 @@
+{
+  "data": {
+    "entry_notification": false,
+    "entry_notification_count": 0,
+    "observed_discussions_notification": false,
+    "observed_discussions_notification_count": 0,
+    "pm": false,
+    "pm_notification": false,
+    "pm_notification_count": 0,
+    "tag_notification": true,
+    "tag_notification_count": 259
+  }
+}

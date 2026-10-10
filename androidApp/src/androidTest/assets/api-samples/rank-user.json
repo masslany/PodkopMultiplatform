@@ -1,0 +1,67 @@
+{
+  "data": [
+    {
+      "about": "Sample about",
+      "actions": {
+        "blacklist": true,
+        "follow": true,
+        "report": true,
+        "update": false,
+        "update_gender": false,
+        "update_note": true
+      },
+      "avatar": "https://example.com/avatar.jpg",
+      "background": "",
+      "blacklist": false,
+      "city": "",
+      "color": "burgundy",
+      "company": false,
+      "donation": null,
+      "follow": false,
+      "followers": 0,
+      "gender": "m",
+      "member_since": "2020-07-16 15:43:55",
+      "name": "",
+      "note": false,
+      "online": true,
+      "public_email": "",
+      "rank": {
+        "position": 1,
+        "trend": 0
+      },
+      "social_media": {
+        "facebook": "",
+        "instagram": "",
+        "twitter": ""
+      },
+      "status": "active",
+      "summary": {
+        "actions": 40467,
+        "entries": 18123,
+        "entries_details": {
+          "added": 3184,
+          "commented": 5645,
+          "voted": 9294
+        },
+        "followers": 60,
+        "following_tags": 349,
+        "following_users": 35,
+        "links": 22344,
+        "links_details": {
+          "added": 10483,
+          "commented": 744,
+          "published": 5437,
+          "related": 314,
+          "up": 10803
+        }
+      },
+      "username": "Tqowotqktqp_nrcm",
+      "verified": false,
+      "website": ""
+    }
+  ],
+  "pagination": {
+    "per_page": 25,
+    "total": 3172
+  }
+}

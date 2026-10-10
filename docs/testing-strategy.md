@@ -32,6 +32,89 @@ Planned structure as tests expand:
 - `.../testsupport/fakes` for hand-written fake repositories/data sources/services
 - `.../testsupport/assertions` for custom assertions/matchers when repeated patterns appear
 
+### Android Integration Tests
+
+Android integration tests live in `androidApp/src/androidTest`. Run them on the Gradle managed
+emulator with `./gradlew :androidApp:pixel6Api34DebugAndroidTest`, or on a connected device with
+`./gradlew :androidApp:connectedDebugAndroidTest`.
+
+How the harness works:
+
+- Android Test Orchestrator runs every test in a fresh app process and clears the app's data
+  (`clearPackageData`), so storage, Koin and the mock server start clean for each test.
+- `PodkopTestRunner` starts `TestMainApplication`, which extends `MainApplication`. Before the app
+  starts it brings up `MockApiServer`, answers the app-token request (`AuthRoutes`) and adds
+  `integrationTestModule`: the mock server's base URL and telemetry that never reports to Firebase.
+- `BaseTest` registers each test's routes before launching `MainActivity`.
+- The mock dispatcher is strict: a request without a route fails the test, and the failure lists
+  every such request. Stub everything a flow requests, including prefetches of the next page.
+
+When writing tests:
+
+- Put repeated UI operations and assertions in feature robots that extend `BaseRobot`. Find list
+  items by their lazy-list key (`scrollToKey`), not by position.
+- Build responses from API samples (below), with short sentinel values such as `Link 2-25` that
+  make UI assertions obvious.
+- Prefer stubbing the API over faking app classes, so the real repositories, mappers and startup
+  code run. Fake only what HTTP cannot cover, such as telemetry.
+
+#### API samples
+
+Mocked responses must look like what website really serves, and the shape differs by endpoint and
+by whether the user is logged in (see `FeaturePaginationPolicies`): guests get numbered pages,
+logged-in feeds get opaque cursors sent back as `page`, and most notification groups send cursors
+as `key`. So responses are not written by hand:
+
+- `androidTest/assets/api-samples` holds sanitized captures of real responses, trimmed to one item
+  per distinct item shape. A sample fixes the shape: every field, null, enum and pagination key the
+  API sends. `-guest` and `-user` samples are captured logged out and signed in.
+- Fixture builders such as `LinkFixtures` pick their templates from a sample by shape and generate
+  full pages from them, changing only values (ids, titles, sentinel text). They use values the API
+  itself sends for missing media (`""` avatars, `null` photos), so tests load no images.
+- A new response shape needs a new capture, not a guess.
+
+What the captures showed (website, 2026-10-09), and the builders reproduce:
+
+- Guest homepage pages are numbered, `{per_page: 25, total: 10000}`, but hold 29 items: a promoted
+  link (`published_at: null`) on top and three entries at positions 5, 11 and 17 repeat on every
+  page. The app drops repeats by id when appending a page.
+- Signed-in homepage pages are cursor pages with only `{next, prev}` (`prev` is null on the first
+  page). The first holds 40 links plus the promoted items, later ones 40 links.
+- Upcoming stays numbered when signed in, with a real `total`; the last page is simply short.
+- Some links carry `recommended: true`; hits links add `related`, `comments.items` and
+  `media.photos`.
+- Signed-in entries (35 per page, 12-character cursors), tag streams (links and entries mixed) and
+  observed feeds are cursor pages too; observed discussions answer `{next: null, prev: null}`.
+- Numbered pages are not always full before the end: profile tabs return e.g. 23 of 25 items on
+  page 1 with `total: 17381`. Only `total` tells whether more pages exist.
+- Link comments report `{per_page: 25, total, total_items}` (`total` counts top-level comments,
+  `total_items` includes replies) and inline two replies each; replies page by 50, entry comments
+  by 50. Voter lists use `per_page: 100000` and come in one page. Related links have no pagination.
+- Tag notifications and favourites came back numbered (`{per_page, total}`, no `next`) for the
+  app's unpaged first request, although the app pages them by cursor.
+
+To capture a sample, use the flow in the debug build with Android Studio's Network Inspector, or on
+website in a browser. The website uses the same API, but its requests often differ (`limit=25`
+for guests, `entries-threads` and `tags-threads` for feeds), so in a browser prefer replaying the
+app's exact GET requests through the site's own HTTP client, which carries the session. Then:
+
+1. Save the response body of each request you need to `captures/api/` (ignored by git). Capture the
+   first page and the next one, so the sample shows how pages link up. Never capture token
+   responses (`/auth`, `/refresh-token`).
+2. Sanitize it into a sample, which replaces names, text, URLs, ids and cursors deterministically
+   but keeps the shape:
+   `python3 -I scripts/api-samples/sanitize.py captures/api/<capture>.json androidApp/src/androidTest/assets/api-samples/<name>.json --items 5`
+
+Integration flow tests should assert visible UI behavior, not implementation details of the mocked
+web requests. Pagination tests should prove the user can reach content from later pages by checking
+that later-page content is displayed after scrolling.
+
+Feature flows should not pass only because the correct URL was requested.
+
+Feature UI test tags should live in one feature-level object, for example `LinksTestTags`, with
+nested groups such as `Screen` when a feature grows. Keep tag names stable and hierarchical, for
+example `links:screen:list`.
+
 ### Fixtures
 
 Fixtures are centralized builders that provide:
@@ -68,6 +151,8 @@ Use Kotlin backtick function names for test cases.
 
 - Preferred: ``fun `maps null values to defaults`()``
 - Avoid: `fun maps_null_values_to_defaults()`
+- Exception: Android instrumented tests should use dex-safe camelCase names because older dex
+  targets reject spaces in method names.
 
 ### SUT naming
 
@@ -123,6 +208,7 @@ Completed:
 - Standardized mapper test names to Kotlin backtick format
 - Added centralized repository fakes (`testsupport/fakes`)
 - Added repository tests for all business repositories (`Auth`, `Entries`, `Hits`, `Links`, `Profile`, `Tags`)
+- Added the first Android integration harness for deterministic MockWebServer-backed UI flows.
 
 ## Next Recommended Targets
 

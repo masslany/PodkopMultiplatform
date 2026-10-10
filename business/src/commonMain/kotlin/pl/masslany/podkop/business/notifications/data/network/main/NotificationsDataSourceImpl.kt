@@ -23,6 +23,13 @@ class NotificationsDataSourceImpl(
         return notificationsApi.getNotifications(group = group, page = page)
     }
 
+    override suspend fun getGroupNotifications(
+        groupId: String,
+        page: Int,
+    ): Result<NotificationsListDto> {
+        return notificationsApi.getGroupNotifications(groupId = groupId, page = page)
+    }
+
     override suspend fun getNotification(
         group: NotificationGroup,
         id: String,

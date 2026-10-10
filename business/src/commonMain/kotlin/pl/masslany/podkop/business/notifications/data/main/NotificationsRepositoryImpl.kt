@@ -82,6 +82,15 @@ class NotificationsRepositoryImpl(
         }
     }
 
+    override suspend fun getGroupNotifications(
+        group: NotificationGroup,
+        groupId: String,
+        page: Int,
+    ): Result<NotificationsPage> = withContext(dispatcherProvider.io) {
+        notificationsDataSource.getGroupNotifications(groupId = groupId, page = page)
+            .mapCatching { it.toNotificationsPage(group = group) }
+    }
+
     override suspend fun getNotification(
         group: NotificationGroup,
         id: String,

@@ -82,6 +82,38 @@ class PaginatorTest {
     }
 
     @Test
+    fun `reachedEnd returns false for a short page when total says more items remain`() {
+        assertFalse(
+            paginator.reachedEnd(
+                pagination = Pagination(
+                    perPage = 25,
+                    total = 532,
+                    next = "",
+                    prev = "",
+                ),
+                receivedItemsCount = 23,
+                emittedItemsCount = 23,
+            ),
+        )
+    }
+
+    @Test
+    fun `reachedEnd returns true for an empty page even when total says more items remain`() {
+        assertTrue(
+            paginator.reachedEnd(
+                pagination = Pagination(
+                    perPage = 25,
+                    total = 532,
+                    next = "",
+                    prev = "",
+                ),
+                receivedItemsCount = 0,
+                emittedItemsCount = 23,
+            ),
+        )
+    }
+
+    @Test
     fun `reachedEnd returns true when next is blank even without per page or total`() {
         assertTrue(
             paginator.reachedEnd(

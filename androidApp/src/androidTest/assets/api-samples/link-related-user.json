@@ -1,0 +1,52 @@
+{
+  "data": [
+    {
+      "actions": {
+        "create": true,
+        "delete": false,
+        "report": true,
+        "update": false,
+        "vote_down": true,
+        "vote_up": true
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "https://example.com/avatar.png",
+        "blacklist": false,
+        "color": "burgundy",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": 68,
+          "trend": -1
+        },
+        "status": "active",
+        "username": "92ljmwjptcgkdj",
+        "verified": false
+      },
+      "created_at": "2026-10-08 22:39:34",
+      "deletable": false,
+      "editable": false,
+      "id": 1000,
+      "media": {
+        "embed": null,
+        "photo": null
+      },
+      "source": {
+        "label": "ceo.mmtz.uce.nm",
+        "url": "https://example.com/url"
+      },
+      "title": "Sample title",
+      "voted": 0,
+      "votes": {
+        "down": 8,
+        "up": 128
+      }
+    }
+  ]
+}

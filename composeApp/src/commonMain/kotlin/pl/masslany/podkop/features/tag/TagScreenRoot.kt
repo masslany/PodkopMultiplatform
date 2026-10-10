@@ -91,9 +91,10 @@ private val TagGalleryItemMinSize = 160.dp
 @Composable
 internal fun TagScreenRoot(
     tag: String,
+    content: TagContent,
     paddingValues: PaddingValues,
 ) {
-    val viewModel = koinViewModel<TagViewModel>(parameters = { parametersOf(tag) })
+    val viewModel = koinViewModel<TagViewModel>(parameters = { parametersOf(tag, content) })
     val state by viewModel.state.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListPaginator(
         resetStateKey = state.screenInstanceId,

@@ -25,6 +25,10 @@ class IOSNotification(
     val isRead: Boolean,
     val groupId: String?,
     val groupCount: Int,
+    /** Set on a row the API grouped (`show_grouped=1`), whose notifications `loadGroup` lists. */
+    val showAsGroup: Boolean,
+    /** When the group last got a notification; groups show it rather than their first one's time. */
+    val groupUpdatedAtEpochMillis: Long?,
     val createdAt: String,
     val createdAtEpochMillis: Long,
     val actorUsername: String?,
@@ -196,6 +200,8 @@ internal fun NotificationItem.toIOS(): IOSNotification {
         isRead = isRead,
         groupId = groupId,
         groupCount = groupCount,
+        showAsGroup = showAsGroup,
+        groupUpdatedAtEpochMillis = groupUpdatedAt?.epochMillis(),
         createdAt = createdAt.toString(),
         createdAtEpochMillis = createdAt.epochMillis(),
         actorUsername = actor?.username,

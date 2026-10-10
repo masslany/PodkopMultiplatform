@@ -2,6 +2,7 @@ package pl.masslany.podkop.ios
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.datetime.LocalDateTime
 import pl.masslany.podkop.business.common.domain.models.common.Gender
@@ -37,12 +38,24 @@ class MessagingMappingTest {
     }
 
     @Test
+    fun serverGroupsKeepTheirFlagAndLatestActivity() {
+        val updated = LocalDateTime(2026, 3, 2, 9, 30)
+        val group = notification(NotificationGroup.Tags).copy(groupUpdatedAt = updated).toIOS()
+        assertTrue(group.showAsGroup)
+        assertEquals(
+            notification(NotificationGroup.Tags).copy(createdAt = updated).toIOS().createdAtEpochMillis,
+            group.groupUpdatedAtEpochMillis,
+        )
+        assertNull(notification(NotificationGroup.Tags).toIOS().groupUpdatedAtEpochMillis)
+    }
+
+    @Test
     fun notificationGroupsUseAndroidPagingPolicies() {
         val pm = FeaturePaginationPolicies.notifications("pm".toNotificationGroup())
         assertEquals(PageRequest.Number(1), pm.initialRequest())
-        val entries = FeaturePaginationPolicies.notifications("entries".toNotificationGroup())
-        assertEquals(PageRequest.Initial, entries.initialRequest())
-        assertEquals(PageRequest.KeyCursor("abc"), entries.nextRequest("abc", 2))
+        val tags = FeaturePaginationPolicies.notifications("tags".toNotificationGroup())
+        assertEquals(PageRequest.Number(1), tags.initialRequest())
+        assertEquals(PageRequest.Number(2), tags.nextRequest("", 2))
     }
 
     @Test

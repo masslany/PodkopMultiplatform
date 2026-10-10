@@ -19,6 +19,13 @@ interface NotificationsRepository {
         page: PageRequest = PageRequest.Initial,
     ): Result<NotificationsPage>
 
+    /** The notifications inside one server group, page by page; see [NotificationItem.groupId]. */
+    suspend fun getGroupNotifications(
+        group: NotificationGroup,
+        groupId: String,
+        page: Int,
+    ): Result<NotificationsPage>
+
     suspend fun getNotification(
         group: NotificationGroup,
         id: String,

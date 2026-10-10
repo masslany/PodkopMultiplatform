@@ -42,11 +42,11 @@ class FeaturePaginationPoliciesTest {
     }
 
     @Test
-    fun `notifications observed entries and tags use key cursor but private messages remain numbered`() {
-        assertEquals(PaginationMode.CursorInKey, FeaturePaginationPolicies.notifications(NotificationGroup.Entries))
-        assertEquals(PaginationMode.CursorInKey, FeaturePaginationPolicies.notifications(NotificationGroup.Tags))
+    fun `notifications are numbered in every group`() {
+        assertEquals(PaginationMode.Numbered, FeaturePaginationPolicies.notifications(NotificationGroup.Entries))
+        assertEquals(PaginationMode.Numbered, FeaturePaginationPolicies.notifications(NotificationGroup.Tags))
         assertEquals(
-            PaginationMode.CursorInKey,
+            PaginationMode.Numbered,
             FeaturePaginationPolicies.notifications(NotificationGroup.ObservedDiscussions),
         )
         assertEquals(

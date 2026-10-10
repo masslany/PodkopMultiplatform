@@ -43,16 +43,11 @@ object FeaturePaginationPolicies {
         if (isLoggedIn) PaginationMode.CursorInPage else PaginationMode.Numbered
 
     /**
-     * Notification groups are split by endpoint behavior: private messages are numbered, while
-     * entries, tag notifications, and observed discussions use opaque cursors under `key`.
+     * Every notification group is numbered. Like website, the app asks for server-grouped lists
+     * (`show_grouped=1`), which page by `page` with `per_page` and `total` and no cursor; even the
+     * unpaged request returns numbered pages (seen for tags, entries and observed discussions on
+     * 2026-10-09).
      */
-    fun notifications(group: NotificationGroup): PaginationMode =
-        when (group) {
-            NotificationGroup.PrivateMessages -> PaginationMode.Numbered
-
-            NotificationGroup.Entries,
-            NotificationGroup.Tags,
-            NotificationGroup.ObservedDiscussions,
-            -> PaginationMode.CursorInKey
-        }
+    @Suppress("UNUSED_PARAMETER")
+    fun notifications(group: NotificationGroup): PaginationMode = PaginationMode.Numbered
 }

@@ -6,8 +6,8 @@ struct TagView: View {
     let dependencies: AppDependencies
     private var session: SessionModel { dependencies.session }
 
-    init(tag: String, tab: AppTab, dependencies: AppDependencies) {
-        _model = State(initialValue: TagModel(tag: tag, isLoggedIn: dependencies.session.isLoggedIn,
+    init(tag: String, kind: TagModel.Kind = .all, tab: AppTab, dependencies: AppDependencies) {
+        _model = State(initialValue: TagModel(tag: tag, kind: kind, isLoggedIn: dependencies.session.isLoggedIn,
                                               loader: dependencies.tagLoader,
                                               updates: dependencies.resourceUpdates))
         self.tab = tab

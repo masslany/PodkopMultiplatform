@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.StringResource
@@ -22,6 +23,7 @@ import org.jetbrains.compose.resources.stringResource
 import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.notifications.NotificationsScreenState
+import pl.masslany.podkop.features.notifications.NotificationsTestTags
 import pl.masslany.podkop.features.notifications.models.NotificationGroupChipState
 import pl.masslany.podkop.features.notifications.preview.NotificationsPreviewFixtures
 import podkop.composeapp.generated.resources.Res
@@ -59,6 +61,7 @@ fun NotificationsScreenHeader(
                 key = { chip -> chip.group.name },
             ) { chip ->
                 FilterChip(
+                    modifier = Modifier.testTag(NotificationsTestTags.Group.chip(chip.group)),
                     selected = chip.selected,
                     onClick = {
                         onGroupSelected(chip.group)

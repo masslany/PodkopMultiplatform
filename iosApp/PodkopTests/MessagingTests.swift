@@ -19,12 +19,16 @@ private final class ManualClock: PollClock {
 private final class ControlledNotifications: NotificationsLoading {
     let pages = Pending<ListPage<AppNotification>>()
     let marks = Pending<Void>()
+    let groups = Pending<ListPage<AppNotification>>()
     private(set) var statusRefreshes = 0
     func firstRequest(_ group: NotificationGroupKind) -> FeedRequest {
         group == .pm ? FeedRequest(kind: "number", value: "1") : FeedRequest(kind: "initial")
     }
     func load(_ group: NotificationGroupKind, request: FeedRequest, loaded: Int) async throws
         -> ListPage<AppNotification> { try await pages.wait(group.rawValue) }
+    func firstGroupRequest() -> FeedRequest { FeedRequest(kind: "number", value: "1") }
+    func loadGroup(_ group: NotificationGroupKind, groupID: String, request: FeedRequest, loaded: Int) async throws
+        -> ListPage<AppNotification> { try await groups.wait("\(groupID):\(request.value ?? "")") }
     func refreshStatus() async throws { statusRefreshes += 1 }
     func markAsRead(_ group: NotificationGroupKind, id: String) async throws { try await marks.wait("\(group.rawValue):\(id)") }
     func markAllAsRead(_ group: NotificationGroupKind) async throws { try await marks.wait("all:\(group.rawValue)") }
@@ -61,8 +65,10 @@ final class MessagingTests: XCTestCase {
 
     private func notification(_ id: String, group: NotificationGroupKind = .tags, read: Bool = false,
                               groupID: String? = nil, count: Int = 1, entry: Int? = nil, link: Int? = nil,
-                              tag: String? = "nauka") -> AppNotification {
+                              tag: String? = "nauka", showAsGroup: Bool = false,
+                              updated: Date? = nil) -> AppNotification {
         AppNotification(id: id, group: group, isRead: read, groupID: groupID, groupCount: count,
+                           showAsGroup: showAsGroup, groupUpdatedAt: updated,
                            createdAt: Date(timeIntervalSince1970: 0), actor: "ewa", actorColor: nil, actorGender: nil,
                            message: "m-\(id)", issueTitle: nil, badgeName: nil, tagName: tag, linkID: link,
                            linkTitle: link.map { "L\($0)" }, entryID: entry, entryContent: entry.map { "E\($0)" },
@@ -84,12 +90,27 @@ final class MessagingTests: XCTestCase {
             notification("d", groupID: "h", count: 2, link: 4, tag: nil),
         ], group: .tags)
         XCTAssertEqual(rows.map(\.id), ["group:g", "c", "d"])
+        XCTAssertEqual(rows[0].groupID, "g")
         XCTAssertEqual(rows[0].notificationIDs, ["a", "b"])
         XCTAssertFalse(rows[0].isRead, "a group is read only when every member is")
         XCTAssertEqual(rows[0].grouped, .entries)
         XCTAssertEqual(rows[0].target, .tag("nauka"))
         XCTAssertNil(rows[2].grouped, "without a tag name the group falls back to a single row")
         XCTAssertEqual(rows[2].headline, "m-d")
+    }
+
+    func testServerGroupsBecomeOneExpandableRowShowingTheirLatestActivity() {
+        let updated = Date(timeIntervalSince1970: 500)
+        let rows = NotificationRow.rows(for: [
+            notification("a", groupID: "g", count: 138, entry: 1, showAsGroup: true, updated: updated),
+            notification("b", groupID: "h", count: 1, link: 2),
+        ], group: .tags)
+        XCTAssertEqual(rows.map(\.id), ["group:g", "b"])
+        XCTAssertEqual(rows[0].groupID, "g", "the API marks the row as a group even with one member loaded")
+        XCTAssertEqual(rows[0].groupCount, 138)
+        XCTAssertEqual(rows[0].grouped, .entries)
+        XCTAssertEqual(rows[0].createdAt, updated, "a group shows when it last got a notification")
+        XCTAssertNil(rows[1].groupID)
     }
 
     func testObservedDiscussionsGroupAndPrivateMessagesHaveNoReadIds() {
@@ -124,6 +145,66 @@ final class MessagingTests: XCTestCase {
         loader.marks.succeed(0, ())
         await settle()
         XCTAssertTrue(model.rows[0].isRead)
+    }
+
+    func testOpeningATagGroupMarksTheTagReadWithoutARequest() async {
+        let loader = ControlledNotifications()
+        let model = NotificationsModel(loader: loader)
+        model.start()
+        await settle()
+        model.select(.tags)
+        await settle()
+        loader.pages.succeed(1, ListPage(items: [
+            notification("a", groupID: "g", count: 5, entry: 1, showAsGroup: true),
+            notification("b", link: 2),
+            notification("c", link: 3, tag: "inne"),
+        ], next: nil, total: 3))
+        await settle()
+        model.opened(model.rows[0])
+        await settle()
+        XCTAssertTrue(loader.marks.calls.isEmpty, "opening the tag's stream marks it read on the server")
+        XCTAssertEqual(model.rows.map(\.isRead), [true, true, false], "the whole tag reads as read, as on the server")
+    }
+
+    func testExpandedGroupPagesThroughItsNotificationsAndMarksAnOpenedOneRead() async {
+        let loader = ControlledNotifications()
+        let model = NotificationsModel(loader: loader)
+        model.start()
+        await settle()
+        model.select(.tags)
+        await settle()
+        loader.pages.succeed(1, ListPage(items: [notification("a", groupID: "g", count: 3, entry: 1, showAsGroup: true)],
+                                         next: nil, total: 1))
+        await settle()
+        let row = model.rows[0]
+        model.toggleExpansion(row)
+        await settle()
+        XCTAssertEqual(loader.groups.calls.map(\.input), ["g:1"])
+        loader.groups.succeed(0, ListPage(items: [notification("m1", groupID: "g", count: 3, entry: 1),
+                                                  notification("m2", groupID: "g", count: 3, entry: 2)],
+                                          next: FeedRequest(kind: "number", value: "2"), total: 3))
+        await settle()
+        guard let members = model.expanded[row.id] else { return XCTFail("the group did not expand") }
+        XCTAssertEqual(NotificationRow.memberRows(members.items).map(\.id), ["m1", "m2"])
+        XCTAssertEqual(NotificationRow.memberRows(members.items)[0].tagged, .entry,
+                       "a tag's notification is an entry using the tag, not a comment")
+        XCTAssertNil(NotificationRow.memberRows(members.items)[0].observed)
+        XCTAssertFalse(members.exhausted)
+        model.showMore(row)
+        await settle()
+        XCTAssertEqual(loader.groups.calls.map(\.input), ["g:1", "g:2"])
+        loader.groups.succeed(1, ListPage(items: [notification("m3", groupID: "g", count: 3, entry: 3)], next: nil, total: 3))
+        await settle()
+        XCTAssertEqual(members.items.map(\.id), ["m1", "m2", "m3"])
+        XCTAssertTrue(members.exhausted)
+        model.openedMember(NotificationRow.memberRows(members.items)[1], in: row)
+        await settle()
+        XCTAssertEqual(loader.marks.calls.map(\.input), ["tags:m2"], "like wykop.pl, only the opened one is marked")
+        loader.marks.succeed(0, ())
+        await settle()
+        XCTAssertEqual(members.items.map(\.isRead), [false, true, false])
+        model.toggleExpansion(row)
+        XCTAssertNil(model.expanded[row.id])
     }
 
     func testMarkAllIsUnavailableForMessagesAndWithoutUnread() async {

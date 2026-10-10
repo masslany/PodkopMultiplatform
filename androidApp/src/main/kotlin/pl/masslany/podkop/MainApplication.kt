@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.core.module.Module
 import pl.masslany.podkop.business.auth.domain.AuthRepository
 import pl.masslany.podkop.business.notifications.domain.main.NotificationsRepository
 import pl.masslany.podkop.business.startup.api.StartupManager
@@ -17,7 +18,7 @@ import pl.masslany.podkop.common.settings.TelemetrySettingsController
 import pl.masslany.podkop.features.privatemessages.inbox.PrivateMessagesBackgroundNotificationsController
 import timber.log.Timber
 
-class MainApplication : Application() {
+open class MainApplication : Application() {
 
     private val mainScope = MainScope()
 
@@ -32,11 +33,14 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        initKoin {
-            androidContext(this@MainApplication)
-            androidLogger()
-            modules(mainModule)
-        }
+        initKoin(
+            appDeclaration = {
+                androidContext(this@MainApplication)
+                androidLogger()
+                modules(mainModule)
+            },
+            additionalModules = additionalKoinModules(),
+        )
 
         plantDebugTree()
         syncTelemetryAndPlantCrashlyticsTree()
@@ -73,6 +77,9 @@ class MainApplication : Application() {
                 }
         }
     }
+
+    /** Loaded after every app module, so the integration test app can override app definitions. */
+    protected open fun additionalKoinModules(): List<Module> = emptyList()
 
     private fun plantDebugTree() {
         if (BuildConfig.DEBUG) {

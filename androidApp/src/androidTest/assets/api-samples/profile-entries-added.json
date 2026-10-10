@@ -1,0 +1,204 @@
+{
+  "data": [
+    {
+      "actions": {
+        "create": true,
+        "create_favourite": true,
+        "delete": false,
+        "delete_favourite": false,
+        "pin": false,
+        "report": true,
+        "undo_vote": false,
+        "unpin": false,
+        "update": false,
+        "vote_up": true
+      },
+      "adult": false,
+      "archive": false,
+      "author": {
+        "avatar": "https://example.com/avatar.jpg",
+        "blacklist": false,
+        "color": "burgundy",
+        "company": false,
+        "donation": null,
+        "follow": false,
+        "gender": "m",
+        "note": false,
+        "online": false,
+        "rank": {
+          "position": 56,
+          "trend": 1
+        },
+        "status": "active",
+        "username": "rjkdqjar",
+        "verified": false
+      },
+      "card": null,
+      "comments": {
+        "count": 2,
+        "items": [
+          {
+            "actions": {
+              "create": true,
+              "create_favourite": true,
+              "delete": false,
+              "delete_favourite": false,
+              "report": true,
+              "update": false,
+              "vote_down": true,
+              "vote_up": true
+            },
+            "adult": false,
+            "archive": false,
+            "author": {
+              "avatar": "https://example.com/avatar.png",
+              "blacklist": false,
+              "color": "burgundy",
+              "company": false,
+              "donation": null,
+              "follow": false,
+              "gender": "m",
+              "note": false,
+              "online": false,
+              "rank": {
+                "position": 917,
+                "trend": 1
+              },
+              "status": "active",
+              "username": "vfcpv",
+              "verified": false
+            },
+            "blacklist": false,
+            "card": null,
+            "content": "Sample content",
+            "created_at": "2026-10-07 00:40:19",
+            "deletable": false,
+            "deleted": null,
+            "device": "Qbbyl",
+            "editable": false,
+            "family_friendly": true,
+            "favourite": false,
+            "id": 1000,
+            "media": {
+              "embed": null,
+              "photo": null,
+              "photos": []
+            },
+            "parent": {
+              "author": {
+                "avatar": "https://example.com/avatar.jpg",
+                "blacklist": false,
+                "color": "burgundy",
+                "company": false,
+                "donation": null,
+                "follow": false,
+                "gender": "m",
+                "note": false,
+                "online": false,
+                "rank": {
+                  "position": 56,
+                  "trend": 1
+                },
+                "status": "active",
+                "username": "rjkdqjar",
+                "verified": false
+              },
+              "id": 1001,
+              "location": [
+                {
+                  "filter": "ehawch",
+                  "page": 1
+                }
+              ],
+              "resource": "entry",
+              "slug": "wtwtcttwctfjjiynjofo-jwocqnjs-haczc-izzcizlppoetpu"
+            },
+            "resource": "entry_comment",
+            "slug": "py-rvnxfmi-zn-aji-mcax-sfvsoo",
+            "status": "visible",
+            "tags": [],
+            "voted": 0,
+            "votes": {
+              "down": 0,
+              "up": 1,
+              "users": [
+                {
+                  "avatar": "https://example.com/avatar.jpg",
+                  "blacklist": false,
+                  "color": "burgundy",
+                  "company": false,
+                  "donation": null,
+                  "follow": false,
+                  "gender": "m",
+                  "note": false,
+                  "online": false,
+                  "rank": {
+                    "position": 56,
+                    "trend": 1
+                  },
+                  "status": "active",
+                  "username": "rjkdqjar",
+                  "verified": false
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "content": "Sample content",
+      "created_at": "2026-10-07 00:33:57",
+      "deletable": false,
+      "deleted": false,
+      "device": "",
+      "editable": false,
+      "family_friendly": true,
+      "favourite": false,
+      "id": 1001,
+      "media": {
+        "embed": null,
+        "photo": null,
+        "photos": [],
+        "survey": null
+      },
+      "observed_discussion": false,
+      "parent": null,
+      "pinnable": false,
+      "resource": "entry",
+      "slug": "wtwtcttwctfjjiynjofo-jwocqnjs-haczc-izzcizlppoetpu",
+      "status": "visible",
+      "tag_pinned_content": false,
+      "tags": [
+        "gdlmuqxzyrwfdndxizhn"
+      ],
+      "voted": 0,
+      "votes": {
+        "down": 0,
+        "up": 2,
+        "users": [
+          {
+            "avatar": "https://example.com/avatar.png",
+            "blacklist": false,
+            "color": "burgundy",
+            "company": false,
+            "donation": null,
+            "follow": false,
+            "gender": "m",
+            "note": false,
+            "online": false,
+            "rank": {
+              "position": 917,
+              "trend": 1
+            },
+            "status": "active",
+            "username": "vfcpv",
+            "verified": false
+          }
+        ]
+      }
+    }
+  ],
+  "pagination": {
+    "per_page": 25,
+    "total": 33
+  }
+}
