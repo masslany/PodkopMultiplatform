@@ -86,6 +86,7 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
                     ),
                 ),
                 isPaginating = false,
+                isPaginationError = false,
             ),
             relatedState = LinkDetailsRelatedState.Content(
                 items = persistentListOf(

@@ -24,6 +24,7 @@ object PrivateMessagesPreviewFixtures {
         isRefreshing = false,
         isError = false,
         isPaginating = false,
+        isPaginationError = false,
         shouldRequestNotificationPermission = false,
         conversations = listOf(
             InboxConversationItemState(
@@ -82,6 +83,7 @@ object PrivateMessagesPreviewFixtures {
         isRefreshing = false,
         isError = false,
         isPaginating = false,
+        isPaginationError = false,
         scrollToLatestMessage = 1,
         messages = listOf(
             ConversationMessageItemState(

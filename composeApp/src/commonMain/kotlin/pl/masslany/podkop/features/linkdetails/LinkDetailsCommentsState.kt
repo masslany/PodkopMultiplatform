@@ -17,6 +17,6 @@ sealed interface LinkDetailsCommentsState {
         override val sortMenuState: DropdownMenuState,
         val comments: ImmutableList<LinkDetailsCommentItemState>,
         val isPaginating: Boolean,
-        val isPaginationError: Boolean = false,
+        val isPaginationError: Boolean,
     ) : LinkDetailsCommentsState
 }

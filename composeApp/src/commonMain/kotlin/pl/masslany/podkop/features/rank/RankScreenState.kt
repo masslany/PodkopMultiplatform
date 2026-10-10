@@ -12,7 +12,7 @@ data class RankScreenState(
     val isRefreshing: Boolean,
     val items: ImmutableList<RankUserItemState>,
     val isPaginating: Boolean,
-    val isPaginationError: Boolean = false,
+    val isPaginationError: Boolean,
 ) {
     companion object {
         val initial = RankScreenState(
@@ -21,6 +21,7 @@ data class RankScreenState(
             isRefreshing = false,
             items = persistentListOf(),
             isPaginating = false,
+            isPaginationError = false,
         )
     }
 
