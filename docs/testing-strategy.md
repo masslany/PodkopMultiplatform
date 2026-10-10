@@ -62,8 +62,8 @@ When writing tests:
 
 Mocked responses must look like what website really serves, and the shape differs by endpoint and
 by whether the user is logged in (see `FeaturePaginationPolicies`): guests get numbered pages,
-logged-in feeds get opaque cursors sent back as `page`, and most notification groups send cursors
-as `key`. So responses are not written by hand:
+logged-in feeds get opaque cursors sent back as `page`, and notifications come in numbered pages.
+So responses are not written by hand:
 
 - `androidTest/assets/api-samples` holds sanitized captures of real responses, trimmed to one item
   per distinct item shape. A sample fixes the shape: every field, null, enum and pagination key the
@@ -90,8 +90,17 @@ What the captures showed (website, 2026-10-09), and the builders reproduce:
 - Link comments report `{per_page: 25, total, total_items}` (`total` counts top-level comments,
   `total_items` includes replies) and inline two replies each; replies page by 50, entry comments
   by 50. Voter lists use `per_page: 100000` and come in one page. Related links have no pagination.
-- Tag notifications and favourites came back numbered (`{per_page, total}`, no `next`) for the
-  app's unpaged first request, although the app pages them by cursor.
+- Favourites came back numbered (`{per_page, total}`, no `next`) for the app's unpaged first
+  request, although the app pages them by cursor when signed in.
+- Notifications are asked for the way the website does, grouped (`show_grouped=1`): one row per
+  group, marked `show_as_group` with `group_id`, `group_count` and `group_updated_at` (when the
+  group last got a notification), in numbered pages. A group's own notifications come from
+  `notifications/groups/{id}?page=N`, numbered by 25, each carrying the group's id and count.
+- `PUT notifications/{group}/{id}` marks one notification read and answers 204 with no body.
+  Opening a tag's stream marks that tag's notifications read on the server, so the app sends
+  nothing for it; once a group is read, new notifications start a new group.
+- Single tag notifications are `new_entry_with_observed_tag` or `new_link_with_observed_tag`, and
+  the website titles them as an entry using the tag or a link added with it, not as comments.
 
 To capture a sample, use the flow in the debug build with Android Studio's Network Inspector, or on
 website in a browser. The website uses the same API, but its requests often differ (`limit=25`

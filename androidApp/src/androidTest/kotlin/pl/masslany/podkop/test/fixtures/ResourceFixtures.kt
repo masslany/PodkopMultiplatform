@@ -1,6 +1,7 @@
 package pl.masslany.podkop.test.fixtures
 
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.int
@@ -29,6 +30,33 @@ object ResourceFixtures {
             items[index % items.size].withoutImages().with("id" to JsonPrimitive(firstId + offset + index))
         }
         return sample.with("data" to JsonArray(data)).toString()
+    }
+
+    /**
+     * The last page of a cursor-paged stream, as signed-in feeds end it (`next` and `prev` null):
+     * [count] items shaped like the sample's [resource] items (`entry` or `link`), with ids from
+     * [firstId] and [text] as each entry's content or link's title.
+     */
+    fun lastCursorPage(
+        sample: JsonObject,
+        resource: String,
+        count: Int,
+        firstId: Int,
+        text: (index: Int) -> String,
+    ): String {
+        val template = sample.getValue("data").jsonArray
+            .map { it.jsonObject }
+            .first { it.getValue("resource").jsonPrimitive.content == resource }
+            .withoutImages()
+        val textField = if (resource == "link") "title" else "content"
+        val data = (1..count).map { index ->
+            template.with(
+                "id" to JsonPrimitive(firstId + index - 1),
+                textField to JsonPrimitive(text(index)),
+            )
+        }
+        val pagination = JsonObject(sample.getValue("pagination").jsonObject.mapValues { JsonNull })
+        return sample.with("data" to JsonArray(data), "pagination" to pagination).toString()
     }
 
     /** A single-object response (`{"data": {...}}`) for the resource with [id]. */
