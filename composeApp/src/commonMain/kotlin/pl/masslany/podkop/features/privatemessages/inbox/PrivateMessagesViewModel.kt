@@ -46,7 +46,6 @@ class PrivateMessagesViewModel(
         },
         onError = {
             logger.error("Failed to load paginated private messages conversations", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
@@ -69,6 +68,7 @@ class PrivateMessagesViewModel(
         currentState.copy(
             conversations = items.toInboxConversationItemStates().toPersistentList(),
             isPaginating = paginatorState is PaginatorState.Loading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         scope = viewModelScope,

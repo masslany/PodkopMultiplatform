@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.features.privatemessages.models.PrivateMessagesScreenState
 
 @Composable
@@ -18,6 +19,7 @@ internal fun PrivateMessagesInboxList(
     lazyListState: LazyListState,
     bottomPadding: Dp,
     onConversationClicked: (String) -> Unit,
+    onRetryPaginationClicked: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -38,6 +40,12 @@ internal fun PrivateMessagesInboxList(
                 state = conversation,
                 onClick = { onConversationClicked(conversation.username) },
             )
+        }
+
+        if (state.isPaginationError) {
+            item(key = "PaginationError") {
+                PaginationErrorItem(onRetryClick = onRetryPaginationClicked)
+            }
         }
     }
 }

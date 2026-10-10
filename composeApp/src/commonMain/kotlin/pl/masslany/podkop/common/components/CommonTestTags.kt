@@ -8,4 +8,8 @@ object CommonTestTags {
         const val Screen = "$Feature:error:screen"
         const val Retry = "$Feature:error:retry"
     }
+
+    object Pagination {
+        const val Retry = "$Feature:pagination:retry"
+    }
 }

@@ -24,6 +24,7 @@ data class AdvancedSearchScreenState(
     val isRefreshing: Boolean,
     val isError: Boolean,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
     val totalResults: Int?,
     val validationError: AdvancedSearchValidationError?,
 ) {

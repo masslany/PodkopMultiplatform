@@ -8,6 +8,7 @@ data class ResourceVotesBottomSheetState(
     val isLoading: Boolean = true,
     val isError: Boolean = false,
     val isPaginating: Boolean = false,
+    val isPaginationError: Boolean = false,
     val items: ImmutableList<UserItemState> = persistentListOf(),
 ) {
     companion object {

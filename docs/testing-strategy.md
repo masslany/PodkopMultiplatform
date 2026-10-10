@@ -53,6 +53,9 @@ When writing tests:
 
 - Put repeated UI operations and assertions in feature robots that extend `BaseRobot`. Find list
   items by their lazy-list key (`scrollToKey`), not by position.
+- Scrolling by key does not hide the bottom bar, which stays over the end of a list. Before tapping
+  something at the end, such as the retry button under a failed page, swipe like a user
+  (`swipeUpOn`), starting mid-list since the list's lower edge lies under the bar.
 - Build responses from API samples (below), with short sentinel values such as `Link 2-25` that
   make UI assertions obvious.
 - Prefer stubbing the API over faking app classes, so the real repositories, mappers and startup

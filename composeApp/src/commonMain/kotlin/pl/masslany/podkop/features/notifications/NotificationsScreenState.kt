@@ -11,6 +11,7 @@ data class NotificationsScreenState(
     val isRefreshing: Boolean,
     val isError: Boolean,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
     val isMarkingAllAsRead: Boolean,
     val selectedGroup: NotificationGroup,
     val groups: ImmutableList<NotificationGroupChipState>,

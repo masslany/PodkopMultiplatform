@@ -16,6 +16,7 @@ data class EntriesScreenState(
     val sortMenuState: DropdownMenuState,
     val hotSortMenuState: DropdownMenuState?,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
     val isLoggedIn: Boolean,
     val notificationsUnreadCount: Int,
 ) {

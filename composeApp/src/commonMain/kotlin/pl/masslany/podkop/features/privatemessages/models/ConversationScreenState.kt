@@ -10,6 +10,7 @@ data class ConversationScreenState(
     val isRefreshing: Boolean,
     val isError: Boolean,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
     val scrollToLatestMessage: Int,
     val messages: ImmutableList<ConversationMessageItemState>,
     val composer: ComposerState,

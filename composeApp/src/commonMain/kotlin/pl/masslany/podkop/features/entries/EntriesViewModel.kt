@@ -70,7 +70,6 @@ class EntriesViewModel(
         },
         onError = {
             logger.error("Failed to load paginated entries", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         entriesRepository.getEntries(
@@ -99,6 +98,7 @@ class EntriesViewModel(
             entries = entries,
             notificationsUnreadCount = notificationsUnreadCount,
             isPaginating = paginatorState is PaginatorState.Loading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         viewModelScope,

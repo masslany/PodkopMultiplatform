@@ -22,6 +22,16 @@ class HomepageRobot(
         clickNodeWithTag(CommonTestTags.Error.Retry)
     }
 
+    /** Taps the button that asks again for a page that failed to load, below the last link. */
+    fun retryNextPage() {
+        scrollToKey(
+            tag = LinksTestTags.Screen.List,
+            key = "PaginationError",
+        )
+        swipeUpOn(LinksTestTags.Screen.List)
+        clickNodeWithTag(CommonTestTags.Pagination.Retry)
+    }
+
     fun displayHomepageList() {
         displayedNode(LinksTestTags.Screen.List)
     }

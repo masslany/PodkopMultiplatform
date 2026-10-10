@@ -9,6 +9,7 @@ data class BlacklistCategoryState(
     val isLoading: Boolean,
     val isError: Boolean,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
     val items: ImmutableList<BlacklistEntryState>,
     val addInput: String,
     val isActionsInProgress: Boolean,

@@ -16,6 +16,7 @@ data class ObservedScreenState(
     val typeMenuState: DropdownMenuState,
     val selectedType: ObservedType,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
 ) {
     companion object {
         val initial = ObservedScreenState(

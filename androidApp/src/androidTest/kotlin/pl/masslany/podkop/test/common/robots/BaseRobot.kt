@@ -15,6 +15,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToKey
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 
 open class BaseRobot(
     private val testRule: AndroidComposeTestRule<*, *>,
@@ -49,6 +51,15 @@ open class BaseRobot(
             testRule.onAllNodes(matcher, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
         }
         testRule.onNode(matcher, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    /**
+     * Swipes up from the middle of the node tagged [tag], as a user scrolling on does. Unlike a
+     * programmatic scroll, this also hides the bottom bar, which otherwise covers the end of a list;
+     * it starts mid-list because the list's lower edge lies under that bar.
+     */
+    protected fun swipeUpOn(tag: String) {
+        nodeWithTag(tag).performTouchInput { swipeUp(startY = centerY, endY = top) }
     }
 
     protected fun onUiThread(action: () -> Unit) {

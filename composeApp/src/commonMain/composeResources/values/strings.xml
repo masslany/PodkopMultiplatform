@@ -385,6 +385,7 @@
     <string name="generic_error_title">Wystąpił błąd podczas próby pobrania danych</string>
     <string name="generic_error_body">Upewnij się, że masz połączenie z internetem i spróbuj jeszcze raz</string>
     <string name="generic_error_button_label">Spróbuj ponownie</string>
+    <string name="common_retry_next_page">Ponów następną stronę</string>
 
     <!-- Tag details -->
     <string name="tag_details_screen_observe_button">Obserwuj</string>

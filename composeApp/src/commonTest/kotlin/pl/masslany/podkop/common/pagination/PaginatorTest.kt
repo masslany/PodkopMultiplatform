@@ -182,6 +182,43 @@ class PaginatorTest {
     }
 
     @Test
+    fun `paginate after a failed page asks for the same page again`() {
+        val requests = mutableListOf<PageRequest>()
+        var fail = true
+        val paginator = Paginator(
+            scope = CoroutineScope(Dispatchers.Unconfined),
+            onNewItems = {},
+        ) { request ->
+            requests += request
+            if (fail) {
+                Result.failure(IllegalStateException("offline"))
+            } else {
+                Result.success(
+                    TestPaginatedData(
+                        data = List(25) { Any() },
+                        pagination = Pagination(perPage = 25, total = 100, next = "", prev = ""),
+                    ),
+                )
+            }
+        }
+        paginator.setup(
+            pagination = Pagination(perPage = 25, total = 100, next = "", prev = ""),
+            initialItemCount = 25,
+        )
+
+        paginator.paginate()
+        assertTrue(paginator.state.value is PaginatorState.Error)
+        // Scrolling does not retry a failed page; the list's retry button does.
+        assertFalse(paginator.shouldPaginate(lastVisibleIndex = 24, totalItemsCount = 25))
+
+        fail = false
+        paginator.paginate()
+
+        assertEquals(listOf<PageRequest>(PageRequest.Number(2), PageRequest.Number(2)), requests)
+        assertEquals(PaginatorState.Idle, paginator.state.value)
+    }
+
+    @Test
     fun `cursor in page pagination requests page cursor when present`() {
         val requests = mutableListOf<PageRequest>()
         val paginator = Paginator(

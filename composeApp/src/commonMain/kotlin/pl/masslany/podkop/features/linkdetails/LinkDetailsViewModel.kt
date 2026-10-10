@@ -114,7 +114,6 @@ class LinkDetailsViewModel(
         },
         onError = {
             logger.error("Failed to load paginated comments for link id=$id", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
@@ -162,6 +161,7 @@ class LinkDetailsViewModel(
             commentsState = state.commentsState.resolve(
                 comments = mappedComments,
                 isPaginating = paginatorState is PaginatorState.Loading,
+                isPaginationError = paginatorState is PaginatorState.Error,
             ),
         )
     }.stateIn(viewModelScope, WhileSubscribed(5000), _state.value)
@@ -1104,6 +1104,7 @@ class LinkDetailsViewModel(
 private fun LinkDetailsCommentsState.resolve(
     comments: ImmutableList<LinkDetailsCommentItemState>,
     isPaginating: Boolean,
+    isPaginationError: Boolean,
 ): LinkDetailsCommentsState = when (this) {
     is LinkDetailsCommentsState.Loading -> this
 
@@ -1119,6 +1120,7 @@ private fun LinkDetailsCommentsState.resolve(
                 sortMenuState = this.sortMenuState,
                 comments = comments,
                 isPaginating = isPaginating,
+                isPaginationError = isPaginationError,
             )
         }
     }

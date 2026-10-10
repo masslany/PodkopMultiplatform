@@ -20,6 +20,7 @@ data class TagScreenState(
     val sortMenuState: DropdownMenuState,
     val typeMenuState: DropdownMenuState,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
     val isLoggedIn: Boolean,
     val isObserved: Boolean,
     val isBlacklisted: Boolean,

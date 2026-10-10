@@ -8,6 +8,7 @@ data class PrivateMessagesScreenState(
     val isRefreshing: Boolean,
     val isError: Boolean,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
     val shouldRequestNotificationPermission: Boolean,
     val conversations: ImmutableList<InboxConversationItemState>,
 ) {

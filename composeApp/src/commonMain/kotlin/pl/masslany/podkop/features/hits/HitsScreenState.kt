@@ -13,6 +13,7 @@ data class HitsScreenState(
     val isError: Boolean,
     val isRefreshing: Boolean,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
     val resources: ImmutableList<ResourceItemState>,
     val sortMenuState: DropdownMenuState,
     val selectedArchive: HitsArchiveState?,

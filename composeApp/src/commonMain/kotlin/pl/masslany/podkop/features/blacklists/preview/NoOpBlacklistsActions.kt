@@ -11,6 +11,8 @@ object NoOpBlacklistsActions : BlacklistsActions, TopBarActions by NoOpTopBarAct
 
     override fun onRefresh() = Unit
 
+    override fun paginate() = Unit
+
     override fun onAddInputChanged(value: String) = Unit
 
     override fun onAddClicked() = Unit

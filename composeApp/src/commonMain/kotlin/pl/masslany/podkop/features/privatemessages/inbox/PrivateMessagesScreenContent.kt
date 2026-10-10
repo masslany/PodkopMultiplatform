@@ -49,6 +49,7 @@ internal fun PrivateMessagesScreenContent(
     onNewConversationClicked: () -> Unit,
     onRefresh: () -> Unit,
     onConversationClicked: (String) -> Unit,
+    onRetryPaginationClicked: () -> Unit,
 ) {
     val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
     val contentInsets = paddingValues.toWindowInsets(includeTop = false)
@@ -132,6 +133,7 @@ internal fun PrivateMessagesScreenContent(
                         lazyListState = lazyListState,
                         bottomPadding = 0.dp,
                         onConversationClicked = onConversationClicked,
+                        onRetryPaginationClicked = onRetryPaginationClicked,
                     )
                 }
             }
@@ -151,6 +153,7 @@ private fun PrivateMessagesScreenContentPreview() {
             onNewConversationClicked = {},
             onRefresh = {},
             onConversationClicked = {},
+            onRetryPaginationClicked = {},
         )
     }
 }

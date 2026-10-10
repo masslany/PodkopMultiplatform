@@ -16,6 +16,7 @@ data class ProfileScreenState(
     val isError: Boolean,
     val isResourcesLoading: Boolean,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean = false,
     val isObserveActionLoading: Boolean,
     val isBlacklistActionLoading: Boolean,
     val isDetailsExpanded: Boolean,
