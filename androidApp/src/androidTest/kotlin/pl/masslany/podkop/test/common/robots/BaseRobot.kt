@@ -42,6 +42,15 @@ open class BaseRobot(
         nodeWithTag(tag).performClick()
     }
 
+    /** Taps [text], e.g. a title, which reaches whatever handles taps around it, like a card. */
+    protected fun clickText(text: String) {
+        waitUntilText(text)
+        testRule
+            .onAllNodesWithText(text, useUnmergedTree = true)
+            .onFirst()
+            .performClick()
+    }
+
     /**
      * Waits until the lazy list tagged [tag] is shown and holds an item with [key], e.g. once its
      * page loads, then scrolls to it.

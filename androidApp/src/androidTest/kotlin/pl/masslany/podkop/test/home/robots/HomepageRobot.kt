@@ -15,6 +15,18 @@ class HomepageRobot(
         displayedNode(LinksTestTags.Screen.List)
     }
 
+    /**
+     * Opens the details of the link with [id] by tapping its [title]. The middle of the card can be
+     * its source, which opens the link's page instead.
+     */
+    fun openLink(
+        id: Int,
+        title: String,
+    ) {
+        scrollToLink(id)
+        clickText(title)
+    }
+
     /** Scrolls the homepage to the link with [id], waiting for the page holding it to load. */
     fun scrollToLink(id: Int) {
         scrollToKey(

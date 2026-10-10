@@ -51,6 +51,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -271,7 +272,7 @@ private fun LinkDetailsScreenList(
     lazyListState: LazyListState,
 ) {
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.testTag(LinkDetailsTestTags.Screen.List),
         state = lazyListState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(
@@ -723,6 +724,7 @@ private fun LinkDetailsCommentItem(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     OutlinedButton(
+                        modifier = Modifier.testTag(LinkDetailsTestTags.Comment.showMoreReplies(state.id)),
                         onClick = {
                             actions.onShowMoreRepliesClicked(
                                 commentId = state.id,
