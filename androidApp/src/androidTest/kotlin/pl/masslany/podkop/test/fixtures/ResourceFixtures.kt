@@ -59,13 +59,26 @@ object ResourceFixtures {
         return sample.with("data" to JsonArray(data), "pagination" to pagination).toString()
     }
 
-    /** A single-object response (`{"data": {...}}`) for the resource with [id], and [content] if given. */
+    /** A single-object response (`{"data": {...}}`) for the resource with [id], [content] and [photoUrl] if given. */
     fun withId(
         sample: JsonObject,
         id: Int,
         content: String? = null,
+        photoUrl: String? = null,
     ): String {
-        val data = sample.getValue("data").jsonObject.withoutImages().with("id" to JsonPrimitive(id))
-        return sample.with("data" to if (content == null) data else data.with("content" to JsonPrimitive(content))).toString()
+        val sampleData = sample.getValue("data").jsonObject
+        var data = sampleData.withoutImages().with("id" to JsonPrimitive(id))
+        if (content != null) data = data.with("content" to JsonPrimitive(content))
+        if (photoUrl != null) data = data.withPhoto(from = sampleData, url = photoUrl)
+        return sample.with("data" to data).toString()
+    }
+
+    private fun JsonObject.withPhoto(
+        from: JsonObject,
+        url: String,
+    ): JsonObject {
+        val photo = from.getValue("media").jsonObject.getValue("photo").jsonObject.with("url" to JsonPrimitive(url))
+        val media = getValue("media").jsonObject.with("photo" to photo, "photos" to JsonArray(listOf(photo)))
+        return with("media" to media)
     }
 }

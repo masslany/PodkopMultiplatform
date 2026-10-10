@@ -3,6 +3,7 @@ package pl.masslany.podkop.test.common.robots
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasAnyDescendant
@@ -60,6 +61,13 @@ open class BaseRobot(
      */
     protected fun swipeUpOn(tag: String) {
         nodeWithTag(tag).performTouchInput { swipeUp(startY = centerY, endY = top) }
+    }
+
+    protected fun touchNodeWithTag(
+        tag: String,
+        gesture: TouchInjectionScope.() -> Unit,
+    ) {
+        nodeWithTag(tag).performTouchInput(gesture)
     }
 
     protected fun onUiThread(action: () -> Unit) {
@@ -130,6 +138,18 @@ open class BaseRobot(
                 .onAllNodesWithTag(tag, useUnmergedTree = true)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
+        }
+    }
+
+    protected fun waitUntilNodeGone(
+        tag: String,
+        timeoutMillis: Long = DEFAULT_TIMEOUT_MS,
+    ) {
+        testRule.waitUntil(timeoutMillis) {
+            testRule
+                .onAllNodesWithTag(tag, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isEmpty()
         }
     }
 

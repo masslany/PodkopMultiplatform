@@ -13,14 +13,22 @@ object EntryRoutes {
      * An entry as a signed-in user opens it: who is viewing (`profile/short`), the entry, whose
      * content is [entryText], and its flat comments (the default) in numbered pages of 50.
      */
-    fun MockApiServer.signedInEntryDetails(entryId: Int) {
+    fun MockApiServer.signedInEntryDetails(
+        entryId: Int,
+        photoUrl: String? = null,
+    ) {
         getJson(
             path = "/api/v3/profile/short",
             body = sample("profile-short-user").withoutImages().toString(),
         )
         getJson(
             path = "$ENTRIES_PATH/$entryId",
-            body = ResourceFixtures.withId(sample("entry-details-user"), entryId, content = entryText(entryId)),
+            body = ResourceFixtures.withId(
+                sample("entry-details-user"),
+                entryId,
+                content = entryText(entryId),
+                photoUrl = photoUrl,
+            ),
         )
         getJson(
             path = "$ENTRIES_PATH/$entryId/comments",

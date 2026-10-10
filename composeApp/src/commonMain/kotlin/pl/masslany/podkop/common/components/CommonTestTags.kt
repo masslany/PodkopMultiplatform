@@ -12,4 +12,8 @@ object CommonTestTags {
     object Pagination {
         const val Retry = "$Feature:pagination:retry"
     }
+
+    object EmbedImage {
+        const val Image = "$Feature:embed-image:image"
+    }
 }

@@ -47,6 +47,7 @@ import pl.masslany.podkop.common.navigation.BottomSheetSceneStrategy
 import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.navigation.HomeScreen
 import pl.masslany.podkop.common.navigation.NavigationContent
+import pl.masslany.podkop.common.navigation.TranslucentSceneStrategy
 import pl.masslany.podkop.common.settings.AppSettings
 import pl.masslany.podkop.common.settings.LocalAppSettings
 import pl.masslany.podkop.common.settings.ThemeOverride
@@ -211,7 +212,9 @@ fun App() {
                             ImageActionsBottomSheetScreenRoot(screen = it)
                         }
 
-                        entry<ImageViewerScreen> {
+                        entry<ImageViewerScreen>(
+                            metadata = TranslucentSceneStrategy.translucent(),
+                        ) {
                             ImageViewerScreenRoot(
                                 imageUrl = it.imageUrl,
                                 paddingValues = safeDrawingPaddingValues,

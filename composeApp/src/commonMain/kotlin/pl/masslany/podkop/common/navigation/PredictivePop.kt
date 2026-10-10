@@ -41,23 +41,26 @@ internal const val PredictivePopScale = 0.9f
  * How dark the scrim over the revealed screen starts. It sets the leaving screen apart
  * from the one below in light mode, and black on a dark theme barely shows.
  */
-private const val PredictivePopScrimAlpha = 0.3f
+internal const val PredictivePopScrimAlpha = 0.3f
 
 /** The corner radius of a screen that a predictive Back gesture is shrinking. */
-private val PredictivePopCornerRadius = 28.dp
+internal val PredictivePopCornerRadius = 28.dp
 
 /** The share of a predictive Back preview over which a leaving screen's corners round fully. */
-private const val PredictivePopCornerProgress = 0.15f
+internal const val PredictivePopCornerProgress = 0.15f
 
 /** Metadata keys of entries that `NavDisplay` shows as overlays, which keep their own shape. */
-private val OverlayMetadataKeys =
-    setOf(AnimatedDialogSceneStrategy.DIALOG_KEY, BottomSheetSceneStrategy.BOTTOM_SHEET_KEY)
+private val OverlayMetadataKeys = setOf(
+    AnimatedDialogSceneStrategy.DIALOG_KEY,
+    BottomSheetSceneStrategy.BOTTOM_SHEET_KEY,
+    TranslucentSceneStrategy.TRANSLUCENT_KEY,
+)
 
 /**
  * Where the leaving screen shrinks toward: the edge opposite the swipe, so only the side the
  * gesture started from moves, and the middle when Back has no edge, such as from a button.
  */
-private fun predictivePopOrigin(swipeEdge: Int): TransformOrigin = when (swipeEdge) {
+internal fun predictivePopOrigin(swipeEdge: Int): TransformOrigin = when (swipeEdge) {
     NavigationEvent.EDGE_LEFT -> TransformOrigin(pivotFractionX = 1f, pivotFractionY = 0.5f)
     NavigationEvent.EDGE_RIGHT -> TransformOrigin(pivotFractionX = 0f, pivotFractionY = 0.5f)
     else -> TransformOrigin.Center
@@ -109,7 +112,7 @@ private fun NavEntry<*>.isOverlay(): Boolean = metadata.keys.any { it in Overlay
 
 /**
  * Rounds a full-screen entry's corners while a predictive Back gesture shrinks it, hides it once
- * the Back completes, and dims the entry it reveals until then. Dialogs and bottom sheets are skipped:
+ * the Back completes, and dims the entry it reveals until then. Overlays such as dialogs are skipped:
  * `NavDisplay` hands them the scope of the screen below them.
  */
 @Composable
