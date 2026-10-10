@@ -92,7 +92,6 @@ class ProfileViewModel(
         },
         onError = {
             logger.error("Failed to load paginated profile list for $selectedSubActionType", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
@@ -135,6 +134,8 @@ class ProfileViewModel(
             ),
             isPaginating = paginatorState is PaginatorState.Loading &&
                 paginatedSubActionType == selectedSubActionType,
+            // Switching tabs loads the new tab afresh, which clears a failed page.
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }
         .stateIn(

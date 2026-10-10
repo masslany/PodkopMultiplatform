@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.notifications.NotificationsActions
@@ -90,6 +91,12 @@ fun NotificationsList(
             if (state.isPaginating) {
                 item(key = "pagination_loading") {
                     PaginationLoadingIndicator()
+                }
+            }
+
+            if (state.isPaginationError) {
+                item(key = "pagination_error") {
+                    PaginationErrorItem(onRetryClick = actions::paginate)
                 }
             }
         }

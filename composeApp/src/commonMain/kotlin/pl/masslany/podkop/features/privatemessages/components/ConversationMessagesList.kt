@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.features.privatemessages.models.ConversationScreenState
 
 @Composable
@@ -19,6 +20,7 @@ internal fun ConversationMessagesList(
     onTagClicked: (String) -> Unit,
     onUrlClicked: (String) -> Unit,
     onImageClicked: (String) -> Unit,
+    onRetryPaginationClicked: () -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -26,6 +28,13 @@ internal fun ConversationMessagesList(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        // Older messages load above the oldest one shown.
+        if (state.isPaginationError) {
+            item(key = "PaginationError") {
+                PaginationErrorItem(onRetryClick = onRetryPaginationClicked)
+            }
+        }
+
         items(
             items = state.messages,
             key = { message -> message.key },

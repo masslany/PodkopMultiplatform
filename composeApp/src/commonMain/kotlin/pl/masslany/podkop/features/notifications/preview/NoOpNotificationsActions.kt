@@ -10,6 +10,7 @@ object NoOpNotificationsActions : NotificationsActions {
     override fun onGroupedRowShowMoreClicked(id: String) = Unit
     override fun onGroupedRowNotificationClicked(rowId: String, id: String) = Unit
     override fun onRefresh() = Unit
+    override fun paginate() = Unit
     override fun onMarkAllAsReadClicked() = Unit
     override fun onTopBarBackClicked() = Unit
     override fun onTopBarSearchClicked() = Unit

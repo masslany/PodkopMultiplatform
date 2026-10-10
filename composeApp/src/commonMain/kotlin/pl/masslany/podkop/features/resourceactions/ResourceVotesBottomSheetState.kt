@@ -5,13 +5,20 @@ import kotlinx.collections.immutable.persistentListOf
 import pl.masslany.podkop.common.models.UserItemState
 
 data class ResourceVotesBottomSheetState(
-    val isLoading: Boolean = true,
-    val isError: Boolean = false,
-    val isPaginating: Boolean = false,
-    val items: ImmutableList<UserItemState> = persistentListOf(),
+    val isLoading: Boolean,
+    val isError: Boolean,
+    val isPaginating: Boolean,
+    val isPaginationError: Boolean,
+    val items: ImmutableList<UserItemState>,
 ) {
     companion object {
-        val initial = ResourceVotesBottomSheetState()
+        val initial = ResourceVotesBottomSheetState(
+            isLoading = true,
+            isError = false,
+            isPaginating = false,
+            isPaginationError = false,
+            items = persistentListOf(),
+        )
     }
 }
 

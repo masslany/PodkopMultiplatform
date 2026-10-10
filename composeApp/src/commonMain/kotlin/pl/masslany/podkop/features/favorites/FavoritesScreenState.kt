@@ -15,6 +15,7 @@ data class FavoritesScreenState(
     val sortMenuState: DropdownMenuState,
     val typeMenuState: DropdownMenuState,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean,
 ) {
     companion object {
         val initial = FavoritesScreenState(
@@ -26,6 +27,7 @@ data class FavoritesScreenState(
             sortMenuState = DropdownMenuState.initial,
             typeMenuState = DropdownMenuState.initial,
             isPaginating = false,
+            isPaginationError = false,
         )
     }
 

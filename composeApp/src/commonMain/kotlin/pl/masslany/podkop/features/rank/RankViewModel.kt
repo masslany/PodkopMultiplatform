@@ -43,7 +43,6 @@ class RankViewModel(
         },
         onError = {
             logger.error("Failed to load paginated rank items", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
@@ -65,6 +64,7 @@ class RankViewModel(
         state.copy(
             items = items.toPersistentList(),
             isPaginating = paginatorState is PaginatorState.Loading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         viewModelScope,
@@ -94,7 +94,7 @@ class RankViewModel(
         totalItems: Int,
     ): Boolean = paginator.shouldPaginate(lastVisibleIndex, totalItems)
 
-    fun paginate() {
+    override fun paginate() {
         paginator.paginate()
     }
 

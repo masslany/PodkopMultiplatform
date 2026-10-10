@@ -50,6 +50,7 @@ import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.business.search.domain.models.request.SearchSort
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -296,6 +297,19 @@ internal fun AdvancedSearchScreenContent(
                                 ) {
                                     Box(modifier = Modifier.widthIn(max = AdvancedSearchContentMaxWidth)) {
                                         PaginationLoadingIndicator()
+                                    }
+                                }
+                            }
+                        }
+
+                        if (state.isPaginationError) {
+                            item(key = "advanced-search-pagination-error") {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.TopCenter,
+                                ) {
+                                    Box(modifier = Modifier.widthIn(max = AdvancedSearchContentMaxWidth)) {
+                                        PaginationErrorItem(onRetryClick = actions::paginate)
                                     }
                                 }
                             }

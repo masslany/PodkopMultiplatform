@@ -40,6 +40,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.rememberWindowSizeClass
 import pl.masslany.podkop.common.extensions.toWindowInsets
@@ -185,6 +186,14 @@ fun RankScreenContent(
                                 item(key = "rank-pagination-loading") {
                                     RankRowContainer {
                                         PaginationLoadingIndicator()
+                                    }
+                                }
+                            }
+
+                            if (state.isPaginationError) {
+                                item(key = "rank-pagination-error") {
+                                    RankRowContainer {
+                                        PaginationErrorItem(onRetryClick = actions::paginate)
                                     }
                                 }
                             }

@@ -51,7 +51,6 @@ class HitsViewModel(
         },
         onError = {
             logger.error("Failed to load paginated hits", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
@@ -90,6 +89,7 @@ class HitsViewModel(
         state.copy(
             resources = items,
             isPaginating = paginatorState is PaginatorState.Loading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         viewModelScope,

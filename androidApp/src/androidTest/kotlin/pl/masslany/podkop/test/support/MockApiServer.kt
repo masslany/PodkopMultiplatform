@@ -3,6 +3,7 @@ package pl.masslany.podkop.test.support
 import android.content.res.AssetManager
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
@@ -30,7 +31,7 @@ class MockApiServer(
                 val requestLine = "${request.method} ${url.encodedPath}${url.encodedQuery?.let { "?$it" }.orEmpty()}"
                 requestLines += requestLine
 
-                val route = routes.firstOrNull { it.matches(request.method, url) }
+                val route = routes.firstOrNull { it.matches(request.method, url) && it.take() }
                 return if (route != null) {
                     response(code = route.code, body = route.body, contentType = route.contentType)
                 } else {
@@ -62,6 +63,29 @@ class MockApiServer(
         )
     }
 
+    /**
+     * Answers the next [method] [path] request with [code] before its usual route, e.g. to show an
+     * error the user then retries. Any non-2xx status fails a request; the body is not read.
+     */
+    fun failOnce(
+        method: String,
+        path: String,
+        query: Map<String, String> = emptyMap(),
+        code: Int = 503,
+    ) {
+        routes.add(
+            0,
+            Route(
+                method = method,
+                path = path,
+                query = query,
+                body = """{"error":"Injected $code"}""",
+                code = code,
+                uses = AtomicInteger(1),
+            ),
+        )
+    }
+
     /** Serves a non-JSON file, e.g. an image the app loads from a URL in a response. */
     fun get(
         path: String,
@@ -84,6 +108,21 @@ class MockApiServer(
     ) {
         routes += Route(
             method = "PUT",
+            path = path,
+            query = emptyMap(),
+            body = "",
+            code = code,
+        )
+    }
+
+    /** Answers a request the API answers without a body, e.g. a vote, by its [method]. */
+    fun respond(
+        method: String,
+        path: String,
+        code: Int = 204,
+    ) {
+        routes += Route(
+            method = method,
             path = path,
             query = emptyMap(),
             body = "",
@@ -145,7 +184,11 @@ private class Route(
     val body: String,
     val contentType: String = JSON,
     val code: Int = 200,
+    /** How many more requests this route answers; unlimited when null. */
+    private val uses: AtomicInteger? = null,
 ) {
+    fun take(): Boolean = uses == null || uses.getAndUpdate { (it - 1).coerceAtLeast(0) } > 0
+
     fun matches(
         requestMethod: String?,
         url: HttpUrl,

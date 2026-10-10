@@ -52,7 +52,6 @@ class FavoritesViewModel(
         },
         onError = {
             logger.error("Failed to load paginated favourites", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         favouritesRepository.getFavourites(
@@ -73,6 +72,7 @@ class FavoritesViewModel(
         state.copy(
             resources = resources,
             isPaginating = paginatorState is PaginatorState.Loading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         viewModelScope,

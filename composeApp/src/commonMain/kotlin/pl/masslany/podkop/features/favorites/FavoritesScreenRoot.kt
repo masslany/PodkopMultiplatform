@@ -47,6 +47,7 @@ import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.extensions.toWindowInsets
@@ -296,6 +297,12 @@ private fun FavoritesScreenList(
         if (state.isPaginating) {
             item(key = "PaginationLoadingIndicator") {
                 PaginationLoadingIndicator()
+            }
+        }
+
+        if (state.isPaginationError) {
+            item(key = "PaginationError") {
+                PaginationErrorItem(onRetryClick = actions::paginate)
             }
         }
     }

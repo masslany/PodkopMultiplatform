@@ -7,6 +7,8 @@ object RankPreviewActions : RankActions {
 
     override fun onUserClicked(username: String) = Unit
 
+    override fun paginate() = Unit
+
     override fun onTopBarBackClicked() = Unit
 
     override fun onTopBarSearchClicked() = Unit

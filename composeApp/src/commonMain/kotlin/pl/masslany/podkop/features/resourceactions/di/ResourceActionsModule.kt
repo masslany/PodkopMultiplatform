@@ -65,7 +65,6 @@ val resourceActionsModule = module {
             linksRepository = get(),
             appNavigator = get(),
             logger = get(),
-            snackbarManager = get(),
         )
     }
 }

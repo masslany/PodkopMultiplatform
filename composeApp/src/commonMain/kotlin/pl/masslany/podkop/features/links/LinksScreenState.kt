@@ -19,6 +19,7 @@ data class LinksScreenState(
     val hits: ImmutableList<ResourceItemState>,
     val sortMenuState: DropdownMenuState,
     val isPaginating: Boolean,
+    val isPaginationError: Boolean,
 ) {
     val shouldShowRefreshPrompt: Boolean
         get() = isRefreshPromptVisible &&
@@ -40,6 +41,7 @@ data class LinksScreenState(
             hits = persistentListOf(),
             sortMenuState = DropdownMenuState.initial,
             isPaginating = false,
+            isPaginationError = false,
         )
     }
 

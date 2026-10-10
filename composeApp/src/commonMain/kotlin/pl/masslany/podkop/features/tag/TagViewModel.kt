@@ -56,7 +56,6 @@ class TagViewModel(
         },
         onError = {
             logger.error("Failed to load paginated tag stream for $tag", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         tagsRepository.getTagStream(
@@ -80,6 +79,7 @@ class TagViewModel(
             resources = resources,
             galleryItems = resources.toTagGalleryItems(),
             isPaginating = paginator is PaginatorState.Loading,
+            isPaginationError = paginator is PaginatorState.Error,
         )
     }.stateIn(
         viewModelScope,

@@ -11,6 +11,8 @@ object NoOpConversationActions : ConversationActions {
     override fun onTopBarAddLinkClicked() = Unit
     override fun onRefresh() = Unit
     override fun onRetryClicked() = Unit
+
+    override fun paginate() = Unit
     override fun onComposerTextChanged(content: TextFieldValue) = Unit
     override fun onComposerAdultChanged(adult: Boolean) = Unit
     override fun onComposerPhotoAttachClicked() = Unit

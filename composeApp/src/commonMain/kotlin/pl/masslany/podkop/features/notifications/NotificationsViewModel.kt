@@ -65,7 +65,6 @@ class NotificationsViewModel(
                 message = "Failed to load paginated notifications for group=${_state.value.selectedGroup}",
                 throwable = it,
             )
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         notificationsRepository.getNotifications(
@@ -96,6 +95,7 @@ class NotificationsViewModel(
                 .map { row -> expansions[row.id]?.let { row.copy(expansion = it.toState()) } ?: row }
                 .toPersistentList(),
             isPaginating = paginatorState is PaginatorState.Loading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -110,7 +110,7 @@ class NotificationsViewModel(
     fun shouldPaginate(lastVisibleIndex: Int?, totalItems: Int): Boolean =
         paginator.shouldPaginate(lastVisibleIndex, totalItems)
 
-    fun paginate() {
+    override fun paginate() {
         paginator.paginate()
     }
 
