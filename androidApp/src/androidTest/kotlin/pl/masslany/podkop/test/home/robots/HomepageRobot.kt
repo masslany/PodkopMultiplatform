@@ -1,5 +1,6 @@
 package pl.masslany.podkop.test.home.robots
 
+import pl.masslany.podkop.common.components.CommonTestTags
 import pl.masslany.podkop.features.links.LinksTestTags
 import pl.masslany.podkop.test.common.PodkopComposeRule
 import pl.masslany.podkop.test.common.robots.BaseRobot
@@ -9,6 +10,15 @@ class HomepageRobot(
 ) : BaseRobot(testRule) {
     fun displayTitle(title: String) {
         displayedText(title)
+    }
+
+    /** The screen shown when the homepage could not load, with a button to try again. */
+    fun displayLoadError() {
+        displayedNode(CommonTestTags.Error.Screen)
+    }
+
+    fun retry() {
+        clickNodeWithTag(CommonTestTags.Error.Retry)
     }
 
     fun displayHomepageList() {
