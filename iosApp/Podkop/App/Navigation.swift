@@ -45,6 +45,8 @@ enum AppRoute: Hashable, Codable {
     case advancedSearch(String)
     case tags
     case tag(String)
+    /// A tag opened on one kind of content, as notifications about new entries or links open it.
+    case tagContent(String, TagModel.Kind)
     case profile
     case user(String)
     case settings

@@ -75,27 +75,101 @@ struct NotificationsView: View {
         case .loaded:
             let rows = model.rows
             ForEach(rows) { row in
-                Button { open(row) } label: { NotificationRowView(row: row) }
-                    .foregroundStyle(.primary)
-                    .disabled(row.target == .none)
-                    .onAppear { if row.id == rows.last?.id { pager.loadNext() } }
+                Group {
+                    if row.groupID != nil {
+                        // As on Android, the group's "Rozwiń" sits inside its row.
+                        VStack(alignment: .trailing, spacing: 4) {
+                            rowButton(row).buttonStyle(.plain)
+                            expandButton(row)
+                        }
+                    } else {
+                        rowButton(row)
+                    }
+                }
+                .onAppear { if row.id == rows.last?.id { pager.loadNext() } }
+                if let members = model.expanded[row.id] { groupMembers(members, of: row) }
             }
             PagerFooter(pager: pager)
         }
     }
 
+    private func rowButton(_ row: NotificationRow) -> some View {
+        Button { open(row) } label: {
+            NotificationRowView(row: row).frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
+        }
+        .foregroundStyle(.primary)
+        .disabled(row.target == .none)
+    }
+
+    /// Like websites's "Rozwiń": shows the group's own notifications under its row.
+    private func expandButton(_ row: NotificationRow) -> some View {
+        let expanded = model.expanded[row.id] != nil
+        return Button {
+            model.toggleExpansion(row)
+        } label: {
+            Label(expanded ? String(localized: .notificationsGroupedCollapse)
+                           : String(localized: .notificationsGroupedExpand),
+                  systemImage: expanded ? "chevron.up" : "chevron.down")
+                .font(.subheadline)
+        }
+        .buttonStyle(.borderless)
+        .foregroundStyle(.secondary)
+        .accessibilityIdentifier("notificationGroupExpand-\(row.id)")
+    }
+
+    @ViewBuilder private func groupMembers(_ members: ListPager<AppNotification>, of row: NotificationRow) -> some View {
+        switch members.phase {
+        case .idle, .loading:
+            ProgressView(.commonLoading).frame(maxWidth: .infinity)
+        case .failed:
+            Button(.commonRetry) { members.retry() }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity)
+        case .loaded:
+            ForEach(NotificationRow.memberRows(members.items)) { member in
+                Button { open(member, in: row) } label: {
+                    NotificationRowView(row: member).padding(.leading, 20)
+                }
+                .foregroundStyle(.primary)
+                .disabled(member.target == .none)
+                .accessibilityIdentifier("notificationGroupMember-\(member.id)")
+            }
+            PagerFooter(pager: members)
+            // website only shows a group's first page; the rest load on request.
+            if !members.exhausted, !members.nextLoading, !members.nextError {
+                Button(.notificationsGroupedShowMore) { model.showMore(row) }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityIdentifier("notificationGroupShowMore-\(row.id)")
+            }
+        }
+    }
+
     private func open(_ row: NotificationRow) {
+        guard navigate(to: row.target, tagKind: row.grouped?.tagKind) else { return }
+        model.opened(row)
+    }
+
+    private func open(_ member: NotificationRow, in row: NotificationRow) {
+        guard navigate(to: member.target, tagKind: nil) else { return }
+        model.openedMember(member, in: row)
+    }
+
+    /// Returns false when there is nothing to open.
+    private func navigate(to target: NotificationTargetValue, tagKind: TagModel.Kind?) -> Bool {
         let router = dependencies.router
-        switch row.target {
+        switch target {
         case .link(let id): router.navigate(.link(id), in: tab)
         case .entry(let id): router.navigate(.entry(id), in: tab)
         case .conversation(let name): router.navigate(.conversation(name), in: tab)
         case .profile(let name): router.navigate(.user(name), in: tab)
-        case .tag(let name): router.navigate(.tag(name), in: tab)
+        case .tag(let name): router.navigate(tagKind.map { .tagContent(name, $0) } ?? .tag(name), in: tab)
         case .external(let url): openURL(url)
-        case .none: return
+        case .none: return false
         }
-        model.opened(row)
+        return true
     }
 
     private func title(for group: NotificationGroupKind) -> String {
@@ -126,6 +200,8 @@ struct NotificationRowView: View {
                 if let content { Text(content).font(.subheadline).lineLimit(3) }
                 Text(row.createdAt.formatted(.relative(presentation: .named))).font(.caption).foregroundStyle(.secondary)
             }
+            // Keeps the separator at the text even when a group's "Rozwiń" follows it.
+            .alignmentGuide(.listRowSeparatorLeading) { $0[.leading] }
         }
         .accessibilityElement(children: .combine)
         .accessibilityValue(row.isRead ? "" : String(localized: .commonUnread))
@@ -139,13 +215,19 @@ struct NotificationRowView: View {
         case .generic: return String(localized: .notificationsHaveNewNotificationsIn(row.groupCount))
         case nil: break
         }
+        // Like website: "used #tag in an entry" or "added a link tagged #tag".
+        switch row.tagged {
+        case .entry: return String(localized: .notificationsTagEntryAction(row.tagName ?? ""))
+        case .link: return String(localized: .notificationsTagLinkAction(row.tagName ?? ""))
+        case nil: break
+        }
         switch row.observed {
         case .entry:
-            return row.notificationIDs.count > 1
+            return row.groupID != nil
                 ? String(localized: .notificationsNewCommentsEntry(row.groupCount))
                 : String(localized: .notificationsCommentEntryObserve)
         case .link:
-            return row.notificationIDs.count > 1
+            return row.groupID != nil
                 ? String(localized: .notificationsNewCommentsLink(row.groupCount))
                 : String(localized: .notificationsCommentLinkObserve)
         case nil:
@@ -155,7 +237,7 @@ struct NotificationRowView: View {
 
     private var content: String? {
         if row.grouped != nil { return row.tagName.map { "#\($0)" } }
-        if row.observed != nil { return row.observedTitle }
+        if row.observed != nil || row.tagged != nil { return row.observedTitle }
         return nil
     }
 }

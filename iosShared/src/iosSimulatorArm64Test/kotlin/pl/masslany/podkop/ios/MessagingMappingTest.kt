@@ -2,6 +2,7 @@ package pl.masslany.podkop.ios
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlinx.datetime.LocalDateTime
 import pl.masslany.podkop.business.common.domain.models.common.Gender
@@ -34,6 +35,18 @@ class MessagingMappingTest {
         assertEquals("conversation", pm.targetKind)
         assertEquals("ewa", pm.targetValue)
         assertEquals("none", notification(NotificationGroup.Entries).toIOS().targetKind)
+    }
+
+    @Test
+    fun serverGroupsKeepTheirFlagAndLatestActivity() {
+        val updated = LocalDateTime(2026, 3, 2, 9, 30)
+        val group = notification(NotificationGroup.Tags).copy(groupUpdatedAt = updated).toIOS()
+        assertTrue(group.showAsGroup)
+        assertEquals(
+            notification(NotificationGroup.Tags).copy(createdAt = updated).toIOS().createdAtEpochMillis,
+            group.groupUpdatedAtEpochMillis,
+        )
+        assertNull(notification(NotificationGroup.Tags).toIOS().groupUpdatedAtEpochMillis)
     }
 
     @Test

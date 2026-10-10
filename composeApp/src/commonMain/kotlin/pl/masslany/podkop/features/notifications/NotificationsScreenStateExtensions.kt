@@ -82,9 +82,10 @@ private fun NotificationItem.toNotificationListItemState(): NotificationListItem
     groupCount = groupCount,
     tagName = tagName,
     groupedTagContentType = null,
-    observedResourceType = observedResourceType,
+    observedResourceType = observedResourceType.takeUnless { group == NotificationGroup.Tags },
     observedResourceTitle = observedResourceTitle,
     navigationTarget = navigationTarget(),
+    tagResourceType = observedResourceType.takeIf { group == NotificationGroup.Tags },
 )
 
 private fun NotificationItem.toGroupedTagState(

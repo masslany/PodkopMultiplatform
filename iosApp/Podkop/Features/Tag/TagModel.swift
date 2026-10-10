@@ -5,14 +5,14 @@ import PodkopShared
 @MainActor @Observable
 final class TagModel {
     enum Sort: String, CaseIterable { case all, best }
-    enum Kind: String, CaseIterable { case all, link, entry }
+    enum Kind: String, CaseIterable, Codable { case all, link, entry }
     enum Action: Hashable { case observe, notifications, blacklist }
 
     let tag: String
     private(set) var details: TagDetails?
     private(set) var detailsFailed = false
     private(set) var sort: Sort = .all
-    private(set) var kind: Kind = .all
+    private(set) var kind: Kind
     private(set) var isLoggedIn: Bool
     private(set) var pending = Set<Action>()
     private(set) var actionFailed = false
@@ -30,8 +30,9 @@ final class TagModel {
         pager.items.filter { $0.kind == .entry && $0.photo != nil && $0.deletion == nil }
     }
 
-    init(tag: String, isLoggedIn: Bool, loader: TagLoading, updates: ResourceUpdates? = nil) {
+    init(tag: String, kind: Kind = .all, isLoggedIn: Bool, loader: TagLoading, updates: ResourceUpdates? = nil) {
         self.tag = tag
+        self.kind = kind
         self.isLoggedIn = isLoggedIn
         self.loader = loader
         self.updates = updates

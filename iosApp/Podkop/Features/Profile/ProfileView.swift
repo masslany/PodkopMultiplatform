@@ -66,7 +66,7 @@ struct ProfileView: View {
     }
 
     /// Banner with the avatar overlapping its lower edge and the rank on the avatar, as on
-    /// Android and wykop.pl. Observe, message and block live in the toolbar.
+    /// Android and website. Observe, message and block live in the toolbar.
     private func header(_ profile: Profile) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             ZStack(alignment: .bottomLeading) {

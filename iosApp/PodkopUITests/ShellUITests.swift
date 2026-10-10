@@ -383,6 +383,24 @@ final class ShellUITests: XCTestCase {
         XCTAssertTrue(app.textViews["messageInput"].waitForExistence(timeout: 5))
     }
 
+    func testFixtureNotificationGroupExpandsAndLoadsMore() {
+        let app = launch("authenticated")
+        XCTAssertTrue(app.buttons["toolbarNotifications"].waitForExistence(timeout: 5))
+        app.buttons["toolbarNotifications"].tap()
+        app.buttons["notificationGroup-tags"].tap()
+        let expand = app.buttons["notificationGroupExpand-group:g1"]
+        XCTAssertTrue(expand.waitForExistence(timeout: 5))
+        expand.tap()
+        XCTAssertTrue(app.buttons["notificationGroupMember-g1-2"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["notificationGroupMember-g1-3"].exists)
+        // wykop.pl stops at a group's first page; the app loads the rest on request.
+        app.buttons["notificationGroupShowMore-group:g1"].tap()
+        XCTAssertTrue(app.buttons["notificationGroupMember-g1-3"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["notificationGroupShowMore-group:g1"].exists)
+        app.buttons["notificationGroupMember-g1-1"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["detail-entry-102"].waitForExistence(timeout: 5))
+    }
+
     func testFixtureInboxConversationSendAndNewConversation() {
         let app = launch("authenticated")
         app.tabBars.buttons["More"].tap()

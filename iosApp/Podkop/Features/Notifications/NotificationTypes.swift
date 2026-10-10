@@ -33,6 +33,10 @@ struct AppNotification: Identifiable, Equatable {
     var isRead: Bool
     let groupID: String?
     let groupCount: Int
+    /// Set on a row the API grouped (`show_grouped=1`), whose own notifications `loadGroup` lists.
+    var showAsGroup = false
+    /// When the group last got a notification; groups show it rather than their first one's time.
+    var groupUpdatedAt: Date? = nil
     let createdAt: Date
     let actor: String?
     var actorAvatarURL: String? = nil
@@ -47,9 +51,16 @@ struct AppNotification: Identifiable, Equatable {
     let entryID: Int?
     let entryContent: String?
     let target: NotificationTargetValue
+
+    func markedRead() -> AppNotification {
+        var read = self
+        read.isRead = true
+        return read
+    }
 }
 
-/// A displayed row; Android groups tag and observed-discussion notifications that share a group id.
+/// A displayed row; like Android, the API's groups of tag and observed-discussion notifications
+/// become one row each, which can be expanded into the group's own notifications.
 struct NotificationRow: Identifiable, Equatable {
     enum Grouped: Equatable { case entries, links, generic }
     enum Observed: Equatable { case entry, link }
@@ -70,6 +81,10 @@ struct NotificationRow: Identifiable, Equatable {
     let observed: Observed?
     let observedTitle: String?
     let target: NotificationTargetValue
+    /// Set when the row stands for a group of notifications.
+    var groupID: String? = nil
+    /// Set on a single notification from an observed tag: the entry or link that used the tag.
+    var tagged: Observed? = nil
 
     static func rows(for items: [AppNotification], group: NotificationGroupKind) -> [NotificationRow] {
         switch group {
@@ -77,13 +92,13 @@ struct NotificationRow: Identifiable, Equatable {
             var order: [String] = []
             var buckets: [String: [AppNotification]] = [:]
             for item in items {
-                let key = item.groupCount > 1 ? (item.groupID ?? item.id) : item.id
+                let key = (item.showAsGroup || item.groupCount > 1) ? (item.groupID ?? item.id) : item.id
                 if buckets[key] == nil { order.append(key) }
                 buckets[key, default: []].append(item)
             }
             return order.compactMap { key in
                 guard let members = buckets[key], let first = members.first else { return nil }
-                let groupable = first.groupCount > 1 && !(first.groupID ?? "").isEmpty
+                let groupable = (first.showAsGroup || first.groupCount > 1) && !(first.groupID ?? "").isEmpty
                 if group == .tags, groupable, !(first.tagName ?? "").isEmpty {
                     return groupedTag(first, members)
                 }
@@ -95,6 +110,11 @@ struct NotificationRow: Identifiable, Equatable {
         default:
             return items.map(single)
         }
+    }
+
+    /// The notifications inside an expanded group, each shown on its own.
+    static func memberRows(_ items: [AppNotification]) -> [NotificationRow] {
+        items.map(single)
     }
 
     private static func observedKind(_ item: AppNotification) -> Observed? {
@@ -120,7 +140,8 @@ struct NotificationRow: Identifiable, Equatable {
             headline: [item.message, item.issueTitle, item.badgeName, item.linkTitle, item.entryContent]
                 .compactMap { $0 }.first,
             groupCount: item.groupCount, tagName: item.tagName, grouped: nil,
-            observed: observedKind(item), observedTitle: observedTitle(item), target: item.target
+            observed: item.group == .tags ? nil : observedKind(item), observedTitle: observedTitle(item),
+            target: item.target, tagged: item.group == .tags ? observedKind(item) : nil
         )
     }
 
@@ -131,10 +152,10 @@ struct NotificationRow: Identifiable, Equatable {
         else { grouped = .generic }
         return NotificationRow(
             id: first.groupID.map { "group:\($0)" } ?? first.id, isRead: members.allSatisfy(\.isRead),
-            actor: nil, actorColor: nil, actorGender: nil, createdAt: first.createdAt,
+            actor: nil, actorColor: nil, actorGender: nil, createdAt: first.groupUpdatedAt ?? first.createdAt,
             notificationIDs: members.map(\.id), headline: nil, groupCount: first.groupCount,
             tagName: first.tagName, grouped: grouped, observed: nil, observedTitle: nil,
-            target: .tag(first.tagName ?? "")
+            target: .tag(first.tagName ?? ""), groupID: first.groupID
         )
     }
 
@@ -143,10 +164,21 @@ struct NotificationRow: Identifiable, Equatable {
             id: first.groupID.map { "group:\($0)" } ?? first.id, isRead: members.allSatisfy(\.isRead),
             actor: first.actor, actorAvatarURL: first.actorAvatarURL, actorColor: first.actorColor,
             actorGender: first.actorGender,
-            createdAt: first.createdAt, notificationIDs: members.map(\.id), headline: nil,
+            createdAt: first.groupUpdatedAt ?? first.createdAt, notificationIDs: members.map(\.id), headline: nil,
             groupCount: first.groupCount, tagName: nil, grouped: nil, observed: observedKind(first),
-            observedTitle: observedTitle(first), target: first.target
+            observedTitle: observedTitle(first), target: first.target, groupID: first.groupID
         )
+    }
+}
+
+extension NotificationRow.Grouped {
+    /// Like Android and website, a group about new entries or links opens the tag on just those.
+    var tagKind: TagModel.Kind {
+        switch self {
+        case .entries: .entry
+        case .links: .link
+        case .generic: .all
+        }
     }
 }
 

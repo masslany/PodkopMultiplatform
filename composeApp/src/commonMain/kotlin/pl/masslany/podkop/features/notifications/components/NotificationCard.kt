@@ -56,9 +56,11 @@ import podkop.composeapp.generated.resources.notifications_observed_entry_commen
 import podkop.composeapp.generated.resources.notifications_observed_entry_comments_action
 import podkop.composeapp.generated.resources.notifications_observed_link_comment_action
 import podkop.composeapp.generated.resources.notifications_observed_link_comments_action
+import podkop.composeapp.generated.resources.notifications_tag_entry_action
 import podkop.composeapp.generated.resources.notifications_tag_grouped_entries_action
 import podkop.composeapp.generated.resources.notifications_tag_grouped_generic_action
 import podkop.composeapp.generated.resources.notifications_tag_grouped_links_action
+import podkop.composeapp.generated.resources.notifications_tag_link_action
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -253,7 +255,7 @@ private fun NotificationListItemState.title(): AnnotatedString {
             contentColor = contentColor,
         )
 
-        null -> when (observedResourceType) {
+        null -> tagTitle(actionColor, contentColor) ?: when (observedResourceType) {
             ObservedNotificationResourceType.Entry -> styledNotificationTitle(
                 action = if (groupId != null) {
                     pluralStringResource(
@@ -287,6 +289,21 @@ private fun NotificationListItemState.title(): AnnotatedString {
             null -> AnnotatedString(plainTitle)
         }
     }
+}
+
+/** Like website: "used #tag in an entry" or "added a link tagged #tag", above the entry or link. */
+@Composable
+private fun NotificationListItemState.tagTitle(actionColor: Color, contentColor: Color): AnnotatedString? {
+    val action = when (tagResourceType ?: return null) {
+        ObservedNotificationResourceType.Entry -> Res.string.notifications_tag_entry_action
+        ObservedNotificationResourceType.Link -> Res.string.notifications_tag_link_action
+    }
+    return styledNotificationTitle(
+        action = stringResource(resource = action, tagName.orEmpty()),
+        content = observedResourceTitle.orEmpty(),
+        actionColor = actionColor,
+        contentColor = contentColor,
+    )
 }
 
 private fun styledNotificationTitle(

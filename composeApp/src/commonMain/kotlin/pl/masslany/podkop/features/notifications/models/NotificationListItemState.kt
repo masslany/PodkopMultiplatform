@@ -21,6 +21,8 @@ data class NotificationListItemState(
     val observedResourceType: ObservedNotificationResourceType?,
     val observedResourceTitle: String?,
     val navigationTarget: NotificationNavigationTarget,
+    /** Set on a single notification from an observed tag: the entry or link that used the tag. */
+    val tagResourceType: ObservedNotificationResourceType? = null,
     /** Set when the row stands for a group of notifications, which can be expanded. */
     val groupId: String? = null,
     /** The group's own notifications, once expanded; null while collapsed. */

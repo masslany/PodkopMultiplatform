@@ -61,8 +61,10 @@ import pl.masslany.podkop.common.deeplink.AppDeepLinkParser
 import pl.masslany.podkop.common.deeplink.AuthSessionEvent
 import pl.masslany.podkop.common.deeplink.AuthSessionEvents
 import pl.masslany.podkop.common.pagination.PageRequest
+import pl.masslany.podkop.common.pagination.PaginationMode
 import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.pagination.nextRequest
+import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.persistence.api.KeyValueStorage
 import pl.masslany.podkop.common.settings.AppSettings
 import pl.masslany.podkop.common.settings.AppSettingsImpl
@@ -453,6 +455,29 @@ class PodkopClient private constructor(
             IOSNotificationPage(
                 items = result.data.map { it.toIOS() },
                 next = result.nextAfter(FeaturePaginationPolicies.notifications(notificationGroup), page, loaded),
+                total = result.pagination?.total,
+            )
+        }
+
+        /** The first page of a group's own notifications; they are numbered, 25 per page. */
+        fun firstGroupRequest(): IOSPageRequest = PageRequest.Number(1).toIOS()
+
+        /** Pages through the notifications inside group [groupId], like wykop.pl's "Rozwiń". */
+        fun loadGroup(
+            group: String,
+            groupId: String,
+            request: IOSPageRequest,
+            loaded: Int,
+            completion: (IOSNotificationPage?, IOSFailure?) -> Unit,
+        ): IOSOperation = operation(completion) {
+            require(groupId.isNotBlank()) { "empty group id" }
+            val page = request.toDomain()
+            val number = page.numberOrNull() ?: error("group notifications are numbered")
+            val result = notificationsRepository.getGroupNotifications(group.toNotificationGroup(), groupId, number)
+                .getOrThrow()
+            IOSNotificationPage(
+                items = result.data.map { it.toIOS() },
+                next = result.nextAfter(PaginationMode.Numbered, page, loaded),
                 total = result.pagination?.total,
             )
         }

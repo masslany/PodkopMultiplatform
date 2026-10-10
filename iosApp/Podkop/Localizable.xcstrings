@@ -4818,6 +4818,57 @@
         }
       }
     },
+    "notifications.groupedCollapse" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapse"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zwiń"
+          }
+        }
+      }
+    },
+    "notifications.groupedExpand" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expand"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rozwiń"
+          }
+        }
+      }
+    },
+    "notifications.groupedShowMore" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show more"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż więcej"
+          }
+        }
+      }
+    },
     "notifications.haveNewEntriesIn" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5164,6 +5215,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wiadomości prywatne"
+          }
+        }
+      }
+    },
+    "notifications.tagEntryAction" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used #%@ in an entry"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Użył(a) tagu #%@ we wpisie"
+          }
+        }
+      }
+    },
+    "notifications.tagLinkAction" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added a link tagged #%@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodał(a) znalezisko z tagiem #%@"
           }
         }
       }
