@@ -18,9 +18,9 @@ object TagRoutes {
     ): String = "Tag $type $index"
 
     /**
-     * A tag as a signed-in user opens it on one content [type] (`entry` or `link`): the tag's
+     * A tag as a signed-in user opens it on a content [type] (`all`, `entry` or `link`): the tag's
      * details and its stream, sorted by `all`. Signed-in streams are cursor-paged; this one ends
-     * on its first page.
+     * on its first page, and holds entries unless it shows only links.
      */
     fun MockApiServer.signedInTagStream(
         tagName: String,
@@ -38,7 +38,7 @@ object TagRoutes {
             query = mapOf("sort" to "all", "type" to type),
             body = ResourceFixtures.lastCursorPage(
                 sample = sample("tags-stream-user-page-1"),
-                resource = type,
+                resource = if (type == "link") "link" else "entry",
                 count = STREAM_ITEMS,
                 firstId = 7001,
                 text = { index -> streamItemText(type, index) },

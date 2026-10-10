@@ -4,6 +4,7 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
 import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
@@ -56,6 +57,19 @@ open class BaseRobot(
 
     protected fun clickNodeWithTag(tag: String) {
         nodeWithTag(tag).performClick()
+    }
+
+    /** Taps [text] inside the node tagged [tag], e.g. one card's label that other cards share. */
+    protected fun clickTextInNode(
+        tag: String,
+        text: String,
+        timeoutMillis: Long = DEFAULT_TIMEOUT_MS,
+    ) {
+        val matcher = hasText(text) and hasAnyAncestor(hasTestTag(tag))
+        testRule.waitUntil(timeoutMillis) {
+            testRule.onAllNodes(matcher, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        testRule.onNode(matcher, useUnmergedTree = true).performClick()
     }
 
     /** Taps [text], e.g. a title, which reaches whatever handles taps around it, like a card. */

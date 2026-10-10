@@ -59,9 +59,13 @@ object ResourceFixtures {
         return sample.with("data" to JsonArray(data), "pagination" to pagination).toString()
     }
 
-    /** A single-object response (`{"data": {...}}`) for the resource with [id]. */
+    /** A single-object response (`{"data": {...}}`) for the resource with [id], and [content] if given. */
     fun withId(
         sample: JsonObject,
         id: Int,
-    ): String = sample.with("data" to sample.getValue("data").jsonObject.withoutImages().with("id" to JsonPrimitive(id))).toString()
+        content: String? = null,
+    ): String {
+        val data = sample.getValue("data").jsonObject.withoutImages().with("id" to JsonPrimitive(id))
+        return sample.with("data" to if (content == null) data else data.with("content" to JsonPrimitive(content))).toString()
+    }
 }

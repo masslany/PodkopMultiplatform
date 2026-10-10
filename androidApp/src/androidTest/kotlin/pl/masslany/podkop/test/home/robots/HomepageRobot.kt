@@ -38,6 +38,19 @@ class HomepageRobot(
         clickText(title)
     }
 
+    /** Taps the source of the link with [id], labelled [label], which opens where the link points. */
+    fun openSource(
+        id: Int,
+        label: String,
+    ) {
+        scrollToLink(id)
+        clickTextInNode(LinksTestTags.Item.link(id), label)
+    }
+
+    fun displayText(text: String) {
+        displayedText(text)
+    }
+
     fun upvoteLink(id: Int) {
         clickNodeWithTag(ResourcesTestTags.Link.vote(id))
     }
