@@ -39,6 +39,36 @@ object LinkFixtures {
         index: Int,
     ): String = "Link $page-${index.toString().padStart(2, '0')}"
 
+    /** Upvotes of the plain links in feeds built from [sample]; they share the sample's count. */
+    fun upvotes(sample: JsonObject): Int =
+        plainLink(sample).getValue("votes").jsonObject.getValue("up").jsonPrimitive.int
+
+    /**
+     * A link as `links/{id}` serves it, from the details sample, with [title] and, once the user
+     * upvoted it, `voted: 1` and [upvotes].
+     */
+    fun details(
+        sample: JsonObject,
+        id: Int,
+        title: String,
+        upvotes: Int? = null,
+    ): String {
+        val data = sample.getValue("data").jsonObject.withoutImages()
+        val votes = data.getValue("votes").jsonObject
+        val vote = upvotes?.let { up ->
+            arrayOf(
+                "voted" to JsonPrimitive(1),
+                "votes" to votes.with(
+                    "up" to JsonPrimitive(up),
+                    "count" to JsonPrimitive(up - votes.getValue("down").jsonPrimitive.int),
+                ),
+            )
+        }.orEmpty()
+        return sample.with(
+            "data" to data.with("id" to JsonPrimitive(id), "title" to JsonPrimitive(title), *vote),
+        ).toString()
+    }
+
     /** The cursor the API hands out for requesting [page] (2 or later) of a signed-in feed. */
     fun pageCursor(
         sample: JsonObject,
@@ -94,7 +124,7 @@ object LinkFixtures {
         promoted: Boolean,
     ): List<JsonObject> {
         val items = sample.getValue("data").jsonArray.map { it.jsonObject }
-        val plain = items.first { it.isLink() && !it.isPromoted() && "recommended" !in it }
+        val plain = plainLink(sample)
         val recommended = items.firstOrNull { it.isLink() && !it.isPromoted() && "recommended" in it } ?: plain
         val feed = (1..links).mapTo(mutableListOf()) { index ->
             link(
@@ -138,6 +168,11 @@ object LinkFixtures {
 }
 
 private fun JsonObject.pagination(): JsonObject = getValue("pagination").jsonObject
+
+private fun plainLink(sample: JsonObject): JsonObject =
+    sample.getValue("data").jsonArray
+        .map { it.jsonObject }
+        .first { it.isLink() && !it.isPromoted() && "recommended" !in it }
 
 private fun JsonObject.isLink(): Boolean = getValue("resource").jsonPrimitive.content == "link"
 

@@ -115,6 +115,21 @@ class MockApiServer(
         )
     }
 
+    /** Answers a request the API answers without a body, e.g. a vote, by its [method]. */
+    fun respond(
+        method: String,
+        path: String,
+        code: Int = 204,
+    ) {
+        routes += Route(
+            method = method,
+            path = path,
+            query = emptyMap(),
+            body = "",
+            code = code,
+        )
+    }
+
     fun hasRequested(
         method: String,
         path: String,

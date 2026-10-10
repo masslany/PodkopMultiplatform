@@ -1,9 +1,7 @@
 package pl.masslany.podkop.test.links
 
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.jsonObject
 import pl.masslany.podkop.test.fixtures.LinkCommentFixtures
-import pl.masslany.podkop.test.fixtures.with
+import pl.masslany.podkop.test.fixtures.LinkFixtures
 import pl.masslany.podkop.test.fixtures.withoutImages
 import pl.masslany.podkop.test.support.MockApiServer
 
@@ -27,15 +25,9 @@ object LinkDetailsRoutes {
             path = "/api/v3/profile/short",
             body = sample("profile-short-user").withoutImages().toString(),
         )
-        val details = sample("link-details-user")
         getJson(
             path = "$LINKS_PATH/$linkId",
-            body = details.with(
-                "data" to details.getValue("data").jsonObject.withoutImages().with(
-                    "id" to JsonPrimitive(linkId),
-                    "title" to JsonPrimitive(title),
-                ),
-            ).toString(),
+            body = LinkFixtures.details(sample("link-details-user"), linkId, title),
         )
         getJson(
             path = "$LINKS_PATH/$linkId/related",

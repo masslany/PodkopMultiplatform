@@ -4,6 +4,9 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -32,6 +35,19 @@ open class BaseRobot(
     ) {
         waitUntilNode(tag, timeoutMillis)
         nodeWithTag(tag).assertIsDisplayed()
+    }
+
+    /** Waits until the node tagged [tag] shows [text], e.g. a count that changes. */
+    protected fun displayedTextInNode(
+        tag: String,
+        text: String,
+        timeoutMillis: Long = DEFAULT_TIMEOUT_MS,
+    ) {
+        val matcher = hasTestTag(tag) and hasAnyDescendant(hasText(text))
+        testRule.waitUntil(timeoutMillis) {
+            testRule.onAllNodes(matcher, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        testRule.onNode(matcher, useUnmergedTree = true).assertIsDisplayed()
     }
 
     protected fun onUiThread(action: () -> Unit) {

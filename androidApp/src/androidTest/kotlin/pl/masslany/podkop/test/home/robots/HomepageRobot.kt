@@ -2,6 +2,7 @@ package pl.masslany.podkop.test.home.robots
 
 import pl.masslany.podkop.common.components.CommonTestTags
 import pl.masslany.podkop.features.links.LinksTestTags
+import pl.masslany.podkop.features.resources.ResourcesTestTags
 import pl.masslany.podkop.test.common.PodkopComposeRule
 import pl.masslany.podkop.test.common.robots.BaseRobot
 
@@ -35,6 +36,17 @@ class HomepageRobot(
     ) {
         scrollToLink(id)
         clickText(title)
+    }
+
+    fun upvoteLink(id: Int) {
+        clickNodeWithTag(ResourcesTestTags.Link.vote(id))
+    }
+
+    fun displayUpvotes(
+        id: Int,
+        upvotes: Int,
+    ) {
+        displayedTextInNode(ResourcesTestTags.Link.vote(id), upvotes.toString())
     }
 
     /** Scrolls the homepage to the link with [id], waiting for the page holding it to load. */
