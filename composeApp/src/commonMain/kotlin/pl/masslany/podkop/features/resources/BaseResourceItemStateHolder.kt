@@ -109,16 +109,7 @@ open class BaseResourceItemStateHolder(
         updateMutex.withLock {
             withContext(dispatcherProvider.default) {
                 _items.update { list ->
-                    val existingIds = list
-                        .mapTo(mutableSetOf()) { it.id }
-
-                    val uniqueNewItems = data
-                        .asSequence()
-                        .filter { item -> existingIds.add(item.id) }
-                        .map { item -> item.toResourceItemState(isUpcoming) }
-                        .toList()
-
-                    (list + uniqueNewItems).toImmutableList()
+                    list.appendPage(data) { item -> item.toResourceItemState(isUpcoming) }
                 }
             }
         }
@@ -927,4 +918,21 @@ internal fun EmbedContentState?.updateStreamableEmbedStateIfMatches(
     if (current.key != embedKey) return current
 
     return current.copy(streamableState = newState)
+}
+
+/**
+ * Adds a later page's items, skipping any already listed: feeds repeat items across pages, e.g. the
+ * homepage repeats its promoted link and entries on every page.
+ */
+internal fun List<ResourceItemState>.appendPage(
+    page: List<ResourceItem>,
+    toState: (ResourceItem) -> ResourceItemState,
+): ImmutableList<ResourceItemState> {
+    val existingIds = mapTo(mutableSetOf()) { it.id }
+    val uniqueNewItems = page
+        .asSequence()
+        .filter { item -> existingIds.add(item.id) }
+        .map(toState)
+        .toList()
+    return (this + uniqueNewItems).toImmutableList()
 }
