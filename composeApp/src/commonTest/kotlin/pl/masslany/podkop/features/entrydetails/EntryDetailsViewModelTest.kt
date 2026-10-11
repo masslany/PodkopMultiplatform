@@ -30,6 +30,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -91,12 +92,44 @@ class EntryDetailsViewModelTest {
         )
     }
 
-    private fun threadedEntries() = FakeEntriesRepository().apply {
+    @Test
+    fun `a failed page of top-level comments offers a retry that loads it`() = runTest(dispatcher) {
+        var failNext = true
+        val entries = threadedEntries(topLevelTotal = 2).apply {
+            threadRepliesHandler = {
+                if (failNext) Result.failure(IllegalStateException("offline")) else Result.success(replies(total = 2, comment(9)))
+            }
+        }
+        val snackbar = FakeSnackbarManager()
+        val sut = createSut(entries, snackbar)
+        backgroundScope.launch { sut.state.collect {} }
+        advanceUntilIdle()
+
+        sut.paginate()
+        advanceUntilIdle()
+
+        assertTrue(sut.state.value.isPaginationError)
+        assertFalse(sut.shouldPaginate(lastVisibleIndex = 3, totalItems = 4), "scrolling does not retry a failed page")
+        assertTrue(snackbar.emittedEvents.isEmpty(), "the list shows the error in place")
+
+        failNext = false
+        sut.paginate()
+        advanceUntilIdle()
+
+        assertFalse(sut.state.value.isPaginationError)
+        assertEquals(
+            listOf(FakeEntriesRepository.ThreadRepliesCall(null, 10), FakeEntriesRepository.ThreadRepliesCall(null, 10)),
+            entries.threadRepliesCalls,
+        )
+        assertEquals("comment-9", sut.state.value.threadRows?.last()?.key)
+    }
+
+    private fun threadedEntries(topLevelTotal: Int = 1) = FakeEntriesRepository().apply {
         entryResult = Result.success(resource(1, Resource.Entry))
         threadResult = Result.success(
             EntryThread(
                 entry = resource(1, Resource.Entry),
-                comments = replies(total = 1, comment(10, replies(total = 3, comment(11)))),
+                comments = replies(total = topLevelTotal, comment(10, replies(total = 3, comment(11)))),
             ),
         )
     }

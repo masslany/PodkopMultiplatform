@@ -54,7 +54,6 @@ class ObservedViewModel(
         },
         onError = {
             logger.error("Failed to load paginated observed items", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         observedRepository.getObserved(
@@ -83,6 +82,7 @@ class ObservedViewModel(
                     ?: resource.toObservedListItemState()
             }.toPersistentList(),
             isPaginating = paginatorState is PaginatorState.Loading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         viewModelScope,

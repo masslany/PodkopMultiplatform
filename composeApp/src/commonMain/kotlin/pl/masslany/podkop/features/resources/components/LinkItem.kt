@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
@@ -45,6 +46,7 @@ import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentState
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.resourceactions.resourceTextSelectionGesture
+import pl.masslany.podkop.features.resources.ResourcesTestTags
 import pl.masslany.podkop.features.resources.models.link.LinkItemState
 import pl.masslany.podkop.features.resources.preview.LinkItemStateProvider
 
@@ -95,6 +97,7 @@ fun LinkItem(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Count(
+                        modifier = Modifier.testTag(ResourcesTestTags.Link.vote(state.id)),
                         state = state.countState,
                         backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp),
                         onClick = onVoteClick,

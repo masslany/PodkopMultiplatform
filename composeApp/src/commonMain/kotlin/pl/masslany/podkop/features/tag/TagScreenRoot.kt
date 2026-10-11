@@ -59,6 +59,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.extensions.toWindowInsets
@@ -372,6 +373,12 @@ private fun TagScreenList(
                 PaginationLoadingIndicator()
             }
         }
+
+        if (state.isPaginationError) {
+            item(key = "PaginationError") {
+                PaginationErrorItem(onRetryClick = actions::paginate)
+            }
+        }
     }
 }
 
@@ -429,6 +436,12 @@ private fun TagScreenGallery(
                 span = StaggeredGridItemSpan.FullLine,
             ) {
                 PaginationLoadingIndicator()
+            }
+        }
+
+        if (state.isPaginationError) {
+            item(key = "PaginationError", span = StaggeredGridItemSpan.FullLine) {
+                PaginationErrorItem(onRetryClick = actions::paginate)
             }
         }
     }

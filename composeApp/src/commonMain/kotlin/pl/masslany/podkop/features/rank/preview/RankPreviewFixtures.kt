@@ -60,6 +60,7 @@ object RankPreviewFixtures {
             risingUser,
         ),
         isPaginating = isPaginating,
+        isPaginationError = false,
     )
 
     fun refreshingState(): RankScreenState = contentState().copy(isRefreshing = true)

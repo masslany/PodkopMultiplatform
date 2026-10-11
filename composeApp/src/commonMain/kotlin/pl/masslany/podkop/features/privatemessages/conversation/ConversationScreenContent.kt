@@ -207,6 +207,7 @@ internal fun ConversationScreenContent(
                         onTagClicked = actions::onTagClicked,
                         onUrlClicked = actions::onUrlClicked,
                         onImageClicked = actions::onImageClicked,
+                        onRetryPaginationClicked = actions::paginate,
                     )
                 }
             }

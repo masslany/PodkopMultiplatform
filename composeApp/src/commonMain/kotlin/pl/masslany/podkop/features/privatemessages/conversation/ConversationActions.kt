@@ -10,6 +10,9 @@ interface ConversationActions : TopBarActions {
 
     fun onRetryClicked()
 
+    /** Loads older messages; after a failed page, the list's retry button asks for it again. */
+    fun paginate()
+
     fun onComposerTextChanged(content: TextFieldValue)
 
     fun onComposerAdultChanged(adult: Boolean)

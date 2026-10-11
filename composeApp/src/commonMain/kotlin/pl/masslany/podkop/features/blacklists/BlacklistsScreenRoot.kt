@@ -59,6 +59,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.common.components.Avatar
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.SectionCardDivider
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.components.toComposeColor
 import pl.masslany.podkop.common.extensions.rememberWindowSizeClass
@@ -317,6 +318,12 @@ fun BlacklistsScreenContent(
                                 span = FullLineSpan,
                             ) {
                                 PaginationLoadingIndicator()
+                            }
+                        }
+
+                        if (state.selectedCategoryState.isPaginationError) {
+                            item(key = "blacklists-pagination-error", span = FullLineSpan) {
+                                PaginationErrorItem(onRetryClick = actions::paginate)
                             }
                         }
                     }

@@ -43,7 +43,6 @@ class AdvancedSearchViewModel(
         },
         onError = {
             logger.error("Failed to load paginated advanced search results", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val activeRequest = currentRequest ?: return@Paginator Result.success(Resources(emptyList(), null))
@@ -75,6 +74,7 @@ class AdvancedSearchViewModel(
         state.copy(
             results = items,
             isPaginating = paginatorState is PaginatorState.Loading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         viewModelScope,
@@ -214,7 +214,7 @@ class AdvancedSearchViewModel(
         !state.value.isError &&
         paginator.shouldPaginate(lastVisibleIndex, totalItems)
 
-    fun paginate() {
+    override fun paginate() {
         if (currentRequest == null) {
             return
         }

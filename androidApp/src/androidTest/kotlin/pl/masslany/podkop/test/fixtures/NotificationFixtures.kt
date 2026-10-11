@@ -27,6 +27,15 @@ object NotificationFixtures {
         index: Int,
     ): String = token("M${page}i${index.toString().padStart(2, '0')}", length = sample.idLength())
 
+    /** The tag of the grouped row at [index] (from 1), as [groupedPage] cycles the sample's rows. */
+    fun tagName(
+        sample: JsonObject,
+        index: Int,
+    ): String {
+        val rows = sample.rows()
+        return rows[(index - 1) % rows.size].getValue("tag").jsonObject.getValue("name").jsonPrimitive.content
+    }
+
     /** A page of groups: the sample's rows, cycled up to its `total`, each with its own ids. */
     fun groupedPage(sample: JsonObject): String {
         val rows = sample.rows()

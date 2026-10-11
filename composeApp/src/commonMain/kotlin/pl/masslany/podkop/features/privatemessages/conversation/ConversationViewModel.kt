@@ -78,7 +78,6 @@ class ConversationViewModel(
         },
         onError = {
             logger.error("Failed to load older private message thread items for ${screen.username}", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
@@ -104,6 +103,7 @@ class ConversationViewModel(
             messages = messages.toConversationMessages().toPersistentList(),
             composer = composer,
             isPaginating = paginatorState is PaginatorState.Loading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -214,7 +214,7 @@ class ConversationViewModel(
         return firstVisibleItemIndex != null && firstVisibleItemIndex <= TOP_PAGINATION_THRESHOLD
     }
 
-    fun paginate() {
+    override fun paginate() {
         paginator.paginate()
     }
 

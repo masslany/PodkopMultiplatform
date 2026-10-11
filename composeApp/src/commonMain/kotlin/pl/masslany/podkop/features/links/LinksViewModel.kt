@@ -68,7 +68,6 @@ class LinksViewModel(
         },
         onError = {
             logger.error("Failed to load paginated links", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         linksRepository.getLinks(
@@ -96,6 +95,7 @@ class LinksViewModel(
             hits = hits,
             notificationsUnreadCount = notificationsUnreadCount,
             isPaginating = paginator is PaginatorState.Loading,
+            isPaginationError = paginator is PaginatorState.Error,
         )
     }.stateIn(
         viewModelScope,

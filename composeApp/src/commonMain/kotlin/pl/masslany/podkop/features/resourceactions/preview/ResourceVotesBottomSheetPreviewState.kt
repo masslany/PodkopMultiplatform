@@ -39,26 +39,24 @@ class ResourceVotesBottomSheetStateProvider : PreviewParameterProvider<ResourceV
 
     override val values: Sequence<ResourceVotesBottomSheetPreviewState> = sequenceOf(
         ResourceVotesBottomSheetPreviewState(
-            state = ResourceVotesBottomSheetState(
-                isLoading = true,
-            ),
+            state = ResourceVotesBottomSheetState.initial,
             resourceType = ResourceVotesType.Entry,
         ),
         ResourceVotesBottomSheetPreviewState(
-            state = ResourceVotesBottomSheetState(
+            state = ResourceVotesBottomSheetState.initial.copy(
                 isLoading = false,
                 isError = true,
             ),
             resourceType = ResourceVotesType.EntryComment,
         ),
         ResourceVotesBottomSheetPreviewState(
-            state = ResourceVotesBottomSheetState(
+            state = ResourceVotesBottomSheetState.initial.copy(
                 isLoading = false,
             ),
             resourceType = ResourceVotesType.LinkUp,
         ),
         ResourceVotesBottomSheetPreviewState(
-            state = ResourceVotesBottomSheetState(
+            state = ResourceVotesBottomSheetState.initial.copy(
                 isLoading = false,
                 isPaginating = true,
                 items = voters,

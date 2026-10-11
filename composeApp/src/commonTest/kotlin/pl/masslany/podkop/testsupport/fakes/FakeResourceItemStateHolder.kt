@@ -9,6 +9,7 @@ import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.common.preview.NoOpResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
+import pl.masslany.podkop.features.resources.appendPage
 import pl.masslany.podkop.features.resources.models.ResourceItemState
 import pl.masslany.podkop.features.resources.models.toResourceItemState
 
@@ -25,8 +26,7 @@ class FakeResourceItemStateHolder :
     }
 
     override suspend fun appendData(data: List<ResourceItem>) {
-        val known = items.value.map { it.id }.toSet()
-        items.value = (items.value + data.filter { it.id !in known }.map { it.toResourceItemState() }).toImmutableList()
+        items.value = items.value.appendPage(data) { it.toResourceItemState() }
     }
 
     override suspend fun notifyItemUpdated(newState: ResourceItem) = Unit

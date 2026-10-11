@@ -36,6 +36,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -209,6 +210,12 @@ internal fun ResourceVotesBottomSheetContent(
                                 key = "PaginationLoadingIndicator",
                             ) {
                                 PaginationLoadingIndicator()
+                            }
+                        }
+
+                        if (state.isPaginationError) {
+                            item(key = "PaginationError") {
+                                PaginationErrorItem(onRetryClick = actions::paginate)
                             }
                         }
                     }

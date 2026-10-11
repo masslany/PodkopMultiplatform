@@ -32,4 +32,7 @@ interface AdvancedSearchActions :
     fun onSearchClicked()
 
     fun onRefresh()
+
+    /** Loads the next page; after a failed one, the list's retry button asks for it again. */
+    fun paginate()
 }

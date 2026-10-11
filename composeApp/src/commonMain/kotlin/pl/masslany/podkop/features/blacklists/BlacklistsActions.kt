@@ -22,4 +22,7 @@ interface BlacklistsActions : TopBarActions {
     fun onEntryClicked(item: BlacklistEntryState)
 
     fun onRemoveClicked(item: BlacklistEntryState)
+
+    /** Loads the next page; after a failed one, the list's retry button asks for it again. */
+    fun paginate()
 }

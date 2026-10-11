@@ -4,6 +4,10 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasAnyAncestor
+import androidx.compose.ui.test.hasAnyDescendant
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -11,6 +15,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToKey
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 
 open class BaseRobot(
     private val testRule: AndroidComposeTestRule<*, *>,
@@ -34,12 +40,56 @@ open class BaseRobot(
         nodeWithTag(tag).assertIsDisplayed()
     }
 
+    /** Waits until the node tagged [tag] shows [text], e.g. a count that changes. */
+    protected fun displayedTextInNode(
+        tag: String,
+        text: String,
+        timeoutMillis: Long = DEFAULT_TIMEOUT_MS,
+    ) {
+        val matcher = hasTestTag(tag) and hasAnyDescendant(hasText(text))
+        testRule.waitUntil(timeoutMillis) {
+            testRule.onAllNodes(matcher, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        testRule.onNode(matcher, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    /**
+     * Swipes up from the middle of the node tagged [tag], as a user scrolling on does. Unlike a
+     * programmatic scroll, this also hides the bottom bar, which otherwise covers the end of a list;
+     * it starts mid-list because the list's lower edge lies under that bar.
+     */
+    protected fun swipeUpOn(tag: String) {
+        nodeWithTag(tag).performTouchInput { swipeUp(startY = centerY, endY = top) }
+    }
+
     protected fun onUiThread(action: () -> Unit) {
         testRule.runOnUiThread(action)
     }
 
     protected fun clickNodeWithTag(tag: String) {
         nodeWithTag(tag).performClick()
+    }
+
+    /** Taps [text] inside the node tagged [tag], e.g. one card's label that other cards share. */
+    protected fun clickTextInNode(
+        tag: String,
+        text: String,
+        timeoutMillis: Long = DEFAULT_TIMEOUT_MS,
+    ) {
+        val matcher = hasText(text) and hasAnyAncestor(hasTestTag(tag))
+        testRule.waitUntil(timeoutMillis) {
+            testRule.onAllNodes(matcher, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        testRule.onNode(matcher, useUnmergedTree = true).performClick()
+    }
+
+    /** Taps [text], e.g. a title, which reaches whatever handles taps around it, like a card. */
+    protected fun clickText(text: String) {
+        waitUntilText(text)
+        testRule
+            .onAllNodesWithText(text, useUnmergedTree = true)
+            .onFirst()
+            .performClick()
     }
 
     /**

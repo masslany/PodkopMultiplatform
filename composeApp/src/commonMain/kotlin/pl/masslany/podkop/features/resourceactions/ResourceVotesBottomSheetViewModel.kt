@@ -24,7 +24,6 @@ import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.pagination.numberOrNull
-import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.profile.ProfileScreen
 
@@ -34,7 +33,6 @@ class ResourceVotesBottomSheetViewModel(
     private val linksRepository: LinksRepository,
     private val appNavigator: AppNavigator,
     private val logger: AppLogger,
-    private val snackbarManager: SnackbarManager,
 ) : ViewModel(),
     ResourceVotesBottomSheetActions {
 
@@ -53,7 +51,6 @@ class ResourceVotesBottomSheetViewModel(
         },
         onError = { throwable ->
             logger.error("Failed to paginate resource vote users for $params", throwable)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
@@ -72,6 +69,7 @@ class ResourceVotesBottomSheetViewModel(
     ) { state, paginatorState ->
         state.copy(
             isPaginating = paginatorState is PaginatorState.Loading && !state.isLoading,
+            isPaginationError = paginatorState is PaginatorState.Error,
         )
     }.stateIn(
         scope = viewModelScope,

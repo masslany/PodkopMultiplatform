@@ -24,4 +24,7 @@ interface NotificationsActions : TopBarActions {
     fun onRefresh()
 
     fun onMarkAllAsReadClicked()
+
+    /** Loads the next page; after a failed one, the list's retry button asks for it again. */
+    fun paginate()
 }

@@ -39,6 +39,36 @@ object LinkFixtures {
         index: Int,
     ): String = "Link $page-${index.toString().padStart(2, '0')}"
 
+    /** Upvotes of the plain links in feeds built from [sample]; they share the sample's count. */
+    fun upvotes(sample: JsonObject): Int =
+        plainLink(sample).getValue("votes").jsonObject.getValue("up").jsonPrimitive.int
+
+    /**
+     * A link as `links/{id}` serves it, from the details sample, with [title] and, once the user
+     * upvoted it, `voted: 1` and [upvotes].
+     */
+    fun details(
+        sample: JsonObject,
+        id: Int,
+        title: String,
+        upvotes: Int? = null,
+    ): String {
+        val data = sample.getValue("data").jsonObject.withoutImages()
+        val votes = data.getValue("votes").jsonObject
+        val vote = upvotes?.let { up ->
+            arrayOf(
+                "voted" to JsonPrimitive(1),
+                "votes" to votes.with(
+                    "up" to JsonPrimitive(up),
+                    "count" to JsonPrimitive(up - votes.getValue("down").jsonPrimitive.int),
+                ),
+            )
+        }.orEmpty()
+        return sample.with(
+            "data" to data.with("id" to JsonPrimitive(id), "title" to JsonPrimitive(title), *vote),
+        ).toString()
+    }
+
     /** The cursor the API hands out for requesting [page] (2 or later) of a signed-in feed. */
     fun pageCursor(
         sample: JsonObject,
@@ -72,9 +102,10 @@ object LinkFixtures {
         firstPage: JsonObject,
         laterPage: JsonObject,
         page: Int,
+        sources: Map<Int, String> = emptyMap(),
     ): String {
         val sample = if (page == 1) firstPage else laterPage
-        val items = page(firstPage, page, links = SIGNED_IN_LINKS_PER_PAGE, promoted = page == 1)
+        val items = page(firstPage, page, links = SIGNED_IN_LINKS_PER_PAGE, promoted = page == 1, sources = sources)
         val pagination = JsonObject(
             sample.pagination().mapValues { (key, value) ->
                 when {
@@ -92,15 +123,17 @@ object LinkFixtures {
         page: Int,
         links: Int,
         promoted: Boolean,
+        sources: Map<Int, String> = emptyMap(),
     ): List<JsonObject> {
         val items = sample.getValue("data").jsonArray.map { it.jsonObject }
-        val plain = items.first { it.isLink() && !it.isPromoted() && "recommended" !in it }
+        val plain = plainLink(sample)
         val recommended = items.firstOrNull { it.isLink() && !it.isPromoted() && "recommended" in it } ?: plain
         val feed = (1..links).mapTo(mutableListOf()) { index ->
             link(
                 template = if (index == RECOMMENDED_LINK_INDEX) recommended else plain,
                 id = linkId(page, index),
                 title = linkTitle(page, index),
+                sourceUrl = sources[linkId(page, index)],
             )
         }
         if (promoted) {
@@ -111,18 +144,26 @@ object LinkFixtures {
         return feed
     }
 
+    /** A link's source is labelled with its URL's host, e.g. `wykop.pl` for a link to the website. */
+    fun sourceLabel(url: String): String = url.substringAfter("://").substringBefore('/')
+
     private fun link(
         template: JsonObject,
         id: Int,
         title: String,
+        sourceUrl: String? = null,
     ): JsonObject {
-        val source = template.getValue("source").jsonObject
+        // Like the API, where a link's source usually carries the link id as type_id.
+        val source = template.getValue("source").jsonObject.with("type_id" to JsonPrimitive(id))
         return template.withoutImages().with(
             "id" to JsonPrimitive(id),
             "title" to JsonPrimitive(title),
             "slug" to JsonPrimitive("link-$id"),
-            // Like the API, where a link's source usually carries the link id as type_id.
-            "source" to source.with("type_id" to JsonPrimitive(id)),
+            "source" to if (sourceUrl == null) {
+                source
+            } else {
+                source.with("url" to JsonPrimitive(sourceUrl), "label" to JsonPrimitive(sourceLabel(sourceUrl)))
+            },
         )
     }
 
@@ -138,6 +179,11 @@ object LinkFixtures {
 }
 
 private fun JsonObject.pagination(): JsonObject = getValue("pagination").jsonObject
+
+private fun plainLink(sample: JsonObject): JsonObject =
+    sample.getValue("data").jsonArray
+        .map { it.jsonObject }
+        .first { it.isLink() && !it.isPromoted() && "recommended" !in it }
 
 private fun JsonObject.isLink(): Boolean = getValue("resource").jsonPrimitive.content == "link"
 

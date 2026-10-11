@@ -29,6 +29,12 @@ class NotificationsRobot(
         clickNodeWithTag(NotificationsTestTags.Grouped.expand(rowId))
     }
 
+    /** Opens what a grouped row is about, e.g. a tag's stream. */
+    fun openGroupedRow(rowId: String) {
+        displayedNode(NotificationsTestTags.Item.card(rowId))
+        clickNodeWithTag(NotificationsTestTags.Item.card(rowId))
+    }
+
     /** Scrolls to a notification inside an expanded group, waiting for the page holding it to load. */
     fun scrollToGroupedRowNotification(
         rowId: String,

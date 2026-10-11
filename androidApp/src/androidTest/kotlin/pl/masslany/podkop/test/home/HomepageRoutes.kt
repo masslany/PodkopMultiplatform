@@ -39,9 +39,10 @@ object HomepageRoutes {
 
     /**
      * Signed-in users get the homepage in cursor pages: the first request has no `page`, and each
-     * later one sends the previous page's `next` cursor as `page`.
+     * later one sends the previous page's `next` cursor as `page`. [sources] gives links, by id, a
+     * source URL of their own.
      */
-    fun MockApiServer.homepageSignedIn() {
+    fun MockApiServer.homepageSignedIn(sources: Map<Int, String> = emptyMap()) {
         val firstPage = sample("links-homepage-user-page-1")
         val laterPage = sample("links-homepage-user-page-2")
         (1..3).forEach { page ->
@@ -52,7 +53,7 @@ object HomepageRoutes {
                     put("type", "homepage")
                     if (page > 1) put("page", LinkFixtures.pageCursor(firstPage, page))
                 },
-                body = LinkFixtures.cursorPage(firstPage, laterPage, page),
+                body = LinkFixtures.cursorPage(firstPage, laterPage, page, sources),
             )
         }
         getJson(

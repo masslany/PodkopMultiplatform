@@ -19,6 +19,9 @@ import pl.masslany.podkop.test.notifications.NotificationsRoutes.markTagNotifica
 import pl.masslany.podkop.test.notifications.robots.NotificationsRobot.Companion.groupedRowId
 import pl.masslany.podkop.test.notifications.robots.notifications
 import pl.masslany.podkop.test.support.MockApiServer
+import pl.masslany.podkop.test.tag.TagRoutes
+import pl.masslany.podkop.test.tag.TagRoutes.signedInTagStream
+import pl.masslany.podkop.test.tag.robots.tag
 
 @RunWith(AndroidJUnit4::class)
 class TagNotificationGroupsTest : BaseTest() {
@@ -33,6 +36,24 @@ class TagNotificationGroupsTest : BaseTest() {
         members = mockApiServer.sample(NotificationsRoutes.MEMBERS_SAMPLE)
         mockApiServer.markTagNotificationRead(NotificationFixtures.memberId(members, page = 1, index = 1))
         mockApiServer.signedInEntryDetails(memberEntryId())
+        mockApiServer.signedInTagStream(
+            tagName = NotificationFixtures.tagName(mockApiServer.sample(NotificationsRoutes.GROUPED_SAMPLE), index = 1),
+            type = "entry",
+        )
+    }
+
+    @Test
+    fun openingATagGroupAboutEntriesShowsTheTagsEntries() {
+        notifications(activityRule) {
+            openNotifications()
+            selectGroup(NotificationGroup.Tags)
+            openGroupedRow(firstGroupRow)
+        }
+
+        // The group is about new entries, so like on website the tag opens on just its entries.
+        tag(activityRule) {
+            displayStreamItem(TagRoutes.streamItemText(type = "entry", index = 1))
+        }
     }
 
     @Test

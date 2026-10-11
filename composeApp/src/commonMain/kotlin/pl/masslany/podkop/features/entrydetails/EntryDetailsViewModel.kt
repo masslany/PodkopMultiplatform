@@ -66,7 +66,10 @@ class EntryDetailsViewModel(
     private val threadTree = MutableStateFlow<EntryCommentThreadTree?>(null)
     private val loadingRepliesIds = MutableStateFlow<Set<Int>>(emptySet())
     private val isLoadingMoreTopLevel = MutableStateFlow(false)
-    private var isTopLevelPaginationBlocked = false
+
+    // Set when more top-level comments failed to load: scrolling stops asking for them, and the
+    // list offers a retry instead.
+    private val isTopLevelPaginationFailed = MutableStateFlow(false)
 
     // Parent of every load for the content on screen. A reload cancels it, so requests from the
     // previous load stop instead of landing on the new content.
@@ -82,7 +85,6 @@ class EntryDetailsViewModel(
         },
         onError = {
             logger.error("Failed to load paginated entry comments for id=$entryId", it)
-            snackbarManager.tryEmitGenericError()
         },
     ) { request ->
         val page = request.numberOrNull() ?: run {
@@ -96,18 +98,25 @@ class EntryDetailsViewModel(
         )
     }
 
-    private val isPaginating = combine(paginator.state, isLoadingMoreTopLevel) { paginatorState, isLoadingTopLevel ->
-        paginatorState is PaginatorState.Loading || isLoadingTopLevel
+    private val pagination = combine(
+        paginator.state,
+        isLoadingMoreTopLevel,
+        isTopLevelPaginationFailed,
+    ) { paginatorState, isLoadingTopLevel, isTopLevelFailed ->
+        PaginationStatus(
+            isPaginating = paginatorState is PaginatorState.Loading || isLoadingTopLevel,
+            isError = paginatorState is PaginatorState.Error || isTopLevelFailed,
+        )
     }
 
     private val _state = MutableStateFlow(initialState())
     val state = combine(
         _state,
         resourceItemStateHolder.items,
-        isPaginating,
+        pagination,
         threadTree,
         loadingRepliesIds,
-    ) { state, comments, isPaginating, tree, loadingReplies ->
+    ) { state, comments, pagination, tree, loadingReplies ->
         logger.debug("Entry details comments updated: $comments")
         val holderEntry = comments
             .filterIsInstance<EntryItemState>()
@@ -118,7 +127,8 @@ class EntryDetailsViewModel(
         state.copy(
             entry = holderEntry ?: state.entry,
             comments = holderComments,
-            isPaginating = isPaginating,
+            isPaginating = pagination.isPaginating,
+            isPaginationError = pagination.isError,
             threadRows = tree?.let { buildEntryThreadRows(it, holderComments, loadingReplies) },
         )
     }.stateIn(viewModelScope, WhileSubscribed(5000), initialState())
@@ -169,7 +179,7 @@ class EntryDetailsViewModel(
         contentLoads = SupervisorJob(viewModelScope.coroutineContext.job)
         loadingRepliesIds.value = emptySet()
         isLoadingMoreTopLevel.value = false
-        isTopLevelPaginationBlocked = false
+        isTopLevelPaginationFailed.value = false
 
         _state.update { previousState ->
             previousState
@@ -259,7 +269,7 @@ class EntryDetailsViewModel(
         totalItems: Int,
     ): Boolean {
         val tree = threadTree.value ?: return paginator.shouldPaginate(lastVisibleIndex, totalItems)
-        if (lastVisibleIndex == null || isLoadingMoreTopLevel.value || isTopLevelPaginationBlocked) return false
+        if (lastVisibleIndex == null || isLoadingMoreTopLevel.value || isTopLevelPaginationFailed.value) return false
         return tree.hasMoreTopLevel && lastVisibleIndex + THREAD_PREFETCH_DISTANCE >= totalItems
     }
 
@@ -284,6 +294,7 @@ class EntryDetailsViewModel(
     private fun loadMoreTopLevelComments() {
         val tree = threadTree.value ?: return
         if (!isLoadingMoreTopLevel.compareAndSet(expect = false, update = true)) return
+        isTopLevelPaginationFailed.value = false
 
         launchContentLoad {
             entriesRepository.getEntryThreadReplies(
@@ -295,9 +306,8 @@ class EntryDetailsViewModel(
                 .onSuccess { page -> appendThreadPage(parentId = null, page = page) }
                 .onFailure {
                     logger.error("Failed to load more entry comments for id=$entryId", it)
-                    // Stop auto-paginating into the same error on every scroll; refresh retries.
-                    isTopLevelPaginationBlocked = true
-                    snackbarManager.tryEmitGenericError()
+                    // Stop auto-paginating into the same error on every scroll; the list offers a retry.
+                    isTopLevelPaginationFailed.value = true
                 }
             isLoadingMoreTopLevel.value = false
         }
@@ -474,3 +484,8 @@ class EntryDetailsViewModel(
         const val THREAD_PREFETCH_DISTANCE = 8
     }
 }
+
+private data class PaginationStatus(
+    val isPaginating: Boolean,
+    val isError: Boolean,
+)

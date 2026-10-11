@@ -155,7 +155,7 @@ class BlacklistsViewModel(
         .paginator
         .shouldPaginate(lastVisibleIndex, totalItems, PAGINATION_PREFETCH_DISTANCE)
 
-    fun paginate() {
+    override fun paginate() {
         categoryControllers.getValue(state.value.selectedCategory).paginator.paginate()
     }
 
@@ -206,7 +206,6 @@ class BlacklistsViewModel(
             },
             onError = { throwable ->
                 logger.error("Failed to paginate blacklist items for $type", throwable)
-                snackbarManager.tryEmitGenericError()
             },
         ) { request ->
             val page = request.numberOrNull() ?: run {
@@ -228,6 +227,7 @@ class BlacklistsViewModel(
         val state = combine(this@CategoryController._state, paginator.state) { currentState, paginatorState ->
             currentState.copy(
                 isPaginating = paginatorState is PaginatorState.Loading,
+                isPaginationError = paginatorState is PaginatorState.Error,
                 canSubmit = normalizeInput(currentState.addInput).isNotBlank() &&
                     !currentState.isActionsInProgress,
             )

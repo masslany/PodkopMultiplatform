@@ -32,5 +32,6 @@ internal fun PrivateMessagesScreenRoot(
         onNewConversationClicked = viewModel::onNewConversationClicked,
         onRefresh = viewModel::onRefresh,
         onConversationClicked = viewModel::onConversationClicked,
+        onRetryPaginationClicked = viewModel::paginate,
     )
 }
