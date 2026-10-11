@@ -68,6 +68,7 @@ private fun GenericNavDisplay(
 ) {
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavTarget>() }
     val dialogSceneStrategy = remember { AnimatedDialogSceneStrategy<NavTarget>() }
+    val translucentSceneStrategy = remember { TranslucentSceneStrategy<NavTarget>() }
     val canNavigateBack = backStack.size > 1
     val navigationInput = rememberPlatformBackNavigationInput(enabled = canNavigateBack)
 
@@ -82,7 +83,7 @@ private fun GenericNavDisplay(
     )
     val sceneState = rememberSceneState(
         entries = entries,
-        sceneStrategies = listOf(bottomSheetStrategy, dialogSceneStrategy),
+        sceneStrategies = listOf(bottomSheetStrategy, dialogSceneStrategy, translucentSceneStrategy),
         onBack = onBack,
     )
 

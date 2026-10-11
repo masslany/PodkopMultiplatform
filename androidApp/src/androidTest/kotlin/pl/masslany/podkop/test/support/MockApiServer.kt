@@ -12,6 +12,10 @@ import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.RecordedRequest
 import okhttp3.HttpUrl
+import okio.Buffer
+import okio.ByteString
+import okio.ByteString.Companion.encodeUtf8
+import okio.ByteString.Companion.toByteString
 
 class MockApiServer(
     private val assets: AssetManager,
@@ -38,7 +42,7 @@ class MockApiServer(
                     unmatchedRequests += requestLine
                     response(
                         code = 404,
-                        body = """{"error":"No route for $requestLine"}""",
+                        body = """{"error":"No route for $requestLine"}""".encodeUtf8(),
                     )
                 }
             }
@@ -59,7 +63,7 @@ class MockApiServer(
             method = "GET",
             path = path,
             query = query,
-            body = body,
+            body = body.encodeUtf8(),
         )
     }
 
@@ -79,7 +83,7 @@ class MockApiServer(
                 method = method,
                 path = path,
                 query = query,
-                body = """{"error":"Injected $code"}""",
+                body = """{"error":"Injected $code"}""".encodeUtf8(),
                 code = code,
                 uses = AtomicInteger(1),
             ),
@@ -92,11 +96,19 @@ class MockApiServer(
         body: String,
         contentType: String,
     ) {
+        get(path = path, body = body.encodeUtf8().toByteArray(), contentType = contentType)
+    }
+
+    fun get(
+        path: String,
+        body: ByteArray,
+        contentType: String,
+    ) {
         routes += Route(
             method = "GET",
             path = path,
             query = emptyMap(),
-            body = body,
+            body = body.toByteString(),
             contentType = contentType,
         )
     }
@@ -110,7 +122,7 @@ class MockApiServer(
             method = "PUT",
             path = path,
             query = emptyMap(),
-            body = "",
+            body = ByteString.EMPTY,
             code = code,
         )
     }
@@ -125,7 +137,7 @@ class MockApiServer(
             method = method,
             path = path,
             query = emptyMap(),
-            body = "",
+            body = ByteString.EMPTY,
             code = code,
         )
     }
@@ -145,7 +157,7 @@ class MockApiServer(
             method = "POST",
             path = path,
             query = emptyMap(),
-            body = body,
+            body = body.encodeUtf8(),
         )
     }
 
@@ -164,13 +176,13 @@ class MockApiServer(
 
     private fun response(
         code: Int = 200,
-        body: String,
+        body: ByteString,
         contentType: String = JSON,
     ): MockResponse =
         MockResponse.Builder()
             .code(code)
             .setHeader("Content-Type", contentType)
-            .body(body)
+            .body(Buffer().write(body))
             .build()
 
     private fun readAsset(path: String): String =
@@ -181,7 +193,7 @@ private class Route(
     val method: String,
     val path: String,
     val query: Map<String, String>,
-    val body: String,
+    val body: ByteString,
     val contentType: String = JSON,
     val code: Int = 200,
     /** How many more requests this route answers; unlimited when null. */

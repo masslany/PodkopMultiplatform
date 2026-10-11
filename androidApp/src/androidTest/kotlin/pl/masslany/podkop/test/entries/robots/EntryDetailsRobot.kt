@@ -1,6 +1,7 @@
 package pl.masslany.podkop.test.entries.robots
 
 import org.koin.core.context.GlobalContext
+import pl.masslany.podkop.common.components.CommonTestTags
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.entrydetails.EntryDetailsTestTags
@@ -19,6 +20,11 @@ class EntryDetailsRobot(
 
     fun displayText(text: String) {
         displayedText(text)
+    }
+
+    fun openPhoto() {
+        waitUntilNode(CommonTestTags.EmbedImage.Image)
+        clickNodeWithTag(CommonTestTags.EmbedImage.Image)
     }
 
     /** Scrolls to the thread's comment with [id], waiting for the page holding it to load. */
