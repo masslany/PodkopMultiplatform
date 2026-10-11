@@ -1,12 +1,6 @@
 package pl.masslany.podkop.features.imageviewer
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationVector2D
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -28,12 +22,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -48,7 +40,6 @@ import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -60,8 +51,6 @@ import androidx.compose.ui.util.fastForEach
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import kotlin.math.abs
-import kotlin.math.sign
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -83,14 +72,9 @@ private const val MaxScale = 5f
 private const val MinScale = 1f
 private const val ScaleResetThreshold = 1.01f
 
-private val DismissDragRange = 240.dp
-private val DismissDistance = 120.dp
-private val DismissVelocity = 900.dp
 private const val DismissShrink = 0.25f
 private const val DismissBackdropFade = 0.7f
 private const val DismissDragSteepness = 1.2f
-private const val DismissExitMillis = 200
-private const val DismissReturnDamping = 0.85f
 private const val TopBarFadeMillis = 200
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -121,11 +105,9 @@ fun ImageViewerScreenContent(
 ) {
     val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
     val contentInsets = paddingValues.toWindowInsets(includeTop = false)
-    val dismissDrag = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
-    val dragRange = with(LocalDensity.current) { DismissDragRange.toPx() }
-    val isDragged by remember { derivedStateOf { dismissDrag.value != Offset.Zero } }
+    val dismissState = rememberImageDismissState()
     val topBarAlpha by animateFloatAsState(
-        targetValue = if (isDragged) 0f else 1f,
+        targetValue = if (dismissState.isDragged) 0f else 1f,
         animationSpec = tween(durationMillis = TopBarFadeMillis),
     )
 
@@ -133,8 +115,7 @@ fun ImageViewerScreenContent(
         modifier = modifier
             .fillMaxSize()
             .drawBehind {
-                val progress = dismissProgress(drag = dismissDrag.value, range = dragRange)
-                drawRect(Color.Black.copy(alpha = 1f - DismissBackdropFade * progress))
+                drawRect(Color.Black.copy(alpha = 1f - DismissBackdropFade * dismissState.progress))
             },
         topBar = {
             TopAppBar(
@@ -189,8 +170,7 @@ fun ImageViewerScreenContent(
                 .padding(innerPaddingValues)
                 .fillMaxSize(),
             imageUrl = state.imageUrl,
-            dismissDrag = dismissDrag,
-            dragRange = dragRange,
+            dismissState = dismissState,
             onDismiss = actions::onBackClicked,
         )
     }
@@ -199,13 +179,11 @@ fun ImageViewerScreenContent(
 @Composable
 private fun ZoomableImage(
     imageUrl: String,
-    dismissDrag: Animatable<Offset, AnimationVector2D>,
-    dragRange: Float,
+    dismissState: ImageDismissState,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val showImageActions = LocalImageActions.current
-    val scope = rememberCoroutineScope()
     val currentOnDismiss by rememberUpdatedState(onDismiss)
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
@@ -217,12 +195,9 @@ private fun ZoomableImage(
             .onSizeChanged {
                 containerSize = it
             }
-            .pointerInput(containerSize) {
-                val dismissDistance = DismissDistance.toPx()
-                val dismissVelocity = DismissVelocity.toPx()
+            .pointerInput(containerSize, dismissState) {
                 detectZoomOrDismissGestures(
                     isZoomed = { scale > MinScale },
-                    dismissDragStart = { dismissDrag.value },
                     onTransform = { pan, zoom ->
                         val updatedScale = (scale * zoom).coerceIn(MinScale, MaxScale)
 
@@ -233,32 +208,10 @@ private fun ZoomableImage(
                             offset = offset + pan,
                         )
                     },
-                    onDismissDrag = { drag ->
-                        scope.launch { dismissDrag.snapTo(drag) }
-                    },
-                    onDismissDragEnd = { drag, velocity ->
-                        if (closesOnRelease(drag.y, velocity.y, dismissDistance, dismissVelocity)) {
+                    onDismissDrag = dismissState::dragBy,
+                    onDismissDragEnd = { velocity ->
+                        if (dismissState.release(velocity, containerHeight = containerSize.height.toFloat())) {
                             currentOnDismiss()
-                            scope.launch {
-                                dismissDrag.animateTo(
-                                    targetValue = Offset(drag.x, sign(drag.y) * containerSize.height),
-                                    animationSpec = tween(
-                                        durationMillis = DismissExitMillis,
-                                        easing = FastOutLinearInEasing,
-                                    ),
-                                )
-                            }
-                        } else {
-                            scope.launch {
-                                dismissDrag.animateTo(
-                                    targetValue = Offset.Zero,
-                                    animationSpec = spring(
-                                        dampingRatio = DismissReturnDamping,
-                                        stiffness = Spring.StiffnessMediumLow,
-                                    ),
-                                    initialVelocity = Offset(velocity.x, velocity.y),
-                                )
-                            }
                         }
                     },
                 )
@@ -300,8 +253,8 @@ private fun ZoomableImage(
                 .fillMaxSize()
                 .align(Alignment.Center)
                 .graphicsLayer {
-                    val drag = dismissDrag.value
-                    val dragScale = 1f - DismissShrink * dismissProgress(drag = drag, range = dragRange)
+                    val drag = dismissState.offset
+                    val dragScale = 1f - DismissShrink * dismissState.progress
                     scaleX = scale * dragScale
                     scaleY = scale * dragScale
                     translationX = offset.x + drag.x
@@ -322,17 +275,16 @@ private enum class ImageGesture { Undecided, Transform, Dismiss }
  */
 private suspend fun PointerInputScope.detectZoomOrDismissGestures(
     isZoomed: () -> Boolean,
-    dismissDragStart: () -> Offset,
     onTransform: (pan: Offset, zoom: Float) -> Unit,
-    onDismissDrag: (drag: Offset) -> Unit,
-    onDismissDragEnd: (drag: Offset, velocity: Velocity) -> Unit,
+    onDismissDrag: (delta: Offset) -> Unit,
+    onDismissDragEnd: (velocity: Velocity) -> Unit,
 ) {
     awaitEachGesture {
         awaitFirstDown(requireUnconsumed = false)
         var gesture = ImageGesture.Undecided
         var zoomBeforeSlop = 1f
         var panBeforeSlop = Offset.Zero
-        var drag = Offset.Zero
+        var dragged = Offset.Zero
         val velocityTracker = VelocityTracker()
         do {
             val event = awaitPointerEvent()
@@ -349,7 +301,6 @@ private suspend fun PointerInputScope.detectZoomOrDismissGestures(
                         val fingers = event.changes.count { it.pressed }
                         val isSteep = abs(panBeforeSlop.y) > abs(panBeforeSlop.x) * DismissDragSteepness
                         gesture = if (!isZoomed() && fingers == 1 && isSteep) {
-                            drag = dismissDragStart()
                             ImageGesture.Dismiss
                         } else {
                             ImageGesture.Transform
@@ -362,9 +313,9 @@ private suspend fun PointerInputScope.detectZoomOrDismissGestures(
                     ImageGesture.Transform -> if (zoom != 1f || pan != Offset.Zero) onTransform(pan, zoom)
 
                     ImageGesture.Dismiss -> {
-                        drag += pan
-                        onDismissDrag(drag)
-                        velocityTracker.addPosition(event.changes.first().uptimeMillis, drag)
+                        dragged += pan
+                        onDismissDrag(pan)
+                        velocityTracker.addPosition(event.changes.first().uptimeMillis, dragged)
                     }
                 }
                 if (gesture != ImageGesture.Undecided) {
@@ -374,26 +325,9 @@ private suspend fun PointerInputScope.detectZoomOrDismissGestures(
         } while (!isCanceled && event.changes.fastAny { it.pressed })
 
         if (gesture == ImageGesture.Dismiss) {
-            onDismissDragEnd(drag, velocityTracker.calculateVelocity())
+            onDismissDragEnd(velocityTracker.calculateVelocity())
         }
     }
-}
-
-internal fun dismissProgress(
-    drag: Offset,
-    range: Float,
-): Float = (abs(drag.y) / range).coerceIn(0f, 1f)
-
-/** A fling closes the viewer only away from the middle, so flicking the image back keeps it open. */
-internal fun closesOnRelease(
-    dragY: Float,
-    velocityY: Float,
-    minDistance: Float,
-    minVelocity: Float,
-): Boolean = if (abs(velocityY) > minVelocity) {
-    sign(velocityY) == sign(dragY)
-} else {
-    abs(dragY) > minDistance
 }
 
 private fun clampOffsetForScale(
