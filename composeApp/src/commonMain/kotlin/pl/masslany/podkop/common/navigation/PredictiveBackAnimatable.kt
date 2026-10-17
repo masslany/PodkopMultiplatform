@@ -47,7 +47,7 @@ internal class PredictiveBackAnimatable(initialEvent: NavigationEvent) {
     private var swipeEdge by mutableIntStateOf(initialEvent.swipeEdge)
     private var touchY by mutableFloatStateOf(initialEvent.touchY)
 
-    fun exitModifier(cornerRadius: Dp): Modifier = Modifier.graphicsLayer {
+    fun Modifier.exit(cornerRadius: Dp): Modifier = graphicsLayer {
         val progress = progressAnimatable.value
         val scale = 1f - progress * (1f - PredictiveBackExitScale)
         scaleX = scale
@@ -59,7 +59,7 @@ internal class PredictiveBackAnimatable(initialEvent: NavigationEvent) {
         clip = true
     }
 
-    fun enterModifier(): Modifier = Modifier.drawWithContent {
+    fun Modifier.enter(): Modifier = drawWithContent {
         drawContent()
         drawRect(color = Color.Black.copy(alpha = finishProgressAnimatable.value * PredictiveBackScrimAlpha))
     }

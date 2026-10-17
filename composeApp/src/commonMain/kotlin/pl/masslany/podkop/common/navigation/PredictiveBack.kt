@@ -14,7 +14,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -68,7 +67,7 @@ internal class PredictiveBackState(private val scope: CoroutineScope) {
     private var revealedKeys by mutableStateOf(emptySet<Any>())
 
     /** Content keys of the entries `NavDisplay` is taking off screen. */
-    private val exitingKeys = mutableStateSetOf<Any>()
+    private var exitingKeys by mutableStateOf(emptySet<Any>())
 
     /** The content keys of the current scene's own entries, and of the scene Back reveals. */
     var sceneKeys by mutableStateOf(emptySet<Any>() to emptySet<Any>())
@@ -83,21 +82,23 @@ internal class PredictiveBackState(private val scope: CoroutineScope) {
 
     private val isSettling: Boolean get() = settleJob?.isActive == true
 
-    fun modifier(key: Any, cornerRadius: Dp): Modifier {
-        val animatable = animatable ?: return Modifier
-        return when (key) {
-            in leavingKeys -> animatable.exitModifier(cornerRadius)
-            in revealedKeys -> animatable.enterModifier()
-            else -> Modifier
+    fun Modifier.predictiveBack(key: Any, cornerRadius: Dp): Modifier {
+        val animatable = animatable ?: return this
+        return with(animatable) {
+            when (key) {
+                in leavingKeys -> exit(cornerRadius)
+                in revealedKeys -> enter()
+                else -> this@predictiveBack
+            }
         }
     }
 
     fun onExiting(key: Any) {
-        exitingKeys += key
+        exitingKeys = exitingKeys + key
     }
 
     fun onNotExiting(key: Any) {
-        exitingKeys -= key
+        exitingKeys = exitingKeys - key
     }
 
     fun onStarted(event: NavigationEvent) {
@@ -205,7 +206,12 @@ internal fun <T : Any> rememberPredictiveBackNavigationEventState(
 
     // A dispatcher of its own, not linked to the app's, so only the state drives what NavDisplay previews.
     val previewOwner = rememberNavigationEventDispatcherOwner(parent = null)
-    remember(previewOwner) { previewOwner.navigationEventDispatcher.addInput(state.previewInput) }
+    // Declared after the owner, so it's disposed first and the input leaves before the dispatcher is disposed.
+    DisposableEffect(previewOwner, state) {
+        val previewDispatcher = previewOwner.navigationEventDispatcher
+        previewDispatcher.addInput(state.previewInput)
+        onDispose { previewDispatcher.removeInput(state.previewInput) }
+    }
     val navigationEventState = rememberNavigationEventState(currentInfo = currentInfo, backInfo = backInfo)
     CompositionLocalProvider(LocalNavigationEventDispatcherOwner provides previewOwner) {
         NavigationBackHandler(state = navigationEventState, isBackEnabled = isBackEnabled, onBackCompleted = {})
@@ -245,7 +251,7 @@ internal fun <T : Any> rememberPredictiveBackDecorator(state: PredictiveBackStat
                 entry.Content()
             } else {
                 val cornerRadius = rememberDisplayCornerRadius()
-                Box(modifier = Modifier.fillMaxSize().then(state.modifier(key, cornerRadius))) {
+                Box(modifier = with(state) { Modifier.fillMaxSize().predictiveBack(key, cornerRadius) }) {
                     entry.Content()
                 }
             }
