@@ -72,12 +72,13 @@ private fun GenericNavDisplay(
     val canNavigateBack = backStack.size > 1
     val navigationInput = rememberPlatformBackNavigationInput(enabled = canNavigateBack)
 
+    val predictiveBackState = rememberPredictiveBackState()
     val entries = rememberDecoratedNavEntries(
         backStack = backStack,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator(),
-            rememberPredictivePopCornersDecorator(),
+            rememberPredictiveBackDecorator(predictiveBackState),
         ),
         entryProvider = { entryProvider(it) },
     )
@@ -89,7 +90,8 @@ private fun GenericNavDisplay(
 
     NavDisplay(
         sceneState = sceneState,
-        navigationEventState = rememberPredictivePopState(
+        navigationEventState = rememberPredictiveBackNavigationEventState(
+            state = predictiveBackState,
             sceneState = sceneState,
             entryCount = entries.size,
             onBack = onBack,
@@ -110,6 +112,6 @@ private fun GenericNavDisplay(
                 initialContentExit = ExitTransition.None,
             )
         },
-        predictivePopTransitionSpec = { edge -> predictivePopTransform(edge) },
+        predictivePopTransitionSpec = { predictiveBackTransform() },
     )
 }
