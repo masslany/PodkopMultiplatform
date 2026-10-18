@@ -39,6 +39,7 @@ import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
 import pl.masslany.podkop.features.composer.ComposerRequest
 import pl.masslany.podkop.features.composer.ComposerResult
 import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
+import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -52,10 +53,10 @@ class EntriesViewModel(
     private val snackbarManager: SnackbarManager,
     private val appNavigator: AppNavigator,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(resourceItemStateHolder),
     EntriesActions,
     TopBarActions by topBarActions,
-    ResourceItemStateHolder by resourceItemStateHolder {
+    ResourceItemActions by resourceItemStateHolder {
 
     private var currentEntriesSortType: EntriesSortType = EntriesSortType.Hot
     private var currentHotSortType: HotSortType = HotSortType.TwelveHours
@@ -115,8 +116,6 @@ class EntriesViewModel(
         .toImmutableList()
 
     init {
-        resourceItemStateHolder.init(viewModelScope)
-
         updateState { previousState ->
             previousState.copy(
                 sortMenuState = DropdownMenuState(

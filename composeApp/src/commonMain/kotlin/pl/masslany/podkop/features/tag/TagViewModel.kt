@@ -26,6 +26,7 @@ import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
+import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -40,10 +41,10 @@ class TagViewModel(
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(resourceItemStateHolder),
     TagActions,
     TopBarActions by topBarActions,
-    ResourceItemStateHolder by resourceItemStateHolder {
+    ResourceItemActions by resourceItemStateHolder {
 
     private var currentSort: TagsSort = TagsSort.All
     private var currentType: TagsType = content.toTagsType()
@@ -88,8 +89,6 @@ class TagViewModel(
     )
 
     init {
-        resourceItemStateHolder.init(viewModelScope)
-
         viewModelScope.launch {
             val isLoggedIn = authRepository.isLoggedIn()
             _state.update { previousState ->

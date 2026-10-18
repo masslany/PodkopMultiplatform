@@ -19,6 +19,7 @@ import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.pagination.numberOrNull
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -29,10 +30,10 @@ class AdvancedSearchViewModel(
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(resourceItemStateHolder),
     AdvancedSearchActions,
     TopBarActions by topBarActions,
-    ResourceItemStateHolder by resourceItemStateHolder {
+    ResourceItemActions by resourceItemStateHolder {
 
     private var currentRequest: SearchStreamQuery? = null
 
@@ -81,10 +82,6 @@ class AdvancedSearchViewModel(
         WhileSubscribed(5000),
         _state.value,
     )
-
-    init {
-        resourceItemStateHolder.init(viewModelScope)
-    }
 
     override fun onQueryChanged(value: String) {
         _state.update { previous ->

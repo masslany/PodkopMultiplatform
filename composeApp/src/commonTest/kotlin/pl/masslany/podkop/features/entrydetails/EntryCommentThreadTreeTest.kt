@@ -1,5 +1,10 @@
 package pl.masslany.podkop.features.entrydetails
 
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import pl.masslany.podkop.business.common.domain.models.common.Deleted
 import pl.masslany.podkop.business.common.domain.models.common.Resource
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
@@ -8,11 +13,6 @@ import pl.masslany.podkop.business.entries.domain.models.EntryThreadComment
 import pl.masslany.podkop.business.entries.domain.models.EntryThreadReplies
 import pl.masslany.podkop.features.entrydetails.EntryCommentThreadTree.Row
 import pl.masslany.podkop.features.resources.models.toResourceItemState
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class EntryCommentThreadTreeTest {
 

@@ -56,7 +56,7 @@ class ProfileViewModel(
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(resourceItemStateHolder),
     ProfileActions,
     TopBarActions by topBarActions,
     ResourceItemActions by resourceItemStateHolder {
@@ -145,7 +145,6 @@ class ProfileViewModel(
         )
 
     init {
-        resourceItemStateHolder.init(viewModelScope)
         viewModelScope.launch {
             loadData()
         }

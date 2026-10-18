@@ -7,13 +7,13 @@ import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.common.navigation.NavigationConfigProvider
 import pl.masslany.podkop.common.navigation.TopLevelDestination
@@ -29,9 +29,10 @@ data class HomeNavigatorState(
     val stacks: ImmutableMap<NavTarget, ImmutableList<NavTarget>> = persistentMapOf(),
 )
 
-class HomeNavigator(private val configProvider: NavigationConfigProvider) : AutoCloseable {
+class HomeNavigator(private val configProvider: NavigationConfigProvider, dispatcherProvider: DispatcherProvider) :
+    AutoCloseable {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val scope = CoroutineScope(SupervisorJob() + dispatcherProvider.mainImmediate)
 
     private val _state = MutableStateFlow(HomeNavigatorState())
     val state = _state.asStateFlow()

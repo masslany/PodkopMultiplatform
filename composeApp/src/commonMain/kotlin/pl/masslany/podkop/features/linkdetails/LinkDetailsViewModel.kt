@@ -27,10 +27,7 @@ import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
 import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.models.embed.EmbedContentState
-import pl.masslany.podkop.common.models.embed.EmbedContentType
-import pl.masslany.podkop.common.models.embed.StreamableEmbedState
 import pl.masslany.podkop.common.models.embed.TwitterEmbedState
-import pl.masslany.podkop.common.models.embed.toTwitterEmbedPreviewState
 import pl.masslany.podkop.common.models.vote.VoteReasonType
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.pagination.Paginator
@@ -49,6 +46,7 @@ import pl.masslany.podkop.features.resourceactions.ResourceActionsBottomSheetScr
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraft
 import pl.masslany.podkop.features.resourceactions.ResourceScreenshotShareDraftStore
 import pl.masslany.podkop.features.resourceactions.ResourceTextSelectionDialogScreen
+import pl.masslany.podkop.features.resources.ResourceEmbedPreviews
 import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.resources.StreamableEmbedPlayback
@@ -57,7 +55,6 @@ import pl.masslany.podkop.features.resources.models.link.toLinkItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.LinkCommentItemState
 import pl.masslany.podkop.features.resources.models.linkcomment.toLinkCommentItemState
 import pl.masslany.podkop.features.resources.models.related.toRelatedItemState
-import pl.masslany.podkop.features.resources.updateStreamableEmbedStateIfMatches
 import pl.masslany.podkop.features.resources.updateTwitterEmbedStateIfMatches
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -67,15 +64,15 @@ class LinkDetailsViewModel(
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository,
     private val resourceItemStateHolder: ResourceItemStateHolder,
-    private val twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
-    private val streamableEmbedPlayback: StreamableEmbedPlayback,
+    twitterEmbedPreviewRepository: TwitterEmbedPreviewRepository,
+    streamableEmbedPlayback: StreamableEmbedPlayback,
     private val appNavigator: AppNavigator,
     private val screenshotShareDraftStore: ResourceScreenshotShareDraftStore,
     private val resourceActionUpdatesStore: ResourceActionUpdatesStore,
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(resourceItemStateHolder),
     LinkDetailsActions,
     TopBarActions by topBarActions,
     ResourceItemActions by resourceItemStateHolder {
@@ -131,6 +128,16 @@ class LinkDetailsViewModel(
     }
 
     private val commentRepliesStateById = MutableStateFlow<Map<Int, CommentRepliesState>>(emptyMap())
+
+    // Loaded replies are kept here rather than in the holder, so their embeds load into this state.
+    private val replyEmbedPreviews = ResourceEmbedPreviews(
+        appNavigator = appNavigator,
+        twitterEmbedPreviewRepository = twitterEmbedPreviewRepository,
+        streamableEmbedPlayback = streamableEmbedPlayback,
+        logger = logger,
+        updateEmbedState = ::updateReplyEmbedState,
+    )
+
     private val _state = MutableStateFlow(initialState())
     val state = combine(
         _state,
@@ -167,7 +174,6 @@ class LinkDetailsViewModel(
     }.stateIn(viewModelScope, WhileSubscribed(5000), _state.value)
 
     init {
-        resourceItemStateHolder.init(viewModelScope)
         observeResourceActionUpdates()
         loadContent(isRefreshing = false)
     }
@@ -317,72 +323,10 @@ class LinkDetailsViewModel(
     }
 
     override fun onEmbedPreviewClicked(itemId: Int, state: EmbedContentState) {
-        if (!hasLoadedReplyWithId(itemId)) {
+        if (hasLoadedReplyWithId(itemId)) {
+            replyEmbedPreviews.onPreviewClicked(viewModelScope, itemId, state)
+        } else {
             resourceItemStateHolder.onEmbedPreviewClicked(itemId, state)
-            return
-        }
-
-        when (state.type) {
-            EmbedContentType.Twitter -> {
-                when (state.twitterState) {
-                    TwitterEmbedState.Preview -> {
-                        viewModelScope.launch {
-                            updateReplyTwitterEmbedState(
-                                itemId = itemId,
-                                embedKey = state.key,
-                                newState = TwitterEmbedState.Loading,
-                            )
-
-                            twitterEmbedPreviewRepository.getTweet(state.url)
-                                .onSuccess { tweet ->
-                                    updateReplyTwitterEmbedState(
-                                        itemId = itemId,
-                                        embedKey = state.key,
-                                        newState = TwitterEmbedState.Loaded(
-                                            tweet.toTwitterEmbedPreviewState(),
-                                        ),
-                                    )
-                                }
-                                .onFailure { error ->
-                                    logger.error(
-                                        message = "Twitter embed preview fetch failed for reply itemId=$itemId " +
-                                            "url=${state.url}",
-                                        throwable = error,
-                                    )
-                                    updateReplyTwitterEmbedState(
-                                        itemId = itemId,
-                                        embedKey = state.key,
-                                        newState = TwitterEmbedState.Error,
-                                    )
-                                }
-                        }
-                    }
-
-                    TwitterEmbedState.Loading -> Unit
-
-                    null,
-                    is TwitterEmbedState.Loaded,
-                    TwitterEmbedState.Error,
-                    -> resourceItemStateHolder.onEmbedPreviewClicked(itemId, state)
-                }
-            }
-
-            EmbedContentType.Streamable -> {
-                if (state.streamableState == StreamableEmbedState.Loading) return
-                viewModelScope.launch {
-                    if (state.streamableState == null || !streamableEmbedPlayback.isInlinePlaybackEnabled()) {
-                        appNavigator.openExternalLink(state.url)
-                        return@launch
-                    }
-                    updateReplyEmbedState(itemId) {
-                        it.updateStreamableEmbedStateIfMatches(state.key, StreamableEmbedState.Loading)
-                    }
-                    val resolved = streamableEmbedPlayback.resolve(state.url)
-                    updateReplyEmbedState(itemId) { it.updateStreamableEmbedStateIfMatches(state.key, resolved) }
-                }
-            }
-
-            else -> resourceItemStateHolder.onEmbedPreviewClicked(itemId, state)
         }
     }
 
@@ -1033,14 +977,6 @@ class LinkDetailsViewModel(
         _state.update { previousState ->
             transform(previousState)
         }
-    }
-
-    private fun updateReplyTwitterEmbedState(
-        itemId: Int,
-        embedKey: String,
-        newState: TwitterEmbedState,
-    ) {
-        updateReplyEmbedState(itemId) { it.updateTwitterEmbedStateIfMatches(embedKey = embedKey, newState = newState) }
     }
 
     private fun updateReplyEmbedState(

@@ -35,7 +35,7 @@ class HitsViewModel(
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(resourceItemStateHolder),
     HitsActions,
     TopBarActions by topBarActions,
     ResourceItemActions by resourceItemStateHolder {
@@ -98,7 +98,6 @@ class HitsViewModel(
     )
 
     init {
-        resourceItemStateHolder.init(viewModelScope)
         fetchHits()
     }
 

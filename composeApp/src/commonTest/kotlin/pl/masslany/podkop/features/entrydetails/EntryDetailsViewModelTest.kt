@@ -1,5 +1,11 @@
 package pl.masslany.podkop.features.entrydetails
 
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,12 +32,6 @@ import pl.masslany.podkop.testsupport.fakes.FakeProfileRepository
 import pl.masslany.podkop.testsupport.fakes.FakeResourceItemStateHolder
 import pl.masslany.podkop.testsupport.fakes.FakeSnackbarManager
 import pl.masslany.podkop.testsupport.navigation.createTestAppNavigator
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EntryDetailsViewModelTest {
