@@ -8,5 +8,6 @@ import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
 internal class DispatcherProviderImpl : DispatcherProvider {
     override val io: CoroutineDispatcher = Dispatchers.IO
     override val main: CoroutineDispatcher = Dispatchers.Main
+    override val mainImmediate: CoroutineDispatcher = Dispatchers.Main.immediate
     override val default: CoroutineDispatcher = Dispatchers.Default
 }

@@ -10,6 +10,7 @@ import pl.masslany.podkop.common.persistence.api.KeyValueStorage
 class FakeDispatcherProvider(
     override val io: CoroutineDispatcher = Dispatchers.Unconfined,
     override val main: CoroutineDispatcher = Dispatchers.Unconfined,
+    override val mainImmediate: CoroutineDispatcher = Dispatchers.Unconfined,
     override val default: CoroutineDispatcher = Dispatchers.Unconfined,
 ) : DispatcherProvider
 

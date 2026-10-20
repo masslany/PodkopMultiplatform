@@ -25,6 +25,7 @@ import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
+import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -36,10 +37,10 @@ class FavoritesViewModel(
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(resourceItemStateHolder),
     FavoritesActions,
     TopBarActions by topBarActions,
-    ResourceItemStateHolder by resourceItemStateHolder {
+    ResourceItemActions by resourceItemStateHolder {
 
     private var currentSortType: FavouritesSortType = FavouritesSortType.Newest
     private var currentResourceType: FavouritesResourceType = FavouritesResourceType.All
@@ -81,7 +82,6 @@ class FavoritesViewModel(
     )
 
     init {
-        resourceItemStateHolder.init(viewModelScope)
         _state.update { previousState ->
             previousState.copy(
                 sortMenuState = DropdownMenuState(

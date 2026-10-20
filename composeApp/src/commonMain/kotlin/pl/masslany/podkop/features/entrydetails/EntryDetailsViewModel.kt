@@ -35,6 +35,7 @@ import pl.masslany.podkop.features.composer.ComposerBottomSheetScreen
 import pl.masslany.podkop.features.composer.ComposerPrefill
 import pl.masslany.podkop.features.composer.ComposerRequest
 import pl.masslany.podkop.features.composer.ComposerResult
+import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.resources.models.entry.EntryItemState
 import pl.masslany.podkop.features.resources.models.toResourceItemState
@@ -51,10 +52,10 @@ class EntryDetailsViewModel(
     private val appNavigator: AppNavigator,
     private val appSettings: AppSettings,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(resourceItemStateHolder),
     EntryDetailsActions,
     TopBarActions by topBarActions,
-    ResourceItemStateHolder by resourceItemStateHolder {
+    ResourceItemActions by resourceItemStateHolder {
 
     private val entryId = screen.id
     private val composerResultKeyPrefix = "entry-details-composer-$entryId-"
@@ -134,7 +135,6 @@ class EntryDetailsViewModel(
     }.stateIn(viewModelScope, WhileSubscribed(5000), initialState())
 
     init {
-        resourceItemStateHolder.init(viewModelScope)
         observeComposerResults()
         loadContent(isRefreshing = false)
     }
@@ -485,7 +485,4 @@ class EntryDetailsViewModel(
     }
 }
 
-private data class PaginationStatus(
-    val isPaginating: Boolean,
-    val isError: Boolean,
-)
+private data class PaginationStatus(val isPaginating: Boolean, val isError: Boolean)

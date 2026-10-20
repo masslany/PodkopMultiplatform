@@ -1,8 +1,8 @@
 package pl.masslany.podkop.features.resources.di
 
 import org.koin.dsl.module
-import pl.masslany.podkop.features.resources.BaseResourceItemStateHolder
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
+import pl.masslany.podkop.features.resources.ResourceItemStateHolderImpl
 import pl.masslany.podkop.features.resources.StreamableEmbedPlayback
 
 val resourcesModule = module {
@@ -14,7 +14,7 @@ val resourcesModule = module {
         )
     }
     factory<ResourceItemStateHolder> {
-        BaseResourceItemStateHolder(
+        ResourceItemStateHolderImpl(
             linksRepository = get(),
             entriesRepository = get(),
             favouritesRepository = get(),

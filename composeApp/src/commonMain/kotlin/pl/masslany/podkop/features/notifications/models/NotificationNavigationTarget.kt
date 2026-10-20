@@ -10,10 +10,7 @@ sealed interface NotificationNavigationTarget {
     data class Profile(val username: String) : NotificationNavigationTarget
 
     /** [content] narrows the tag to what the notification group is about, as website does. */
-    data class Tag(
-        val name: String,
-        val content: GroupedTagContentType? = null,
-    ) : NotificationNavigationTarget
+    data class Tag(val name: String, val content: GroupedTagContentType? = null) : NotificationNavigationTarget
 
     data class External(val url: String) : NotificationNavigationTarget
 

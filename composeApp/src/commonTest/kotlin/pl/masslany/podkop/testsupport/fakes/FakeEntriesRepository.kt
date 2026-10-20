@@ -1,5 +1,7 @@
 package pl.masslany.podkop.testsupport.fakes
 
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.business.common.domain.models.common.Resources
 import pl.masslany.podkop.business.common.domain.models.common.Voters
@@ -11,8 +13,6 @@ import pl.masslany.podkop.business.entries.domain.models.EntryThreadSort
 import pl.masslany.podkop.business.entries.domain.models.request.EntriesSortType
 import pl.masslany.podkop.business.entries.domain.models.request.HotSortType
 import pl.masslany.podkop.common.pagination.PageRequest
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 /** Entry reads used by the entry details screen; every other call fails the test. */
 @OptIn(ExperimentalTime::class)
@@ -29,7 +29,8 @@ class FakeEntriesRepository : EntriesRepository {
 
     override suspend fun getEntry(entryId: Int): Result<ResourceItem> = entryResult ?: notUsed()
 
-    override suspend fun getEntryThread(entryId: Int, sort: EntryThreadSort): Result<EntryThread> = threadResult ?: notUsed()
+    override suspend fun getEntryThread(entryId: Int, sort: EntryThreadSort): Result<EntryThread> =
+        threadResult ?: notUsed()
 
     override suspend fun getEntryThreadReplies(
         entryId: Int,

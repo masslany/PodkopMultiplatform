@@ -37,7 +37,9 @@ class AppendPageTest {
     fun `listed items keep their state`() {
         val listed = listOf(resource(1, Resource.Link).copy(content = "listed")).map { it.toResourceItemState() }
 
-        val result = listed.appendPage(listOf(resource(1, Resource.Link).copy(content = "repeated"))) { it.toResourceItemState() }
+        val result = listed.appendPage(listOf(resource(1, Resource.Link).copy(content = "repeated"))) {
+            it.toResourceItemState()
+        }
 
         assertEquals(listed, result)
     }

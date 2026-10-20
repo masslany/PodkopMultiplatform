@@ -3,7 +3,6 @@ package pl.masslany.podkop.testsupport.fakes
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import pl.masslany.podkop.business.common.domain.models.common.ResourceItem
 import pl.masslany.podkop.common.preview.NoOpResourceItemActions
@@ -19,8 +18,6 @@ class FakeResourceItemStateHolder :
     ResourceItemActions by NoOpResourceItemActions {
     override val items = MutableStateFlow<ImmutableList<ResourceItemState>>(persistentListOf())
 
-    override fun init(scope: CoroutineScope, isUpcoming: Boolean) = Unit
-
     override suspend fun updateData(data: List<ResourceItem>) {
         items.value = data.map { it.toResourceItemState() }.toImmutableList()
     }
@@ -30,4 +27,6 @@ class FakeResourceItemStateHolder :
     }
 
     override suspend fun notifyItemUpdated(newState: ResourceItem) = Unit
+
+    override fun close() = Unit
 }

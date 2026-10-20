@@ -36,6 +36,7 @@ import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
 import pl.masslany.podkop.features.linksubmission.AddLinkScreen
 import pl.masslany.podkop.features.pagination.FeaturePaginationPolicies
+import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.topbar.TopBarActions
 
 @OptIn(ExperimentalUuidApi::class)
@@ -50,10 +51,10 @@ class LinksViewModel(
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(linksResourceItemStateHolder),
     LinksActions,
     TopBarActions by topBarActions,
-    LinksResourceItemStateHolder by linksResourceItemStateHolder {
+    ResourceItemActions by linksResourceItemStateHolder {
 
     val linksType = if (isUpcoming) LinksType.UPCOMING else LinksType.HOMEPAGE
     var selectedLinksSortType = if (isUpcoming) LinksSortType.Active else LinksSortType.Newest
@@ -104,8 +105,6 @@ class LinksViewModel(
     )
 
     init {
-        linksResourceItemStateHolder.init(viewModelScope, isUpcoming)
-
         _state.update { previousState ->
             previousState.copy(
                 isUpcoming = isUpcoming,

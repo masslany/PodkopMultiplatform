@@ -18,13 +18,13 @@ import pl.masslany.podkop.business.observed.domain.models.request.ObservedType
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.models.DropdownMenuItemType
 import pl.masslany.podkop.common.models.DropdownMenuState
-import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.common.pagination.PaginationMode
 import pl.masslany.podkop.common.pagination.Paginator
 import pl.masslany.podkop.common.pagination.PaginatorState
 import pl.masslany.podkop.common.pagination.initialRequest
 import pl.masslany.podkop.common.snackbar.SnackbarManager
 import pl.masslany.podkop.common.snackbar.tryEmitGenericError
+import pl.masslany.podkop.features.resources.ResourceItemActions
 import pl.masslany.podkop.features.resources.ResourceItemStateHolder
 import pl.masslany.podkop.features.topbar.TopBarActions
 
@@ -35,10 +35,10 @@ class ObservedViewModel(
     private val logger: AppLogger,
     private val snackbarManager: SnackbarManager,
     topBarActions: TopBarActions,
-) : ViewModel(),
+) : ViewModel(resourceItemStateHolder),
     ObservedActions,
     TopBarActions by topBarActions,
-    ResourceItemStateHolder by resourceItemStateHolder {
+    ResourceItemActions by resourceItemStateHolder {
 
     private var currentType: ObservedType = ObservedType.All
     private val screenInstanceId = Uuid.random().toString()
@@ -91,7 +91,6 @@ class ObservedViewModel(
     )
 
     init {
-        resourceItemStateHolder.init(viewModelScope)
         _state.update { previousState ->
             previousState.copy(
                 selectedType = currentType,

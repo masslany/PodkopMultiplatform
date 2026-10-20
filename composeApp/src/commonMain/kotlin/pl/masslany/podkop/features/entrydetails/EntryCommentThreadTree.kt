@@ -9,10 +9,7 @@ import pl.masslany.podkop.business.entries.domain.models.EntryThreadReplies
  * many replies each branch still has on the server. The comment contents themselves live in the
  * resource item holder, keyed by id.
  */
-internal data class EntryCommentThreadTree(
-    private val root: Branch,
-    private val nodes: Map<Int, Node>,
-) {
+internal data class EntryCommentThreadTree(private val root: Branch, private val nodes: Map<Int, Node>) {
     /** Loaded children plus what is needed to fetch the rest after them. */
     data class Branch(
         val childIds: List<Int>,
@@ -23,12 +20,7 @@ internal data class EntryCommentThreadTree(
         val remainingCount: Int get() = (totalCount - childIds.size).coerceAtLeast(0)
     }
 
-    data class Node(
-        val depth: Int,
-        val isByEntryAuthor: Boolean,
-        val replyParentId: Int,
-        val replies: Branch,
-    )
+    data class Node(val depth: Int, val isByEntryAuthor: Boolean, val replyParentId: Int, val replies: Branch)
 
     sealed interface Row {
         val connectors: ThreadConnectors

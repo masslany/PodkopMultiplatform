@@ -7,16 +7,13 @@ import kotlin.test.assertTrue
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import pl.masslany.podkop.common.navigation.NavTarget
 import pl.masslany.podkop.common.navigation.NavigationConfigProvider
 import pl.masslany.podkop.common.navigation.TopLevelDestination
@@ -25,6 +22,7 @@ import pl.masslany.podkop.features.entrydetails.EntryDetailsScreen
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreen
 import pl.masslany.podkop.features.links.LinksScreen
 import pl.masslany.podkop.features.upcoming.UpcomingScreen
+import pl.masslany.podkop.testsupport.fakes.FakeDispatcherProvider
 import podkop.composeapp.generated.resources.Res
 import podkop.composeapp.generated.resources.ic_home
 import podkop.composeapp.generated.resources.navigation_label_homepage
@@ -182,10 +180,11 @@ class HomeNavigatorTest {
     }
 }
 
-private fun createNavigator(
+private fun TestScope.createNavigator(
     destinations: ImmutableList<TopLevelDestination>,
 ): HomeNavigator = HomeNavigator(
     configProvider = FakeNavigationConfigProvider(destinations = destinations),
+    dispatcherProvider = FakeDispatcherProvider(StandardTestDispatcher(testScheduler)),
 )
 
 private fun topLevelDestination(root: NavTarget): TopLevelDestination = TopLevelDestination(
@@ -203,13 +202,4 @@ private class FakeNavigationConfigProvider(destinations: ImmutableList<TopLevelD
     override val topLevelDestinations: Flow<ImmutableList<TopLevelDestination>> = destinationsFlow
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
-private fun runHomeNavigatorTest(block: suspend TestScope.() -> Unit) {
-    val dispatcher = StandardTestDispatcher()
-    Dispatchers.setMain(dispatcher)
-    try {
-        runTest(dispatcher, testBody = block)
-    } finally {
-        Dispatchers.resetMain()
-    }
-}
+private fun runHomeNavigatorTest(block: suspend TestScope.() -> Unit) = runTest(testBody = block)

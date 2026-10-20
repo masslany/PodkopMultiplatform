@@ -6,6 +6,6 @@ import pl.masslany.podkop.features.home.HomeNavigator
 import pl.masslany.podkop.features.home.HomeViewModel
 
 val homeModule = module {
-    factory { HomeNavigator(configProvider = get()) }
+    factory { HomeNavigator(configProvider = get(), dispatcherProvider = get()) }
     viewModelOf(::HomeViewModel)
 }
