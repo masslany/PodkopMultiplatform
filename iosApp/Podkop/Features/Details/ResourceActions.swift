@@ -14,6 +14,9 @@ struct ResourceActionsSheet: View {
     @State private var report = false
     @State private var textSelection = false
     @State private var confirmDelete = false
+    @State private var confirmBlock = false
+    @State private var blocking = false
+    @State private var blockedAuthor: String?
     @State private var contentHeight: CGFloat = 320
 
     /// Android's actions bottom sheet: neutral rows with a leading glyph, no title bar.
@@ -29,9 +32,15 @@ struct ResourceActionsSheet: View {
                 if resource.kind != .link {
                     row(.detailsShareScreenshot, systemImage: "square.and.arrow.up") { screenshot = true }
                 }
-                if let url = ResourceLinkBuilder.url(for: resource, root: root,
-                                                     parentCommentID: parent?.sourceID) {
+                if contentURL != nil {
                     row(.reportTitle, systemImage: "flag") { report = true }
+                }
+                if let author = blockableAuthor {
+                    row(.detailsBlockAuthor(author), systemImage: "lock") { confirmBlock = true }
+                        .disabled(blocking)
+                        .accessibilityIdentifier("blockAuthor")
+                }
+                if let url = contentURL {
                     row(.detailsCopyLink, systemImage: "link") {
                         UIPasteboard.general.url = url
                         dependencies.router.banner = String(localized: .detailsSnackbarLinkCopied)
@@ -85,9 +94,14 @@ struct ResourceActionsSheet: View {
                 dependencies.router.navigate(.user(username))
             }
         }
-        .sheet(isPresented: $report) {
-            if let url = ResourceLinkBuilder.url(for: resource, root: root,
-                                                 parentCommentID: parent?.sourceID) {
+        // The author's content goes once the sheets close, so a report still opens over the page it came from.
+        .onDisappear {
+            guard let blockedAuthor else { return }
+            dependencies.resourceUpdates.block(blockedAuthor)
+            dependencies.router.banner = String(localized: .detailsSnackbarAuthorBlocked(blockedAuthor))
+        }
+        .sheet(isPresented: $report, onDismiss: { if blockedAuthor != nil { dismiss() } }) {
+            if let url = contentURL {
                 WebsiteReportView(contentURL: url,
                                   missingCommentID: resource.kind == .linkComment && root.slug.isEmpty
                                       ? resource.sourceID : nil)
@@ -114,6 +128,43 @@ struct ResourceActionsSheet: View {
                             isPresented: $confirmDelete, titleVisibility: .visible) {
             Button(.commonDelete, role: .destructive) { delete(); dismiss() }
             Button(.commonCancel, role: .cancel) {}
+        }
+        .confirmationDialog(Text(.detailsBlockAuthorTitle(blockableAuthor ?? "")),
+                            isPresented: $confirmBlock, titleVisibility: .visible) {
+            Button(.detailsBlockAndReport) { block(report: true) }
+            Button(.detailsBlock, role: .destructive) { block(report: false) }
+            Button(.commonCancel, role: .cancel) {}
+        } message: {
+            Text(.detailsBlockAuthorMessage)
+        }
+    }
+
+    private var contentURL: URL? {
+        ResourceLinkBuilder.url(for: resource, root: root, parentCommentID: parent?.sourceID)
+    }
+
+    /// App Store guideline 1.2 wants blocking on the content itself, not only on profiles.
+    private var blockableAuthor: String? {
+        guard dependencies.session.isLoggedIn, resource.deletion == nil, !resource.blacklisted,
+              let me = dependencies.session.username, let author = resource.author?.name,
+              author.caseInsensitiveCompare(me) != .orderedSame else { return nil }
+        return author
+    }
+
+    private func block(report: Bool) {
+        guard let author = blockableAuthor, !blocking else { return }
+        blocking = true
+        Task {
+            do {
+                try await dependencies.profileLoader.setBlacklisted(author, true)
+                blockedAuthor = author
+                if report { self.report = true } else { dismiss() }
+            } catch {
+                blocking = false
+                if !(error is CancellationError) {
+                    dependencies.router.banner = String(localized: .commonCouldNotCompleteAction)
+                }
+            }
         }
     }
 

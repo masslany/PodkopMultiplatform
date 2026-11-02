@@ -7,9 +7,9 @@ final class BlacklistsModel {
     var selected: BlacklistCategory = .users
     let categories: [BlacklistCategory: BlacklistCategoryModel]
 
-    init(loader: BlacklistsLoading, suggester: SearchSuggesting) {
+    init(loader: BlacklistsLoading, suggester: SearchSuggesting, updates: ResourceUpdates? = nil) {
         categories = Dictionary(uniqueKeysWithValues: BlacklistCategory.allCases.map {
-            ($0, BlacklistCategoryModel(category: $0, loader: loader, suggester: suggester))
+            ($0, BlacklistCategoryModel(category: $0, loader: loader, suggester: suggester, updates: updates))
         })
     }
 

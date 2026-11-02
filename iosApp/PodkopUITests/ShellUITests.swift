@@ -201,6 +201,35 @@ final class ShellUITests: XCTestCase {
         XCTAssertFalse(app.buttons["Profile"].exists)
     }
 
+    func testAccountDeletionOpensTheWebsiteStepsAndSignsOut() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["More"].tap()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.switches["settingsMessageNotifications"].waitForExistence(timeout: 5))
+        // The account rows end the list, below the fold on shorter phones.
+        let delete = app.buttons["settingsDeleteAccount"]
+        for _ in 0..<4 where !delete.isHittable { app.swipeUp() }
+        delete.tap()
+        XCTAssertTrue(app.buttons["openAccountDeletion"].waitForExistence(timeout: 5))
+        app.buttons["accountDeletionSignOut"].tap()
+        XCTAssertTrue(app.buttons["settingsSignOut"].waitForNonExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["settingsDeleteAccount"].exists)
+    }
+
+    func testBlockingAnAuthorFromTheMenuHidesTheirEntry() {
+        let app = launch("authenticated")
+        app.tabBars.buttons["Entries"].tap()
+        let card = app.descendants(matching: .any)["resource-entry:102"]
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        card.buttons["More actions"].firstMatch.tap()
+        app.buttons["blockAuthor"].tap()
+        let block = app.buttons["Block"]
+        XCTAssertTrue(block.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Block and report"].exists)
+        block.tap()
+        XCTAssertTrue(card.waitForNonExistence(timeout: 5))
+    }
+
     func testLoginSheetCanBeDismissed() {
         let app = launch("guest")
         app.tabBars.buttons["More"].tap()

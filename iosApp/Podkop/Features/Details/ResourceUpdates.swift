@@ -26,11 +26,13 @@ final class ResourceUpdates {
     private(set) var feedRevision = 0
     private(set) var sessionRevision = 0
     private var values: [ResourceIdentity: (revision: Int, change: ResourceChange)] = [:]
+    private var blockedAuthors = Set<String>()
 
     func reset(for sessionRevision: Int) {
         guard self.sessionRevision != sessionRevision else { return }
         self.sessionRevision = sessionRevision
         values.removeAll()
+        blockedAuthors.removeAll()
         revision += 1
     }
 
@@ -41,13 +43,33 @@ final class ResourceUpdates {
 
     func publishNewResource() { feedRevision += 1 }
 
-    /// The latest confirmed copy, including embedded comments; nil once deleted.
+    /// App Store guideline 1.2: a blocked user's content leaves loaded lists at once, not on their next reload.
+    func block(_ author: String) {
+        blockedAuthors.insert(author.lowercased())
+        revision += 1
+    }
+
+    func unblock(_ author: String) {
+        guard blockedAuthors.remove(author.lowercased()) != nil else { return }
+        revision += 1
+    }
+
+    func isBlocked(_ author: String?) -> Bool {
+        author.map { blockedAuthors.contains($0.lowercased()) } ?? false
+    }
+
+    /// The latest confirmed copy, including embedded comments; nil once deleted or its author blocked.
     func reconcile(_ resource: Resource) -> Resource? {
         var current: Resource
         switch values[ResourceIdentity(resource)]?.change {
         case .replacement(let value): current = value
         case .deleted: return nil
         case .invalidated, .none: current = resource
+        }
+        if isBlocked(current.author?.name) {
+            // Comments fold behind the blacklist notice instead, so the replies around them still read.
+            guard current.kind == .entryComment || current.kind == .linkComment else { return nil }
+            current.blacklisted = true
         }
         if !current.inlineComments.isEmpty {
             current.inlineComments = current.inlineComments.compactMap(reconcile)

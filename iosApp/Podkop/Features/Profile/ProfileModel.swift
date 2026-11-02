@@ -221,6 +221,7 @@ final class ProfileModel {
                     value.followers = max(0, value.followers + (value.observed ? 1 : -1))
                 case .blacklist:
                     value.blacklisted.toggle()
+                    if value.blacklisted { self.updates?.block(username) } else { self.updates?.unblock(username) }
                 }
                 self.profile = value
             } catch {

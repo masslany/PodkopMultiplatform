@@ -57,6 +57,8 @@ final class DetailModel {
     private(set) var actionFailed = false
     /// Set when a delete succeeds, so the screen can confirm it like Android's snackbar.
     private(set) var deletedKind: ResourceKind?
+    /// The reader blocked whoever posted this link or entry, so the screen closes.
+    private(set) var authorBlocked = false
 
     private let loader: DetailLoading
     private let updates: ResourceUpdates
@@ -124,6 +126,7 @@ final class DetailModel {
             do {
                 let value = try await loader.resource(kind: kind, id: id)
                 guard token == generation, !Task.isCancelled else { return }
+                if updates.isBlocked(value.author?.name) { authorBlocked = true }
                 resource = updates.reconcile(value)
                 phase = .loaded
             } catch is CancellationError {
@@ -417,6 +420,7 @@ final class DetailModel {
             .flatMap { [$0] + $0.inlineComments } + related
         let refresh = updates.needsReload(affected, since: appliedUpdateRevision)
         appliedUpdateRevision = updates.revision
+        if updates.isBlocked(resource?.author?.name) { authorBlocked = true }
         resource = resource.flatMap(updates.reconcile)
         comments = comments.compactMap(updates.reconcile)
         threadComments = threadComments.compactMapValues(updates.reconcile)
