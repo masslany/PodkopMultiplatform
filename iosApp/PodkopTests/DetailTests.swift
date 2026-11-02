@@ -264,6 +264,19 @@ final class DetailTests: XCTestCase {
         XCTAssertEqual(updates.reconcile(resource)?.favourite, resource.favourite)
     }
 
+    func testBlockingTheAuthorClosesTheScreen() async {
+        let updates = ResourceUpdates()
+        let model = DetailModel(kind: .link, id: 101, loader: DetailFixtureLoader(),
+                                mutator: FixtureDetailMutator(), updates: updates)
+        model.start()
+        await settle()
+        XCTAssertFalse(model.authorBlocked)
+        updates.block(ContentFixtures.author.name)
+        model.reconcileUpdates()
+        XCTAssertTrue(model.authorBlocked)
+        XCTAssertNil(model.resource)
+    }
+
     func testDeleteReportsItsKindForTheConfirmation() async throws {
         let loader = DetailFixtureLoader()
         let mutator = ControlledDetailMutator()

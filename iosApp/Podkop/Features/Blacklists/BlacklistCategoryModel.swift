@@ -15,6 +15,7 @@ final class BlacklistCategoryModel {
     private(set) var suggestionStatus: SuggestionStatus = .hidden
     private let loader: BlacklistsLoading
     private let suggester: SearchSuggesting
+    private let updates: ResourceUpdates?
     private let debounce: Duration
     private var suggestionTask: Task<Void, Never>?
     private var suggestionRevision = 0
@@ -23,10 +24,11 @@ final class BlacklistCategoryModel {
     var total: Int? { pager.phase == .loaded ? pager.total ?? pager.items.count : nil }
 
     init(category: BlacklistCategory, loader: BlacklistsLoading, suggester: SearchSuggesting,
-         debounce: Duration = .milliseconds(300)) {
+         updates: ResourceUpdates? = nil, debounce: Duration = .milliseconds(300)) {
         self.category = category
         self.loader = loader
         self.suggester = suggester
+        self.updates = updates
         self.debounce = debounce
     }
 
@@ -53,6 +55,7 @@ final class BlacklistCategoryModel {
             do {
                 try await loader.add(category, normalized)
                 guard let self else { return }
+                if category == .users { self.updates?.block(normalized) }
                 self.input = ""
                 self.suggestionTask?.cancel()
                 self.suggestions = []
@@ -77,6 +80,7 @@ final class BlacklistCategoryModel {
             do {
                 try await loader.remove(entry)
                 guard let self else { return }
+                if entry.category == .users { self.updates?.unblock(entry.value) }
                 self.pager.update { $0.id == entry.id ? nil : $0 }
                 self.busy = false
             } catch {

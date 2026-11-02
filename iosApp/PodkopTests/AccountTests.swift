@@ -223,6 +223,26 @@ final class AccountTests: XCTestCase {
         XCTAssertEqual(model.total, 1)
     }
 
+    func testBlacklistedUserLeavesLoadedListsUntilRemoved() async throws {
+        let loader = ControlledBlacklists()
+        let updates = ResourceUpdates()
+        let model = BlacklistCategoryModel(category: .users, loader: loader, suggester: ControlledSuggestions(),
+                                           updates: updates, debounce: .milliseconds(1))
+        defer { model.stop() }
+        model.start()
+        try await waitUntil("initial blacklist request") { loader.pages.calls.count == 1 }
+        loader.pages.succeed(0, ListPage(items: [], next: nil, total: 0))
+        model.submit("Spamer")
+        try await waitUntil("add request") { loader.mutations.calls.count == 1 }
+        XCTAssertFalse(updates.isBlocked("Spamer"), "only a confirmed add hides content")
+        loader.mutations.succeed(0, ())
+        try await waitUntil("confirmed add") { updates.isBlocked("Spamer") }
+        model.remove(BlacklistEntry(category: .users, value: "Spamer", color: nil, gender: nil))
+        try await waitUntil("remove request") { loader.mutations.calls.count == 2 }
+        loader.mutations.succeed(1, ())
+        try await waitUntil("confirmed remove") { !updates.isBlocked("Spamer") }
+    }
+
     func testBlacklistSuggestionsSkipListedValuesAndDomains() async throws {
         let loader = ControlledBlacklists()
         let suggester = ControlledSuggestions()

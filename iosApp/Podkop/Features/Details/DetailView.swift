@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DetailView: View {
     @Environment(\.openURL) private var openURL
+    @Environment(\.dismiss) private var dismiss
     @State private var model: DetailModel
     let dependencies: AppDependencies
     @State private var actionTarget: Resource?
@@ -76,6 +77,9 @@ struct DetailView: View {
         .onChange(of: dependencies.resourceUpdates.revision) { _, _ in model.reconcileUpdates() }
         .onChange(of: dependencies.session.revision) { _, _ in model.sessionChanged() }
         // Failed votes and favourites show the app banner, like the lists' ResourceInteractor.
+        .onChange(of: model.authorBlocked) { _, blocked in
+            if blocked { dismiss() }
+        }
         .onChange(of: model.deletedKind) { _, kind in
             guard let kind else { return }
             dependencies.router.banner = kind.deletedMessage

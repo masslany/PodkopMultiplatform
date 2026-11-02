@@ -8,7 +8,8 @@ struct BlacklistsView: View {
 
     init(tab: AppTab, dependencies: AppDependencies) {
         _model = State(initialValue: BlacklistsModel(loader: dependencies.blacklistsLoader,
-                                                     suggester: dependencies.searchSuggesting))
+                                                     suggester: dependencies.searchSuggesting,
+                                                     updates: dependencies.resourceUpdates))
         self.tab = tab
         self.dependencies = dependencies
     }

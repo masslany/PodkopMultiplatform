@@ -113,6 +113,29 @@ final class InteractionTests: XCTestCase {
         XCTAssertEqual(updates.reconcile(parent)?.inlineComments.first?.vote.up, 2)
     }
 
+    func testBlockedAuthorsPostsLeaveListsAndTheirCommentsFold() {
+        let updates = ResourceUpdates()
+        let blocked = Author(name: "Spamer", avatarURL: nil, color: nil, verified: false, online: false, rank: nil)
+        let other = Author(name: "Ewa", avatarURL: nil, color: nil, verified: false, online: false, rank: nil)
+        let post = Resource(sourceID: 1, kind: .entry, body: "", author: blocked)
+        let host = Resource(sourceID: 2, kind: .entry, body: "", author: other, inlineComments: [
+            Resource(sourceID: 3, kind: .entryComment, body: "", author: blocked, parentID: 2),
+        ])
+        let revision = updates.revision
+
+        updates.block("spamer")
+        XCTAssertGreaterThan(updates.revision, revision, "visible lists reconcile on a new revision")
+        XCTAssertNil(updates.reconcile(post))
+        XCTAssertEqual(updates.reconcile(host)?.inlineComments.map(\.blacklisted), [true],
+                       "comments stay in place behind the blacklist notice")
+
+        updates.unblock("SPAMER")
+        XCTAssertNotNil(updates.reconcile(post))
+        updates.block("Spamer")
+        updates.reset(for: 1)
+        XCTAssertFalse(updates.isBlocked("Spamer"), "another account starts from its own blacklist")
+    }
+
     func testFeedSurveyVoteUsesOneBasedOptionAndReloadsAfterConfirmation() async {
         let mutator = GatedMutator()
         let updates = ResourceUpdates()

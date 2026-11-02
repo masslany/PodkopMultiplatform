@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @State private var model: SettingsModel
     @State private var confirmLogout = false
+    @State private var deleteAccount = false
     let tab: AppTab
     let dependencies: AppDependencies
     private var session: SessionModel { dependencies.session }
@@ -78,6 +79,8 @@ struct SettingsView: View {
                     Button(.settingsManageBlacklists) { dependencies.router.navigate(.blacklists, in: tab) }
                     Button(.settingsSignOut, role: .destructive) { confirmLogout = true }
                         .accessibilityIdentifier("settingsSignOut")
+                    Button(.settingsDeleteAccount, role: .destructive) { deleteAccount = true }
+                        .accessibilityIdentifier("settingsDeleteAccount")
                 }
             }
             #if DEBUG
@@ -94,6 +97,9 @@ struct SettingsView: View {
         }
         .navigationTitle(.commonSettings)
         .task { await dependencies.messageNotifications.refreshSystemPermission() }
+        .sheet(isPresented: $deleteAccount) {
+            AccountDeletionView { Task { await session.logout() } }
+        }
         .alert(.settingsSureWantSignOut, isPresented: $confirmLogout) {
             Button(.settingsSignOut, role: .destructive) { Task { await session.logout() } }
             Button(.commonCancel, role: .cancel) {}

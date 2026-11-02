@@ -3233,6 +3233,91 @@
         }
       }
     },
+    "details.block" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Block"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zablokuj"
+          }
+        }
+      }
+    },
+    "details.blockAndReport" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Block and report"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zablokuj i zgłoś"
+          }
+        }
+      }
+    },
+    "details.blockAuthor" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Block %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zablokuj %@"
+          }
+        }
+      }
+    },
+    "details.blockAuthorMessage" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Their links, entries and comments disappear from your lists. You can unblock them in Settings → Manage blacklists."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Znaleziska, wpisy i komentarze tego użytkownika znikną z Twoich list. Odblokujesz go w Ustawieniach → Zarządzaj czarną listą."
+          }
+        }
+      }
+    },
+    "details.blockAuthorTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Block %@?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zablokować %@?"
+          }
+        }
+      }
+    },
     "details.copyLink" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3484,6 +3569,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Brak powiązanych"
+          }
+        }
+      }
+    },
+    "details.snackbarAuthorBlocked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ is blocked"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zablokowano %@"
           }
         }
       }
@@ -6613,6 +6715,108 @@
         }
       }
     },
+    "settings.deleteAccount" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete account"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń konto"
+          }
+        }
+      }
+    },
+    "settings.deleteAccountIntro" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podkop signs in with your Wykop account and has no accounts of its own, so you delete your account on Wykop."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podkop loguje się kontem Wykopu i nie ma własnych kont, dlatego konto usuwasz na Wykopie."
+          }
+        }
+      }
+    },
+    "settings.deleteAccountNotice" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deletion takes up to 30 days and cannot be undone. Signing in during that time, in Podkop too, stops it."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuwanie konta trwa do 30 dni i jest nieodwracalne. Zalogowanie się w tym czasie, również w Podkopie, przerywa je."
+          }
+        }
+      }
+    },
+    "settings.deleteAccountOpen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open account deletion on Wykop"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz usuwanie konta na Wykopie"
+          }
+        }
+      }
+    },
+    "settings.deleteAccountSignOut" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Once you have started the deletion, sign out of Podkop."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Po rozpoczęciu usuwania wyloguj się z Podkopu."
+          }
+        }
+      }
+    },
+    "settings.deleteAccountSteps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1. Open account deletion on Wykop and sign in if asked.\n2. Choose “Usuń konto” (Delete account) and enter your password.\n3. Follow the instructions Wykop emails you."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1. Otwórz usuwanie konta na Wykopie i zaloguj się, jeśli strona o to poprosi.\n2. Wybierz „Usuń konto” i podaj hasło.\n3. Postępuj zgodnie z instrukcją, którą Wykop wyśle e-mailem."
+          }
+        }
+      }
+    },
     "settings.diagnosticsCopied" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7741,13 +7945,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To report a link, entry or comment, choose “Report on Wykop” from its ⋯ menu. When signed in, you can block users and tags from their pages and manage blocked users, tags and domains in Settings → Manage blacklists. Blocked content disappears from your feeds."
+            "value" : "To report a link, entry or comment, choose “Report on Wykop” from its ⋯ menu. When signed in, you can block its author from the same menu, block users and tags from their pages and manage blocked users, tags and domains in Settings → Manage blacklists. Blocked content disappears from your feeds."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aby zgłosić znalezisko, wpis lub komentarz, wybierz „Zgłoś na Wykopie” z jego menu ⋯. Po zalogowaniu możesz blokować użytkowników i tagi na ich stronach oraz zarządzać zablokowanymi użytkownikami, tagami i domenami w Ustawieniach → Zarządzaj czarną listą. Zablokowane treści znikają z Twoich list."
+            "value" : "Aby zgłosić znalezisko, wpis lub komentarz, wybierz „Zgłoś na Wykopie” z jego menu ⋯. Po zalogowaniu możesz zablokować jego autora z tego samego menu, blokować użytkowników i tagi na ich stronach oraz zarządzać zablokowanymi użytkownikami, tagami i domenami w Ustawieniach → Zarządzaj czarną listą. Zablokowane treści znikają z Twoich list."
           }
         }
       }
