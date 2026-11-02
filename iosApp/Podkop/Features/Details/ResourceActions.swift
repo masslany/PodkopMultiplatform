@@ -36,7 +36,7 @@ struct ResourceActionsSheet: View {
                     row(.reportTitle, systemImage: "flag") { report = true }
                 }
                 if let author = blockableAuthor {
-                    row(.detailsBlockAuthor(author), systemImage: "hand.raised") { confirmBlock = true }
+                    row(.detailsBlockAuthor(author), systemImage: "lock") { confirmBlock = true }
                         .disabled(blocking)
                         .accessibilityIdentifier("blockAuthor")
                 }
