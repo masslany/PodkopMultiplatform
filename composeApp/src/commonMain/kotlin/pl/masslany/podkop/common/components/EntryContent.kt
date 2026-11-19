@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -185,6 +186,7 @@ private val markdownComponents = markdownComponents(
                         annotator = annotator,
                         linkTextSpanStyle = typography.textLink,
                         codeSpanStyle = codeSpanStyle,
+                        highlightSpanStyle = SpanStyle(),
                     )
 
                     val fullAnnotatedString = content.buildMarkdownAnnotatedString(
