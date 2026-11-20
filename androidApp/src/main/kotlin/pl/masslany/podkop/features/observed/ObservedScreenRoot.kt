@@ -1,9 +1,6 @@
 package pl.masslany.podkop.features.observed
 
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +20,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,6 +54,7 @@ import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
 import pl.masslany.podkop.common.components.ScreenLoadingIndicator
+import pl.masslany.podkop.common.components.ScrollToTopFab
 import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
@@ -141,29 +138,16 @@ fun ObservedScreenContent(
             )
         },
         floatingActionButton = {
-            AnimatedVisibility(
+            ScrollToTopFab(
                 visible = showFab,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                FloatingActionButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            scrollBehavior.state.heightOffset = 0f
-                            scrollBehavior.state.contentOffset = 0f
-                            lazyListState.animateScrollToItem(0)
-                        }
-                    },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_keyboard_arrow_up),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_fab_scroll_to_top,
-                        ),
-                    )
-                }
-            }
+                onClick = {
+                    coroutineScope.launch {
+                        scrollBehavior.state.heightOffset = 0f
+                        scrollBehavior.state.contentOffset = 0f
+                        lazyListState.animateScrollToItem(0)
+                    }
+                },
+            )
         },
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = contentInsets,

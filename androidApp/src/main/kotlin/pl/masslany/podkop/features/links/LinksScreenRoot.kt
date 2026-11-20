@@ -1,8 +1,5 @@
 package pl.masslany.podkop.features.links
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -61,6 +57,7 @@ import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
 import pl.masslany.podkop.common.components.ScreenLoadingIndicator
+import pl.masslany.podkop.common.components.ScrollToTopFab
 import pl.masslany.podkop.common.components.StaleRefreshPill
 import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
@@ -260,7 +257,7 @@ fun LinksScreenContent(
             },
         )
 
-        AnimatedVisibility(
+        ScrollToTopFab(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(
@@ -268,25 +265,12 @@ fun LinksScreenContent(
                     bottom = 16.dp + bottomPadding,
                 ),
             visible = showFab,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            FloatingActionButton(
-                onClick = {
-                    coroutineScope.launch {
-                        scrollToTop()
-                    }
-                },
-            ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_keyboard_arrow_up),
-                    contentDescription = stringResource(
-                        id = R.string.accessibility_fab_scroll_to_top,
-                    ),
-                )
-            }
-        }
+            onClick = {
+                coroutineScope.launch {
+                    scrollToTop()
+                }
+            },
+        )
 
         Box(
             modifier = Modifier
