@@ -27,25 +27,29 @@ private final class ControlledFeedLoader: FeedLoading {
         }
     }
     func hits() async throws -> [Resource] { hitRows }
-    func complete(_ index: Int, items: [Resource], next: String? = nil, total: Int? = nil) {
-        calls[index].finish(.success(FeedPage(items: items, next: next, total: total)))
+    func complete(_ index: Int, items: [Resource], next: String? = nil, total: Int? = nil,
+                  file: StaticString = #filePath, line: UInt = #line) {
+        call(index, file: file, line: line)?(.success(FeedPage(items: items, next: next, total: total)))
     }
-    func fail(_ index: Int) {
-        calls[index].finish(.failure(NSError(domain: "fixture", code: 1)))
+    func fail(_ index: Int, file: StaticString = #filePath, line: UInt = #line) {
+        call(index, file: file, line: line)?(.failure(NSError(domain: "fixture", code: 1)))
+    }
+    private func call(_ index: Int, file: StaticString, line: UInt) -> ((Result<FeedPage, Error>) -> Void)? {
+        guard calls.indices.contains(index) else {
+            XCTFail("Call \(index) was never made; \(calls.count) so far", file: file, line: line)
+            return nil
+        }
+        return calls[index].finish
     }
 }
 
 @MainActor
 final class FeedTests: XCTestCase {
-    /// Waits up to two seconds of real time: the test host is the app, whose own startup can
-    /// keep the main actor busy for longer than a fixed number of yields.
-    private func waitForCalls(_ loader: ControlledFeedLoader, _ count: Int) async {
-        let deadline = Date().addingTimeInterval(2)
-        while loader.calls.count < count && Date() < deadline {
-            try? await Task.sleep(for: .milliseconds(5))
-        }
-        XCTAssertGreaterThanOrEqual(loader.calls.count, count)
+    private func waitForCalls(_ loader: ControlledFeedLoader, _ count: Int,
+                              file: StaticString = #filePath, line: UInt = #line) async throws {
+        try await waitUntil("\(count) feed requests", file: file, line: line) { loader.calls.count >= count }
     }
+    /// Only for checking that something did not happen, after waiting for what did.
     private func settle() async {
         for _ in 0..<10 { await Task.yield() }
     }
@@ -53,107 +57,108 @@ final class FeedTests: XCTestCase {
         Resource(sourceID: id, kind: .link, body: "row \(id)")
     }
 
-    func testNumberedPageRetryAndDeduplication() async {
+    func testNumberedPageRetryAndDeduplication() async throws {
         let loader = ControlledFeedLoader()
         let model = FeedModel(tab: .upcoming, loggedIn: false, loader: loader)
         model.start()
-        await waitForCalls(loader, 1)
+        try await waitForCalls(loader, 1)
         XCTAssertEqual(loader.calls[0].request, FeedRequest(kind: "number", value: "1"))
         loader.complete(0, items: [row(1)], next: "2")
-        await settle()
+        try await waitUntil("first page") { model.phase == .loaded }
         model.loadNext(); model.loadNext()
-        await waitForCalls(loader, 2)
+        try await waitForCalls(loader, 2)
         XCTAssertEqual(loader.calls.count, 2)
         XCTAssertEqual(loader.calls[1].request.value, "2")
         loader.fail(1)
-        await settle()
+        try await waitUntil("next page error") { model.nextError }
         XCTAssertTrue(model.nextError)
         XCTAssertEqual(model.items.map(\.sourceID), [1])
         model.retry()
-        await waitForCalls(loader, 3)
+        try await waitForCalls(loader, 3)
         XCTAssertEqual(loader.calls[2].request, loader.calls[1].request)
         loader.complete(2, items: [row(1), row(2)], next: "2")
-        await settle()
+        try await waitUntil("retried page") { !model.nextLoading }
         XCTAssertEqual(model.items.map(\.sourceID), [1, 2])
         XCTAssertTrue(model.exhausted) // repeated page request
     }
 
-    func testSortChangeDiscardsLatePageAndRefreshFailureKeepsRows() async {
+    func testSortChangeDiscardsLatePageAndRefreshFailureKeepsRows() async throws {
         let loader = ControlledFeedLoader()
         let model = FeedModel(tab: .links, loggedIn: true, loader: loader)
         model.start()
-        await waitForCalls(loader, 1)
+        try await waitForCalls(loader, 1)
         XCTAssertEqual(loader.calls[0].request.kind, "initial")
         loader.complete(0, items: [row(1)], next: "opaque-2")
-        await settle()
+        try await waitUntil("first page") { model.phase == .loaded }
         model.loadNext()
-        await waitForCalls(loader, 2)
+        try await waitForCalls(loader, 2)
         XCTAssertEqual(loader.calls[1].request, FeedRequest(kind: "pageCursor", value: "opaque-2"))
         model.select(sort: "active")
-        await waitForCalls(loader, 3)
+        try await waitForCalls(loader, 3)
         loader.complete(1, items: [row(99)], next: "stale")
         loader.fail(2)
+        try await waitUntil("failed sort refresh") { model.refreshError }
         await settle()
         XCTAssertEqual(model.items.map(\.sourceID), [1])
         XCTAssertEqual(model.phase, .loaded)
         XCTAssertTrue(model.refreshError)
         Task { await model.refresh() }
-        await waitForCalls(loader, 4)
+        try await waitForCalls(loader, 4)
         loader.complete(3, items: [row(3)], next: nil)
-        await settle()
+        try await waitUntil("refreshed page") { model.phase == .loaded }
         XCTAssertEqual(model.items.map(\.sourceID), [3])
         XCTAssertFalse(model.refreshError)
     }
 
-    func testAccountSwitchClearsRowsAndChangesPolicy() async {
+    func testAccountSwitchClearsRowsAndChangesPolicy() async throws {
         let loader = ControlledFeedLoader()
         let model = FeedModel(tab: .entries, loggedIn: true, loader: loader)
         model.start()
-        await waitForCalls(loader, 1)
+        try await waitForCalls(loader, 1)
         loader.complete(0, items: [row(7)], next: "cursor")
-        await settle()
+        try await waitUntil("first page") { model.phase == .loaded }
         model.setSession(false)
         XCTAssertTrue(model.items.isEmpty)
-        await waitForCalls(loader, 2)
+        try await waitForCalls(loader, 2)
         XCTAssertEqual(loader.calls[1].request, FeedRequest(kind: "number", value: "1"))
         loader.complete(1, items: [], total: 0)
-        await settle()
+        try await waitUntil("guest page") { model.phase == .loaded }
         XCTAssertTrue(model.exhausted)
     }
 
-    func testPullRefreshDuringPagingKeepsCursorAfterFailure() async {
+    func testPullRefreshDuringPagingKeepsCursorAfterFailure() async throws {
         let loader = ControlledFeedLoader()
         let model = FeedModel(tab: .links, loggedIn: true, loader: loader)
         model.start()
-        await waitForCalls(loader, 1)
+        try await waitForCalls(loader, 1)
         loader.complete(0, items: [row(1)], next: "cursor-2")
-        await settle()
+        try await waitUntil("first page") { model.phase == .loaded }
         model.loadNext()
-        await waitForCalls(loader, 2)
+        try await waitForCalls(loader, 2)
         let refresh = Task { await model.refresh() }
-        await waitForCalls(loader, 3)
+        try await waitForCalls(loader, 3)
         loader.complete(1, items: [row(99)], next: "stale")
         loader.fail(2)
         await refresh.value
         XCTAssertEqual(model.items.map(\.sourceID), [1])
         model.loadNext()
-        await waitForCalls(loader, 4)
+        try await waitForCalls(loader, 4)
         XCTAssertEqual(loader.calls[3].request, FeedRequest(kind: "pageCursor", value: "cursor-2"))
         loader.complete(3, items: [row(2)])
-        await settle()
+        try await waitUntil("next page") { !model.nextLoading }
         XCTAssertEqual(model.items.map(\.sourceID), [1, 2])
     }
 
-    func testStaleFeedShowsRefreshPromptUntilItReloads() async {
+    func testStaleFeedShowsRefreshPromptUntilItReloads() async throws {
         let loader = ControlledFeedLoader()
         let model = FeedModel(tab: .entries, loggedIn: false, loader: loader)
         let start = Date(timeIntervalSince1970: 1_000_000)
         model.screenOpened(at: start) // before the first load, like Android's hasBeenInitialized
         XCTAssertFalse(model.showsRefreshPrompt)
         model.start()
-        await waitForCalls(loader, 1)
+        try await waitForCalls(loader, 1)
         loader.complete(0, items: [row(1)], next: nil)
-        await settle()
+        try await waitUntil("first page") { model.phase == .loaded }
 
         model.screenOpened(at: start.addingTimeInterval(2 * 60 * 60))
         XCTAssertFalse(model.showsRefreshPrompt, "two hours is not stale yet")
@@ -161,7 +166,7 @@ final class FeedTests: XCTestCase {
         XCTAssertTrue(model.showsRefreshPrompt)
 
         let refresh = Task { await model.refresh() }
-        await waitForCalls(loader, 2)
+        try await waitForCalls(loader, 2)
         XCTAssertFalse(model.showsRefreshPrompt, "any reload hides the prompt")
         loader.complete(1, items: [row(1)], next: nil)
         await refresh.value
