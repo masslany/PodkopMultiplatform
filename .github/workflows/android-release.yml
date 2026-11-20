@@ -141,7 +141,7 @@ jobs:
         run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
 
       - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-37.0" "build-tools;$BUILD_TOOLS_VERSION"
+        run: sdkmanager "platforms;android-37.0" "platforms;android-37.1" "build-tools;$BUILD_TOOLS_VERSION"
 
       - name: Write release config and keystore
         shell: bash

@@ -22,7 +22,11 @@ val podkopVersionCode: Int = providers.gradleProperty("podkop.versionCode").map(
 
 android {
     namespace = "pl.masslany.podkop"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk {
+        version = release(libs.versions.android.compileSdk.get().toInt()) {
+            minorApiLevel = libs.versions.android.compileSdkMinor.get().toInt()
+        }
+    }
     defaultConfig {
         applicationId = "pl.masslany.podkop"
         minSdk = libs.versions.android.minSdk.get().toInt()

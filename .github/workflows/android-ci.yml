@@ -44,7 +44,7 @@ jobs:
         run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
 
       - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+        run: sdkmanager "platforms;android-37.0" "platforms;android-37.1" "build-tools;37.0.0"
 
       - name: Create CI-only Android config
         shell: bash
@@ -187,7 +187,7 @@ jobs:
         run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
 
       - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+        run: sdkmanager "platforms;android-37.0" "platforms;android-37.1" "build-tools;37.0.0"
 
       - name: Create CI-only API keys
         shell: bash
@@ -268,7 +268,7 @@ jobs:
       - name: Install Android SDK packages
         run: |
           sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
-          sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+          sdkmanager "platforms;android-37.0" "platforms;android-37.1" "build-tools;37.0.0"
 
       - name: Create CI-only API keys
         shell: bash
@@ -431,7 +431,7 @@ jobs:
       - name: Install Android SDK packages
         run: |
           sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
-          sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+          sdkmanager "platforms;android-37.0" "platforms;android-37.1" "build-tools;37.0.0"
 
       - name: Create CI-only API keys
         shell: bash
@@ -486,7 +486,7 @@ jobs:
         run: sdkmanager --licenses <<< "$(printf 'y\n%.0s' {1..100})" >/dev/null
 
       - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+        run: sdkmanager "platforms;android-37.0" "platforms;android-37.1" "build-tools;37.0.0"
 
       - name: Create CI-only API keys
         shell: bash
