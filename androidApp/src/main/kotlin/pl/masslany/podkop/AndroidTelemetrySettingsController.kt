@@ -9,10 +9,8 @@ import kotlinx.coroutines.flow.map
 import pl.masslany.podkop.common.persistence.api.KeyValueStorage
 import pl.masslany.podkop.common.settings.TelemetrySettingsController
 
-class AndroidTelemetrySettingsController(
-    application: Application,
-    private val keyValueStorage: KeyValueStorage,
-) : TelemetrySettingsController {
+class AndroidTelemetrySettingsController(application: Application, private val keyValueStorage: KeyValueStorage) :
+    TelemetrySettingsController {
     private val firebaseAnalytics by lazy { FirebaseAnalytics.getInstance(application) }
     private val firebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
 

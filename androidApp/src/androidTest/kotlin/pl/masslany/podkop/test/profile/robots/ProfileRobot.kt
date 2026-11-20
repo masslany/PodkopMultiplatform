@@ -6,9 +6,7 @@ import pl.masslany.podkop.features.profile.ProfileTestTags
 import pl.masslany.podkop.test.common.PodkopComposeRule
 import pl.masslany.podkop.test.common.robots.BaseRobot
 
-class ProfileRobot(
-    testRule: PodkopComposeRule,
-) : BaseRobot(testRule) {
+class ProfileRobot(testRule: PodkopComposeRule) : BaseRobot(testRule) {
     /** Opens a website profile link the way the app handles any incoming link. */
     fun openProfileLink(username: String) {
         onUiThread {

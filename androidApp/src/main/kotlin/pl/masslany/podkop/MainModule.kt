@@ -17,16 +17,13 @@ val mainModule = module {
     viewModelOf(::MainActivityViewModel)
     single { AndroidActivityHolder() }
     single {
-        AndroidPrivateMessagesBackgroundNotificationsController(
+        PrivateMessagesBackgroundNotificationsController(
             application = androidApplication(),
             authRepository = get(),
             notificationsRepository = get(),
             keyValueStorage = get(),
             logger = get(),
         )
-    }
-    single<PrivateMessagesBackgroundNotificationsController> {
-        get<AndroidPrivateMessagesBackgroundNotificationsController>()
     }
     single {
         BuildInfo(
@@ -41,13 +38,13 @@ val mainModule = module {
             keyValueStorage = get(),
         )
     }
-    single<AppMaintenanceController> {
-        AndroidAppMaintenanceController(
+    single {
+        AppMaintenanceController(
             application = androidApplication(),
         )
     }
-    single<TextClipboardController> {
-        AndroidTextClipboardController(
+    single {
+        TextClipboardController(
             application = androidApplication(),
         )
     }

@@ -9,9 +9,7 @@ import pl.masslany.podkop.features.notifications.components.groupedRowMemberKey
 import pl.masslany.podkop.test.common.PodkopComposeRule
 import pl.masslany.podkop.test.common.robots.BaseRobot
 
-class NotificationsRobot(
-    testRule: PodkopComposeRule,
-) : BaseRobot(testRule) {
+class NotificationsRobot(testRule: PodkopComposeRule) : BaseRobot(testRule) {
     /** Opens notifications the way the top bar's bell does. */
     fun openNotifications() {
         onUiThread {

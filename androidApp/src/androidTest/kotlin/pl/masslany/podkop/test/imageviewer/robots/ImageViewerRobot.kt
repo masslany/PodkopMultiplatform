@@ -7,9 +7,7 @@ import pl.masslany.podkop.features.imageviewer.ImageViewerTestTags
 import pl.masslany.podkop.test.common.PodkopComposeRule
 import pl.masslany.podkop.test.common.robots.BaseRobot
 
-class ImageViewerRobot(
-    testRule: PodkopComposeRule,
-) : BaseRobot(testRule) {
+class ImageViewerRobot(testRule: PodkopComposeRule) : BaseRobot(testRule) {
     fun displayImage() {
         displayedNode(ImageViewerTestTags.Screen.Image)
     }

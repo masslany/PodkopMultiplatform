@@ -6,9 +6,7 @@ import pl.masslany.podkop.features.resources.ResourcesTestTags
 import pl.masslany.podkop.test.common.PodkopComposeRule
 import pl.masslany.podkop.test.common.robots.BaseRobot
 
-class HomepageRobot(
-    testRule: PodkopComposeRule,
-) : BaseRobot(testRule) {
+class HomepageRobot(testRule: PodkopComposeRule) : BaseRobot(testRule) {
     fun displayTitle(title: String) {
         displayedText(title)
     }

@@ -110,8 +110,15 @@ object LinkFixtures {
             sample.pagination().mapValues { (key, value) ->
                 when {
                     value is JsonNull -> value
+
                     key == "next" -> JsonPrimitive(pageCursor(firstPage, page + 1))
-                    else -> JsonPrimitive(token("${key.replaceFirstChar(Char::uppercase)}${page}Cursor", value.jsonPrimitive.content.length))
+
+                    else -> JsonPrimitive(
+                        token(
+                            "${key.replaceFirstChar(Char::uppercase)}${page}Cursor",
+                            value.jsonPrimitive.content.length,
+                        ),
+                    )
                 }
             },
         )

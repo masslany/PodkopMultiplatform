@@ -1,0 +1,61 @@
+package pl.masslany.podkop.features.composer
+
+import androidx.annotation.StringRes
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetValue
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.R
+import pl.masslany.podkop.common.composer.Composer
+import pl.masslany.podkop.common.navigation.LocalBottomSheetState
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ComposerBottomSheetScreenRoot(
+    screen: ComposerBottomSheetScreen,
+    modifier: Modifier = Modifier,
+) {
+    val viewModel = koinViewModel<ComposerBottomSheetViewModel>(
+        parameters = { parametersOf(screen) },
+    )
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val bottomSheetState = LocalBottomSheetState.current
+    val autoFocusEnabled = bottomSheetState?.currentValue != SheetValue.Hidden
+
+    Composer(
+        modifier = modifier,
+        state = state.composer,
+        autoFocus = autoFocusEnabled,
+        hintText = stringResource(id = screen.request.hintTextResource()),
+        submitText = stringResource(id = R.string.composer_button_send),
+        submitEnabled = !state.composer.isSubmitting &&
+            !state.composer.isMediaUploading &&
+            (state.composer.content.text.isNotBlank() || state.composer.photoKey != null),
+        showDismissButton = true,
+        onContentChanged = viewModel::onComposerTextChanged,
+        onAdultChanged = viewModel::onComposerAdultChanged,
+        onPhotoAttachClicked = viewModel::onComposerPhotoAttachClicked,
+        onPhotoRemoved = viewModel::onComposerPhotoRemoved,
+        onDismiss = viewModel::onComposerDismissed,
+        onSubmit = viewModel::onComposerSubmit,
+    )
+}
+
+@StringRes
+private fun ComposerRequest.hintTextResource(): Int = when (this) {
+    is ComposerRequest.CreateEntry,
+    is ComposerRequest.EditEntry,
+    -> R.string.entries_composer_hint
+
+    is ComposerRequest.CreateEntryComment,
+    is ComposerRequest.CreateLinkComment,
+    is ComposerRequest.EditEntryComment,
+    is ComposerRequest.EditLinkComment,
+    -> R.string.entry_details_reply_composer_hint
+}

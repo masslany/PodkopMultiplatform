@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
             }
             onBackInvokedDispatcher.registerOnBackInvokedCallback(
                 OnBackInvokedDispatcher.PRIORITY_DEFAULT,
-                callback
+                callback,
             )
             backCallback = callback
         } else {
