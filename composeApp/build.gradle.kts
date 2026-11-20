@@ -6,9 +6,7 @@ import org.jmailen.gradle.kotlinter.tasks.LintTask
 import pl.masslany.podkop.buildlogic.GenerateAboutDependenciesMetadataTask
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidKmpLibrary)
-    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinter)
     alias(libs.plugins.kover)
@@ -71,83 +69,72 @@ private val aboutPomFileMappings = aboutDependencyCoordinates.associate { coordi
     coordinate.notation to pomFilePath
 }
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.add("-Xexpect-actual-classes")
-    }
-
-    android {
-        withHostTestBuilder {}.configure {
-            isIncludeAndroidResources = true
-        }
-
-        namespace = "pl.masslany.podkop.composeapp"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
+android {
+    namespace = "pl.masslany.podkop.composeapp"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
-
-        androidResources.enable = true
-
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
     }
-
-    sourceSets {
-        androidMain.dependencies  {
-            implementation(libs.androidx.browser)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.media3.exoplayer)
-            implementation(libs.androidx.media3.ui)
-            implementation(libs.androidx.compose.ui.tooling)
-            implementation(libs.coil.svg)
-        }
-
-        commonMain.dependencies {
-            implementation(libs.compose.runtime)
-            implementation(libs.compose.foundation)
-            implementation(libs.compose.material3)
-            implementation(libs.compose.material3.window.sizes)
-            implementation(libs.compose.ui)
-            implementation(libs.compose.components.resources)
-            implementation(libs.compose.ui.tooling.preview)
-            implementation(libs.org.jetbrains.compose.material3.adaptive.adaptive)
-            implementation(libs.adaptive.layout)
-            implementation(libs.adaptive.navigation)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.koin.core)
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel)
-            implementation(libs.jetbrains.navigation3.ui)
-            implementation(libs.lifecycle.viewmodel.navigation3)
-            implementation(libs.kotlinx.collections.immutable)
-            implementation(libs.coil.compose)
-            implementation(libs.coil.gif)
-            // Coil's Ktor fetcher uses whichever Ktor engine is on the classpath: keep that OkHttp (from
-            // :common). Since Ktor 3.5.1 the Android engine closes a cancelled image download from the
-            // main thread, which HttpURLConnection rejects with a crash.
-            implementation(libs.coil.network.ktor)
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.multiplatform.markdown.renderer)
-            implementation(libs.multiplatform.markdown.renderer.m3)
-            implementation(libs.haze)
-            implementation(libs.haze.blur)
-
-            implementation(projects.business)
-        }
-
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
-        }
+    buildFeatures {
+        compose = true
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
     }
 }
 
-kotlin.sourceSets.named("androidHostTest") {
-    dependencies {
-        implementation(libs.kotlin.testJunit)
-        implementation(libs.kotlinx.coroutines.test)
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
     }
+}
+
+dependencies {
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material3.window.sizes)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
+    implementation(libs.androidx.compose.material3.adaptive.navigation)
+    implementation(libs.androidx.lifecycle.viewmodelCompose)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigationevent.compose)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.koin.core)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.svg)
+    // Coil's Ktor fetcher uses whichever Ktor engine is on the classpath: keep that OkHttp (from
+    // :common). Since Ktor 3.5.1 the Android engine closes a cancelled image download from the
+    // main thread, which HttpURLConnection rejects with a crash.
+    implementation(libs.coil.network.ktor)
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.multiplatform.markdown.renderer)
+    implementation(libs.multiplatform.markdown.renderer.m3)
+    implementation(libs.haze)
+    implementation(libs.haze.blur)
+
+    implementation(projects.business)
+
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotlin.testJunit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 val generateAboutDependenciesMetadata = tasks.register<GenerateAboutDependenciesMetadataTask>(
@@ -159,10 +146,13 @@ val generateAboutDependenciesMetadata = tasks.register<GenerateAboutDependencies
     outputDirectory.set(layout.buildDirectory.dir("generated/source/about/kotlin"))
 }
 
-// Registering the task output (not a bare path) makes every consumer of commonMain sources,
-// including compilation and kotlinter, depend on the generator.
-kotlin.sourceSets.named("commonMain") {
-    kotlin.srcDir(generateAboutDependenciesMetadata.flatMap { it.outputDirectory })
+androidComponents {
+    onVariants { variant ->
+        variant.sources.kotlin?.addGeneratedSourceDirectory(
+            generateAboutDependenciesMetadata,
+            GenerateAboutDependenciesMetadataTask::outputDirectory,
+        )
+    }
 }
 
 afterEvaluate {

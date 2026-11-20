@@ -1,0 +1,564 @@
+package pl.masslany.podkop.features.profile
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
+import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
+import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
+import pl.masslany.podkop.common.models.UserItemState
+import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.composeapp.R
+import pl.masslany.podkop.features.profile.components.ObservedTagItem
+import pl.masslany.podkop.features.profile.components.ObservedUserItem
+import pl.masslany.podkop.features.profile.components.ProfileAchievementsSection
+import pl.masslany.podkop.features.profile.components.ProfileHeader
+import pl.masslany.podkop.features.profile.components.ProfileNoteSection
+import pl.masslany.podkop.features.profile.components.ProfileSubActionDropdown
+import pl.masslany.podkop.features.profile.components.ProfileSummary
+import pl.masslany.podkop.features.profile.models.ProfileListContentState
+import pl.masslany.podkop.features.profile.models.ProfileObservedTagItemState
+import pl.masslany.podkop.features.profile.preview.NoOpProfileActions
+import pl.masslany.podkop.features.profile.preview.ProfileScreenStateProvider
+import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
+import pl.masslany.podkop.features.resources.models.ResourceItemConfig
+import pl.masslany.podkop.features.resources.models.ResourceItemState
+
+private const val FAB_ITEMS_OFFSET = 10
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun ProfileScreenRoot(
+    username: String,
+    paddingValues: PaddingValues,
+) {
+    val viewModel = koinViewModel<ProfileViewModel>(
+        parameters = { parametersOf(username) },
+    )
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val lazyListState = rememberLazyListPaginator(
+        shouldPaginate = { lastVisibleIndex, totalItems ->
+            viewModel.shouldPaginate(lastVisibleIndex, totalItems)
+        },
+        paginate = {
+            viewModel.paginate()
+        },
+    )
+
+    ProfileScreenContent(
+        paddingValues = paddingValues,
+        state = state,
+        actions = viewModel,
+        lazyListState = lazyListState,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileScreenContent(
+    paddingValues: PaddingValues,
+    state: ProfileScreenState,
+    actions: ProfileActions,
+    lazyListState: LazyListState,
+    modifier: Modifier = Modifier,
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val isScrollingUp = lazyListState.isScrollingUp()
+    val showFab by remember(isScrollingUp) {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > FAB_ITEMS_OFFSET && isScrollingUp
+        }
+    }
+    val showProfileName by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemScrollOffset > 0
+        }
+    }
+    val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = false, includeBottom = false)
+    val layoutDirection = LocalLayoutDirection.current
+    val bottomInsetPadding = paddingValues.calculateBottomPadding()
+
+    Scaffold(
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                title = {
+                    if (state.isError) {
+                        Text(text = stringResource(id = R.string.topbar_label_profile))
+                    } else if (showProfileName) {
+                        state.header?.let { header ->
+                            Text(
+                                text = header.username,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = actions::onTopBarBackClicked) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
+                            contentDescription = stringResource(
+                                id = R.string.accessibility_topbar_back,
+                            ),
+                        )
+                    }
+                },
+                actions = {
+                    state.header?.let { header ->
+                        if (header.canSendPrivateMessage) {
+                            IconButton(onClick = actions::onPrivateMessageClicked) {
+                                Icon(
+                                    modifier = Modifier.size(24.dp),
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_mail),
+                                    contentDescription = stringResource(
+                                        id = R.string.accessibility_profile_send_private_message,
+                                    ),
+                                )
+                            }
+                        }
+
+                        if (header.isLoggedIn && !header.isOwnProfile) {
+                            IconButton(
+                                onClick = actions::onBlacklistClicked,
+                                enabled = !state.isBlacklistActionLoading,
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(24.dp),
+                                    imageVector = ImageVector.vectorResource(
+                                        id = if (header.isBlacklisted) {
+                                            R.drawable.ic_lock_open_right
+                                        } else {
+                                            R.drawable.ic_lock
+                                        },
+                                    ),
+                                    contentDescription = stringResource(
+                                        id = if (header.isBlacklisted) {
+                                            R.string.accessibility_unlock_icon
+                                        } else {
+                                            R.string.accessibility_lock_icon
+                                        },
+                                    ),
+                                )
+                            }
+                        }
+
+                        if (header.canManageObservation) {
+                            IconButton(
+                                onClick = actions::onObserveClicked,
+                                enabled = !state.isObserveActionLoading,
+                            ) {
+                                Icon(
+                                    modifier = Modifier.size(24.dp),
+                                    imageVector = ImageVector.vectorResource(
+                                        id = if (header.isObserved) {
+                                            R.drawable.ic_visibility_off
+                                        } else {
+                                            R.drawable.ic_visibility_on
+                                        },
+                                    ),
+                                    contentDescription = stringResource(
+                                        id = if (header.isObserved) {
+                                            R.string.accessibility_profile_unobserve
+                                        } else {
+                                            R.string.accessibility_profile_observe
+                                        },
+                                    ),
+                                )
+                            }
+                        }
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                windowInsets = topBarInsets,
+            )
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = showFab,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                FloatingActionButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            scrollBehavior.state.heightOffset = 0f
+                            scrollBehavior.state.contentOffset = 0f
+                            lazyListState.animateScrollToItem(0)
+                        }
+                    },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_keyboard_arrow_up),
+                        contentDescription = stringResource(
+                            id = R.string.accessibility_fab_scroll_to_top,
+                        ),
+                    )
+                }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentWindowInsets = contentInsets,
+    ) { innerPaddingValues ->
+        val bodyPadding = PaddingValues(
+            start = innerPaddingValues.calculateStartPadding(layoutDirection),
+            top = innerPaddingValues.calculateTopPadding(),
+            end = innerPaddingValues.calculateEndPadding(layoutDirection),
+        )
+
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bodyPadding),
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                )
+            }
+        } else if (state.isError) {
+            GenericErrorScreen(
+                onRefreshClicked = actions::onRetryClicked,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bodyPadding),
+            )
+        } else {
+            ProfileScreenBody(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bodyPadding),
+                state = state,
+                actions = actions,
+                lazyListState = lazyListState,
+                bottomContentPadding = bottomInsetPadding + 16.dp,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProfileScreenBody(
+    modifier: Modifier = Modifier,
+    state: ProfileScreenState,
+    actions: ProfileActions,
+    lazyListState: LazyListState,
+    bottomContentPadding: androidx.compose.ui.unit.Dp,
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center,
+    ) {
+        ProfileLoadedContent(
+            state = state,
+            actions = actions,
+            lazyListState = lazyListState,
+            bottomContentPadding = bottomContentPadding,
+        )
+    }
+}
+
+@Composable
+private fun ProfileLoadedContent(
+    state: ProfileScreenState,
+    actions: ProfileActions,
+    lazyListState: LazyListState,
+    bottomContentPadding: androidx.compose.ui.unit.Dp,
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag(ProfileTestTags.Screen.List),
+        state = lazyListState,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(
+            bottom = bottomContentPadding,
+        ),
+    ) {
+        item(
+            key = "ProfileHeader",
+        ) {
+            state.header?.let {
+                ProfileHeader(
+                    state = state.header,
+                    isDetailsExpanded = state.isDetailsExpanded,
+                    isDetailsToggleVisible = true,
+                    onDetailsToggleClicked = actions::onDetailsToggleClicked,
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+            }
+        }
+
+        item(
+            key = "ProfileDetailsSection",
+        ) {
+            if (state.isDetailsExpanded) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    if (state.header?.isLoggedIn == true && !state.header.isOwnProfile) {
+                        ProfileNoteSection(
+                            state = state.noteState,
+                            onContentChanged = actions::onNoteContentChanged,
+                            onSaveClicked = actions::onNoteSaveClicked,
+                        )
+                    }
+                    ProfileAchievementsSection(
+                        state = state.achievementsState,
+                    )
+                }
+            }
+        }
+
+        item(
+            key = "ProfileSummary",
+        ) {
+            ProfileSummary(
+                summary = state.summary,
+                selectedType = state.selectedSummaryType,
+                onSelected = actions::onSummarySelected,
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+        }
+
+        if (state.subActionState.items.size > 1) {
+            item(
+                key = "ProfileSubActionDropdown",
+            ) {
+                ProfileSubActionDropdown(
+                    subActionState = state.subActionState,
+                    actions = actions,
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+            }
+        }
+
+        if (state.isResourcesLoading) {
+            item(
+                key = "ResourcesLoadingIndicator",
+            ) {
+                PaginationLoadingIndicator()
+            }
+        }
+
+        renderListContent(
+            listContent = state.listContent,
+            actions = actions,
+        )
+
+        if (state.isPaginating) {
+            item(
+                key = "PaginationLoadingIndicator",
+            ) {
+                PaginationLoadingIndicator()
+            }
+        }
+
+        if (state.isPaginationError) {
+            item(key = "PaginationError") {
+                PaginationErrorItem(onRetryClick = actions::paginate)
+            }
+        }
+    }
+}
+
+private fun LazyListScope.renderListContent(
+    listContent: ProfileListContentState,
+    actions: ProfileActions,
+) {
+    when (listContent) {
+        ProfileListContentState.Empty -> Unit
+
+        is ProfileListContentState.Resources -> {
+            renderResources(
+                resources = listContent.items,
+                actions = actions,
+            )
+        }
+
+        is ProfileListContentState.ObservedUsers -> {
+            renderObservedUsers(
+                users = listContent.items,
+                actions = actions,
+            )
+        }
+
+        is ProfileListContentState.ObservedTags -> {
+            renderObservedTags(
+                tags = listContent.items,
+                actions = actions,
+            )
+        }
+    }
+}
+
+private fun LazyListScope.renderResources(
+    resources: ImmutableList<ResourceItemState>,
+    actions: ProfileActions,
+) {
+    if (resources.isEmpty()) return
+
+    resources.forEach { resource ->
+        item(
+            key = "${resource.contentType}_${resource.id}",
+            contentType = resource.contentType,
+        ) {
+            ResourceItemRenderer(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp),
+                state = resource,
+                actions = actions,
+                config = ResourceItemConfig(
+                    showReplyAction = true,
+                ),
+            )
+        }
+    }
+}
+
+private fun LazyListScope.renderObservedUsers(
+    users: ImmutableList<UserItemState>,
+    actions: ProfileActions,
+) {
+    if (users.isEmpty()) {
+        item(
+            key = "no_observed_users",
+            contentType = "no_observed_users",
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.profile_no_observed_users),
+                )
+            }
+        }
+    } else {
+        users.forEach { user ->
+            item(
+                key = "observed_user_${user.username}",
+                contentType = "observed_user",
+            ) {
+                ObservedUserItem(
+                    user = user,
+                    onClick = { actions.onProfileClicked(user.username) },
+                )
+            }
+        }
+    }
+}
+
+private fun LazyListScope.renderObservedTags(
+    tags: ImmutableList<ProfileObservedTagItemState>,
+    actions: ProfileActions,
+) {
+    if (tags.isEmpty()) {
+        item(
+            key = "no_observed_tags",
+            contentType = "no_observed_tags",
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.profile_no_observed_tags),
+                )
+            }
+        }
+    } else {
+        tags.forEach { tag ->
+            item(
+                key = "observed_tag_${tag.name}",
+                contentType = "observed_tag",
+            ) {
+                ObservedTagItem(
+                    tag = tag,
+                    onClick = { actions.onTagClicked(tag.name) },
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ProfileScreenContentPreview(
+    @PreviewParameter(ProfileScreenStateProvider::class) state: ProfileScreenState,
+) {
+    PodkopPreview(darkTheme = false) {
+        ProfileScreenContent(
+            paddingValues = PaddingValues(),
+            state = state,
+            actions = NoOpProfileActions,
+            lazyListState = rememberLazyListState(),
+        )
+    }
+}

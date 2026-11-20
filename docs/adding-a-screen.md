@@ -36,7 +36,7 @@ entry<HitsScreen> {
 
 The helper used by most screens lives in:
 
-- `composeApp/src/commonMain/kotlin/pl/masslany/podkop/common/extensions/PaddingValuesInsetsExtension.kt`
+- `composeApp/src/main/kotlin/pl/masslany/podkop/common/extensions/PaddingValuesInsetsExtension.kt`
 
 ```kotlin
 @Composable
@@ -333,7 +333,7 @@ Do not add another manual start cutout padding around it, or the left inset will
 
 See:
 
-- `composeApp/src/commonMain/kotlin/pl/masslany/podkop/features/bottombar/BottomBarRoot.kt`
+- `composeApp/src/main/kotlin/pl/masslany/podkop/features/bottombar/BottomBarRoot.kt`
 
 ### 3. Using route-level safe-area logic inside home tabs
 
@@ -343,9 +343,9 @@ If you reapply raw `safeDrawing` assumptions there, landscape split mode will br
 
 See:
 
-- `composeApp/src/commonMain/kotlin/pl/masslany/podkop/features/home/HomeScreenRoot.kt`
-- `composeApp/src/commonMain/kotlin/pl/masslany/podkop/features/links/LinksScreenRoot.kt`
-- `composeApp/src/commonMain/kotlin/pl/masslany/podkop/features/entries/EntriesScreenRoot.kt`
+- `composeApp/src/main/kotlin/pl/masslany/podkop/features/home/HomeScreenRoot.kt`
+- `composeApp/src/main/kotlin/pl/masslany/podkop/features/links/LinksScreenRoot.kt`
+- `composeApp/src/main/kotlin/pl/masslany/podkop/features/entries/EntriesScreenRoot.kt`
 
 ### 4. Adding horizontal safe-area padding to a centered modal sheet
 
@@ -355,7 +355,7 @@ That can create unnecessary empty space when the card is already far from the cu
 
 See the composer implementation for the current expected behavior:
 
-- `composeApp/src/commonMain/kotlin/pl/masslany/podkop/common/composer/Composer.kt`
+- `composeApp/src/main/kotlin/pl/masslany/podkop/common/composer/Composer.kt`
 
 ## Copy-Paste Checklist
 
@@ -374,15 +374,15 @@ Before finishing a new screen, verify:
 Use these files as the closest live references:
 
 - Routed `Scaffold` screen with list-owned bottom inset:
-  - `composeApp/src/commonMain/kotlin/pl/masslany/podkop/features/hits/HitsScreenRoot.kt`
-  - `composeApp/src/commonMain/kotlin/pl/masslany/podkop/features/profile/ProfileScreenRoot.kt`
+  - `composeApp/src/main/kotlin/pl/masslany/podkop/features/hits/HitsScreenRoot.kt`
+  - `composeApp/src/main/kotlin/pl/masslany/podkop/features/profile/ProfileScreenRoot.kt`
 
 - Home-tab screen:
-  - `composeApp/src/commonMain/kotlin/pl/masslany/podkop/features/links/LinksScreenRoot.kt`
-  - `composeApp/src/commonMain/kotlin/pl/masslany/podkop/features/entries/EntriesScreenRoot.kt`
+  - `composeApp/src/main/kotlin/pl/masslany/podkop/features/links/LinksScreenRoot.kt`
+  - `composeApp/src/main/kotlin/pl/masslany/podkop/features/entries/EntriesScreenRoot.kt`
 
 - Shared inset helper:
-  - `composeApp/src/commonMain/kotlin/pl/masslany/podkop/common/extensions/PaddingValuesInsetsExtension.kt`
+  - `composeApp/src/main/kotlin/pl/masslany/podkop/common/extensions/PaddingValuesInsetsExtension.kt`
 
 If a new screen does not clearly fit one of the patterns above, stop and decide first whether it behaves like:
 

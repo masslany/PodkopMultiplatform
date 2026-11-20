@@ -1,6 +1,6 @@
 # Podkop
 
-Podkop is a Kotlin Multiplatform (KMP) client for Wykop.pl, built with modern Android development practices and Compose Multiplatform.
+Podkop is a Kotlin Multiplatform (KMP) client for Wykop.pl, built with modern Android development practices.
 
 The iOS app is written in SwiftUI on top of the shared Kotlin modules; Android uses Compose.
 
@@ -9,7 +9,7 @@ The iOS app is written in SwiftUI on top of the shared Kotlin modules; Android u
 The project is divided into several modules to ensure a clean separation of concerns and maximize code sharing:
 
 - **`:business`**: The core logic of the application. It contains the domain models, repositories, and data sources (networking with Ktor, serialization). This is a pure Kotlin Multiplatform module.
-- **`:composeApp`**: The Android UI module using Compose. It contains the ViewModels, screens, and navigation logic.
+- **`:composeApp`**: The Android UI module using Jetpack Compose (androidx artifacts, Android-only). It contains the ViewModels, screens, and navigation logic.
 - **`:common`**: Shared utilities, design system components, and base classes used by other modules.
 - **`:androidApp`**: The Android-specific entry point and configuration.
 - **`:iosShared`**: The Kotlin facade the iOS app calls; it exports the `PodkopShared` framework.

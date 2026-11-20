@@ -208,7 +208,7 @@ jobs:
           EOF
 
       - name: Verify KMP shared modules
-        run: ./gradlew --stacktrace :common:allTests :business:allTests :composeApp:allTests :iosShared:iosSimulatorArm64Test
+        run: ./gradlew --stacktrace :common:allTests :business:allTests :composeApp:testDebugUnitTest :iosShared:iosSimulatorArm64Test
 
       - name: Upload KMP failure reports
         if: failure()
