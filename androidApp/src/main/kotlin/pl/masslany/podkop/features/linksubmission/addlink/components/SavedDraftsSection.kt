@@ -11,6 +11,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -119,6 +120,7 @@ private fun AddLinkSavedDraftItem(
             IconButton(
                 onClick = onContinueClicked,
                 enabled = isActionEnabled && !isDeleting,
+                shapes = IconButtonDefaults.shapes(),
             ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_edit),
@@ -128,6 +130,7 @@ private fun AddLinkSavedDraftItem(
             IconButton(
                 onClick = onDeleteClicked,
                 enabled = isActionEnabled && !isDeleting,
+                shapes = IconButtonDefaults.shapes(),
             ) {
                 if (isDeleting) {
                     CircularProgressIndicator(

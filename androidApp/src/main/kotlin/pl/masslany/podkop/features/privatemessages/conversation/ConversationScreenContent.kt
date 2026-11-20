@@ -17,6 +17,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -85,7 +86,7 @@ internal fun ConversationScreenContent(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = actions::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
@@ -125,6 +126,7 @@ internal fun ConversationScreenContent(
                                     keyboardController?.hide()
                                     isComposerCollapsed = true
                                 },
+                                shapes = IconButtonDefaults.shapes(),
                             ) {
                                 Icon(
                                     modifier = Modifier.graphicsLayer {
@@ -242,7 +244,7 @@ private fun CollapsedConversationComposerBar(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                IconButton(onClick = onExpand) {
+                IconButton(onClick = onExpand, shapes = IconButtonDefaults.shapes()) {
                     Icon(
                         modifier = Modifier.size(20.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_keyboard_arrow_up),

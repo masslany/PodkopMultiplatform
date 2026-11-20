@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -95,7 +96,7 @@ private fun AboutAppScreenContent(
                         )
                     }
 
-                    IconButton(onClick = actions::onCloseClicked) {
+                    IconButton(onClick = actions::onCloseClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
                             contentDescription = stringResource(

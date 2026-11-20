@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
@@ -171,7 +172,7 @@ fun ProfileHeader(
                         }
                     }
                     if (isDetailsToggleVisible) {
-                        IconButton(onClick = onDetailsToggleClicked) {
+                        IconButton(onClick = onDetailsToggleClicked, shapes = IconButtonDefaults.shapes()) {
                             Icon(
                                 modifier = Modifier
                                     .size(20.dp)

@@ -23,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -151,7 +152,7 @@ fun ProfileScreenContent(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = actions::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
@@ -164,7 +165,10 @@ fun ProfileScreenContent(
                 actions = {
                     state.header?.let { header ->
                         if (header.canSendPrivateMessage) {
-                            IconButton(onClick = actions::onPrivateMessageClicked) {
+                            IconButton(
+                                onClick = actions::onPrivateMessageClicked,
+                                shapes = IconButtonDefaults.shapes(),
+                            ) {
                                 Icon(
                                     modifier = Modifier.size(24.dp),
                                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_mail),
@@ -179,6 +183,7 @@ fun ProfileScreenContent(
                             IconButton(
                                 onClick = actions::onBlacklistClicked,
                                 enabled = !state.isBlacklistActionLoading,
+                                shapes = IconButtonDefaults.shapes(),
                             ) {
                                 Icon(
                                     modifier = Modifier.size(24.dp),
@@ -204,6 +209,7 @@ fun ProfileScreenContent(
                             IconButton(
                                 onClick = actions::onObserveClicked,
                                 enabled = !state.isObserveActionLoading,
+                                shapes = IconButtonDefaults.shapes(),
                             ) {
                                 Icon(
                                     modifier = Modifier.size(24.dp),
