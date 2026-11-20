@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SnackbarDuration
@@ -35,6 +34,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.business.startup.models.AppState
 import pl.masslany.podkop.common.components.GenericErrorScreen
 import pl.masslany.podkop.common.components.LocalImageActions
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
 import pl.masslany.podkop.common.components.dialog.DefaultGenericDialog
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreen
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaAttachBottomSheetScreenRoot
@@ -490,7 +490,7 @@ private fun StartupStateScreen(
                         .padding(horizontal = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    CircularProgressIndicator()
+                    ScreenLoadingIndicator()
                 }
             }
 

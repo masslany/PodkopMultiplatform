@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -17,7 +16,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
 import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.privatemessages.components.PrivateMessagesInboxList
@@ -85,7 +85,7 @@ internal fun PrivateMessagesScreenContent(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = contentInsets,
     ) { innerPadding ->
-        PullToRefreshBox(
+        PodkopPullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = onRefresh,
             modifier = Modifier
@@ -95,7 +95,7 @@ internal fun PrivateMessagesScreenContent(
             when {
                 state.isLoading -> {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        ScreenLoadingIndicator(modifier = Modifier.align(Alignment.Center))
                     }
                 }
 

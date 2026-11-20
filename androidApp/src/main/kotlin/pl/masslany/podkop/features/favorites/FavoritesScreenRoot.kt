@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -28,7 +27,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -49,6 +47,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
 import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
@@ -165,7 +165,7 @@ fun FavoritesScreenContent(
                 .fillMaxSize()
                 .padding(innerPaddingValues),
         ) {
-            PullToRefreshBox(
+            PodkopPullToRefreshBox(
                 isRefreshing = state.isRefreshing,
                 onRefresh = actions::onRefresh,
                 modifier = Modifier.fillMaxSize(),
@@ -173,7 +173,7 @@ fun FavoritesScreenContent(
                 when {
                     state.isLoading -> {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            CircularProgressIndicator(
+                            ScreenLoadingIndicator(
                                 modifier = Modifier.align(Alignment.Center),
                             )
                         }

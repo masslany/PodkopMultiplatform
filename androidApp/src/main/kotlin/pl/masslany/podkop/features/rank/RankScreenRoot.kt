@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,7 +25,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,6 +40,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
 import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.rememberWindowSizeClass
@@ -125,7 +125,7 @@ fun RankScreenContent(
                 .fillMaxSize()
                 .padding(innerPaddingValues),
         ) {
-            PullToRefreshBox(
+            PodkopPullToRefreshBox(
                 isRefreshing = state.isRefreshing,
                 onRefresh = actions::onRefresh,
                 modifier = Modifier.fillMaxSize(),
@@ -133,7 +133,7 @@ fun RankScreenContent(
                 when {
                     state.isLoading -> {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            CircularProgressIndicator(
+                            ScreenLoadingIndicator(
                                 modifier = Modifier.align(Alignment.Center),
                             )
                         }
