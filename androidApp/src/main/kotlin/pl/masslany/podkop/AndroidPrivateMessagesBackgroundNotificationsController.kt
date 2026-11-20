@@ -40,8 +40,6 @@ class AndroidPrivateMessagesBackgroundNotificationsController(
         WorkManager.getInstance(application)
     }
 
-    override val supportsSettings: Boolean = true
-
     override val backgroundNotificationsEnabled: Flow<Boolean> =
         keyValueStorage.observeBoolean(BACKGROUND_NOTIFICATIONS_ENABLED_KEY)
             .map { it ?: false }

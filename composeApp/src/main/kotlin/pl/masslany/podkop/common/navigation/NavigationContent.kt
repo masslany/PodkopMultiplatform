@@ -70,7 +70,6 @@ private fun GenericNavDisplay(
     val dialogSceneStrategy = remember { AnimatedDialogSceneStrategy<NavTarget>() }
     val translucentSceneStrategy = remember { TranslucentSceneStrategy<NavTarget>() }
     val canNavigateBack = backStack.size > 1
-    val navigationInput = rememberPlatformBackNavigationInput(enabled = canNavigateBack)
 
     val predictiveBackState = rememberPredictiveBackState()
     val entries = rememberDecoratedNavEntries(
@@ -96,10 +95,7 @@ private fun GenericNavDisplay(
             entryCount = entries.size,
             onBack = onBack,
         ),
-        modifier = modifier.edgeSwipeBackGesture(
-            enabled = canNavigateBack,
-            navigationInput = navigationInput,
-        ),
+        modifier = modifier,
         transitionSpec = {
             ContentTransform(
                 targetContentEnter = EnterTransition.None,

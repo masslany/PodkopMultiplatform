@@ -5,10 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import pl.masslany.podkop.common.composer.rememberComposerImagePickerLauncher
@@ -34,18 +30,7 @@ fun ComposerMediaPickLocalScreenRoot(
             )
         },
     )
-    var launchAttempted by remember { mutableStateOf(false) }
-
-    LaunchedEffect(pickerLauncher.isAvailable) {
-        if (launchAttempted) return@LaunchedEffect
-        launchAttempted = true
-        if (!pickerLauncher.isAvailable) {
-            appNavigator.sendResult(
-                key = screen.resultKey,
-                result = ComposerMediaPickLocalResult(image = null),
-            )
-            return@LaunchedEffect
-        }
+    LaunchedEffect(Unit) {
         pickerLauncher.launch()
     }
 

@@ -16,8 +16,6 @@ class AndroidTelemetrySettingsController(
     private val firebaseAnalytics by lazy { FirebaseAnalytics.getInstance(application) }
     private val firebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
 
-    override val supportsControls: Boolean = true
-
     override val analyticsEnabled: Flow<Boolean> =
         keyValueStorage.observeBoolean(ANALYTICS_ENABLED_KEY)
             .map { it ?: true }

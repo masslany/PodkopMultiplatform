@@ -27,7 +27,5 @@ data class ComposerPickedImage(val bytes: ByteArray, val fileName: String?, val 
 
 @Stable
 internal interface ComposerImagePickerLauncher {
-    val isAvailable: Boolean
-
     fun launch()
 }

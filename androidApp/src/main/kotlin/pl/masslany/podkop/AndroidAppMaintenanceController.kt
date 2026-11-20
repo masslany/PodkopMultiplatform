@@ -7,8 +7,6 @@ import pl.masslany.podkop.common.platform.AppMaintenanceController
 class AndroidAppMaintenanceController(
     private val application: Application,
 ) : AppMaintenanceController {
-    override val supportsCacheClearing: Boolean = true
-
     override suspend fun clearCache(): Boolean = runCatching {
         val internalCacheCleared = application.cacheDir.clearContents()
         val externalCacheCleared = application.externalCacheDir?.clearContents() ?: true

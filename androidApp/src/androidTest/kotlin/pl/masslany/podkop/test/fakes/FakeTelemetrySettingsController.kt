@@ -5,7 +5,6 @@ import pl.masslany.podkop.common.settings.TelemetrySettingsController
 
 /** Keeps the telemetry settings in memory and never turns Firebase collection back on. */
 class FakeTelemetrySettingsController : TelemetrySettingsController {
-    override val supportsControls: Boolean = true
     override val analyticsEnabled = MutableStateFlow(true)
     override val crashReportingEnabled = MutableStateFlow(true)
 

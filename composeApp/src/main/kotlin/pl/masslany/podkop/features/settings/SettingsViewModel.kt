@@ -16,7 +16,6 @@ import pl.masslany.podkop.common.navigation.GenericDialog
 import pl.masslany.podkop.common.platform.AppMaintenanceController
 import pl.masslany.podkop.common.platform.BuildInfo
 import pl.masslany.podkop.common.platform.TextClipboardController
-import pl.masslany.podkop.common.platform.supportsDynamicColorsToggle
 import pl.masslany.podkop.common.settings.AppSettings
 import pl.masslany.podkop.common.settings.TelemetrySettingsController
 import pl.masslany.podkop.common.settings.ThemeOverride
@@ -96,9 +95,7 @@ class SettingsViewModel(
         SettingsScreenState(
             isLoading = false,
             privateMessagesBackgroundNotificationsEnabled = backgroundNotificationsEnabled,
-            supportsPrivateMessagesBackgroundNotifications =
-                privateMessagesBackgroundNotificationsController.supportsSettings &&
-                    isLoggedIn,
+            showPrivateMessagesBackgroundNotifications = isLoggedIn,
             areSystemNotificationsEnabled =
                 privateMessagesBackgroundNotificationsController.areSystemNotificationsEnabled(),
             shouldRequestNotificationPermission = shouldRequestNotificationPermission,
@@ -107,11 +104,8 @@ class SettingsViewModel(
             threadedEntryComments = preferencesState.threadedEntryComments,
             themeOverride = preferencesState.themeOverride,
             dynamicColorsEnabled = preferencesState.dynamicColorsEnabled,
-            supportsDynamicColorsToggle = supportsDynamicColorsToggle(),
             analyticsEnabled = preferencesState.analyticsEnabled,
             crashReportingEnabled = preferencesState.crashReportingEnabled,
-            supportsTelemetryControls = telemetrySettingsController.supportsControls,
-            supportsCacheClearing = appMaintenanceController.supportsCacheClearing,
             showDebugTools = buildInfo.isDebugBuild,
             showAccountSection = isLoggedIn,
             appVersion = buildInfo.appVersionName,
@@ -296,15 +290,13 @@ class SettingsViewModel(
         appendLine("playVideosInline=${state.playVideosInline}")
         appendLine("threadedEntryComments=${state.threadedEntryComments}")
 
-        if (state.supportsPrivateMessagesBackgroundNotifications) {
+        if (state.showPrivateMessagesBackgroundNotifications) {
             appendLine("pmBackgroundNotifications=${state.privateMessagesBackgroundNotificationsEnabled}")
             appendLine("systemNotificationsEnabled=${state.areSystemNotificationsEnabled}")
         }
 
-        if (state.supportsTelemetryControls) {
-            appendLine("analyticsEnabled=${state.analyticsEnabled}")
-            appendLine("crashReportingEnabled=${state.crashReportingEnabled}")
-        }
+        appendLine("analyticsEnabled=${state.analyticsEnabled}")
+        appendLine("crashReportingEnabled=${state.crashReportingEnabled}")
     }.trim()
 }
 

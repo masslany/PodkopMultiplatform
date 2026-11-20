@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import pl.masslany.podkop.common.navigation.NavTarget
 
 @Serializable
-data class ComposerMediaAttachBottomSheetScreen(val resultKey: String, val showLocalPicker: Boolean) : NavTarget
+data class ComposerMediaAttachBottomSheetScreen(val resultKey: String) : NavTarget
 
 enum class ComposerMediaAttachResult {
     Url,

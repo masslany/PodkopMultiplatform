@@ -50,8 +50,6 @@ internal fun rememberComposerImagePickerLauncher(
 
     return remember(launcher) {
         object : ComposerImagePickerLauncher {
-            override val isAvailable: Boolean = true
-
             override fun launch() {
                 launcher.launch(
                     PickVisualMediaRequest(
@@ -62,8 +60,6 @@ internal fun rememberComposerImagePickerLauncher(
         }
     }
 }
-
-internal fun isComposerImagePickerAvailable(): Boolean = true
 
 private fun ContentResolver.resolveDisplayName(uri: Uri): String? {
     val projection = arrayOf(OpenableColumns.DISPLAY_NAME)

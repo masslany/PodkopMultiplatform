@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
@@ -72,7 +71,6 @@ fun EmbedImage(
     var latestSuccessResult by remember(state.url) { mutableStateOf<SuccessResult?>(null) }
     var hasLoadedImage by remember(state.url) { mutableStateOf(false) }
     var isImageLoading by remember(state.url) { mutableStateOf(true) }
-    var isPlatformGifReady by remember(state.url) { mutableStateOf(false) }
     var aspectRatio by rememberSaveable(state.url, state.width, state.height) { mutableStateOf(state.aspectRatio) }
 
     LaunchedEffect(state.url, state.isGif, isGifAutoplayEnabled) {
@@ -89,13 +87,6 @@ fun EmbedImage(
         }
     }
 
-    LaunchedEffect(state.url, state.isGif, isGifPlaybackEnabled) {
-        if (state.isGif && supportsPlatformGifImage && isGifPlaybackEnabled) {
-            isPlatformGifReady = false
-        }
-    }
-
-    val usePlatformGifRenderer = state.isGif && supportsPlatformGifImage && isGifPlaybackEnabled
     val isGifOverlayVisible = state.isGif && !isGifAutoplayEnabled && !isGifPlaybackEnabled
     val imageContainerModifier = Modifier
         .testTag(CommonTestTags.EmbedImage.Image)
@@ -165,92 +156,35 @@ fun EmbedImage(
                         )
                     }
 
-                    if (usePlatformGifRenderer) {
-                        AsyncImage(
-                            modifier = Modifier.fillMaxSize(),
-                            model = ImageRequest.Builder(context)
-                                .data(state.url)
-                                .memoryCacheKey(state.url)
-                                .diskCacheKey(state.url)
-                                .memoryCachePolicy(CachePolicy.ENABLED)
-                                .diskCachePolicy(CachePolicy.ENABLED)
-                                .networkCachePolicy(CachePolicy.ENABLED)
-                                .scale(Scale.FIT)
-                                .size(sizeResolver)
-                                .build(),
-                            onSuccess = {
-                                hasLoadedImage = true
-                                isImageLoading = false
-                                latestSuccessResult = it.result
-                            },
-                            onError = {
-                                isImageLoading = false
-                            },
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                        )
-
-                        PlatformGifImage(
-                            modifier = Modifier.fillMaxSize(),
-                            url = state.url,
-                            onSuccess = {
-                                hasLoadedImage = true
-                                isPlatformGifReady = true
-                                isImageLoading = false
-                            },
-                            onError = {
-                                isImageLoading = false
-                            },
-                        )
-                    } else {
-                        AsyncImage(
-                            modifier = Modifier.fillMaxSize(),
-                            model = ImageRequest.Builder(context)
-                                .data(state.url)
-                                .memoryCacheKey(state.url)
-                                .diskCacheKey(state.url)
-                                .memoryCachePolicy(CachePolicy.ENABLED)
-                                .diskCachePolicy(CachePolicy.ENABLED)
-                                .networkCachePolicy(CachePolicy.ENABLED)
-                                .scale(Scale.FIT)
-                                .size(sizeResolver)
-                                .build(),
-                            onSuccess = { success ->
-                                hasLoadedImage = true
-                                isImageLoading = false
-                                latestSuccessResult = success.result
-                                if (state.isGif) {
-                                    setImageAnimationPlaying(
-                                        image = success.result.image,
-                                        isPlaying = isGifPlaybackEnabled,
-                                    )
-                                }
-                            },
-                            onError = {
-                                isImageLoading = false
-                            },
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                        )
-                    }
-                }
-
-                if (usePlatformGifRenderer && !isPlatformGifReady && !isAdultOverlayVisible) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .background(
-                                color = Color.Black.copy(alpha = 0.45f),
-                                shape = RoundedCornerShape(24.dp),
-                            )
-                            .padding(8.dp),
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
-                            color = Color.White,
-                        )
-                    }
+                    AsyncImage(
+                        modifier = Modifier.fillMaxSize(),
+                        model = ImageRequest.Builder(context)
+                            .data(state.url)
+                            .memoryCacheKey(state.url)
+                            .diskCacheKey(state.url)
+                            .memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED)
+                            .networkCachePolicy(CachePolicy.ENABLED)
+                            .scale(Scale.FIT)
+                            .size(sizeResolver)
+                            .build(),
+                        onSuccess = { success ->
+                            hasLoadedImage = true
+                            isImageLoading = false
+                            latestSuccessResult = success.result
+                            if (state.isGif) {
+                                setImageAnimationPlaying(
+                                    image = success.result.image,
+                                    isPlaying = isGifPlaybackEnabled,
+                                )
+                            }
+                        },
+                        onError = {
+                            isImageLoading = false
+                        },
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                    )
                 }
 
                 if (isGifOverlayVisible && !isAdultOverlayVisible) {

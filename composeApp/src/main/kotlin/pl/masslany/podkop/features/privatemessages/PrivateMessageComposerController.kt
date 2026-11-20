@@ -22,7 +22,6 @@ import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalRe
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaPickLocalScreen
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogResult
 import pl.masslany.podkop.common.composer.composermedia.ComposerMediaUrlDialogScreen
-import pl.masslany.podkop.common.composer.isComposerImagePickerAvailable
 import pl.masslany.podkop.common.logging.api.AppLogger
 import pl.masslany.podkop.common.navigation.AppNavigator
 import pl.masslany.podkop.common.navigation.GenericDialog
@@ -65,7 +64,6 @@ internal class PrivateMessageComposerController(
             val attachResult = appNavigator.awaitResult<ComposerMediaAttachResult>(
                 target = ComposerMediaAttachBottomSheetScreen(
                     resultKey = attachResultKey,
-                    showLocalPicker = isComposerImagePickerAvailable(),
                 ),
                 key = attachResultKey,
             )

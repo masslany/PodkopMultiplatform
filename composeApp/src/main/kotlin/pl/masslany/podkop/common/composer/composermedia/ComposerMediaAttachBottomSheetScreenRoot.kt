@@ -55,21 +55,19 @@ fun ComposerMediaAttachBottomSheetScreenRoot(
                     text = stringResource(id = R.string.composer_photo_attach_url),
                 )
             }
-            if (screen.showLocalPicker) {
-                TextButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        appNavigator.sendResult(
-                            key = screen.resultKey,
-                            result = ComposerMediaAttachResult.Local,
-                        )
-                    },
-                ) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = stringResource(id = R.string.composer_photo_attach_device),
+            TextButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    appNavigator.sendResult(
+                        key = screen.resultKey,
+                        result = ComposerMediaAttachResult.Local,
                     )
-                }
+                },
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.composer_photo_attach_device),
+                )
             }
             TextButton(
                 modifier = Modifier.fillMaxWidth(),

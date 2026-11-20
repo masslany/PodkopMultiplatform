@@ -128,7 +128,7 @@ fun SettingsScreenContent(
                     ),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                if (state.supportsPrivateMessagesBackgroundNotifications) {
+                if (state.showPrivateMessagesBackgroundNotifications) {
                     SectionCard(
                         title = stringResource(id = R.string.settings_headline_notifications),
                     ) {
@@ -155,15 +155,13 @@ fun SettingsScreenContent(
                         onThemeSelected = actions::onThemeOverrideChanged,
                     )
 
-                    if (state.supportsDynamicColorsToggle) {
-                        SectionCardDivider()
-                        SwitchSettingRow(
-                            label = stringResource(id = R.string.settings_body_dynamic_colors),
-                            supportingText = null,
-                            checked = state.dynamicColorsEnabled,
-                            onCheckedChange = actions::onDynamicColorsChanged,
-                        )
-                    }
+                    SectionCardDivider()
+                    SwitchSettingRow(
+                        label = stringResource(id = R.string.settings_body_dynamic_colors),
+                        supportingText = null,
+                        checked = state.dynamicColorsEnabled,
+                        onCheckedChange = actions::onDynamicColorsChanged,
+                    )
                 }
 
                 SectionCard(
@@ -199,24 +197,22 @@ fun SettingsScreenContent(
                     )
                 }
 
-                if (state.supportsTelemetryControls) {
-                    SectionCard(
-                        title = stringResource(id = R.string.settings_headline_privacy),
-                    ) {
-                        SwitchSettingRow(
-                            label = stringResource(id = R.string.settings_body_analytics),
-                            supportingText = null,
-                            checked = state.analyticsEnabled,
-                            onCheckedChange = actions::onAnalyticsCollectionChanged,
-                        )
-                        SectionCardDivider()
-                        SwitchSettingRow(
-                            label = stringResource(id = R.string.settings_body_crash_reporting),
-                            supportingText = null,
-                            checked = state.crashReportingEnabled,
-                            onCheckedChange = actions::onCrashReportingChanged,
-                        )
-                    }
+                SectionCard(
+                    title = stringResource(id = R.string.settings_headline_privacy),
+                ) {
+                    SwitchSettingRow(
+                        label = stringResource(id = R.string.settings_body_analytics),
+                        supportingText = null,
+                        checked = state.analyticsEnabled,
+                        onCheckedChange = actions::onAnalyticsCollectionChanged,
+                    )
+                    SectionCardDivider()
+                    SwitchSettingRow(
+                        label = stringResource(id = R.string.settings_body_crash_reporting),
+                        supportingText = null,
+                        checked = state.crashReportingEnabled,
+                        onCheckedChange = actions::onCrashReportingChanged,
+                    )
                 }
 
                 if (state.showDebugTools) {
@@ -236,16 +232,14 @@ fun SettingsScreenContent(
                         )
                     }
                 }
-                if (state.supportsCacheClearing) {
-                    SectionCard(
-                        title = stringResource(id = R.string.settings_headline_support),
-                    ) {
-                        ActionSettingRow(
-                            label = stringResource(id = R.string.settings_action_clear_cache),
-                            buttonLabel = stringResource(id = R.string.settings_button_clear),
-                            onClick = actions::onClearCacheClicked,
-                        )
-                    }
+                SectionCard(
+                    title = stringResource(id = R.string.settings_headline_support),
+                ) {
+                    ActionSettingRow(
+                        label = stringResource(id = R.string.settings_action_clear_cache),
+                        buttonLabel = stringResource(id = R.string.settings_button_clear),
+                        onClick = actions::onClearCacheClicked,
+                    )
                 }
 
                 if (state.showAccountSection) {
