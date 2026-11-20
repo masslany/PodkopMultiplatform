@@ -69,7 +69,10 @@ class EntryCommentThreadTreeTest {
     fun `appending a page skips comments that are already loaded`() {
         val sut = EntryCommentThreadTree.from(replies(total = 2, comment(10, depth = 0)))
 
-        val actual = sut.appendPage(parentId = null, page = replies(total = 2, comment(10, depth = 0), comment(20, depth = 0)))
+        val actual = sut.appendPage(
+            parentId = null,
+            page = replies(total = 2, comment(10, depth = 0), comment(20, depth = 0)),
+        )
 
         assertEquals(listOf(10, 20), actual.rows().map { (it as Row.Comment).id })
         assertFalse(actual.hasMoreTopLevel)

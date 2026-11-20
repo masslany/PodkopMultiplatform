@@ -97,7 +97,11 @@ class EntryDetailsViewModelTest {
         var failNext = true
         val entries = threadedEntries(topLevelTotal = 2).apply {
             threadRepliesHandler = {
-                if (failNext) Result.failure(IllegalStateException("offline")) else Result.success(replies(total = 2, comment(9)))
+                if (failNext) {
+                    Result.failure(IllegalStateException("offline"))
+                } else {
+                    Result.success(replies(total = 2, comment(9)))
+                }
             }
         }
         val snackbar = FakeSnackbarManager()
@@ -118,7 +122,10 @@ class EntryDetailsViewModelTest {
 
         assertFalse(sut.state.value.isPaginationError)
         assertEquals(
-            listOf(FakeEntriesRepository.ThreadRepliesCall(null, 10), FakeEntriesRepository.ThreadRepliesCall(null, 10)),
+            listOf(
+                FakeEntriesRepository.ThreadRepliesCall(null, 10),
+                FakeEntriesRepository.ThreadRepliesCall(null, 10),
+            ),
             entries.threadRepliesCalls,
         )
         assertEquals("comment-9", sut.state.value.threadRows?.last()?.key)

@@ -113,7 +113,11 @@ internal data class EntryCommentThreadTree(private val root: Branch, private val
                 ),
             )
             val childAncestorLines = if (node.depth == 0) emptyList() else ancestorLines + continuesBelow
-            addRows(childIds = replies.childIds, branchHasMore = replies.remainingCount > 0, ancestorLines = childAncestorLines)
+            addRows(
+                childIds = replies.childIds,
+                branchHasMore = replies.remainingCount > 0,
+                ancestorLines = childAncestorLines,
+            )
             if (replies.remainingCount > 0) {
                 add(
                     Row.MoreReplies(
