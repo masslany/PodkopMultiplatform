@@ -41,6 +41,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.ImmutableList
@@ -291,7 +292,7 @@ private fun ProfileScreenBody(
     state: ProfileScreenState,
     actions: ProfileActions,
     lazyListState: LazyListState,
-    bottomContentPadding: androidx.compose.ui.unit.Dp,
+    bottomContentPadding: Dp,
 ) {
     Box(
         modifier = modifier,
@@ -311,7 +312,7 @@ private fun ProfileLoadedContent(
     state: ProfileScreenState,
     actions: ProfileActions,
     lazyListState: LazyListState,
-    bottomContentPadding: androidx.compose.ui.unit.Dp,
+    bottomContentPadding: Dp,
 ) {
     LazyColumn(
         modifier = Modifier

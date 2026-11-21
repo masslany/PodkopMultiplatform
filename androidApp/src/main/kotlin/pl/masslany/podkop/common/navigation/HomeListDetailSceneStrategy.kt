@@ -3,6 +3,7 @@ package pl.masslany.podkop.common.navigation
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -154,7 +155,7 @@ private data class HomeListDetailScene<T : Any>(
                                 if (initialState == null && targetState != null) {
                                     (
                                         slideInHorizontally(
-                                            animationSpec = androidx.compose.animation.core.tween(
+                                            animationSpec = tween(
                                                 durationMillis = DetailPaneAnimationDurationMs,
                                             ),
                                             initialOffsetX = { fullWidth -> fullWidth },
@@ -166,7 +167,7 @@ private data class HomeListDetailScene<T : Any>(
                                 } else {
                                     (
                                         slideInHorizontally(
-                                            animationSpec = androidx.compose.animation.core.tween(
+                                            animationSpec = tween(
                                                 durationMillis = DetailPaneAnimationDurationMs,
                                             ),
                                             initialOffsetX = { fullWidth -> fullWidth / 4 },
@@ -174,7 +175,7 @@ private data class HomeListDetailScene<T : Any>(
                                         )
                                         .togetherWith(
                                             slideOutHorizontally(
-                                                animationSpec = androidx.compose.animation.core.tween(
+                                                animationSpec = tween(
                                                     durationMillis = DetailPaneAnimationDurationMs,
                                                 ),
                                                 targetOffsetX = { fullWidth -> -fullWidth / 4 },

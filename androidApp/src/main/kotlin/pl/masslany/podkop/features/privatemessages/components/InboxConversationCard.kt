@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
@@ -93,7 +94,7 @@ internal fun InboxConversationCard(
                         overflow = TextOverflow.Ellipsis,
                     )
                 } else {
-                    androidx.compose.material3.HorizontalDivider(
+                    HorizontalDivider(
                         thickness = 1.dp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f),
                     )

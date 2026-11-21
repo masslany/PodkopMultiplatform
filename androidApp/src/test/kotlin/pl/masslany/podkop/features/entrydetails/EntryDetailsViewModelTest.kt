@@ -1,5 +1,6 @@
 package pl.masslany.podkop.features.entrydetails
 
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -51,7 +52,7 @@ class EntryDetailsViewModelTest {
             threadRepliesHandler = {
                 try {
                     firstRepliesPage.await()
-                } catch (cancelled: kotlin.coroutines.cancellation.CancellationException) {
+                } catch (cancelled: CancellationException) {
                     repliesLoadCancelled = true
                     throw cancelled
                 }

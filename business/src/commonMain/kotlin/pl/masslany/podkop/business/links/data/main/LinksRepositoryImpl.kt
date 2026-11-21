@@ -25,6 +25,7 @@ import pl.masslany.podkop.business.links.domain.models.request.LinksType
 import pl.masslany.podkop.business.links.domain.models.request.PublishLinkDraft
 import pl.masslany.podkop.business.links.domain.models.request.UpdateLinkDraft
 import pl.masslany.podkop.common.coroutines.api.DispatcherProvider
+import pl.masslany.podkop.business.links.data.network.models.LinkDraftDto
 
 class LinksRepositoryImpl(
     private val linksDataSource: LinksDataSource,
@@ -278,7 +279,7 @@ class LinksRepositoryImpl(
     }
 }
 
-private fun pl.masslany.podkop.business.links.data.network.models.LinkDraftDto.toLinkDraftDetails(): LinkDraftDetails {
+private fun LinkDraftDto.toLinkDraftDetails(): LinkDraftDetails {
     val media = media?.toMedia()
     return LinkDraftDetails(
         key = key,

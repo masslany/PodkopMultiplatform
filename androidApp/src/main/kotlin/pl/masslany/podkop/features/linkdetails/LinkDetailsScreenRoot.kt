@@ -69,6 +69,7 @@ import pl.masslany.podkop.common.components.ScrollToTopFab
 import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.extensions.isScrollingUp
 import pl.masslany.podkop.common.extensions.toWindowInsets
+import pl.masslany.podkop.common.models.EntryContentState
 import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
 import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
@@ -738,7 +739,7 @@ private fun LinkDetailsCommentItem(
 }
 
 private fun LinkCommentItemState.textSelectionLongClick(actions: LinkDetailsActions): (() -> Unit)? =
-    if (entryContentState is pl.masslany.podkop.common.models.EntryContentState.Content &&
+    if (entryContentState is EntryContentState.Content &&
         !isBlacklisted &&
         rawContent.isNotBlank()
     ) {

@@ -3,6 +3,8 @@ package pl.masslany.podkop.common.deeplink
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class AppDeepLinkParserTest {
     private val parser = AppDeepLinkParser()
@@ -177,11 +179,11 @@ class AppDeepLinkParserTest {
 
     @Test
     fun recognizesOnlyHttpsAppHostForEmbeddedLogin() {
-        kotlin.test.assertTrue(parser.isAppHost("https://masslany.pl/wykop/connect?error=denied"))
-        kotlin.test.assertTrue(parser.isAppHost("https://MASSLANY.pl/anything"))
-        kotlin.test.assertFalse(parser.isAppHost("http://masslany.pl/wykop/connect?token=a&rtoken=b"))
-        kotlin.test.assertFalse(parser.isAppHost("https://wykop.pl/connect"))
-        kotlin.test.assertFalse(parser.isAppHost("https://masslany.pl.evil.example/connect"))
-        kotlin.test.assertFalse(parser.isAppHost(""))
+        assertTrue(parser.isAppHost("https://masslany.pl/wykop/connect?error=denied"))
+        assertTrue(parser.isAppHost("https://MASSLANY.pl/anything"))
+        assertFalse(parser.isAppHost("http://masslany.pl/wykop/connect?token=a&rtoken=b"))
+        assertFalse(parser.isAppHost("https://wykop.pl/connect"))
+        assertFalse(parser.isAppHost("https://masslany.pl.evil.example/connect"))
+        assertFalse(parser.isAppHost(""))
     }
 }

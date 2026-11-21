@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
@@ -220,7 +221,7 @@ private fun HitsScreenList(
     state: HitsScreenState,
     actions: HitsActions,
     lazyListState: LazyListState,
-    bottomContentPadding: androidx.compose.ui.unit.Dp,
+    bottomContentPadding: Dp,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(

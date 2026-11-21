@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.persistentListOf
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.linksubmission.addlink.components.SavedDraftsSection
@@ -96,7 +97,7 @@ private fun AddLinkScreenContentPreview() {
     PodkopPreview(darkTheme = false) {
         AddLinkScreenContent(
             state = AddLinkStartState.initial.copy(
-                currentDrafts = kotlinx.collections.immutable.persistentListOf(
+                currentDrafts = persistentListOf(
                     AddLinkSavedDraftState(
                         key = "draft-1",
                         title = "Świnoujście zawarło ugodę z wykonawcą tunelu pod Świną",

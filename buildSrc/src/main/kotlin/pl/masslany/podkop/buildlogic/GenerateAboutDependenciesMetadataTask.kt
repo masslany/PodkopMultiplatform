@@ -9,6 +9,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.w3c.dom.Element
+import org.w3c.dom.NodeList
 
 abstract class GenerateAboutDependenciesMetadataTask : DefaultTask() {
     @get:Input
@@ -127,10 +129,10 @@ private fun parsePomNotice(
     )
 }
 
-private fun org.w3c.dom.NodeList.elements(): List<org.w3c.dom.Element> =
-    (0 until length).mapNotNull { item(it) as? org.w3c.dom.Element }
+private fun NodeList.elements(): List<Element> =
+    (0 until length).mapNotNull { item(it) as? Element }
 
-private fun org.w3c.dom.Element.firstChildText(tagName: String): String? =
+private fun Element.firstChildText(tagName: String): String? =
     getElementsByTagName(tagName)
         .item(0)
         ?.textContent

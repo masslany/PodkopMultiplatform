@@ -37,10 +37,11 @@ import coil3.compose.AsyncImage
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.features.profile.models.ProfileAchievementItemState
+import pl.masslany.podkop.features.profile.models.ProfileAchievementsSectionState
 
 @Composable
 internal fun ProfileAchievementsSection(
-    state: pl.masslany.podkop.features.profile.models.ProfileAchievementsSectionState,
+    state: ProfileAchievementsSectionState,
     modifier: Modifier = Modifier,
 ) {
     Surface(
