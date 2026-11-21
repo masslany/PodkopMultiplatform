@@ -10,6 +10,7 @@ import pl.masslany.podkop.features.linkdetails.LinkDetailsRelatedState
 import pl.masslany.podkop.features.linkdetails.LinkDetailsScreenState
 import pl.masslany.podkop.features.linkdetails.LinkDownvoteMenuState
 import pl.masslany.podkop.features.linkdetails.models.LinkDetailsCommentItemState
+import pl.masslany.podkop.features.resources.models.ResourceType
 import pl.masslany.podkop.features.resources.models.related.RelatedItemState
 import pl.masslany.podkop.features.resources.preview.LinkCommentItemStateProvider
 import pl.masslany.podkop.features.resources.preview.LinkItemStateProvider
@@ -92,13 +93,13 @@ class LinkDetailsScreenStateProvider : PreviewParameterProvider<LinkDetailsScree
                 items = persistentListOf(
                     RelatedItemState(
                         id = 1,
-                        contentType = pl.masslany.podkop.features.resources.models.ResourceType.RelatedItem,
+                        contentType = ResourceType.RelatedItem,
                         imageUrl = "https://picsum.photos/seed/related/400/300",
                         titleState = link.titleState,
                         authorState = link.authorState,
                         source = link.source,
                         sourceUrl = link.sourceUrl,
-                        voteState = pl.masslany.podkop.common.preview.PreviewFixtures.voteState(),
+                        voteState = PreviewFixtures.voteState(),
                     ),
                 ),
             ),

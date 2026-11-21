@@ -17,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
@@ -117,7 +118,7 @@ fun ImageViewerScreenContent(
                 modifier = Modifier.graphicsLayer { alpha = topBarAlpha },
                 title = { },
                 navigationIcon = {
-                    IconButton(onClick = actions::onBackClicked) {
+                    IconButton(onClick = actions::onBackClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
@@ -129,6 +130,7 @@ fun ImageViewerScreenContent(
                     IconButton(
                         enabled = !state.isCopying,
                         onClick = { actions.onCopyClicked(state.imageUrl) },
+                        shapes = IconButtonDefaults.shapes(),
                     ) {
                         if (state.isCopying) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
@@ -143,6 +145,7 @@ fun ImageViewerScreenContent(
                     IconButton(
                         enabled = !state.isCopying,
                         onClick = { actions.onDownloadClicked(state.imageUrl) },
+                        shapes = IconButtonDefaults.shapes(),
                     ) {
                         Icon(
                             modifier = Modifier.size(24.dp),

@@ -1,8 +1,5 @@
 package pl.masslany.podkop.features.favorites
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,17 +15,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -49,6 +44,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
+import pl.masslany.podkop.common.components.ScrollToTopFab
 import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
@@ -118,7 +116,7 @@ fun FavoritesScreenContent(
                     Text(text = stringResource(id = R.string.topbar_label_favorites))
                 },
                 navigationIcon = {
-                    IconButton(onClick = actions::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
@@ -133,29 +131,16 @@ fun FavoritesScreenContent(
             )
         },
         floatingActionButton = {
-            AnimatedVisibility(
+            ScrollToTopFab(
                 visible = showFab,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                FloatingActionButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            scrollBehavior.state.heightOffset = 0f
-                            scrollBehavior.state.contentOffset = 0f
-                            lazyListState.animateScrollToItem(0)
-                        }
-                    },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_keyboard_arrow_up),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_fab_scroll_to_top,
-                        ),
-                    )
-                }
-            }
+                onClick = {
+                    coroutineScope.launch {
+                        scrollBehavior.state.heightOffset = 0f
+                        scrollBehavior.state.contentOffset = 0f
+                        lazyListState.animateScrollToItem(0)
+                    }
+                },
+            )
         },
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = contentInsets,
@@ -165,7 +150,7 @@ fun FavoritesScreenContent(
                 .fillMaxSize()
                 .padding(innerPaddingValues),
         ) {
-            PullToRefreshBox(
+            PodkopPullToRefreshBox(
                 isRefreshing = state.isRefreshing,
                 onRefresh = actions::onRefresh,
                 modifier = Modifier.fillMaxSize(),
@@ -173,7 +158,7 @@ fun FavoritesScreenContent(
                 when {
                     state.isLoading -> {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            CircularProgressIndicator(
+                            ScreenLoadingIndicator(
                                 modifier = Modifier.align(Alignment.Center),
                             )
                         }

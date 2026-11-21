@@ -20,12 +20,14 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -34,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -52,6 +53,8 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.R
 import pl.masslany.podkop.business.search.domain.models.request.SearchSort
+import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
 import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.toWindowInsets
@@ -112,7 +115,7 @@ internal fun AdvancedSearchScreenContent(
                     Text(text = stringResource(id = R.string.topbar_label_advanced_search))
                 },
                 navigationIcon = {
-                    IconButton(onClick = actions::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
@@ -129,7 +132,7 @@ internal fun AdvancedSearchScreenContent(
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = contentInsets,
     ) { innerPaddingValues ->
-        PullToRefreshBox(
+        PodkopPullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = actions::onRefresh,
             modifier = Modifier
@@ -180,7 +183,7 @@ internal fun AdvancedSearchScreenContent(
                                     .padding(vertical = 32.dp),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                CircularProgressIndicator()
+                                ScreenLoadingIndicator()
                             }
                         }
                     }
@@ -318,7 +321,7 @@ private fun AdvancedSearchFiltersCard(
             },
             trailingIcon = {
                 if (state.query.isNotEmpty()) {
-                    IconButton(onClick = onClearQueryClicked) {
+                    IconButton(onClick = onClearQueryClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
                             contentDescription = null,
@@ -327,8 +330,8 @@ private fun AdvancedSearchFiltersCard(
                 }
             },
             isError = state.validationError == AdvancedSearchValidationError.QueryRequired,
-            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(
                 onSearch = { onSearchImeAction() },
             ),
         )

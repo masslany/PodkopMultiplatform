@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,6 +52,7 @@ fun TagDetails(
                     modifier = Modifier.size(32.dp),
                     onClick = actions::onBlacklistClicked,
                     enabled = !state.isBlacklistActionLoading,
+                    shapes = IconButtonDefaults.shapes(),
                 ) {
                     Icon(
                         modifier = Modifier.size(20.dp),
@@ -89,6 +91,7 @@ fun TagDetails(
                             modifier = Modifier.size(32.dp),
                             onClick = actions::onNotificationsClicked,
                             enabled = !state.isNotificationsActionLoading,
+                            shapes = IconButtonDefaults.shapes(),
                         ) {
                             Icon(
                                 modifier = Modifier.size(20.dp),
@@ -101,6 +104,7 @@ fun TagDetails(
                             modifier = Modifier.size(32.dp),
                             onClick = actions::onNotificationsClicked,
                             enabled = !state.isNotificationsActionLoading,
+                            shapes = IconButtonDefaults.shapes(),
                         ) {
                             Icon(
                                 modifier = Modifier.size(20.dp),

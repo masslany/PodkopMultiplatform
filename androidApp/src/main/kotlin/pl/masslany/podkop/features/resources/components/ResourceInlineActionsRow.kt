@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -87,6 +88,7 @@ internal fun ResourceInlineActionsRow(
                 enabled = isFavouriteActionEnabled,
                 modifier = Modifier.size(32.dp),
                 onClick = { onFavouriteClick?.invoke() },
+                shapes = IconButtonDefaults.shapes(),
             ) {
                 Icon(
                     modifier = Modifier.size(18.dp),
@@ -108,6 +110,7 @@ internal fun ResourceInlineActionsRow(
                 .size(32.dp)
                 .offset(12.dp),
             onClick = onMoreClick,
+            shapes = IconButtonDefaults.shapes(),
         ) {
             Icon(
                 modifier = Modifier

@@ -24,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -100,7 +101,7 @@ fun SearchScreenContent(
                     Text(text = stringResource(id = R.string.topbar_label_search))
                 },
                 navigationIcon = {
-                    IconButton(onClick = actions::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
@@ -147,6 +148,7 @@ fun SearchScreenContent(
                             onClick = {
                                 actions.onQueryChanged("")
                             },
+                            shapes = IconButtonDefaults.shapes(),
                         ) {
                             Icon(
                                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),

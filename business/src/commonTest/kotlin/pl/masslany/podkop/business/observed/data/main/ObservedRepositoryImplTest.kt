@@ -12,6 +12,7 @@ import pl.masslany.podkop.business.testsupport.fakes.FakeDispatcherProvider
 import pl.masslany.podkop.business.testsupport.fakes.FakeObservedDataSource
 import pl.masslany.podkop.common.pagination.PageRequest
 import pl.masslany.podkop.business.testsupport.fixtures.BusinessFixtures as Fixtures
+import pl.masslany.podkop.business.common.domain.models.common.Resource
 
 class ObservedRepositoryImplTest {
 
@@ -58,14 +59,14 @@ class ObservedRepositoryImplTest {
                     ObservedResource(
                         item = Fixtures.resourceItem(
                             id = 17,
-                            resource = pl.masslany.podkop.business.common.domain.models.common.Resource.Entry,
+                            resource = Resource.Entry,
                         ),
                         newContentCount = null,
                     ),
                     ObservedResource(
                         item = Fixtures.resourceItem(
                             id = 18,
-                            resource = pl.masslany.podkop.business.common.domain.models.common.Resource.Link,
+                            resource = Resource.Link,
                         ),
                         newContentCount = null,
                     ),

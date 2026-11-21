@@ -1,6 +1,7 @@
 package pl.masslany.podkop.testsupport.navigation
 
 import android.app.Application
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +31,7 @@ fun createTestAppNavigator(scope: CoroutineScope): AppNavigator = AppNavigator(
 private class TestNavigationConfigProvider : NavigationConfigProvider {
     override suspend fun resolveStartDestination(): NavTarget = HomeScreen
 
-    override val topLevelDestinations: Flow<kotlinx.collections.immutable.ImmutableList<TopLevelDestination>> =
+    override val topLevelDestinations: Flow<ImmutableList<TopLevelDestination>> =
         MutableStateFlow(persistentListOf())
 }
 

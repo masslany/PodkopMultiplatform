@@ -10,6 +10,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.decodeFromJsonElement
 import pl.masslany.podkop.business.common.data.network.models.common.ResourceItemDto
+import kotlinx.serialization.json.JsonEncoder
 
 /**
  * Normalizes two observed item response shapes into one DTO.
@@ -54,7 +55,7 @@ object ObservedItemDtoSerializer : KSerializer<ObservedItemDto> {
         encoder: Encoder,
         value: ObservedItemDto,
     ) {
-        val jsonEncoder = encoder as? kotlinx.serialization.json.JsonEncoder
+        val jsonEncoder = encoder as? JsonEncoder
             ?: throw SerializationException("Observed items can be encoded only to JSON")
         val element = if (value.newContentCount != null) {
             jsonEncoder.json.encodeToJsonElement(

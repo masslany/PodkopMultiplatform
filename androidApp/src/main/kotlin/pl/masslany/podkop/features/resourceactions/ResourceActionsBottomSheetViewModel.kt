@@ -2,6 +2,7 @@ package pl.masslany.podkop.features.resourceactions
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlin.random.Random
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -232,7 +233,7 @@ class ResourceActionsBottomSheetViewModel(
                 append('-')
                 append(commentId)
                 append('-')
-                append(kotlin.random.Random.nextInt())
+                append(Random.nextInt())
             }
             val result = appNavigator.awaitResult<ComposerResult>(
                 target = ComposerBottomSheetScreen(
@@ -261,7 +262,7 @@ class ResourceActionsBottomSheetViewModel(
                 append('-')
                 append(commentId)
                 append('-')
-                append(kotlin.random.Random.nextInt())
+                append(Random.nextInt())
             }
             val result = appNavigator.awaitResult<ComposerResult>(
                 target = ComposerBottomSheetScreen(

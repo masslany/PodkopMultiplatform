@@ -1,6 +1,6 @@
 @file:OptIn(
-    kotlinx.cinterop.BetaInteropApi::class,
-    kotlinx.cinterop.ExperimentalForeignApi::class,
+    BetaInteropApi::class,
+    ExperimentalForeignApi::class,
 )
 
 package pl.masslany.podkop.common.securestorage.infrastructure.main
@@ -43,6 +43,8 @@ import platform.Security.kSecMatchLimitOne
 import platform.Security.kSecReturnData
 import platform.Security.kSecValueData
 import pl.masslany.podkop.common.securestorage.api.SecureKeyValueStorage
+import kotlinx.cinterop.BetaInteropApi
+import kotlinx.cinterop.ExperimentalForeignApi
 
 /**
  * Stores values as generic passwords in the Keychain.

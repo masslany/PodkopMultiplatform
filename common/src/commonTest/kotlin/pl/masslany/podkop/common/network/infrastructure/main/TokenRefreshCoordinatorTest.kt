@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import io.ktor.http.HttpStatusCode
 
 class TokenRefreshCoordinatorTest {
 
@@ -86,7 +87,7 @@ class TokenRefreshCoordinatorTest {
             testHttpClient { request ->
                 requestedPaths += request.url.encodedPath
                 when (request.url.encodedPath) {
-                    "/api/v3/refresh-token" -> respondJson("{}", status = io.ktor.http.HttpStatusCode.InternalServerError)
+                    "/api/v3/refresh-token" -> respondJson("{}", status = HttpStatusCode.InternalServerError)
                     "/api/v3/auth" ->
                         respondJson(
                             """

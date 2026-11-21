@@ -7,17 +7,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,6 +32,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
 import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -89,7 +90,7 @@ fun NotificationsScreenContent(
                     Text(text = stringResource(id = R.string.topbar_label_notifications))
                 },
                 navigationIcon = {
-                    IconButton(onClick = actions::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
@@ -119,7 +120,7 @@ fun NotificationsScreenContent(
 
             HorizontalDivider()
 
-            PullToRefreshBox(
+            PodkopPullToRefreshBox(
                 isRefreshing = state.isRefreshing,
                 onRefresh = actions::onRefresh,
                 modifier = Modifier
@@ -128,7 +129,7 @@ fun NotificationsScreenContent(
                 when {
                     state.isLoading -> {
                         Box(modifier = Modifier.fillMaxSize()) {
-                            CircularProgressIndicator(
+                            ScreenLoadingIndicator(
                                 modifier = Modifier.align(Alignment.Center),
                             )
                         }

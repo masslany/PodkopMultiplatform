@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -36,10 +37,11 @@ import coil3.compose.AsyncImage
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.imageActions
 import pl.masslany.podkop.features.profile.models.ProfileAchievementItemState
+import pl.masslany.podkop.features.profile.models.ProfileAchievementsSectionState
 
 @Composable
 internal fun ProfileAchievementsSection(
-    state: pl.masslany.podkop.features.profile.models.ProfileAchievementsSectionState,
+    state: ProfileAchievementsSectionState,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -159,6 +161,24 @@ private fun ProfileAchievementBadge(
                         text = item.description,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                item.level?.let { level ->
+                    Text(
+                        text = stringResource(id = R.string.profile_badge_level, level),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                item.progress?.let { progress ->
+                    Text(
+                        text = stringResource(id = R.string.profile_badge_progress, progress),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    LinearWavyProgressIndicator(
+                        progress = { progress.coerceIn(0, 100) / 100f },
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
                 if (item.achievedAt.isNotBlank()) {

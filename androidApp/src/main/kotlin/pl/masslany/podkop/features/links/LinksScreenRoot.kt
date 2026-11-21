@@ -1,8 +1,5 @@
 package pl.masslany.podkop.features.links
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,15 +18,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -60,6 +55,9 @@ import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
+import pl.masslany.podkop.common.components.ScrollToTopFab
 import pl.masslany.podkop.common.components.StaleRefreshPill
 import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
@@ -186,7 +184,7 @@ fun LinksScreenContent(
                 title = { Text(text = getTopBarTitle(state.isUpcoming)) },
                 actions = {
                     if (state.isUpcoming && state.isLoggedIn) {
-                        IconButton(onClick = actions::onTopBarAddLinkClicked) {
+                        IconButton(onClick = actions::onTopBarAddLinkClicked, shapes = IconButtonDefaults.shapes()) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_add),
@@ -207,7 +205,7 @@ fun LinksScreenContent(
                 windowInsets = topBarInsets,
             )
 
-            PullToRefreshBox(
+            PodkopPullToRefreshBox(
                 isRefreshing = state.isRefreshing,
                 onRefresh = { actions.onRefresh(state.sortMenuState.selected) },
                 modifier = Modifier
@@ -216,7 +214,7 @@ fun LinksScreenContent(
             ) {
                 if (state.isLoading) {
                     Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(
+                        ScreenLoadingIndicator(
                             modifier = Modifier.align(Alignment.Center),
                         )
                     }
@@ -259,7 +257,7 @@ fun LinksScreenContent(
             },
         )
 
-        AnimatedVisibility(
+        ScrollToTopFab(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(
@@ -267,25 +265,12 @@ fun LinksScreenContent(
                     bottom = 16.dp + bottomPadding,
                 ),
             visible = showFab,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            FloatingActionButton(
-                onClick = {
-                    coroutineScope.launch {
-                        scrollToTop()
-                    }
-                },
-            ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_keyboard_arrow_up),
-                    contentDescription = stringResource(
-                        id = R.string.accessibility_fab_scroll_to_top,
-                    ),
-                )
-            }
-        }
+            onClick = {
+                coroutineScope.launch {
+                    scrollToTop()
+                }
+            },
+        )
 
         Box(
             modifier = Modifier

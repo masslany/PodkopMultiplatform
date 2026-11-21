@@ -4,6 +4,7 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,6 +24,7 @@ fun FeedTopBarActions(
     IconButton(
         onClick = onSearchClicked,
         modifier = modifier,
+        shapes = IconButtonDefaults.shapes(),
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_search),
@@ -34,6 +36,7 @@ fun FeedTopBarActions(
         IconButton(
             onClick = onNotificationsClicked,
             modifier = modifier,
+            shapes = IconButtonDefaults.shapes(),
         ) {
             BadgedBox(
                 badge = {

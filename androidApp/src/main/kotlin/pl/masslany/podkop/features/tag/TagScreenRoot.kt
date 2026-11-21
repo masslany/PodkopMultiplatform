@@ -1,8 +1,5 @@
 package pl.masslany.podkop.features.tag
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,17 +23,15 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -61,6 +56,9 @@ import org.koin.core.parameter.parametersOf
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.DropdownMenu
 import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.PodkopPullToRefreshBox
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
+import pl.masslany.podkop.common.components.ScrollToTopFab
 import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
 import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
 import pl.masslany.podkop.common.extensions.isScrollingUp
@@ -213,6 +211,7 @@ internal fun TagScreenContent(
                             }
                             actions.onGalleryModeToggled()
                         },
+                        shapes = IconButtonDefaults.shapes(),
                     ) {
                         Icon(
                             modifier = Modifier.size(24.dp),
@@ -234,7 +233,7 @@ internal fun TagScreenContent(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = actions::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             modifier = Modifier.size(24.dp),
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
@@ -249,38 +248,25 @@ internal fun TagScreenContent(
             )
         },
         floatingActionButton = {
-            AnimatedVisibility(
+            ScrollToTopFab(
                 visible = showFab,
-                enter = fadeIn(),
-                exit = fadeOut(),
-            ) {
-                FloatingActionButton(
-                    onClick = {
-                        coroutineScope.launch {
-                            scrollBehavior.state.heightOffset = 0f
-                            scrollBehavior.state.contentOffset = 0f
-                            if (state.isGalleryMode) {
-                                lazyStaggeredGridState.animateScrollToItem(0)
-                            } else {
-                                lazyListState.animateScrollToItem(0)
-                            }
+                onClick = {
+                    coroutineScope.launch {
+                        scrollBehavior.state.heightOffset = 0f
+                        scrollBehavior.state.contentOffset = 0f
+                        if (state.isGalleryMode) {
+                            lazyStaggeredGridState.animateScrollToItem(0)
+                        } else {
+                            lazyListState.animateScrollToItem(0)
                         }
-                    },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_keyboard_arrow_up),
-                        contentDescription = stringResource(
-                            id = R.string.accessibility_fab_scroll_to_top,
-                        ),
-                    )
-                }
-            }
+                    }
+                },
+            )
         },
         containerColor = MaterialTheme.colorScheme.surface,
         contentWindowInsets = contentInsets,
     ) { innerPaddingValues ->
-        PullToRefreshBox(
+        PodkopPullToRefreshBox(
             isRefreshing = state.isRefreshing,
             onRefresh = actions::onRefresh,
             modifier = Modifier
@@ -289,7 +275,7 @@ internal fun TagScreenContent(
         ) {
             if (state.isLoading) {
                 Box(modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(
+                    ScreenLoadingIndicator(
                         modifier = Modifier.align(Alignment.Center),
                     )
                 }

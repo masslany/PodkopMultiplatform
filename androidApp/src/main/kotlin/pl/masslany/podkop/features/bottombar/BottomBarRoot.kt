@@ -2,16 +2,16 @@ package pl.masslany.podkop.features.bottombar
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.WideNavigationRail
+import androidx.compose.material3.WideNavigationRailItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -55,7 +55,7 @@ private fun BottomBar(
     destinations: ImmutableList<BottomBarDestinationState>,
     onScreenChanged: (NavTarget) -> Unit,
 ) {
-    NavigationBar(
+    ShortNavigationBar(
         modifier = modifier,
     ) {
         destinations.forEach { bottomBarDestinationState ->
@@ -64,13 +64,12 @@ private fun BottomBar(
                 labelRes = bottomBarDestinationState.labelRes,
                 badgeCount = bottomBarDestinationState.badgeCount,
                 content = { itemModifier, icon, label ->
-                    NavigationBarItem(
+                    ShortNavigationBarItem(
                         modifier = itemModifier,
                         selected = bottomBarDestinationState.isSelected,
                         enabled = bottomBarDestinationState.isEnabled,
                         onClick = { onScreenChanged(bottomBarDestinationState.screen) },
                         icon = icon,
-                        alwaysShowLabel = true,
                         label = label,
                     )
                 },
@@ -86,7 +85,8 @@ fun SideBarRoot(
     modifier: Modifier = Modifier,
     onSizeChanged: ((Int) -> Unit)? = null,
 ) {
-    NavigationRail(
+    WideNavigationRail(
+        arrangement = Arrangement.Center,
         modifier = modifier
             .onSizeChanged { size ->
                 onSizeChanged?.invoke(size.width)
@@ -96,26 +96,24 @@ fun SideBarRoot(
                 clip = false,
             ),
     ) {
-        Spacer(modifier = Modifier.weight(1f))
         destinations.forEach { destination ->
             NavigationBarItemContent(
                 iconRes = destination.iconRes,
                 labelRes = destination.labelRes,
                 badgeCount = destination.badgeCount,
                 content = { itemModifier, icon, label ->
-                    NavigationRailItem(
+                    WideNavigationRailItem(
                         modifier = itemModifier,
+                        railExpanded = false,
                         selected = destination.isSelected,
                         enabled = destination.isEnabled,
                         onClick = { onScreenChanged(destination.screen) },
                         icon = icon,
                         label = label,
-                        alwaysShowLabel = true,
                     )
                 },
             )
         }
-        Spacer(modifier = Modifier.weight(1f))
     }
 }
 

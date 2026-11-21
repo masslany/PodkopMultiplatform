@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -44,7 +45,7 @@ internal fun AddLinkScreenRoot() {
             TopAppBar(
                 title = { Text(text = stringResource(id = R.string.topbar_label_add_link)) },
                 navigationIcon = {
-                    IconButton(onClick = actions::onTopBarBackClicked) {
+                    IconButton(onClick = actions::onTopBarBackClicked, shapes = IconButtonDefaults.shapes()) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
                             contentDescription = stringResource(id = R.string.accessibility_topbar_back),

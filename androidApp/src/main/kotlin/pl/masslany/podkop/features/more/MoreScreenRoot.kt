@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -22,6 +21,7 @@ import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.persistentListOf
 import org.koin.compose.viewmodel.koinViewModel
+import pl.masslany.podkop.common.components.ScreenLoadingIndicator
 import pl.masslany.podkop.common.models.NameColorType
 import pl.masslany.podkop.common.models.avatar.GenderIndicatorType
 import pl.masslany.podkop.common.preview.PodkopPreview
@@ -70,7 +70,7 @@ fun MoreScreenContent(
             modifier = modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator()
+            ScreenLoadingIndicator()
         }
     } else {
         Column(
@@ -85,6 +85,7 @@ fun MoreScreenContent(
                 state = state,
                 onProfileClicked = actions::onProfileClicked,
                 onLoginClicked = actions::onLoginClicked,
+                topInset = paddingValues.calculateTopPadding(),
             )
             LazyColumn(
                 modifier = modifier

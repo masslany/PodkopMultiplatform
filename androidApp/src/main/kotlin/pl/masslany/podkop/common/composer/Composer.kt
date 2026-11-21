@@ -23,6 +23,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -115,6 +116,7 @@ fun Composer(
                         .align(Alignment.End),
                     enabled = !state.isSubmitting,
                     onClick = onDismiss,
+                    shapes = IconButtonDefaults.shapes(),
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
@@ -295,6 +297,7 @@ fun Composer(
                             .size(28.dp),
                         enabled = areMediaActionsEnabled,
                         onClick = onPhotoRemoved,
+                        shapes = IconButtonDefaults.shapes(),
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_delete),
@@ -331,6 +334,7 @@ fun Composer(
                             focusManager.clearFocus()
                             onPhotoAttachClicked()
                         },
+                        shapes = IconButtonDefaults.shapes(),
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_add_photo),
@@ -370,6 +374,7 @@ private fun MarkdownActionButton(
     IconButton(
         enabled = enabled,
         onClick = onClick,
+        shapes = IconButtonDefaults.shapes(),
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(id = iconRes),

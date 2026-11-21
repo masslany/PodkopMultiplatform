@@ -18,6 +18,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -114,6 +115,7 @@ internal fun AddLinkTagChip(
             IconButton(
                 modifier = Modifier.size(18.dp),
                 onClick = onRemoveClicked,
+                shapes = IconButtonDefaults.shapes(),
             ) {
                 Icon(
                     modifier = Modifier.size(14.dp),
