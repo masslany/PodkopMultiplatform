@@ -377,10 +377,13 @@ private fun SwitchSettingRow(
     index: Int,
     count: Int,
 ) {
+    // A checked segment would otherwise morph into its selected pill shape and leave the group;
+    // the switch already shows the state.
+    val shapes = ListItemDefaults.segmentedShapes(index = index, count = count)
     SegmentedListItem(
         checked = checked,
         onCheckedChange = onCheckedChange,
-        shapes = ListItemDefaults.segmentedShapes(index = index, count = count),
+        shapes = shapes.copy(selectedShape = shapes.shape),
         colors = segmentedRowColors(),
         supportingContent = supportingText?.let { text -> { Text(text = text) } },
         trailingContent = {
