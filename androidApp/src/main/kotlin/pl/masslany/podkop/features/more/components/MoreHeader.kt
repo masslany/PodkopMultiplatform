@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import pl.masslany.podkop.R
@@ -42,6 +43,7 @@ fun MoreHeader(
     onProfileClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    topInset: Dp = 0.dp,
 ) {
     if (state.isLoggedIn) {
         val fallbackHeaderState = ProfileHeaderState(
@@ -75,6 +77,7 @@ fun MoreHeader(
     } else {
         MoreLoggedOutHeader(
             modifier = modifier,
+            topInset = topInset,
             onLoginClicked = onLoginClicked,
         )
     }
@@ -83,18 +86,21 @@ fun MoreHeader(
 @Composable
 private fun MoreLoggedOutHeader(
     onLoginClicked: () -> Unit,
+    topInset: Dp,
     modifier: Modifier = Modifier,
 ) {
+    // The background runs under the status bar; the card stays below it.
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(160.dp)
+            .heightIn(min = 160.dp)
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(1.dp)),
     ) {
         Card(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(
+                    top = topInset + 12.dp,
                     start = 16.dp,
                     end = 16.dp,
                     bottom = 12.dp,

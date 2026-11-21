@@ -85,6 +85,7 @@ fun MoreScreenContent(
                 state = state,
                 onProfileClicked = actions::onProfileClicked,
                 onLoginClicked = actions::onLoginClicked,
+                topInset = paddingValues.calculateTopPadding(),
             )
             LazyColumn(
                 modifier = modifier
