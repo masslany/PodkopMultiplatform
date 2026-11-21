@@ -1,0 +1,29 @@
+package pl.masslany.podkop.common.components.embed.video
+
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+/**
+ * Keeps a single inline video playing at a time across the whole app. [active] is the player last asked to
+ * play, until it pauses or leaves composition.
+ */
+internal object InlineVideoPlayback {
+    private val _active = MutableStateFlow<Any?>(null)
+    val active: StateFlow<Any?> = _active.asStateFlow()
+
+    fun claim(token: Any) {
+        _active.value = token
+    }
+
+    fun release(token: Any) {
+        _active.compareAndSet(token, null)
+    }
+}
+
+// Very tall or very wide clips would take over the feed; the player letterboxes the rest.
+internal fun Float.clampedVideoAspectRatio(): Float = coerceIn(MinVideoAspectRatio, MaxVideoAspectRatio)
+
+internal const val DefaultVideoAspectRatio = 16f / 9f
+private const val MinVideoAspectRatio = 4f / 5f
+private const val MaxVideoAspectRatio = 21f / 9f

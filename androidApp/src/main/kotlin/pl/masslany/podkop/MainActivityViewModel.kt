@@ -49,7 +49,7 @@ class MainActivityViewModel(
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
-            AppState.Initializing
+            AppState.Initializing,
         )
 
     private companion object {

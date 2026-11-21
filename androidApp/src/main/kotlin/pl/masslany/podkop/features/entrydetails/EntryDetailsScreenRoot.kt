@@ -1,0 +1,461 @@
+package pl.masslany.podkop.features.entrydetails
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
+import pl.masslany.podkop.R
+import pl.masslany.podkop.common.components.GenericErrorScreen
+import pl.masslany.podkop.common.components.pagination.PaginationErrorItem
+import pl.masslany.podkop.common.components.pagination.PaginationLoadingIndicator
+import pl.masslany.podkop.common.extensions.isScrollingUp
+import pl.masslany.podkop.common.extensions.toWindowInsets
+import pl.masslany.podkop.common.navigation.bottombar.LocalBottomBarScrollBehavior
+import pl.masslany.podkop.common.navigation.bottombar.nestedScrollConnection
+import pl.masslany.podkop.common.pagination.rememberLazyListPaginator
+import pl.masslany.podkop.common.preview.PodkopPreview
+import pl.masslany.podkop.common.theme.colorsPalette
+import pl.masslany.podkop.features.entrydetails.preview.EntryDetailsScreenStateProvider
+import pl.masslany.podkop.features.entrydetails.preview.NoOpEntryDetailsActions
+import pl.masslany.podkop.features.resources.components.ResourceItemRenderer
+import pl.masslany.podkop.features.resources.models.ResourceItemConfig
+import pl.masslany.podkop.features.resources.models.entrycomment.EntryCommentItemState
+
+private const val FAB_ITEMS_OFFSET = 10
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun EntryDetailsScreenRoot(
+    screen: EntryDetailsScreen,
+    paddingValues: PaddingValues,
+    showTopBar: Boolean = true,
+) {
+    val viewModel = koinViewModel<EntryDetailsViewModel>(
+        parameters = { parametersOf(screen) },
+    )
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val lazyListState = rememberLazyListPaginator(
+        shouldPaginate = { lastVisibleIndex, totalItems ->
+            viewModel.shouldPaginate(lastVisibleIndex, totalItems)
+        },
+        paginate = {
+            viewModel.paginate()
+        },
+    )
+    EntryDetailsScreenContent(
+        paddingValues = paddingValues,
+        showTopBar = showTopBar,
+        state = state,
+        actions = viewModel,
+        lazyListState = lazyListState,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EntryDetailsScreenContent(
+    paddingValues: PaddingValues,
+    showTopBar: Boolean,
+    state: EntryDetailsScreenState,
+    actions: EntryDetailsActions,
+    lazyListState: LazyListState,
+    modifier: Modifier = Modifier,
+) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val bottomBarScrollBehavior = LocalBottomBarScrollBehavior.current
+    val isScrollingUp = lazyListState.isScrollingUp()
+    val showFab by remember(isScrollingUp) {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex > FAB_ITEMS_OFFSET && isScrollingUp
+        }
+    }
+    val coroutineScope = rememberCoroutineScope()
+    val topBarInsets = paddingValues.toWindowInsets(includeBottom = false)
+    val contentInsets = paddingValues.toWindowInsets(includeTop = !showTopBar, includeBottom = false)
+    val scaffoldModifier = modifier
+        .fillMaxSize()
+        .let { baseModifier ->
+            if (showTopBar) {
+                baseModifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            } else {
+                baseModifier
+                    .nestedScroll(bottomBarScrollBehavior.nestedScrollConnection())
+            }
+        }
+
+    Scaffold(
+        modifier = scaffoldModifier,
+        topBar = {
+            if (showTopBar) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(
+                                id = R.string.topbar_label_entry,
+                            ),
+                        )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = actions::onTopBarBackClicked) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
+                                contentDescription = stringResource(
+                                    id = R.string.accessibility_topbar_back,
+                                ),
+                            )
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                    windowInsets = topBarInsets,
+                )
+            }
+        },
+        floatingActionButton = {
+            AnimatedVisibility(
+                visible = showFab,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
+                FloatingActionButton(
+                    onClick = {
+                        coroutineScope.launch {
+                            scrollBehavior.state.heightOffset = 0f
+                            scrollBehavior.state.contentOffset = 0f
+                            lazyListState.animateScrollToItem(0)
+                        }
+                    },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_keyboard_arrow_up),
+                        contentDescription = stringResource(
+                            id = R.string.accessibility_fab_scroll_to_top,
+                        ),
+                    )
+                }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentWindowInsets = contentInsets,
+    ) { innerPaddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPaddingValues),
+        ) {
+            PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = actions::onRefresh,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                if (state.isLoading) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                        )
+                    }
+                } else if (state.isError) {
+                    GenericErrorScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center),
+                        onRefreshClicked = actions::onRefresh,
+                    )
+                } else {
+                    EntryDetailsScreenList(
+                        modifier = Modifier.fillMaxSize(),
+                        state = state,
+                        actions = actions,
+                        lazyListState = lazyListState,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EntryDetailsScreenList(
+    modifier: Modifier = Modifier,
+    state: EntryDetailsScreenState,
+    actions: EntryDetailsActions,
+    lazyListState: LazyListState,
+) {
+    LazyColumn(
+        modifier = modifier.testTag(EntryDetailsTestTags.Screen.List),
+        state = lazyListState,
+        contentPadding = PaddingValues(
+            bottom = 16.dp +
+                WindowInsets
+                    .navigationBars
+                    .asPaddingValues()
+                    .calculateBottomPadding(),
+        ),
+    ) {
+        val replyActionsConfig = ResourceItemConfig(
+            showReplyAction = true,
+            renderEntryAsCard = true,
+        )
+
+        if (state.entry != null) {
+            item(
+                key = "Entry",
+            ) {
+                Column {
+                    ResourceItemRenderer(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp),
+                        state = state.entry,
+                        actions = actions,
+                        config = replyActionsConfig,
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+            }
+        }
+
+        if (state.isCommentsError) {
+            item(
+                key = "CommentsContextError",
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = stringResource(id = R.string.entry_details_screen_error_loading_comments),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+
+        val threadRows = state.threadRows
+        val threadActionsConfig = replyActionsConfig.copy(indentCommentBodyUnderAuthor = true)
+        if (threadRows != null) {
+            itemsIndexed(
+                items = threadRows,
+                key = { _, row -> row.key },
+                contentType = { _, row ->
+                    when (row) {
+                        is EntryThreadRowState.Comment -> row.item.contentType
+                        is EntryThreadRowState.MoreReplies -> "MoreReplies"
+                    }
+                },
+            ) { index, row ->
+                EntryThreadRow(
+                    row = row,
+                    // Threads are separated from each other, not from their own replies.
+                    showDivider = threadRows.getOrNull(index + 1)?.depth == 0,
+                    actions = actions,
+                    config = threadActionsConfig,
+                )
+            }
+        } else {
+            itemsIndexed(
+                items = state.comments,
+                key = { _, item -> item.id },
+                contentType = { _, item -> item.contentType },
+            ) { index, item ->
+                val lineColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                val authorColor = MaterialTheme.colorsPalette.nameGreen
+                val isCurrentUserComment = (item as? EntryCommentItemState)
+                    ?.authorState
+                    ?.name == state.currentUsername
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                        )
+                        .drawBehind {
+                            val lineWidth = 2.dp.toPx()
+                            drawRect(
+                                color = if (isCurrentUserComment && !state.currentUsername.isNullOrBlank()) {
+                                    authorColor
+                                } else {
+                                    lineColor
+                                },
+                                topLeft = Offset(0f, 0f),
+                                size = Size(lineWidth, size.height),
+                            )
+                        },
+                ) {
+                    Row(
+                        modifier = Modifier.padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        Spacer(Modifier.width(2.dp))
+
+                        ResourceItemRenderer(
+                            state = item,
+                            actions = actions,
+                            config = replyActionsConfig,
+                        )
+                    }
+
+                    if (index != state.comments.lastIndex) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(
+                                top = 16.dp,
+                                start = 16.dp,
+                            ),
+                        )
+                    }
+                }
+            }
+        }
+
+        if (state.isPaginating) {
+            item(
+                key = "PaginationLoadingIndicator",
+            ) {
+                PaginationLoadingIndicator()
+            }
+        }
+
+        if (state.isPaginationError) {
+            item(key = "PaginationError") {
+                PaginationErrorItem(onRetryClick = actions::paginate)
+            }
+        }
+    }
+}
+
+@Composable
+private fun EntryThreadRow(
+    row: EntryThreadRowState,
+    showDivider: Boolean,
+    actions: EntryDetailsActions,
+    config: ResourceItemConfig,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .threadConnectors(
+                depth = row.depth,
+                connectors = row.connectors,
+                // Middle of the avatar, or of the "more replies" button.
+                elbowY = if (row is EntryThreadRowState.Comment) 34.dp else 32.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            .padding(start = threadContentStart(row.depth), end = 16.dp),
+    ) {
+        when (row) {
+            is EntryThreadRowState.Comment -> ResourceItemRenderer(
+                modifier = Modifier.padding(top = 16.dp),
+                state = row.item,
+                actions = actions,
+                config = config,
+            )
+
+            is EntryThreadRowState.MoreReplies -> ShowMoreRepliesButton(
+                modifier = Modifier
+                    .padding(top = 12.dp)
+                    .testTag(EntryDetailsTestTags.Thread.moreReplies(row.parentId)),
+                row = row,
+                onClick = { actions.onShowMoreEntryRepliesClicked(row.parentId) },
+            )
+        }
+
+        if (showDivider) {
+            HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
+        }
+    }
+}
+
+@Composable
+private fun ShowMoreRepliesButton(
+    row: EntryThreadRowState.MoreReplies,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedButton(
+        modifier = modifier,
+        onClick = onClick,
+        enabled = !row.isLoading,
+    ) {
+        if (row.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(16.dp),
+                strokeWidth = 2.dp,
+            )
+            Spacer(Modifier.size(8.dp))
+        }
+        Text(
+            text = stringResource(
+                id = R.string.entry_details_button_show_more_replies,
+                row.remainingCount,
+            ),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun EntryDetailsScreenContentPreview(
+    @PreviewParameter(EntryDetailsScreenStateProvider::class) state: EntryDetailsScreenState,
+) {
+    PodkopPreview(darkTheme = false) {
+        EntryDetailsScreenContent(
+            paddingValues = PaddingValues(),
+            showTopBar = true,
+            state = state,
+            actions = NoOpEntryDetailsActions,
+            lazyListState = rememberLazyListState(),
+        )
+    }
+}

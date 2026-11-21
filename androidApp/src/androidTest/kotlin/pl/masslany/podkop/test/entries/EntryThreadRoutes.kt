@@ -9,7 +9,10 @@ import pl.masslany.podkop.test.support.MockApiServer
 object EntryThreadRoutes {
     const val THREADS_PATH = "/api/v3/entries-threads"
 
-    private val threadQuery = mapOf("sort" to "oldest", "limit" to "${EntryThreadFixtures.PAGE_SIZE}", "expanded" to "true")
+    private val threadQuery = mapOf(
+        "sort" to "oldest", "limit" to "${EntryThreadFixtures.PAGE_SIZE}",
+        "expanded" to "true",
+    )
 
     /**
      * An entry as a guest opens it with threaded comments on: the entry, and its thread, oldest

@@ -5,9 +5,7 @@ import pl.masslany.podkop.test.common.PodkopComposeRule
 import pl.masslany.podkop.test.common.robots.BaseRobot
 import pl.masslany.podkop.test.fixtures.LinkCommentFixtures
 
-class LinkDetailsRobot(
-    testRule: PodkopComposeRule,
-) : BaseRobot(testRule) {
+class LinkDetailsRobot(testRule: PodkopComposeRule) : BaseRobot(testRule) {
     /** Scrolls to the comment with [id], waiting for the page holding it to load. */
     fun scrollToComment(id: Int) {
         scrollToKey(

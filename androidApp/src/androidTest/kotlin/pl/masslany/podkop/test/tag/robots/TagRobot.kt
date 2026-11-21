@@ -3,9 +3,7 @@ package pl.masslany.podkop.test.tag.robots
 import pl.masslany.podkop.test.common.PodkopComposeRule
 import pl.masslany.podkop.test.common.robots.BaseRobot
 
-class TagRobot(
-    testRule: PodkopComposeRule,
-) : BaseRobot(testRule) {
+class TagRobot(testRule: PodkopComposeRule) : BaseRobot(testRule) {
     /** Checks the stream shows an entry's content or a link's title. */
     fun displayStreamItem(text: String) {
         displayedText(text)

@@ -12,16 +12,14 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToKey
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeUp
 
-open class BaseRobot(
-    private val testRule: AndroidComposeTestRule<*, *>,
-) {
+open class BaseRobot(private val testRule: AndroidComposeTestRule<*, *>) {
     protected fun displayedText(
         text: String,
         timeoutMillis: Long = DEFAULT_TIMEOUT_MS,

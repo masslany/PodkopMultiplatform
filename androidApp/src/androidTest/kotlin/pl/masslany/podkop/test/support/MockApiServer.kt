@@ -17,9 +17,7 @@ import okio.ByteString
 import okio.ByteString.Companion.encodeUtf8
 import okio.ByteString.Companion.toByteString
 
-class MockApiServer(
-    private val assets: AssetManager,
-) {
+class MockApiServer(private val assets: AssetManager) {
     private val server = MockWebServer()
     private val routes = CopyOnWriteArrayList<Route>()
     private val unmatchedRequests = CopyOnWriteArrayList<String>()

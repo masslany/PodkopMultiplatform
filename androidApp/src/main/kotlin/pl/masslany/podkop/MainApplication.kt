@@ -27,7 +27,8 @@ open class MainApplication : Application() {
     private val authRepository by inject<AuthRepository>()
     private val authSessionEvents by inject<AuthSessionEvents>()
     private val notificationsRepository by inject<NotificationsRepository>()
-    private val privateMessagesBackgroundNotificationsController by inject<PrivateMessagesBackgroundNotificationsController>()
+    private val privateMessagesBackgroundNotificationsController by
+        inject<PrivateMessagesBackgroundNotificationsController>()
     private val telemetrySettingsController by inject<TelemetrySettingsController>()
 
     override fun onCreate() {

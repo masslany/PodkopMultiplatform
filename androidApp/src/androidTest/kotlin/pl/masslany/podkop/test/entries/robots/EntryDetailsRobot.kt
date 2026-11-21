@@ -8,9 +8,7 @@ import pl.masslany.podkop.features.entrydetails.EntryDetailsTestTags
 import pl.masslany.podkop.test.common.PodkopComposeRule
 import pl.masslany.podkop.test.common.robots.BaseRobot
 
-class EntryDetailsRobot(
-    testRule: PodkopComposeRule,
-) : BaseRobot(testRule) {
+class EntryDetailsRobot(testRule: PodkopComposeRule) : BaseRobot(testRule) {
     /** Opens the entry the way tapping it in a feed does. */
     fun openEntry(id: Int) {
         onUiThread {

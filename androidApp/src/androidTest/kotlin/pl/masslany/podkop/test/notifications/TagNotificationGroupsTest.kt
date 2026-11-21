@@ -2,13 +2,13 @@ package pl.masslany.podkop.test.notifications
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.serialization.json.JsonObject
-import org.junit.Test
-import org.junit.runner.RunWith
-import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.junit.Test
+import org.junit.runner.RunWith
+import pl.masslany.podkop.business.notifications.domain.models.NotificationGroup
 import pl.masslany.podkop.test.common.BaseTest
 import pl.masslany.podkop.test.entries.EntryRoutes
 import pl.masslany.podkop.test.entries.EntryRoutes.signedInEntryDetails
@@ -85,5 +85,7 @@ class TagNotificationGroupsTest : BaseTest() {
     }
 
     private fun memberEntryId(): Int =
-        members.getValue("data").jsonArray.first().jsonObject.getValue("entry").jsonObject.getValue("id").jsonPrimitive.int
+        members.getValue("data").jsonArray.first().jsonObject
+            .getValue("entry").jsonObject
+            .getValue("id").jsonPrimitive.int
 }

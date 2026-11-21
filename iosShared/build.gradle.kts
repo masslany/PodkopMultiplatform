@@ -25,7 +25,7 @@ kotlin {
 
 /*
  * About-screen notices for the libraries actually linked into PodkopShared (iosArm64 klibs),
- * resolved at execution time; Android keeps its own list in composeApp.
+ * resolved at execution time; Android keeps its own list in androidApp.
  */
 val generateIosAboutDependenciesMetadata = tasks.register<GenerateAboutDependenciesMetadataTask>(
     "generateIosAboutDependenciesMetadata",
