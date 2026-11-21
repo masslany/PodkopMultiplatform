@@ -19,11 +19,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.TopAppBar
@@ -45,8 +46,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import pl.masslany.podkop.R
 import pl.masslany.podkop.common.components.ScreenLoadingIndicator
-import pl.masslany.podkop.common.components.SectionCard
-import pl.masslany.podkop.common.components.SectionCardDivider
+import pl.masslany.podkop.common.components.SegmentedSection
+import pl.masslany.podkop.common.components.segmentedRowColors
 import pl.masslany.podkop.common.extensions.toWindowInsets
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.common.settings.ThemeOverride
@@ -133,10 +134,12 @@ fun SettingsScreenContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 if (state.showPrivateMessagesBackgroundNotifications) {
-                    SectionCard(
+                    SegmentedSection(
                         title = stringResource(id = R.string.settings_headline_notifications),
                     ) {
                         SwitchSettingRow(
+                            index = 0,
+                            count = 1,
                             label = stringResource(id = R.string.settings_body_pm_notifications_toggle),
                             supportingText = stringResource(
                                 id = if (state.areSystemNotificationsEnabled) {
@@ -151,16 +154,19 @@ fun SettingsScreenContent(
                     }
                 }
 
-                SectionCard(
+                SegmentedSection(
                     title = stringResource(id = R.string.settings_headline_theme),
                 ) {
                     ThemeOverrideSelector(
+                        index = 0,
+                        count = 2,
                         selectedTheme = state.themeOverride,
                         onThemeSelected = actions::onThemeOverrideChanged,
                     )
 
-                    SectionCardDivider()
                     SwitchSettingRow(
+                        index = 1,
+                        count = 2,
                         label = stringResource(id = R.string.settings_body_dynamic_colors),
                         supportingText = null,
                         checked = state.dynamicColorsEnabled,
@@ -168,17 +174,20 @@ fun SettingsScreenContent(
                     )
                 }
 
-                SectionCard(
+                SegmentedSection(
                     title = stringResource(id = R.string.settings_headline_media),
                 ) {
                     SwitchSettingRow(
+                        index = 0,
+                        count = 2,
                         label = stringResource(id = R.string.settings_body_gif_autoplay),
                         supportingText = null,
                         checked = state.autoplayGifs,
                         onCheckedChange = actions::onAutoplayGifsChanged,
                     )
-                    SectionCardDivider()
                     SwitchSettingRow(
+                        index = 1,
+                        count = 2,
                         label = stringResource(id = R.string.settings_body_play_videos_inline),
                         supportingText = stringResource(
                             id = R.string.settings_body_play_videos_inline_supporting,
@@ -188,10 +197,12 @@ fun SettingsScreenContent(
                     )
                 }
 
-                SectionCard(
+                SegmentedSection(
                     title = stringResource(id = R.string.settings_headline_comments),
                 ) {
                     SwitchSettingRow(
+                        index = 0,
+                        count = 1,
                         label = stringResource(id = R.string.settings_body_threaded_entry_comments),
                         supportingText = stringResource(
                             id = R.string.settings_body_threaded_entry_comments_supporting,
@@ -201,17 +212,20 @@ fun SettingsScreenContent(
                     )
                 }
 
-                SectionCard(
+                SegmentedSection(
                     title = stringResource(id = R.string.settings_headline_privacy),
                 ) {
                     SwitchSettingRow(
+                        index = 0,
+                        count = 2,
                         label = stringResource(id = R.string.settings_body_analytics),
                         supportingText = null,
                         checked = state.analyticsEnabled,
                         onCheckedChange = actions::onAnalyticsCollectionChanged,
                     )
-                    SectionCardDivider()
                     SwitchSettingRow(
+                        index = 1,
+                        count = 2,
                         label = stringResource(id = R.string.settings_body_crash_reporting),
                         supportingText = null,
                         checked = state.crashReportingEnabled,
@@ -220,26 +234,31 @@ fun SettingsScreenContent(
                 }
 
                 if (state.showDebugTools) {
-                    SectionCard(
+                    SegmentedSection(
                         title = stringResource(id = R.string.settings_headline_debug),
                     ) {
                         ActionSettingRow(
+                            index = 0,
+                            count = 2,
                             label = stringResource(id = R.string.settings_body_open_debug),
                             buttonLabel = stringResource(id = R.string.settings_button_open_debug),
                             onClick = actions::onDebugToolsClicked,
                         )
-                        SectionCardDivider()
                         ActionSettingRow(
+                            index = 1,
+                            count = 2,
                             label = stringResource(id = R.string.settings_action_copy_diagnostics),
                             buttonLabel = stringResource(id = R.string.settings_button_copy),
                             onClick = actions::onCopyDiagnosticsClicked,
                         )
                     }
                 }
-                SectionCard(
+                SegmentedSection(
                     title = stringResource(id = R.string.settings_headline_support),
                 ) {
                     ActionSettingRow(
+                        index = 0,
+                        count = 1,
                         label = stringResource(id = R.string.settings_action_clear_cache),
                         buttonLabel = stringResource(id = R.string.settings_button_clear),
                         onClick = actions::onClearCacheClicked,
@@ -247,20 +266,21 @@ fun SettingsScreenContent(
                 }
 
                 if (state.showAccountSection) {
-                    SectionCard(
+                    SegmentedSection(
                         title = stringResource(id = R.string.settings_headline_account),
                     ) {
                         ActionSettingRow(
+                            index = 0,
+                            count = 1,
                             label = stringResource(id = R.string.settings_body_manage_blacklists),
                             buttonLabel = stringResource(id = R.string.settings_button_open),
                             onClick = actions::onManageBlacklistsClicked,
                         )
-                        SectionCardDivider()
                         Button(
                             modifier = Modifier
+                                .padding(top = 8.dp)
                                 .fillMaxWidth()
                                 .widthIn(max = 600.dp)
-                                .padding(16.dp)
                                 .align(Alignment.CenterHorizontally),
                             onClick = actions::onLogoutClicked,
                             colors = ButtonDefaults.buttonColors(
@@ -293,6 +313,8 @@ fun SettingsScreenContent(
 private fun ThemeOverrideSelector(
     selectedTheme: ThemeOverride,
     onThemeSelected: (ThemeOverride) -> Unit,
+    index: Int,
+    count: Int,
 ) {
     val options = listOf(
         ThemeOverride.AUTO to stringResource(id = R.string.settings_option_theme_auto),
@@ -300,10 +322,27 @@ private fun ThemeOverrideSelector(
         ThemeOverride.DARK to stringResource(id = R.string.settings_option_theme_dark),
     )
 
+    SegmentedListItem(
+        shapes = ListItemDefaults.segmentedShapes(index = index, count = count),
+        colors = segmentedRowColors(),
+        contentPadding = PaddingValues(16.dp),
+    ) {
+        ThemeOverrideButtons(
+            options = options,
+            selectedTheme = selectedTheme,
+            onThemeSelected = onThemeSelected,
+        )
+    }
+}
+
+@Composable
+private fun ThemeOverrideButtons(
+    options: List<Pair<ThemeOverride, String>>,
+    selectedTheme: ThemeOverride,
+    onThemeSelected: (ThemeOverride) -> Unit,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
     ) {
         options.forEachIndexed { index, (themeOverride, label) ->
@@ -335,34 +374,23 @@ private fun SwitchSettingRow(
     supportingText: String?,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    index: Int,
+    count: Int,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(
-            modifier = Modifier.weight(1f).padding(end = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyLarge,
+    SegmentedListItem(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
+        shapes = ListItemDefaults.segmentedShapes(index = index, count = count),
+        colors = segmentedRowColors(),
+        supportingContent = supportingText?.let { text -> { Text(text = text) } },
+        trailingContent = {
+            Switch(
+                checked = checked,
+                onCheckedChange = null,
             )
-            supportingText?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-        Switch(
-            checked = checked,
-            onCheckedChange = onCheckedChange,
-        )
+        },
+    ) {
+        Text(text = label)
     }
 }
 
@@ -371,22 +399,22 @@ private fun ActionSettingRow(
     label: String,
     buttonLabel: String,
     onClick: () -> Unit,
+    index: Int,
+    count: Int,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+    SegmentedListItem(
+        onClick = onClick,
+        shapes = ListItemDefaults.segmentedShapes(index = index, count = count),
+        colors = segmentedRowColors(),
+        trailingContent = {
+            Text(
+                text = buttonLabel,
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        },
     ) {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        TextButton(onClick = onClick) {
-            Text(text = buttonLabel)
-        }
+        Text(text = label)
     }
 }
 

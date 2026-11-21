@@ -1,14 +1,13 @@
 package pl.masslany.podkop.features.more.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,8 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import pl.masslany.podkop.R
-import pl.masslany.podkop.common.components.SectionCard
-import pl.masslany.podkop.common.components.SectionCardDivider
+import pl.masslany.podkop.common.components.SegmentedSection
+import pl.masslany.podkop.common.components.segmentedRowColors
 import pl.masslany.podkop.common.preview.PodkopPreview
 import pl.masslany.podkop.features.more.MoreActions
 import pl.masslany.podkop.features.more.models.MoreSectionItemState
@@ -38,19 +37,16 @@ fun MoreSectionCard(
     modifier: Modifier = Modifier,
 ) {
     if (section.items.isNotEmpty()) {
-        SectionCard(
+        SegmentedSection(
             modifier = modifier,
             title = stringResource(id = section.type.labelRes),
         ) {
             section.items.forEachIndexed { index, item ->
                 MoreSectionRow(
                     item = item,
+                    shapes = ListItemDefaults.segmentedShapes(index = index, count = section.items.size),
                     onClick = { actions.onSectionItemClicked(item.type) },
                 )
-
-                if (index < section.items.lastIndex) {
-                    SectionCardDivider()
-                }
             }
         }
     }
@@ -59,46 +55,47 @@ fun MoreSectionCard(
 @Composable
 private fun MoreSectionRow(
     item: MoreSectionItemState,
+    shapes: ListItemShapes,
     onClick: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 76.dp)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(
-            imageVector = ImageVector.vectorResource(id = item.type.iconRes),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        Text(
-            modifier = Modifier.weight(1f),
-            text = stringResource(id = item.type.titleRes),
-            style = MaterialTheme.typography.bodyLarge,
-        )
-
-        if (item.badgeCount != null && item.badgeCount > 0) {
-            Badge(
-                containerColor = MaterialTheme.colorScheme.error,
+    SegmentedListItem(
+        onClick = onClick,
+        shapes = shapes,
+        colors = segmentedRowColors(),
+        leadingContent = {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = item.type.iconRes),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        trailingContent = {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    text = item.badgeCount.toString(),
-                    color = MaterialTheme.colorScheme.onError,
+                if (item.badgeCount != null && item.badgeCount > 0) {
+                    Badge(
+                        containerColor = MaterialTheme.colorScheme.error,
+                    ) {
+                        Text(
+                            text = item.badgeCount.toString(),
+                            color = MaterialTheme.colorScheme.onError,
+                        )
+                    }
+                }
+                Icon(
+                    modifier = Modifier.rotate(180f),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-        }
-
-        Icon(
-            modifier = Modifier
-                .rotate(180f),
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_arrow_back),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        },
+    ) {
+        Text(
+            text = stringResource(id = item.type.titleRes),
+            style = MaterialTheme.typography.bodyLarge,
         )
     }
 }
